@@ -1,0 +1,21 @@
+#streamline {
+  --sl-bg: #ffffff;
+  --sl-overlay-bg: rgba(0, 0, 0, 0.75);
+
+  --sl-p: 1.5rem;
+  --sl-border-radius: 0.25rem;
+
+  --sl-search-h: 64px;
+
+  --wp-g2-light-gray-500: #e2e4e7;
+  --wp-g2-wordpress-blue: #007cba;
+}
+
+.streamline__inner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 9999999999;
+}
