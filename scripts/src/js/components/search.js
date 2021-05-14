@@ -6,8 +6,9 @@ import {
 
 /**
  * Search.
+ *
+ * @param {Object} props
  */
-
 export default function Search( props ) {
 	const Input = withFocusReturn( () => (
 		<InputControl

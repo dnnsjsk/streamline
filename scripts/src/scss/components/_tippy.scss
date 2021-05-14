@@ -1,0 +1,20 @@
+.streamline__tippy {
+  &-button {
+    color: #ffffff;
+    background: transparent;
+    box-shadow: none;
+    outline: none;
+    border-radius: 2px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    line-height: 1;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &:focus {
+      border-color: var(--wp-g2-blueberry);
+    }
+  }
+}

@@ -4,48 +4,44 @@
   margin: 0;
 
   &--sub {
-    padding: calc(var(--sl-p) / 8) var(--sl-p) calc(var(--sl-p) / 2) var(--sl-p);
     display: flex;
     flex-wrap: wrap;
+    padding: 0.25rem 0 0.5rem 0;
   }
 }
 
 .streamline__entry {
-  margin: 0;
-  cursor: pointer;
   transition: none;
+  display: flex;
+  margin: 0 var(--sl-p);
 
   & + & {
     border-top: 1px solid var(--wp-g2-light-gray-500);
   }
 
-  & > a {
-    width: 100%;
-    height: 100%;
-    padding: 1.25rem var(--sl-p) 1.25rem var(--sl-p);
+  h1 {
+    margin-top: 18px;
+    margin-right: var(--sl-p);
     line-height: 1;
-    font-size: 1.25rem;
+    font-size: 1rem;
+    font-weight: 500;
     transition: none;
     display: inline-block;
     box-sizing: border-box;
+    color: var(--wp-g2-dark-gray-900);
+    text-decoration: none;
+  }
+
+  .is-tertiary {
+    color: var(--wp-g2-blueberry-dark) !important;
 
     &:hover {
-      background-color: var(--wp-g2-wordpress-blue);
-      color: #ffffff !important;
-      text-decoration: underline;
+      box-shadow: inset 0 0 0 1px var(--wp-g2-blueberry-dark) !important;
     }
-  }
-
-  &:nth-child(odd) {
-    background-color: #fafafa;
-  }
-
-  &:nth-child(even) {
-    background-color: #fcfcfc;
   }
 
   &--sub {
     padding: 0;
-    margin: 0 1rem 0 0;
+    margin: 0.25rem 1rem 0 0;
   }
 }

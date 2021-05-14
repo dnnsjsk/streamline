@@ -1,16 +1,20 @@
 .streamline__search {
   .components-input-control {
-    border-radius: var(--sl-border-radius) var(--sl-border-radius) 0 0 !important;
+    border-radius: 0 0 0 !important;
   }
 
   .components-input-control__backdrop {
     border: none !important;
-    border-bottom: 1px solid var(--wp-g2-light-gray-500) !important;
+    border-bottom: 1px solid var(--sl-border-color) !important;
   }
 
   .components-input-control__input {
     padding: var(--sl-p) !important;
     height: var(--sl-search-h) !important;
     font-size: 1rem !important;
+  }
+
+  [aria-hidden="true"] {
+    box-shadow: none !important;
   }
 }

@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx wp-scripts start src/js/streamline.js  --output-path=../assets",
-    "build": "npx wp-scripts build src/js/streamline.js  --output-path=../assets"
+    "start": "npx wp-scripts start src/js/streamline.js",
+    "build": "npx wp-scripts build src/js/streamline.js"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +15,7 @@
     "@wordpress/blocks": "^7.0.5",
     "@wordpress/components": "^12.0.7",
     "@wordpress/compose": "^3.24.4",
+    "@wordpress/data": "^4.27.3",
     "@wordpress/element": "^2.19.1",
     "@wordpress/hooks": "^2.11.1",
     "@wordpress/i18n": "^3.18.0",
@@ -24,9 +25,11 @@
     "browser-sync-webpack-plugin": "^2.3.0",
     "deepdash-es": "^5.3.7",
     "lodash-es": "^4.17.21",
-    "toml": "^3.0.0"
+    "toml": "^3.0.0",
+    "zustand": "^3.5.0"
   },
   "dependencies": {
-    "@wordpress/data": "^4.27.3"
+    "@tippyjs/react": "^4.2.5",
+    "tippy.js": "^6.3.1"
   }
 }

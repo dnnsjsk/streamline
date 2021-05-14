@@ -1,0 +1,12 @@
+:host {
+  background: var(--sl-wp-g2-light-gray-100);
+  height: 100%;
+  width: calc(var(--sl-side-w) - 1px);
+  border-right: 1px solid var(--sl-border-color);
+
+  .container {
+    display: grid;
+    grid-auto-rows: max-content;
+    border-radius: 0;
+  }
+}

@@ -1,6 +1,6 @@
 .streamline__box {
   width: 100%;
-  height: calc(100% - var(--sl-search-h));
+  height: 100%;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -9,5 +9,14 @@
   max-height: 700px;
   z-index: 99999999999;
   background-color: var(--sl-bg);
-  border-radius: var(--sl-border-radius);
+  border-radius: 0;
+  display: grid;
+  overflow: hidden;
+
+  &-inner {
+    left: var(--sl-side-w);
+    position: absolute;
+    height: 100%;
+    width: calc(100% - var(--sl-side-w));
+  }
 }

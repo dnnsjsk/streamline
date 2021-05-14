@@ -1,0 +1,44 @@
+@mixin focus {
+  .focus {
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+
+    input,
+    button {
+      &:focus {
+        outline: none;
+      }
+    }
+
+    input {
+      padding-left: var(--sl-p);
+    }
+
+    &:before {
+      position: absolute;
+      content: '';
+      box-sizing: border-box;
+      left: 4px;
+      top: 4px;
+      width: calc(100% - 8px);
+      height: calc(100% - 9px);
+      pointer-events: none;
+    }
+
+    &:focus-within {
+      &:before {
+        box-shadow: inset 0 0 0 2px var(--sl-focus-color);
+      }
+    }
+
+    &.is-main {
+      &:before {
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+}

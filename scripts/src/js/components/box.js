@@ -1,52 +1,55 @@
-import { useEffect, useState } from '@wordpress/element';
-import { filterDeep } from 'deepdash-es/standalone';
+import { useEffect, useState } from "@wordpress/element";
+import { filterDeep } from "deepdash-es/standalone";
 
-import Entries from './entries';
-import Search from './search';
+import Sidebar from "./sidebar";
+import Entries from "./entries";
+import Search from "./search";
+
+import { useStore as useLocal } from "../store/local";
+import { useStore as useInternal } from "../store/internal";
 
 /**
- * App.
+ * Box.
  */
+export function Box() {
+  const active = useLocal((state) => state.active);
+  const menu = useInternal((state) => state.menu);
+  const [value, setValue] = useState("");
+  const [obj, setObj] = useState([]);
 
-export function Box( props ) {
-	const [ value, setValue ] = useState( '' );
-	const [ obj, setObj ] = useState( [] );
+  const data = menu;
 
-	const data = props.items;
+  function onValueChange(nextValue) {
+    setValue(nextValue);
 
-	function onValueChange( nextValue ) {
-		setValue( nextValue );
-		console.log( nextValue );
+    const newObj =
+      obj === null || nextValue === ""
+        ? data
+        : filterDeep(
+            data.filter((val) => Object.keys(val).length !== 0),
+            function (o) {
+              return o.name.toLowerCase().includes(nextValue.toLowerCase());
+            },
+            { childrenPath: ["children"] }
+          );
 
-		const newObj =
-			obj === null || nextValue === ''
-				? data
-				: filterDeep(
-						obj.filter(
-							( val ) => Object.keys( val ).length !== 0
-						),
-						function ( o ) {
-							return o.name
-								.toLowerCase()
-								.includes( nextValue.toLowerCase() );
-						},
-						{ childrenPath: 'children' }
-				  );
+    setObj(newObj);
+  }
 
-		setObj( newObj );
-	}
+  useEffect(() => {
+    setObj(data);
+  }, []);
 
-	useEffect( () => {
-		setObj( data );
-	}, [] );
-
-	return (
-		<div className="streamline__box">
-			<Search
-				value={ value }
-				onChange={ ( nextValue ) => onValueChange( nextValue ) }
-			/>
-			<Entries items={ obj } />
-		</div>
-	);
+  return (
+    <div className="streamline__box">
+      <Sidebar />
+      <div className="streamline__box-inner">
+        <Search
+          value={value}
+          onChange={(nextValue) => onValueChange(nextValue)}
+        />
+        {active === "menu" ? <Entries items={obj} /> : ""}
+      </div>
+    </div>
+  );
 }
