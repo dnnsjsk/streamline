@@ -69,7 +69,7 @@ class Init {
 	 */
 	public static function addCss() {
 
-		$str = file_get_contents( STREAMLINE_DIR . '/assets/build/streamline.min.css' );
+		$str = file_get_contents( STREAMLINE_DIR . '/assets/build/streamline.css' );
 
 		add_action( 'wp_head', function () use ( &$str ) {
 

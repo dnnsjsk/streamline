@@ -44,7 +44,11 @@ export class StreamlineButton {
       <div class={'focus' + (this.type ? ` ${this.type}` : '')}>
         <button
           onClick={() => this.handleClick()}
-          class={'container' + (this.type ? ` ${this.type}` : '')}
+          class={
+            'container' +
+            (this.type ? ` ${this.type}` : '') +
+            (stateLocal.active === this.icon ? ` is-active` : '')
+          }
         >
           {this.icon === 'wordpress'
             ? iconWordpress

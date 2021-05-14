@@ -44,11 +44,18 @@
         width: 1.25rem;
       }
 
-      &:hover {
+      &:hover,
+      &.is-active {
         color: var(--sl-wp-g2-blueberry-dark);
 
         svg {
           fill: var(--sl-wp-g2-blueberry-dark);
+        }
+      }
+
+      &.is-active {
+        span {
+          font-weight: 600;
         }
       }
 
