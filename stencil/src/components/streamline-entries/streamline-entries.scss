@@ -1,15 +1,24 @@
 :host {
-  --sl-entry-space: 1rem;
+  --sl-entry-space: var(--sl-s-4);
+
+  h1 {
+    margin: var(--sl-s-8) var(--sl-s) var(--sl-s-4) var(--sl-s);
+    padding-bottom: calc(var(--sl-s) / 2);
+    border-bottom: 1px dotted var(--sl-wp-g2-dark-gray-700);
+    font-weight: 500;
+    font-size: 1.5rem;
+    color: var(--sl-wp-g2-dark-gray-900);
+  }
 
   ul {
     padding: 0;
+    margin: 0;
     list-style-type: none;
   }
 
   .container {
     height: calc(100% - var(--sl-side-w));
     overflow: auto;
-    margin: 0;
     display: none;
 
     &-sub {
@@ -22,17 +31,17 @@
   .entry {
     transition: none;
     display: flex;
-    margin: 0 var(--sl-p);
+    margin: 0 var(--sl-s);
     padding: 0;
 
     & + .entry {
       border-top: 1px solid var(--sl-wp-g2-light-gray-500);
     }
 
-    h1 {
+    h2 {
       white-space: nowrap;
       margin-top: calc(var(--sl-entry-space) + 0.125rem);
-      margin-right: var(--sl-p);
+      margin-right: var(--sl-s);
       line-height: 1;
       font-size: 1rem;
       font-weight: 500;
@@ -43,17 +52,9 @@
       text-decoration: none;
     }
 
-    .is-tertiary {
-      color: var(--wp-g2-blueberry-dark);
-
-      &:hover {
-        box-shadow: inset 0 0 0 1px var(--sl-wp-g2-blueberry-dark);
-      }
-    }
-
     &-sub {
       padding: 0;
-      margin: var(--sl-entry-space) var(--sl-entry-space) 0 0;
+      margin: var(--sl-entry-space) 0 0;
     }
   }
 }

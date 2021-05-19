@@ -1,17 +1,28 @@
 :host {
   @include focus;
+  position: relative;
+  display: inline-flex;
+
+  .focus {
+    &:hover {
+      & + .icon {
+        opacity: 1;
+      }
+    }
+  }
 
   .container {
     cursor: pointer;
 
     &.is-main {
-      font-size: 0.8rem;
-      padding: 0.5rem;
+      font-size: var(--sl-text-sm);
+      padding: var(--sl-s-2-5) var(--sl-s-3);
       line-height: 1;
       border: 1px solid var(--sl-wp-g2-light-gray-300);
       background: var(--sl-wp-g2-light-gray-100);
       color: var(--sl-wp-g2-blueberry);
       min-width: 75px;
+      transition: border-color var(--sl-transition-fast);
 
       &:hover {
         border-color: var(--sl-wp-g2-blueberry);
@@ -30,26 +41,28 @@
       width: 100%;
       background: transparent;
       border-bottom: 1px solid var(--sl-wp-g2-light-gray-500);
+      transition: color var(--sl-transition-fast);
 
       span {
-        font-size: 11px;
+        font-size: var(--sl-text-xs);
         font-weight: 500;
         text-transform: uppercase;
-        margin-top: 4px;
+        margin-top: var(--sl-s-1-5);
         display: inline-block;
       }
 
       svg {
-        height: 1.25rem;
-        width: 1.25rem;
+        height: var(--sl-text-xl);
+        width: var(--sl-text-xl);
+        transition: fill var(--sl-transition-fast);
       }
 
       &:hover,
       &.is-active {
-        color: var(--sl-wp-g2-blueberry-dark);
+        color: var(--sl-wp-g2-blueberry);
 
         svg {
-          fill: var(--sl-wp-g2-blueberry-dark);
+          fill: var(--sl-wp-g2-blueberry);
         }
       }
 
@@ -66,10 +79,12 @@
         height: calc(var(--sl-side-w) - 1px);
         width: var(--sl-side-w);
         border-bottom: 1px solid var(--sl-wp-g2-dark-gray-900);
+        transition: all var(--sl-transition-fast);
+        transition-property: background, border-color;
 
         svg {
-          height: 1.5rem;
-          width: 1.5rem;
+          height: var(--sl-s-6);
+          width: var(--sl-s-6);
           fill: currentColor;
         }
 
@@ -78,6 +93,33 @@
           border-color: var(--sl-wp-g2-dark-gray-700);
         }
       }
+    }
+  }
+
+  .icon {
+    background: none;
+    position: relative;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    padding: 0 var(--sl-s-2);
+    opacity: 0;
+    left: -1px;
+    transition: opacity var(--sl-transition-fast);
+
+    &:hover,
+    &:focus {
+      opacity: 1;
+      color: var(--sl-wp-g2-blueberry);
+    }
+
+    svg {
+      margin-left: 1px;
+      height: var(--sl-s-2-5);
+      width: var(--sl-s-2-5);
     }
   }
 }

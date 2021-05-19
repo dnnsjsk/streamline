@@ -1,0 +1,1 @@
+import{c as e}from"./p-a5ba57ee.js";const{state:s,onChange:i}=e({visible:!0,entries:[],entriesActive:[]});i("visible",(e=>{s.visible=e})),i("entries",(e=>{s.entries=e})),i("entriesActive",(e=>{s.entriesActive=e}));export{s}

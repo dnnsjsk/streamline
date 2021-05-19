@@ -25,45 +25,58 @@ export class StreamlineEntries {
   }
 
   private renderEntries() {
-    return [stateInternal.entriesActive].map((item) => {
-      return Object.values(item).map((itemInner, indexInner) => {
+    return (
+      stateInternal.entriesActive !== null &&
+      Object.values(stateInternal.entriesActive).map((item) => {
         return (
-          <li key={indexInner} class="entry">
-            <h1>{itemInner.name}</h1>
-            {itemInner.children && (
-              <ul class="container-sub">
-                {Object.values(itemInner.children).map((itemSub, indexSub) => {
-                  if (
-                    indexInner + 1 === itemInner.children.length &&
-                    indexSub + 1 === Object.values(itemInner.children).length
-                  ) {
-                    // console.log(this.el.shadowRoot);
-                  }
-                  return (
-                    <li key={indexSub} class="entry-sub">
-                      <streamline-button
-                        type="is-main"
-                        text={
-                          // @ts-ignore
-                          itemSub.name
-                        }
-                      />
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </li>
+          <div>
+            <h1>{item.name}</h1>
+            <ul>
+              {item.children.map((itemInner, indexInner) => {
+                return (
+                  <li key={indexInner} class="entry">
+                    <h2>{itemInner.name}</h2>
+                    {itemInner.children && (
+                      <ul class="container-sub">
+                        {Object.values(itemInner.children).map(
+                          (itemSub, indexSub) => {
+                            if (
+                              indexInner + 1 === itemInner.children.length &&
+                              indexSub + 1 ===
+                                Object.values(itemInner.children).length
+                            ) {
+                              // console.log(this.el.shadowRoot);
+                            }
+                            return (
+                              <li key={indexSub} class="entry-sub">
+                                <streamline-button
+                                  type="is-main"
+                                  text={
+                                    // @ts-ignore
+                                    itemSub.name
+                                  }
+                                />
+                              </li>
+                            );
+                          }
+                        )}
+                      </ul>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         );
-      });
-    });
+      })
+    );
   }
 
   render() {
     return (
-      <ul tabIndex={-1} class="container">
-        {stateInternal.entriesActive && this.renderEntries()}
-      </ul>
+      <div class="container" tabIndex={-1}>
+        {stateInternal.entries && this.renderEntries()}
+      </div>
     );
   }
 }

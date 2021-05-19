@@ -15,15 +15,13 @@ export class StreamlineContainer {
   connectedCallback() {
     hotkeys('command+k', function () {
       stateInternal.visible = !stateInternal.visible;
-
-      console.log(stateInternal.visible);
       return false;
     });
   }
 
   componentDidLoad() {
-    const obj = [];
-    const go = {};
+    let data = [];
+    const menu = [];
 
     document.querySelectorAll('.menu-top > a').forEach((item) => {
       const name = (item as HTMLElement).innerText.replace(
@@ -47,18 +45,24 @@ export class StreamlineContainer {
         });
       }
 
-      obj.push({
+      menu.push({
         name,
         href,
         children: subArr,
       });
     });
 
-    obj.push(go);
+    data = [
+      ...data,
+      {
+        type: 'menu',
+        name: 'Navigate to',
+        children: menu,
+      },
+    ];
 
-    stateInternal.entriesAll = obj;
-    stateInternal.entriesMenu = obj;
-    stateInternal.entriesActive = obj;
+    stateInternal.entries = data;
+    stateInternal.entriesActive = data;
   }
 
   render() {
@@ -66,7 +70,11 @@ export class StreamlineContainer {
       <Host>
         {stateInternal.visible && (
           <div class="container">
-            <div class="overlay" />
+            <div
+              tabIndex={-1}
+              class="overlay"
+              onClick={() => (stateInternal.visible = false)}
+            />
             <streamline-box />
           </div>
         )}

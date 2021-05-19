@@ -3,6 +3,7 @@ import { Component, Element, h, State, Host } from '@stencil/core';
 import { filterDeep } from 'deepdash-es/standalone';
 import { stateInternal } from '../../store/internal';
 import { stateLocal } from '../../store/local';
+import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 
 /**
  * Box.
@@ -18,21 +19,38 @@ export class StreamlineBox {
 
   @State() value: string;
 
+  connectedCallback() {
+    disableBodyScroll(this.el);
+
+    stateInternal.entriesActive = stateInternal.entries;
+  }
+
+  componentDidLoad() {
+    setTimeout(() => {
+      this.el.shadowRoot.querySelector('input').focus();
+    }, 50);
+  }
+
+  disconnectedCallback() {
+    clearAllBodyScrollLocks();
+  }
+
   private handleChange(event) {
     this.value = event.target.value;
 
-    stateInternal.entriesActive =
-      this.value === ''
-        ? stateInternal.entriesMenu
-        : filterDeep(
-            stateInternal.entriesMenu.filter(
-              (val) => Object.keys(val).length !== 0
-            ),
-            (o) => {
-              return o.name.toLowerCase().includes(this.value.toLowerCase());
-            },
-            { childrenPath: ['children'] }
-          );
+    const filter = filterDeep(
+      stateInternal.entries.filter((val) => Object.keys(val).length !== 0),
+      (o) => {
+        return o.name.toLowerCase().includes(this.value.toLowerCase());
+      },
+      { childrenPath: ['children'] }
+    );
+
+    if (this.value === '') {
+      stateInternal.entriesActive = stateInternal.entries;
+    } else if (filter !== null || filter !== '') {
+      stateInternal.entriesActive = filter;
+    }
   }
 
   render() {
