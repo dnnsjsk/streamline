@@ -9,7 +9,13 @@ export namespace Components {
     interface StreamlineBox {
     }
     interface StreamlineButton {
+        "favourite": boolean;
+        "header": string;
+        "href": string;
         "icon": string;
+        "index": number;
+        "indexInner": number;
+        "indexSub": number;
         "text": string;
         "type": string;
     }
@@ -63,7 +69,13 @@ declare namespace LocalJSX {
     interface StreamlineBox {
     }
     interface StreamlineButton {
+        "favourite"?: boolean;
+        "header"?: string;
+        "href"?: string;
         "icon"?: string;
+        "index"?: number;
+        "indexInner"?: number;
+        "indexSub"?: number;
         "text"?: string;
         "type"?: string;
     }

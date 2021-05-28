@@ -4,6 +4,7 @@ const { state, onChange } = createStore({
   visible: true,
   entries: [],
   entriesActive: [],
+  entriesFavourites: [],
 });
 
 onChange('visible', (value) => {
@@ -16,6 +17,10 @@ onChange('entries', (value) => {
 
 onChange('entriesActive', (value) => {
   state.entriesActive = value;
+});
+
+onChange('entriesFavourites', (value) => {
+  state.entriesFavourites = value;
 });
 
 export { state as stateInternal };

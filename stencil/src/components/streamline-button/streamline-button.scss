@@ -3,6 +3,10 @@
   position: relative;
   display: inline-flex;
 
+  a {
+    text-decoration: none;
+  }
+
   .focus {
     &:hover {
       & + .icon {
@@ -13,6 +17,9 @@
 
   .container {
     cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+    border-radius: var(--sl-border-radius);
 
     &.is-main {
       font-size: var(--sl-text-sm);
@@ -45,7 +52,7 @@
 
       span {
         font-size: var(--sl-text-xs);
-        font-weight: 500;
+        font-weight: 600;
         text-transform: uppercase;
         margin-top: var(--sl-s-1-5);
         display: inline-block;
@@ -66,12 +73,6 @@
         }
       }
 
-      &.is-active {
-        span {
-          font-weight: 600;
-        }
-      }
-
       &.is-primary {
         --sl-focus-color: var(--sl-wp-g2-blueberry);
         background: var(--sl-wp-g2-dark-gray-900);
@@ -79,8 +80,7 @@
         height: calc(var(--sl-side-w) - 1px);
         width: var(--sl-side-w);
         border-bottom: 1px solid var(--sl-wp-g2-dark-gray-900);
-        transition: all var(--sl-transition-fast);
-        transition-property: background, border-color;
+        transition: border-color var(--sl-transition-fast);
 
         svg {
           height: var(--sl-s-6);
@@ -92,6 +92,31 @@
           background: var(--sl-wp-g2-dark-gray-700);
           border-color: var(--sl-wp-g2-dark-gray-700);
         }
+      }
+    }
+
+    &.is-header {
+      height: var(--sl-s-8);
+      width: var(--sl-s-8);
+      padding: 0;
+      background: transparent;
+      color: var(--sl-wp-g2-dark-gray-700);
+      background: var(--sl-wp-g2-light-gray-100);
+      border: 1px solid var(--sl-border-color);
+      transition: border-color var(--transition-fast);
+
+      &:hover {
+        border-color: var(--sl-wp-g2-blueberry);
+      }
+
+      svg {
+        margin-top: var(--sl-s-1);
+        height: var(--sl-s-3-5);
+        width: var(--sl-s-3-5);
+      }
+
+      &.is-active {
+        color: var(--sl-wp-g2-blueberry);
       }
     }
   }
@@ -108,12 +133,17 @@
     padding: 0 var(--sl-s-2);
     opacity: 0;
     left: -1px;
-    transition: opacity var(--sl-transition-fast);
+    outline: none;
 
     &:hover,
     &:focus {
       opacity: 1;
       color: var(--sl-wp-g2-blueberry);
+    }
+
+    &.is-favourite {
+      opacity: 1;
+      color: var(--sl-wp-g2-blueberry-dark);
     }
 
     svg {

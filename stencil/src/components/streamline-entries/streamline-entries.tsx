@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, h, Element } from '@stencil/core';
 import { stateInternal } from '../../store/internal';
+import { stateLocal } from '../../store/local';
 
 /**
  * Entries.
@@ -27,10 +28,19 @@ export class StreamlineEntries {
   private renderEntries() {
     return (
       stateInternal.entriesActive !== null &&
-      Object.values(stateInternal.entriesActive).map((item) => {
+      Object.values(stateInternal.entriesActive).map((item, index) => {
         return (
           <div>
-            <h1>{item.name}</h1>
+            <div class="header">
+              <h1>{item.name}</h1>
+              <div class="header__buttons">
+                <streamline-button
+                  header="favourite"
+                  type="is-header"
+                  icon="heart"
+                />
+              </div>
+            </div>
             <ul>
               {item.children.map((itemInner, indexInner) => {
                 return (
@@ -55,6 +65,26 @@ export class StreamlineEntries {
                                     // @ts-ignore
                                     itemSub.name
                                   }
+                                  href={
+                                    // @ts-ignore
+                                    itemSub.href
+                                  }
+                                  favourite={
+                                    // @ts-ignore
+                                    itemSub.favourite
+                                  }
+                                  index={
+                                    // @ts-ignore
+                                    index
+                                  }
+                                  indexInner={
+                                    // @ts-ignore
+                                    itemInner.index
+                                  }
+                                  indexSub={
+                                    // @ts-ignore
+                                    itemSub.index
+                                  }
                                 />
                               </li>
                             );
@@ -74,7 +104,7 @@ export class StreamlineEntries {
 
   render() {
     return (
-      <div class="container" tabIndex={-1}>
+      <div class={`container ${stateLocal.menuMode}`} tabIndex={-1}>
         {stateInternal.entries && this.renderEntries()}
       </div>
     );

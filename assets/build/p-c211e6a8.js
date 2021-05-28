@@ -1,0 +1,1 @@
+import{a,s as r}from"./p-51a53fca.js";import{f as t}from"./p-11c260a1.js";function s(){return t(a.entries.filter((a=>0!==Object.keys(a).length)),(a=>!0===a.favourite),{childrenPath:["children"]})}function n(){let t=[];"favourite"===r.menuMode&&(t=s(),a.entriesActive=t),""!==r.menuMode&&null!==t||(a.entriesActive=a.entries)}export{s as g,n as s}

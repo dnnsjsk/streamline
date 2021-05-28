@@ -4,6 +4,8 @@
     position: relative;
     display: flex;
     width: 100%;
+    outline: none;
+    border-radius: var(--sl-border-radius);
 
     &:hover + .focus {
       .icon {
@@ -12,7 +14,8 @@
     }
 
     input,
-    button {
+    button,
+    a {
       &:focus {
         outline: none;
       }
@@ -23,6 +26,7 @@
     }
 
     &:before {
+      border-radius: var(--sl-border-radius);
       position: absolute;
       content: '';
       box-sizing: border-box;
@@ -41,7 +45,8 @@
     }
 
     &.is-main,
-    &.is-icon {
+    &.is-icon,
+    &.is-header {
       &:before {
         left: 0;
         top: 0;

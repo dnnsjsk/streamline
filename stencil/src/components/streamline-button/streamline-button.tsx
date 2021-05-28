@@ -1,6 +1,11 @@
 // eslint-disable-next-line no-unused-vars
-import { Component, h, Prop, Host } from '@stencil/core';
+import { Component, h, Host, Prop } from '@stencil/core';
 import { stateLocal } from '../../store/local';
+import { stateInternal } from '../../store/internal';
+import { without } from 'lodash-es';
+import { setFavourites } from '../../utils/setFavourites';
+import { getFavourites } from '../../utils/getFavourites';
+// import { filterDeep } from 'deepdash-es/standalone';
 
 /**
  * Box.
@@ -11,14 +16,65 @@ import { stateLocal } from '../../store/local';
   styleUrl: 'streamline-button.scss',
 })
 export class StreamlineButton {
+  @Prop({ reflect: true, mutable: true }) favourite: boolean;
+  @Prop({ reflect: true }) header: string;
+  @Prop({ reflect: true }) href: string;
   @Prop({ reflect: true }) icon: string;
+  @Prop({ reflect: true }) index: number;
+  @Prop({ reflect: true }) indexInner: number;
+  @Prop({ reflect: true }) indexSub: number;
   @Prop({ reflect: true }) text: string;
   @Prop({ reflect: true }) type: string;
 
   private handleClick() {
-    if (this.icon === 'menu' || this.icon === 'tasks') {
+    if (this.type === 'is-sidebar') {
       stateLocal.active = this.icon;
     }
+
+    if (this.type === 'is-header') {
+      if (stateLocal.menuMode === this.header) {
+        stateLocal.menuMode = '';
+      } else {
+        stateLocal.menuMode = this.header;
+      }
+
+      setFavourites();
+    }
+  }
+
+  private handleFavClick() {
+    /**
+     * Update favourites.
+     */
+    if (stateLocal.favourites.includes(this.href)) {
+      stateLocal.favourites = without(stateLocal.favourites, this.href);
+      this.favourite = false;
+    } else {
+      stateLocal.favourites = [...stateLocal.favourites, this.href];
+      this.favourite = true;
+    }
+
+    /**
+     * Update current object.
+     */
+    const obj = stateInternal.entries;
+    obj[this.index].children[this.indexInner].children[
+      this.indexSub
+    ].favourite = this.favourite;
+
+    stateInternal.entries = obj;
+    stateInternal.entriesFavourites = getFavourites();
+  }
+
+  private static getHeart() {
+    return (
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        <path
+          fill="currentColor"
+          d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"
+        />
+      </svg>
+    );
   }
 
   render() {
@@ -40,37 +96,55 @@ export class StreamlineButton {
       </svg>
     );
 
-    const iconHeart = (
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-        <path
-          fill="currentColor"
-          d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"
-        />
-      </svg>
-    );
+    const icon =
+      this.icon === 'wordpress'
+        ? iconWordpress
+        : this.icon === 'menu'
+        ? iconMenu
+        : this.icon === 'tasks'
+        ? iconTasks
+        : this.icon === 'heart' && StreamlineButton.getHeart();
+
+    const text = this.text && <span>{this.text}</span>;
+
+    const className =
+      'container' +
+      (this.type ? ` ${this.type}` : '') +
+      (stateLocal.menuMode === this.header ? ' is-active' : '') +
+      (this.type === 'is-sidebar' && stateLocal.active === this.icon
+        ? ` is-active`
+        : '');
 
     return (
       <Host>
         <div class={'focus' + (this.type ? ` ${this.type}` : '')}>
-          <button
-            onClick={() => this.handleClick()}
-            class={
-              'container' +
-              (this.type ? ` ${this.type}` : '') +
-              (stateLocal.active === this.icon ? ` is-active` : '')
-            }
-          >
-            {this.icon === 'wordpress'
-              ? iconWordpress
-              : this.icon === 'menu'
-              ? iconMenu
-              : this.icon === 'tasks' && iconTasks}
-            {this.text && <span>{this.text}</span>}
-          </button>
+          {this.type === 'is-main' && this.href ? (
+            <a
+              href={this.href}
+              onClick={() => this.handleClick()}
+              class={className}
+            >
+              {icon}
+              {text}
+            </a>
+          ) : (
+            <button onClick={() => this.handleClick()} class={className}>
+              {icon}
+              {text}
+            </button>
+          )}
+          {this.type === 'is-main' && this.favourite && (
+            <span class="favourite">{StreamlineButton.getHeart()}</span>
+          )}
         </div>
         {this.type === 'is-main' && (
-          <div class={'focus is-icon'}>
-            <button class={'icon'}>{iconHeart}</button>
+          <div class={`focus is-icon`}>
+            <button
+              onClick={() => this.handleFavClick()}
+              class={`icon ${this.favourite ? 'is-favourite' : ''}`}
+            >
+              {StreamlineButton.getHeart()}
+            </button>
           </div>
         )}
       </Host>

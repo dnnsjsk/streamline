@@ -7,11 +7,17 @@
 
 ## Properties
 
-| Property | Attribute | Description | Type     | Default     |
-| -------- | --------- | ----------- | -------- | ----------- |
-| `icon`   | `icon`    |             | `string` | `undefined` |
-| `text`   | `text`    |             | `string` | `undefined` |
-| `type`   | `type`    |             | `string` | `undefined` |
+| Property     | Attribute     | Description | Type      | Default     |
+| ------------ | ------------- | ----------- | --------- | ----------- |
+| `favourite`  | `favourite`   |             | `boolean` | `undefined` |
+| `header`     | `header`      |             | `string`  | `undefined` |
+| `href`       | `href`        |             | `string`  | `undefined` |
+| `icon`       | `icon`        |             | `string`  | `undefined` |
+| `index`      | `index`       |             | `number`  | `undefined` |
+| `indexInner` | `index-inner` |             | `number`  | `undefined` |
+| `indexSub`   | `index-sub`   |             | `number`  | `undefined` |
+| `text`       | `text`        |             | `string`  | `undefined` |
+| `type`       | `type`        |             | `string`  | `undefined` |
 
 
 ## Dependencies

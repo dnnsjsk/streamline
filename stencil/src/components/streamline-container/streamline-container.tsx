@@ -2,6 +2,9 @@
 import { Component, h, Host } from '@stencil/core';
 import { stateInternal } from '../../store/internal';
 import hotkeys from 'hotkeys-js';
+import { stateLocal } from '../../store/local';
+import { setFavourites } from '../../utils/setFavourites';
+import { getFavourites } from '../../utils/getFavourites';
 
 /**
  * Container.
@@ -13,41 +16,57 @@ import hotkeys from 'hotkeys-js';
 })
 export class StreamlineContainer {
   connectedCallback() {
+    /**
+     * Shortcut.
+     */
+
     hotkeys('command+k', function () {
       stateInternal.visible = !stateInternal.visible;
       return false;
     });
-  }
 
-  componentDidLoad() {
+    /**
+     * Set all vars.
+     */
     let data = [];
     const menu = [];
 
-    document.querySelectorAll('.menu-top > a').forEach((item) => {
+    /**
+     * Get the menu.
+     */
+    document.querySelectorAll('.menu-top > a').forEach((item, index) => {
       const name = (item as HTMLElement).innerText.replace(
         /(\r\n|\n|\r)/gm,
         ''
       );
-      const href = item.getAttribute('href');
 
       const subMenu = item.closest('li.menu-top');
       const subArr = [];
 
       if (subMenu) {
-        subMenu.querySelectorAll('a').forEach((itemSub) => {
-          const nameSub = itemSub.innerText.replace(/(\r\n|\n|\r)/gm, '');
-          const hrefSub = itemSub.getAttribute('href');
+        const subSubMenu = subMenu.querySelectorAll('a');
+        subSubMenu.forEach((itemSub, indexSub) => {
+          if (
+            (indexSub !== 0 && subSubMenu.length >= 2) ||
+            (indexSub === 0 && subSubMenu.length === 1)
+          ) {
+            const nameSub = itemSub.innerText.replace(/(\r\n|\n|\r)/gm, '');
+            const hrefSub = itemSub.getAttribute('href');
 
-          subArr.push({
-            name: nameSub,
-            href: hrefSub,
-          });
+            subArr.push({
+              index: indexSub - 1,
+              name: nameSub,
+              nameParent: name,
+              href: hrefSub,
+              favourite: !!stateLocal.favourites.includes(hrefSub),
+            });
+          }
         });
       }
 
       menu.push({
+        index,
         name,
-        href,
         children: subArr,
       });
     });
@@ -61,8 +80,16 @@ export class StreamlineContainer {
       },
     ];
 
+    /**
+     * Set final data.
+     */
     stateInternal.entries = data;
     stateInternal.entriesActive = data;
+    stateInternal.entriesFavourites = getFavourites();
+  }
+
+  componentDidLoad() {
+    setFavourites();
   }
 
   render() {

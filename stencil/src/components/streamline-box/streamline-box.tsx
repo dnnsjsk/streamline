@@ -38,16 +38,35 @@ export class StreamlineBox {
   private handleChange(event) {
     this.value = event.target.value;
 
+    /**
+     * Check if favourites or not.
+     */
+    const entries =
+      stateLocal.menuMode === 'favourite'
+        ? stateInternal.entriesFavourites
+        : stateInternal.entries;
+
+    /**
+     * Filter entries.
+     */
     const filter = filterDeep(
-      stateInternal.entries.filter((val) => Object.keys(val).length !== 0),
+      entries.filter((val) => Object.keys(val).length !== 0),
       (o) => {
-        return o.name.toLowerCase().includes(this.value.toLowerCase());
+        return (
+          (o.name.toLowerCase().includes(this.value.toLowerCase()) ||
+            (o.nameParent &&
+              o.nameParent.toLowerCase().includes(this.value.toLowerCase()))) &&
+          o.href
+        );
       },
       { childrenPath: ['children'] }
     );
 
+    /**
+     * Show entries or reset if value is empty.
+     */
     if (this.value === '') {
-      stateInternal.entriesActive = stateInternal.entries;
+      stateInternal.entriesActive = entries;
     } else if (filter !== null || filter !== '') {
       stateInternal.entriesActive = filter;
     }

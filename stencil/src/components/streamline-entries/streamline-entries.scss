@@ -1,15 +1,6 @@
 :host {
   --sl-entry-space: var(--sl-s-4);
 
-  h1 {
-    margin: var(--sl-s-8) var(--sl-s) var(--sl-s-4) var(--sl-s);
-    padding-bottom: calc(var(--sl-s) / 2);
-    border-bottom: 1px dotted var(--sl-wp-g2-dark-gray-700);
-    font-weight: 500;
-    font-size: 1.5rem;
-    color: var(--sl-wp-g2-dark-gray-900);
-  }
-
   ul {
     padding: 0;
     margin: 0;
@@ -28,11 +19,37 @@
     }
   }
 
+  .header {
+    margin: var(--sl-s-6) var(--sl-s) var(--sl-s-4) var(--sl-s);
+    padding-bottom: var(--sl-s-1);
+    border-bottom: 1px dotted var(--sl-wp-g2-dark-gray-700);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    position: sticky;
+    top: 0;
+    background: #ffffff;
+    z-index: 10;
+
+    h1 {
+      font-weight: 500;
+      font-size: 1.5rem;
+      color: var(--sl-wp-g2-dark-gray-900);
+    }
+
+    &__buttons {
+      margin-bottom: var(--sl-s-1-5);
+    }
+  }
+
   .entry {
     transition: none;
     display: flex;
     margin: 0 var(--sl-s);
-    padding: 0;
+
+    &:last-of-type {
+      margin-bottom: var(--sl-s-4);
+    }
 
     & + .entry {
       border-top: 1px solid var(--sl-wp-g2-light-gray-500);
