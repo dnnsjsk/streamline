@@ -84,7 +84,8 @@ export class StreamlineContainer {
      * Set final data.
      */
     stateInternal.entries = data;
-    stateInternal.entriesActive = data;
+    stateInternal.entriesActive =
+      stateLocal.menuMode === 'favourite' ? getFavourites() : data;
     stateInternal.entriesFavourites = getFavourites();
   }
 

@@ -21,8 +21,6 @@ export class StreamlineBox {
 
   connectedCallback() {
     disableBodyScroll(this.el);
-
-    stateInternal.entriesActive = stateInternal.entries;
   }
 
   componentDidLoad() {
