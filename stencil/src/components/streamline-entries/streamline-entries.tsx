@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, h, Element } from '@stencil/core';
 import { stateInternal } from '../../store/internal';
-import { stateLocal } from '../../store/local';
+import { getFavourites } from '../../utils/getFavourites';
 
 /**
  * Entries.
@@ -28,26 +28,32 @@ export class StreamlineEntries {
   private renderEntries() {
     return (
       stateInternal.entriesActive !== null &&
-      Object.values(stateInternal.entriesActive).map((item, index) => {
+      Object.values(stateInternal.entriesActive).map((item) => {
         return (
           <div>
-            <div class="header">
+            <div class={`header ${item.type}`}>
               <h1>{item.name}</h1>
               <div class="header__buttons">
-                <streamline-button
-                  header="favourite"
-                  type="is-header"
-                  icon="heart"
-                />
+                {((item.type === 'menu' &&
+                  getFavourites(stateInternal.entries, 'menu')) ||
+                  (item.type === 'flow' &&
+                    getFavourites(stateInternal.entries, 'flow'))) && (
+                  <streamline-button
+                    header="favourite"
+                    type="is-header"
+                    typeSub={item.type}
+                    icon="heart"
+                  />
+                )}
               </div>
             </div>
             <ul>
               {item.children.map((itemInner, indexInner) => {
                 return (
                   <li key={indexInner} class="entry">
-                    <h2>{itemInner.name}</h2>
+                    <h2 class={item.type}>{itemInner.name}</h2>
                     {itemInner.children && (
-                      <ul class="container-sub">
+                      <ul class="container--sub">
                         {Object.values(itemInner.children).map(
                           (itemSub, indexSub) => {
                             if (
@@ -58,9 +64,17 @@ export class StreamlineEntries {
                               // console.log(this.el.shadowRoot);
                             }
                             return (
-                              <li key={indexSub} class="entry-sub">
+                              <li key={indexSub} class="entry--sub">
                                 <streamline-button
                                   type="is-main"
+                                  typeSub={
+                                    // @ts-ignore
+                                    itemSub.type
+                                  }
+                                  ident={
+                                    // @ts-ignore
+                                    itemSub.id
+                                  }
                                   text={
                                     // @ts-ignore
                                     itemSub.name
@@ -71,11 +85,11 @@ export class StreamlineEntries {
                                   }
                                   favourite={
                                     // @ts-ignore
-                                    itemSub.favourite
+                                    !!itemSub.favourite
                                   }
                                   index={
                                     // @ts-ignore
-                                    index
+                                    item.index
                                   }
                                   indexInner={
                                     // @ts-ignore
@@ -104,7 +118,7 @@ export class StreamlineEntries {
 
   render() {
     return (
-      <div class={`container ${stateLocal.menuMode}`} tabIndex={-1}>
+      <div class={`container`} tabIndex={-1}>
         {stateInternal.entries && this.renderEntries()}
       </div>
     );

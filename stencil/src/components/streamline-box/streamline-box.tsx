@@ -1,9 +1,8 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, Element, h, State, Host } from '@stencil/core';
-import { filterDeep } from 'deepdash-es/standalone';
 import { stateInternal } from '../../store/internal';
-import { stateLocal } from '../../store/local';
 import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
+import { setActiveEntries } from '../../utils/setActiveEntries';
 
 /**
  * Box.
@@ -21,6 +20,7 @@ export class StreamlineBox {
 
   connectedCallback() {
     disableBodyScroll(this.el);
+    setActiveEntries();
   }
 
   componentDidLoad() {
@@ -33,41 +33,9 @@ export class StreamlineBox {
     clearAllBodyScrollLocks();
   }
 
-  private handleChange(event) {
-    this.value = event.target.value;
-
-    /**
-     * Check if favourites or not.
-     */
-    const entries =
-      stateLocal.menuMode === 'favourite'
-        ? stateInternal.entriesFavourites
-        : stateInternal.entries;
-
-    /**
-     * Filter entries.
-     */
-    const filter = filterDeep(
-      entries.filter((val) => Object.keys(val).length !== 0),
-      (o) => {
-        return (
-          (o.name.toLowerCase().includes(this.value.toLowerCase()) ||
-            (o.nameParent &&
-              o.nameParent.toLowerCase().includes(this.value.toLowerCase()))) &&
-          o.href
-        );
-      },
-      { childrenPath: ['children'] }
-    );
-
-    /**
-     * Show entries or reset if value is empty.
-     */
-    if (this.value === '') {
-      stateInternal.entriesActive = entries;
-    } else if (filter !== null || filter !== '') {
-      stateInternal.entriesActive = filter;
-    }
+  private static handleChange(event) {
+    stateInternal.searchValue = event.target.value;
+    setActiveEntries();
   }
 
   render() {
@@ -82,10 +50,10 @@ export class StreamlineBox {
                 class="search"
                 type="text"
                 placeholder="Search for anything"
-                onInput={(event) => this.handleChange(event)}
+                onInput={(event) => StreamlineBox.handleChange(event)}
               />
             </div>
-            {stateLocal.active === 'menu' && <streamline-entries />}
+            <streamline-entries />
           </div>
         </div>
       </Host>

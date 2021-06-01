@@ -16,7 +16,7 @@ export const config: Config = {
   ],
   plugins: [
     sass({
-      injectGlobalPaths: ['src/globals/mixins.scss'],
+      injectGlobalPaths: ['src/globals/mixins.scss', 'src/globals/mq.scss'],
     }),
   ],
   devServer: {

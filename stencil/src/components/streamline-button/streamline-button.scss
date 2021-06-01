@@ -46,6 +46,7 @@
       padding: 0;
       border: none;
       width: 100%;
+      color: #000000;
       background: transparent;
       border-bottom: 1px solid var(--sl-wp-g2-light-gray-500);
       transition: color var(--sl-transition-fast);
@@ -80,7 +81,8 @@
         height: calc(var(--sl-side-w) - 1px);
         width: var(--sl-side-w);
         border-bottom: 1px solid var(--sl-wp-g2-dark-gray-900);
-        transition: border-color var(--sl-transition-fast);
+        transition: all var(--sl-transition-fast);
+        transition-property: border-color, background;
 
         svg {
           height: var(--sl-s-6);

@@ -13,11 +13,13 @@ export namespace Components {
         "header": string;
         "href": string;
         "icon": string;
+        "ident": string;
         "index": number;
         "indexInner": number;
         "indexSub": number;
         "text": string;
         "type": string;
+        "typeSub": string;
     }
     interface StreamlineContainer {
     }
@@ -73,11 +75,13 @@ declare namespace LocalJSX {
         "header"?: string;
         "href"?: string;
         "icon"?: string;
+        "ident"?: string;
         "index"?: number;
         "indexInner"?: number;
         "indexSub"?: number;
         "text"?: string;
         "type"?: string;
+        "typeSub"?: string;
     }
     interface StreamlineContainer {
     }

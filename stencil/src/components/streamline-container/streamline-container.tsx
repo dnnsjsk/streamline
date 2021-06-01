@@ -3,8 +3,7 @@ import { Component, h, Host } from '@stencil/core';
 import { stateInternal } from '../../store/internal';
 import hotkeys from 'hotkeys-js';
 import { stateLocal } from '../../store/local';
-import { setFavourites } from '../../utils/setFavourites';
-import { getFavourites } from '../../utils/getFavourites';
+import { setActiveEntries } from '../../utils/setActiveEntries';
 
 /**
  * Container.
@@ -15,7 +14,7 @@ import { getFavourites } from '../../utils/getFavourites';
   styleUrl: 'streamline-container.scss',
 })
 export class StreamlineContainer {
-  connectedCallback() {
+  componentDidLoad() {
     /**
      * Shortcut.
      */
@@ -55,10 +54,11 @@ export class StreamlineContainer {
 
             subArr.push({
               index: indexSub - 1,
+              type: 'menu',
               name: nameSub,
               nameParent: name,
               href: hrefSub,
-              favourite: !!stateLocal.favourites.includes(hrefSub),
+              favourite: !!stateLocal.menuFavourites.includes(hrefSub),
             });
           }
         });
@@ -74,6 +74,7 @@ export class StreamlineContainer {
     data = [
       ...data,
       {
+        index: 0,
         type: 'menu',
         name: 'Navigate to',
         children: menu,
@@ -81,16 +82,69 @@ export class StreamlineContainer {
     ];
 
     /**
+     * Get the flows.
+     */
+    data = [
+      ...data,
+      {
+        index: 1,
+        type: 'flow',
+        name: 'Start a flow',
+        children: [
+          {
+            index: 0,
+            name: 'General',
+            children: [
+              {
+                index: 0,
+                id: 'create-oxy',
+                type: 'flow',
+                name: 'Create new page and open with Oxygen',
+                nameParent: 'General',
+                favourite: !!stateLocal.flowFavourites.includes('create-oxy'),
+              },
+              {
+                index: 1,
+                id: 'create-fancy',
+                type: 'flow',
+                name: 'Do something else fancy',
+                nameParent: 'General',
+                favourite: !!stateLocal.flowFavourites.includes('create-fancy'),
+              },
+            ],
+          },
+          {
+            index: 1,
+            name: 'Elementor',
+            children: [
+              {
+                index: 0,
+                id: 'a-job',
+                type: 'flow',
+                name: 'Oh wow another job',
+                nameParent: 'Elementor',
+                favourite: !!stateLocal.flowFavourites.includes('a-job'),
+              },
+              {
+                index: 1,
+                id: 'much-great',
+                type: 'flow',
+                name: 'That is much great',
+                nameParent: 'Elementor',
+                favourite: !!stateLocal.flowFavourites.includes('much-great'),
+              },
+            ],
+          },
+        ],
+      },
+    ];
+
+    /**
      * Set final data.
      */
     stateInternal.entries = data;
-    stateInternal.entriesActive =
-      stateLocal.menuMode === 'favourite' ? getFavourites() : data;
-    stateInternal.entriesFavourites = getFavourites();
-  }
-
-  componentDidLoad() {
-    setFavourites();
+    stateInternal.entriesActive = data;
+    setActiveEntries();
   }
 
   render() {

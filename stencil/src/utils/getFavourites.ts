@@ -1,11 +1,10 @@
-import { stateInternal } from '../store/internal';
 import { filterDeep } from 'deepdash-es/standalone';
 
-export function getFavourites() {
+export function getFavourites(obj, type) {
   return filterDeep(
-    stateInternal.entries.filter((val) => Object.keys(val).length !== 0),
+    obj.filter((val) => Object.keys(val).length !== 0),
     (o) => {
-      return o.favourite === true;
+      return o.favourite === true && o.type === type;
     },
     { childrenPath: ['children'] }
   );

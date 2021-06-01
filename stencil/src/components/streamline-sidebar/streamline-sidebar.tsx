@@ -20,7 +20,7 @@ export class StreamlineSidebar {
           onClick={() => (stateInternal.visible = false)}
         />
         <streamline-button type="is-sidebar" text="Menu" icon="menu" />
-        <streamline-button type="is-sidebar" text="Tasks" icon="tasks" />
+        <streamline-button type="is-sidebar" text="Flows" icon="flow" />
       </nav>
     );
   }

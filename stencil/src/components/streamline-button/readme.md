@@ -13,11 +13,13 @@
 | `header`     | `header`      |             | `string`  | `undefined` |
 | `href`       | `href`        |             | `string`  | `undefined` |
 | `icon`       | `icon`        |             | `string`  | `undefined` |
+| `ident`      | `ident`       |             | `string`  | `undefined` |
 | `index`      | `index`       |             | `number`  | `undefined` |
 | `indexInner` | `index-inner` |             | `number`  | `undefined` |
 | `indexSub`   | `index-sub`   |             | `number`  | `undefined` |
 | `text`       | `text`        |             | `string`  | `undefined` |
 | `type`       | `type`        |             | `string`  | `undefined` |
+| `typeSub`    | `type-sub`    |             | `string`  | `undefined` |
 
 
 ## Dependencies
