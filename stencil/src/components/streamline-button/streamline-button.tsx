@@ -142,7 +142,7 @@ export class StreamlineButton {
     const className =
       'container' +
       (this.type ? ` ${this.type}` : '') +
-      (stateLocal[this.typeSub + 'Mode'] === this.header ? ' is-active' : '') +
+      (this.type === 'is-header' && stateLocal[this.typeSub + 'Mode'] === this.header ? ' is-active' : '') +
       (this.type === 'is-sidebar' && stateLocal.active === this.icon
         ? ` is-active`
         : '');

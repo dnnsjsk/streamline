@@ -47,3 +47,12 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/classes/init.php';
  */
 
 new Init();
+
+add_action( 'admin_footer', function () {
+	echo '<script>console.log(';
+	echo json_encode( $GLOBALS['menu'] );
+	echo ')</script>';
+	echo '<script>console.log(';
+	echo json_encode( $GLOBALS['submenu'] );
+	echo ')</script>';
+} );
