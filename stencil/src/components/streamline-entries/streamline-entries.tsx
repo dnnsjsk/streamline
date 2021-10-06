@@ -22,9 +22,11 @@ export class StreamlineEntries {
         return (
           <div>
             <div
-              class={`${item.type} mx-6 mb-4 pb-1 flex justify-between items-end sticky top-0 bg-white z-10 border-b border-dotted border-gray-900`}
+              class={`${item.type} mx-3 mb-4 pb-1 flex justify-between items-end sticky top-0 bg-white z-10 border-b border-dotted border-gray-900 sm:mx-6`}
             >
-              <h1 class={`text-gray-900 font-medium text-2xl mt-5 mb-2`}>
+              <h1
+                class={`text-gray-900 font-medium text-xl mt-4 mb-2 sm:text-2xl sm:mt-5`}
+              >
                 {item.name}
               </h1>
               <div class={`mb-1.5`}>
@@ -46,10 +48,10 @@ export class StreamlineEntries {
                 return (
                   <li
                     key={indexInner}
-                    class={`border-t border-gray-100 flex mx-6 flex-col sm:flex-row last-of-type:mb-4 first-of-type:border-none`}
+                    class={`border-t border-gray-100 flex mx-3 flex-col sm:flex-row last-of-type:mb-4 first-of-type:border-none sm:mx-6`}
                   >
                     <h2
-                      class={`mt-3.5 mr-4 leading-1 text-base font-medium inline-block text-gray-900 sm:min-w-[120px] md:min-w-[200px]`}
+                      class={`mt-3.5 mr-4 leading-1 text-base font-medium inline-block text-gray-900 break-words sm:min-w-[120px] md:min-w-[200px]`}
                     >
                       {itemInner.name}
                     </h2>

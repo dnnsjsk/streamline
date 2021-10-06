@@ -17,7 +17,7 @@ export const config: Config = {
   ],
   plugins: [
     sass({
-      injectGlobalPaths: ['src/globals/mixins.scss', 'src/globals/mq.scss'],
+      injectGlobalPaths: ['src/globals/mixins.scss'],
     }),
     tailwind({
       tailwindCssPath: './tailwind.css',

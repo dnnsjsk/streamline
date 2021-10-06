@@ -47,7 +47,7 @@ export class StreamlineBox {
             <div class="focus">
               <input
                 part="search"
-                class="search h-[var(--sl-side-w)] text-[1.15rem] w-full h-full m-0 p-0 border-b border-gray-300"
+                class="px-4 sm:px-6 search h-[var(--sl-side-w)] text-[1.15rem] w-full h-full m-0 p-0 border-b border-gray-300"
                 type="text"
                 placeholder="Search for anything"
                 onInput={(event) => StreamlineBox.handleChange(event)}

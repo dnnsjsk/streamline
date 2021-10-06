@@ -150,7 +150,7 @@ export class StreamlineButton {
         this.indexSub
       ]?.favourite;
 
-    const className = `inner w-[max-content] underline-none cursor-pointer text-center whitespace-no-wrap rounded-lg transition ease-in duration-100 ${
+    const className = `break-words w-[max-content] underline-none cursor-pointer text-center whitespace-no-wrap rounded-lg transition ease-in duration-100 ${
       this.type === 'main'
         ? `text-sm px-3 py-2.5 leading-none border border-gray-200 bg-gray-50 text-indigo-600 min-w-[75px] hover:border-indigo-600`
         : this.type === 'sidebar' || this.type === 'primary'
@@ -169,7 +169,7 @@ export class StreamlineButton {
 
     const classNameText = `${
       this.type === 'sidebar'
-        ? 'text-xs font-bold uppercase mt-1.5 inline-block'
+        ? 'hidden sm:inline-block text-xs font-bold uppercase mt-1.5'
         : ''
     }`;
 
