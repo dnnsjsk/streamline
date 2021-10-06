@@ -13,14 +13,17 @@ import { stateInternal } from '../../store/internal';
 export class StreamlineSidebar {
   render() {
     return (
-      <nav class="container">
+      <nav
+        class={`bg-gray-50 h-full w-[var(--sl-side-w)] grid-flow-row grid auto-rows-max rounded-none border-r border-gray-300`}
+      >
         <streamline-button
-          type="is-sidebar is-primary"
+          type="primary"
           icon="wordpress"
           onClick={() => (stateInternal.visible = false)}
         />
-        <streamline-button type="is-sidebar" text="Menu" icon="menu" />
-        <streamline-button type="is-sidebar" text="Flows" icon="flow" />
+        <div class={`grid-flow-row grid auto-rows-max`}>
+          <streamline-button type="sidebar" text="Menu" icon="menu" />
+        </div>
       </nav>
     );
   }

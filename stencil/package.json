@@ -2,35 +2,20 @@
   "name": "streamline",
   "version": "1.0.0",
   "description": "Do things faster.",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "es2015": "dist/esm/index.mjs",
-  "es2017": "dist/esm/index.mjs",
-  "types": "dist/types/index.d.ts",
-  "collection": "dist/collection/collection-manifest.json",
-  "collection:main": "dist/collection/index.js",
-  "unpkg": "dist/streamline/streamline.js",
-  "files": [
-    "dist/",
-    "loader/"
-  ],
   "scripts": {
     "build": "stencil build --docs",
-    "start": "stencil build --dev --watch --serve",
-    "startBs": "browser-sync start --no-open --proxy 'https://fabrikat.local' --files [\"* .css\", \"* .js\"]\n",
-    "test": "stencil test --spec --e2e",
-    "test.watch": "stencil test --spec --e2e --watchAll",
-    "generate": "stencil generate"
+    "start:stencil": "stencil build --dev --watch --serve",
+    "start:bs": "browser-sync start --proxy 'https://fabrikat.local/harmoni/wp-admin/options-reading.php' --files './../assets/build/*.js' -w"
   },
   "devDependencies": {
     "@stencil/core": "^2.5.2",
     "@stencil/eslint-plugin": "^0.3.1",
     "@stencil/sass": "^1.4.1",
     "@stencil/store": "^1.4.1",
-    "@types/node": "^15.0.1",
+    "@types/node": "^16.10.2",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
-    "@wordpress/icons": "^2.9.1",
+    "@wordpress/icons": "^5.0.2",
     "body-scroll-lock": "^3.1.5",
     "deepdash-es": "^5.3.7",
     "eslint": "^7.25.0",
@@ -38,7 +23,7 @@
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-react": "^7.23.2",
     "eslint-plugin-standard": "^5.0.0",
@@ -47,6 +32,9 @@
     "prettier": "^2.2.1",
     "resize-observer-polyfill": "^1.5.1",
     "stencil-store-storage": "^0.2.0",
+    "stencil-tailwind-plugin": "^0.5.0",
+    "tailwindcss": "^2.2.16",
+    "tippy.js": "^6.3.2",
     "typescript": "^4.2.4"
   },
   "license": "MIT"

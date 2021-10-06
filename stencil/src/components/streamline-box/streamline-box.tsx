@@ -41,13 +41,13 @@ export class StreamlineBox {
   render() {
     return (
       <Host>
-        <div class="container">
+        <div class="inner w-full h-full absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[900px] max-h-[700px] bg-white overflow-hidden grid">
           <streamline-sidebar />
-          <div class="inner">
+          <div class="wrap h-full absolute left-[var(--sl-side-w)] w-[calc(100%-var(--sl-side-w))]">
             <div class="focus">
               <input
                 part="search"
-                class="search"
+                class="search h-[var(--sl-side-w)] text-[1.15rem] w-full h-full m-0 p-0 border-b border-gray-300"
                 type="text"
                 placeholder="Search for anything"
                 onInput={(event) => StreamlineBox.handleChange(event)}

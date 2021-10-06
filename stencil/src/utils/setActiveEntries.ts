@@ -33,16 +33,12 @@ export function setActiveEntries() {
       };
 
       const menu = getResults('menu') && o.href;
-      const flow = getResults('flow');
 
       if (isActive('menu')) {
         stateLocal.menuMode = '';
         return menu;
-      } else if (isActive('flow')) {
-        stateLocal.flowMode = '';
-        return flow;
       } else {
-        return menu || flow;
+        return menu;
       }
     },
     { childrenPath: ['children'] }

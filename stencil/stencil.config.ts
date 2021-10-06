@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { Config } from '@stencil/core';
 import { sass } from '@stencil/sass';
+import tailwind from 'stencil-tailwind-plugin';
 
 export const config: Config = {
   namespace: 'streamline',
@@ -17,6 +18,9 @@ export const config: Config = {
   plugins: [
     sass({
       injectGlobalPaths: ['src/globals/mixins.scss', 'src/globals/mq.scss'],
+    }),
+    tailwind({
+      tailwindCssPath: './tailwind.css',
     }),
   ],
   devServer: {

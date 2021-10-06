@@ -15,24 +15,14 @@ import { setActiveEntries } from '../../utils/setActiveEntries';
 })
 export class StreamlineContainer {
   componentDidLoad() {
-    /**
-     * Shortcut.
-     */
-
     hotkeys('command+k', function () {
       stateInternal.visible = !stateInternal.visible;
       return false;
     });
 
-    /**
-     * Set all vars.
-     */
     let data = [];
     const menu = [];
 
-    /**
-     * Get the menu.
-     */
     document.querySelectorAll('.menu-top > a').forEach((item, index) => {
       const name = (item as HTMLElement).innerText.replace(
         /(\r\n|\n|\r)/gm,
@@ -81,67 +71,6 @@ export class StreamlineContainer {
       },
     ];
 
-    /**
-     * Get the flows.
-     */
-    data = [
-      ...data,
-      {
-        index: 1,
-        type: 'flow',
-        name: 'Start a flow',
-        children: [
-          {
-            index: 0,
-            name: 'General',
-            children: [
-              {
-                index: 0,
-                id: 'create-oxy',
-                type: 'flow',
-                name: 'Create new page and open with Oxygen',
-                nameParent: 'General',
-                favourite: !!stateLocal.flowFavourites.includes('create-oxy'),
-              },
-              {
-                index: 1,
-                id: 'create-fancy',
-                type: 'flow',
-                name: 'Do something else fancy',
-                nameParent: 'General',
-                favourite: !!stateLocal.flowFavourites.includes('create-fancy'),
-              },
-            ],
-          },
-          {
-            index: 1,
-            name: 'Elementor',
-            children: [
-              {
-                index: 0,
-                id: 'a-job',
-                type: 'flow',
-                name: 'Oh wow another job',
-                nameParent: 'Elementor',
-                favourite: !!stateLocal.flowFavourites.includes('a-job'),
-              },
-              {
-                index: 1,
-                id: 'much-great',
-                type: 'flow',
-                name: 'That is much great',
-                nameParent: 'Elementor',
-                favourite: !!stateLocal.flowFavourites.includes('much-great'),
-              },
-            ],
-          },
-        ],
-      },
-    ];
-
-    /**
-     * Set final data.
-     */
     stateInternal.entries = data;
     stateInternal.entriesActive = data;
     setActiveEntries();
@@ -151,10 +80,10 @@ export class StreamlineContainer {
     return (
       <Host>
         {stateInternal.visible && (
-          <div class="container">
+          <div class="fixed top-0 left-0 w-full h-full z-[9999999999999999]">
             <div
               tabIndex={-1}
-              class="overlay"
+              class="fixed top-0 left-0 w-full h-full bg-black/90"
               onClick={() => (stateInternal.visible = false)}
             />
             <streamline-box />
