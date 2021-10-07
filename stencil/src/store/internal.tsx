@@ -1,10 +1,12 @@
 import { createStore } from '@stencil/store';
 
 const { state } = createStore({
-  visible: true,
-  searchValue: '',
+  // @ts-ignore
+  data: window.streamlineData,
   entries: [],
   entriesActive: [],
+  searchValue: '',
+  visible: true,
 });
 
 export { state as stateInternal };

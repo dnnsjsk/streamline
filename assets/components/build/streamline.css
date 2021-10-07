@@ -1,0 +1,1 @@
+:root{--sl-focus-color:#4F46E5;--sl-border-radius:0.25rem;--sl-transition:cubic-bezier(0.4, 0, 0.2, 1);--sl-transition-fast:200ms var(--sl-transition);--sl-side-w:48px}@media (min-width: 640px){:root{--sl-side-w:64px}}

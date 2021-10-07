@@ -11,7 +11,12 @@ export const config: Config = {
     {
       type: 'www',
       serviceWorker: null,
-      dir: '../assets',
+      dir: '../assets/components',
+      empty: true,
+    },
+    {
+      type: 'dist-custom-elements-bundle',
+      dir: '../assets/bundle',
       empty: true,
     },
   ],

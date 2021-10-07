@@ -10,7 +10,7 @@ namespace Streamline;
  */
 class Init {
 
-	public function script() {
+	function getScript() {
 
 		global $post;
 
@@ -21,9 +21,9 @@ class Init {
 
 		wp_enqueue_script(
 			'streamline',
-			plugins_url( '../assets/build/streamline.esm.js', dirname( __FILE__ ) ),
+			plugins_url( '../assets/components/build/streamline.esm.js', dirname( __FILE__ ) ),
 			[],
-			filemtime( STREAMLINE_DIR . '/assets/build/streamline.esm.js' ),
+			filemtime( STREAMLINE_DIR . '/assets/components/build/streamline.esm.js' ),
 			TRUE );
 
 		wp_localize_script( 'streamline', 'streamline', $localizeArray );
@@ -38,7 +38,8 @@ class Init {
 	 */
 	private function enqueueScripts() {
 
-		add_action( 'admin_enqueue_scripts', [ $this, 'script' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'getScript' ] );
+		add_action( 'wp_enqueue_scripts', [ $this, 'getScript' ] );
 
 	}
 
@@ -69,7 +70,7 @@ class Init {
 	 */
 	public static function addCss() {
 
-		$str = file_get_contents( STREAMLINE_DIR . '/assets/build/streamline.css' );
+		$str = file_get_contents( STREAMLINE_DIR . '/assets/components/build/streamline.css' );
 
 		add_action( 'wp_head', function () use ( &$str ) {
 
@@ -86,35 +87,55 @@ class Init {
 	}
 
 	/**
+	 * Get data
+	 *
+	 * @date    04/05/2021
+	 * @since   1.0.0
+	 */
+	function getData() {
+
+		global $menu;
+		global $submenu;
+
+		echo '<script id="streamline-data">';
+		echo 'window.streamlineData =';
+		echo json_encode( [
+			'menu' => [
+				'top' => $menu,
+				'sub' => $submenu
+			]
+		] );
+		echo '</script>';
+
+	}
+
+	/**
+	 * Inject data.
+	 *
+	 * @date    04/05/2021
+	 * @since   1.0.0
+	 */
+	private function injectData() {
+
+		add_action( 'admin_footer', [ $this, 'getData' ] );
+		add_action( 'wp_head', [ $this, 'getData' ] );
+
+	}
+
+	/**
 	 * Add container.
 	 *
 	 * @date    04/05/2021
 	 * @since   1.0.0
 	 */
 	private static function addContainer() {
+		$container = '<streamline-container></streamline-container>';
 
-		add_action( 'admin_footer', function () {
-			echo '<streamline-container></streamline-container>';
+		add_action( 'admin_footer', function () use ( $container ) {
+			echo $container;
 		} );
-
-	}
-
-	/**
-	 * Get data.
-	 *
-	 * @date    04/05/2021
-	 * @since   1.0.0
-	 */
-	private static function getData() {
-
-		add_action( 'admin_footer', function () {
-			global $menu;
-			global $submenu;
-
-			echo '<script id="streamline-data">';
-			echo 'window.streamlineMenu = ' . json_encode( $menu ) . ';';
-			echo 'window.streamlineSubmenu = ' . json_encode( $submenu ) . ';';
-			echo '</script>';
+		add_action( 'wp_footer', function () use ( $container ) {
+			echo $container;
 		} );
 
 	}
@@ -129,8 +150,8 @@ class Init {
 		self::enqueueScripts();
 		self::addScriptTags();
 		self::addCss();
+		self::injectData();
 		self::addContainer();
-		self::getData();
 	}
 
 }

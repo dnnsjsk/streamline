@@ -25,7 +25,6 @@ use Streamline\init;
  * @date    03/05/2021
  * @since   1.0.0
  */
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -36,7 +35,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @date    03/05/2021
  * @since   1.0.0
  */
-
 require_once plugin_dir_path( __FILE__ ) . 'includes/classes/init.php';
 
 /**
@@ -45,14 +43,4 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/classes/init.php';
  * @date    03/05/2021
  * @since   1.0.0
  */
-
 new Init();
-
-add_action( 'admin_footer', function () {
-	echo '<script>console.log(';
-	echo json_encode( $GLOBALS['menu'] );
-	echo ')</script>';
-	echo '<script>console.log(';
-	echo json_encode( $GLOBALS['submenu'] );
-	echo ')</script>';
-} );

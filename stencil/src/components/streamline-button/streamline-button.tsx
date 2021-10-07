@@ -17,6 +17,7 @@ import tippy, { hideAll } from 'tippy.js';
 })
 export class StreamlineButton {
   private container: HTMLElement;
+  private link: HTMLElement;
   private tooltip: HTMLElement;
 
   @Prop({ reflect: true, mutable: true }) favourite: boolean;
@@ -56,7 +57,7 @@ export class StreamlineButton {
       const template = this.tooltip;
       template.style.display = 'block';
 
-      tippy(this.container, {
+      tippy(this.link, {
         content: template,
         appendTo: this.container,
         interactive: true,
@@ -66,8 +67,7 @@ export class StreamlineButton {
     }
   }
 
-  private handleClick = (e) => {
-    e.preventDefault();
+  private handleClick = () => {
     if (this.type === 'sidebar') {
       stateLocal.active = this.icon;
 
@@ -218,39 +218,16 @@ export class StreamlineButton {
 
     return (
       <div class={`relative inline-flex w-full`}>
-        <div class={`focus`}>
+        <div ref={(el) => (this.container = el as HTMLElement)} class={`focus`}>
           {this.type === 'main' && this.href ? (
             <a
-              ref={(el) => (this.container = el as HTMLElement)}
+              ref={(el) => (this.link = el as HTMLElement)}
               href={this.href}
               onClick={this.handleClick}
               class={className}
             >
               {icon}
               {text}
-              <div
-                class={`!grid divide-x divide-gray-200 auto-cols-max grid-flow-col`}
-                ref={(el) => (this.tooltip = el as HTMLElement)}
-              >
-                {[
-                  {
-                    onClick: this.handleFavClick,
-                    condition: isFavourite,
-                  },
-                ].map((item) => {
-                  return (
-                    <button class={`border-none focus`} onClick={item.onClick}>
-                      <span
-                        class={`w-8 h-8 flex items-center justify-center ${
-                          item.condition ? 'text-red-500' : ''
-                        }`}
-                      >
-                        {this.getHeart()}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
             </a>
           ) : (
             <button onClick={this.handleClick} class={className}>
@@ -266,6 +243,31 @@ export class StreamlineButton {
             </span>
           )}
         </div>
+        {this.type === 'main' && (
+          <div
+            class={`!grid divide-x divide-gray-200 auto-cols-max grid-flow-col`}
+            ref={(el) => (this.tooltip = el as HTMLElement)}
+          >
+            {[
+              {
+                onClick: this.handleFavClick,
+                condition: isFavourite,
+              },
+            ].map((item) => {
+              return (
+                <button class={`border-none focus`} onClick={item.onClick}>
+                  <span
+                    class={`w-8 h-8 flex items-center justify-center ${
+                      item.condition ? 'text-red-500' : ''
+                    }`}
+                  >
+                    {this.getHeart()}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   }
