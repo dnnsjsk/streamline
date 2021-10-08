@@ -1,18 +1,18 @@
+@keyframes fadein {
+  from {
+    opacity: 0;
+    transform: translate3d(-50%, calc(-50% + 20px), 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0);
+  }
+}
+
 :host {
   display: block;
-  @include focus;
-  @keyframes fadein {
-    from {
-      opacity: 0;
-      transform: translate3d(-50%, calc(-50% + 20px), 0);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(-50%, -50%, 0);
-    }
-  }
+}
 
-  .inner {
-    animation: fadein 0.4s var(--sl-transition);
-  }
+.inner {
+  animation: fadein 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }

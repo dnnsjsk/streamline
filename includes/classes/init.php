@@ -12,11 +12,9 @@ class Init {
 
 	function getScript() {
 
-		global $post;
-
 		$localizeArray = [
 			'ajax'   => admin_url( 'admin-ajax.php' ),
-			'postId' => $post->ID,
+			'nonce' => wp_create_nonce( 'ajax-nonce' )
 		];
 
 		wp_enqueue_script(
@@ -73,9 +71,7 @@ class Init {
 		$str = file_get_contents( STREAMLINE_DIR . '/assets/components/build/streamline.css' );
 
 		add_action( 'wp_head', function () use ( &$str ) {
-
 			echo '<style id="streamline-css">' . $str . '</style>';
-
 		} );
 
 		add_action( 'admin_head', function () use ( &$str ) {
@@ -94,16 +90,12 @@ class Init {
 	 */
 	function getData() {
 
-		global $menu;
-		global $submenu;
-
 		echo '<script id="streamline-data">';
 		echo 'window.streamlineData =';
 		echo json_encode( [
-			'menu' => [
-				'top' => $menu,
-				'sub' => $submenu
-			]
+			'adminUrl'      => admin_url(),
+			'currentSiteId' => get_current_blog_id(),
+			'isMultisite'   => is_multisite(),
 		] );
 		echo '</script>';
 

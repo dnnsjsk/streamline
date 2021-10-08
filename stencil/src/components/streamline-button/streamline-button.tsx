@@ -70,8 +70,6 @@ export class StreamlineButton {
   private handleClick = () => {
     if (this.type === 'sidebar') {
       stateLocal.active = this.icon;
-
-      setActiveEntries();
     }
 
     if (this.type === 'header') {
@@ -80,18 +78,15 @@ export class StreamlineButton {
       } else {
         stateLocal[this.typeSub + 'Mode'] = this.header;
       }
-
-      setActiveEntries();
     }
+
+    setActiveEntries();
   };
 
   private handleFavClick = () => {
     const fav = stateLocal[this.typeSub + 'Favourites'];
 
-    const id =
-      this.typeSub === 'menu'
-        ? this.href
-        : this.typeSub === 'flow' && this.ident;
+    const id = this.href;
 
     if (fav.includes(id)) {
       stateLocal[this.typeSub + 'Favourites'] = without(fav, id);
@@ -111,10 +106,8 @@ export class StreamlineButton {
     setActiveEntries();
 
     if (
-      (this.typeSub === 'menu' &&
-        getFavourites(stateInternal.entries, 'menu') === null) ||
-      (this.typeSub === 'flow' &&
-        getFavourites(stateInternal.entries, 'flow') === null)
+      this.typeSub === 'menu' &&
+      getFavourites(stateInternal.entries, 'menu') === null
     ) {
       (document.activeElement as HTMLElement).blur();
     }
@@ -150,11 +143,11 @@ export class StreamlineButton {
         this.indexSub
       ]?.favourite;
 
-    const className = `break-words w-[max-content] underline-none cursor-pointer text-center whitespace-no-wrap rounded-lg transition ease-in duration-100 ${
+    const className = `break-words w-[max-content] underline-none cursor-pointer text-center whitespace-no-wrap ${
       this.type === 'main'
         ? `text-sm px-3 py-2.5 leading-none border border-gray-200 bg-gray-50 text-indigo-600 min-w-[75px] hover:border-indigo-600`
         : this.type === 'sidebar' || this.type === 'primary'
-        ? `h-[calc(var(--sl-side-w)+8px)] w-[calc(var(--sl-side-w)-1px)] flex flex-col items-center justify-center p-0 rounded-none text-gray-900 bg-transparent border-b border-gray-300 ${
+        ? `h-[calc(var(--sl-side-w)+8px)] w-[calc(var(--sl-side-w)-1px)] flex flex-col items-center justify-center p-0 text-gray-900 bg-transparent border-b border-gray-300 ${
             this.type === 'primary'
               ? `bg-[#191E23] border-none text-white fill-current h-[var(--sl-side-w)] w-[var(--sl-side-w)] hover:bg-[#0e1114]`
               : this.type === 'sidebar' &&
@@ -163,7 +156,7 @@ export class StreamlineButton {
                 }`
           }`
         : this.type === 'header'
-        ? `flex items-center justify-center w-8 h-8 p-0 bg-transparent text-gray-900 bg-gray-50 border border-gray-300`
+        ? `flex items-center justify-center w-8 h-8 p-0 bg-transparent text-gray-900 bg-gray-50 border border-gray-200`
         : ''
     }`;
 
@@ -218,7 +211,10 @@ export class StreamlineButton {
 
     return (
       <div class={`relative inline-flex w-full`}>
-        <div ref={(el) => (this.container = el as HTMLElement)} class={`focus`}>
+        <div
+          ref={(el) => (this.container = el as HTMLElement)}
+          class={`focus focus--px`}
+        >
           {this.type === 'main' && this.href ? (
             <a
               ref={(el) => (this.link = el as HTMLElement)}
@@ -237,7 +233,7 @@ export class StreamlineButton {
           )}
           {isFavourite && stateLocal.menuMode !== 'favourite' && (
             <span
-              class={`absolute -top-1 -right-1 w-4 h-4 text-red-500 pointer-events-none bg-white rounded-full flex items-center justify-center border border-gray-200`}
+              class={`absolute rounded-full -top-1 -right-1 w-4 h-4 text-red-500 pointer-events-none bg-white flex items-center justify-center border border-gray-200`}
             >
               <span>{this.getHeart()}</span>
             </span>
@@ -255,9 +251,12 @@ export class StreamlineButton {
               },
             ].map((item) => {
               return (
-                <button class={`border-none focus`} onClick={item.onClick}>
+                <button
+                  class={`border-none focus focus--px`}
+                  onClick={item.onClick}
+                >
                   <span
-                    class={`w-8 h-8 flex items-center justify-center ${
+                    class={`w-8 h-8 flex items-center scale-125 justify-center ${
                       item.condition ? 'text-red-500' : ''
                     }`}
                   >

@@ -36,6 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since   1.0.0
  */
 require_once plugin_dir_path( __FILE__ ) . 'includes/classes/init.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/functions/ajax-query.php';
 
 /**
  * Init Streamline.

@@ -1,7 +1,6 @@
 import { stateInternal } from '../store/internal';
 import { stateLocal } from '../store/local';
 import { filterDeep } from 'deepdash-es/standalone';
-import { getFavourites } from './getFavourites';
 
 export function setActiveEntries() {
   stateInternal.entriesActive = filterDeep(
@@ -25,21 +24,7 @@ export function setActiveEntries() {
         );
       };
 
-      const isActive = (type) => {
-        return (
-          stateLocal.active === type &&
-          getFavourites(stateInternal.entries, type) === null
-        );
-      };
-
-      const menu = getResults('menu') && o.href;
-
-      if (isActive('menu')) {
-        stateLocal.menuMode = '';
-        return menu;
-      } else {
-        return menu;
-      }
+      return getResults(stateLocal.active);
     },
     { childrenPath: ['children'] }
   );

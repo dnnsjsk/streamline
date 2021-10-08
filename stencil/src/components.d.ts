@@ -25,6 +25,8 @@ export namespace Components {
     }
     interface StreamlineEntries {
     }
+    interface StreamlineSearch {
+    }
     interface StreamlineSidebar {
     }
 }
@@ -53,6 +55,12 @@ declare global {
         prototype: HTMLStreamlineEntriesElement;
         new (): HTMLStreamlineEntriesElement;
     };
+    interface HTMLStreamlineSearchElement extends Components.StreamlineSearch, HTMLStencilElement {
+    }
+    var HTMLStreamlineSearchElement: {
+        prototype: HTMLStreamlineSearchElement;
+        new (): HTMLStreamlineSearchElement;
+    };
     interface HTMLStreamlineSidebarElement extends Components.StreamlineSidebar, HTMLStencilElement {
     }
     var HTMLStreamlineSidebarElement: {
@@ -64,6 +72,7 @@ declare global {
         "streamline-button": HTMLStreamlineButtonElement;
         "streamline-container": HTMLStreamlineContainerElement;
         "streamline-entries": HTMLStreamlineEntriesElement;
+        "streamline-search": HTMLStreamlineSearchElement;
         "streamline-sidebar": HTMLStreamlineSidebarElement;
     }
 }
@@ -87,6 +96,8 @@ declare namespace LocalJSX {
     }
     interface StreamlineEntries {
     }
+    interface StreamlineSearch {
+    }
     interface StreamlineSidebar {
     }
     interface IntrinsicElements {
@@ -94,6 +105,7 @@ declare namespace LocalJSX {
         "streamline-button": StreamlineButton;
         "streamline-container": StreamlineContainer;
         "streamline-entries": StreamlineEntries;
+        "streamline-search": StreamlineSearch;
         "streamline-sidebar": StreamlineSidebar;
     }
 }
@@ -105,6 +117,7 @@ declare module "@stencil/core" {
             "streamline-button": LocalJSX.StreamlineButton & JSXBase.HTMLAttributes<HTMLStreamlineButtonElement>;
             "streamline-container": LocalJSX.StreamlineContainer & JSXBase.HTMLAttributes<HTMLStreamlineContainerElement>;
             "streamline-entries": LocalJSX.StreamlineEntries & JSXBase.HTMLAttributes<HTMLStreamlineEntriesElement>;
+            "streamline-search": LocalJSX.StreamlineSearch & JSXBase.HTMLAttributes<HTMLStreamlineSearchElement>;
             "streamline-sidebar": LocalJSX.StreamlineSidebar & JSXBase.HTMLAttributes<HTMLStreamlineSidebarElement>;
         }
     }

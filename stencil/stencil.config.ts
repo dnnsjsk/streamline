@@ -5,7 +5,7 @@ import tailwind from 'stencil-tailwind-plugin';
 
 export const config: Config = {
   namespace: 'streamline',
-  globalStyle: 'src/globals/globals.scss',
+  globalStyle: 'src/scss/globals.scss',
   taskQueue: 'async',
   outputTargets: [
     {
@@ -22,7 +22,7 @@ export const config: Config = {
   ],
   plugins: [
     sass({
-      injectGlobalPaths: ['src/globals/mixins.scss'],
+      injectGlobalPaths: ['src/scss/mixins.scss'],
     }),
     tailwind({
       tailwindCssPath: './tailwind.css',
