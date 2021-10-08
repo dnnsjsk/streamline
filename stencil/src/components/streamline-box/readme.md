@@ -5,13 +5,6 @@
 <!-- Auto Generated Below -->
 
 
-## Shadow Parts
-
-| Part       | Description |
-| ---------- | ----------- |
-| `"search"` |             |
-
-
 ## Dependencies
 
 ### Used by
@@ -21,12 +14,14 @@
 ### Depends on
 
 - [streamline-sidebar](../streamline-sidebar)
+- [streamline-search](../streamline-search)
 - [streamline-entries](../streamline-entries)
 
 ### Graph
 ```mermaid
 graph TD;
   streamline-box --> streamline-sidebar
+  streamline-box --> streamline-search
   streamline-box --> streamline-entries
   streamline-sidebar --> streamline-button
   streamline-entries --> streamline-button

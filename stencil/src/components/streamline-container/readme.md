@@ -16,6 +16,7 @@
 graph TD;
   streamline-container --> streamline-box
   streamline-box --> streamline-sidebar
+  streamline-box --> streamline-search
   streamline-box --> streamline-entries
   streamline-sidebar --> streamline-button
   streamline-entries --> streamline-button
