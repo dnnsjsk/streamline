@@ -2,7 +2,7 @@ import { newSpecPage } from '@stencil/core/testing';
 import { StreamlineContainer } from './streamline-container';
 import { stateInternal } from '../../store/internal';
 
-it('Render container component', async () => {
+it('Render container', async () => {
   const page = await newSpecPage({
     components: [StreamlineContainer],
     html: `<streamline-container></streamline-container>`,

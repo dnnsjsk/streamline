@@ -6,7 +6,7 @@ beforeEach(async () => {
   disposeInternal();
 });
 
-describe('Render search component', function () {
+describe('Render search', function () {
   it('without enter button', async () => {
     const page = await newSpecPage({
       components: [StreamlineSearch],
@@ -54,7 +54,7 @@ describe('Render search component', function () {
   });
 });
 
-it("Activate slash mode after typing '/'", async () => {
+it("Activate 'slash' mode after typing '/'", async () => {
   stateInternal.searchValue = '/';
   const page = await newSpecPage({
     components: [StreamlineSearch],

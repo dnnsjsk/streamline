@@ -11,8 +11,8 @@ beforeEach(async () => {
   setData();
 });
 
-describe('Render entries component when', function () {
-  it('is slash', async () => {
+describe('Render entries when', function () {
+  it("the mode is 'slash'", async () => {
     stateInternal.isSlash = true;
     stateLocal.active = 'fav';
     const page = await newSpecPage({
@@ -23,7 +23,7 @@ describe('Render entries component when', function () {
     const length = el.querySelectorAll('li').length;
     expect(length).toBe(2);
   });
-  it('is sites', async () => {
+  it("the mode is 'sites'", async () => {
     stateInternal.isSites = true;
     stateLocal.active = 'fav';
     const page = await newSpecPage({
@@ -35,7 +35,7 @@ describe('Render entries component when', function () {
     expect(length).toBe(7);
   });
 
-  describe('is favourites', function () {
+  describe("the mode is 'favourites'", function () {
     it('and all are shown', async () => {
       stateLocal.active = 'fav';
       const page = await newSpecPage({
@@ -72,23 +72,31 @@ describe('Render entries component when', function () {
         await page.waitForChanges();
         const lengthLi = el.querySelectorAll('li').length;
         if (index === 0) {
+          // eslint-disable-next-line jest/no-conditional-expect
           expect(stateLocal.entriesFav.length).toBe(3);
+          // eslint-disable-next-line jest/no-conditional-expect
           expect(lengthLi).toBe(18);
         } else if (index === 2) {
+          // eslint-disable-next-line jest/no-conditional-expect
           expect(stateLocal.entriesFav.length).toBe(2);
+          // eslint-disable-next-line jest/no-conditional-expect
           expect(lengthLi).toBe(15);
         } else if (index === 8) {
+          // eslint-disable-next-line jest/no-conditional-expect
           expect(stateLocal.entriesFav.length).toBe(1);
+          // eslint-disable-next-line jest/no-conditional-expect
           expect(lengthLi).toBe(5);
         } else if (index === 11) {
+          // eslint-disable-next-line jest/no-conditional-expect
           expect(stateLocal.entriesFav.length).toBe(0);
+          // eslint-disable-next-line jest/no-conditional-expect
           expect(lengthLi).toBe(0);
         }
       }
     });
   });
 
-  describe('is menu', function () {
+  describe("the mode is 'menu'", function () {
     it('and all are shown', async () => {
       stateLocal.active = 'menu';
       const page = await newSpecPage({

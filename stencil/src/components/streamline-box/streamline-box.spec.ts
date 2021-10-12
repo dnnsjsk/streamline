@@ -1,7 +1,7 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { StreamlineBox } from './streamline-box';
 
-it('Render box component', async () => {
+it('Render box', async () => {
   const page = await newSpecPage({
     components: [StreamlineBox],
     html: `<streamline-box></streamline-box>`,

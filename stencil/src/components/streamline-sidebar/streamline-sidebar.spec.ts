@@ -1,7 +1,7 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { StreamlineSidebar } from './streamline-sidebar';
 
-it('Render sidebar component', async () => {
+it('Render sidebar', async () => {
   const page = await newSpecPage({
     components: [StreamlineSidebar],
     html: `<streamline-sidebar></streamline-sidebar>`,
