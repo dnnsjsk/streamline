@@ -10,7 +10,9 @@ describe('Render button with', function () {
   it("'type' set to 'primary' (WordPress icon)", async () => {
     const page = await newSpecPage({
       components: [StreamlineButton],
-      html: `<streamline-button type="primary"></streamline-button>`,
+      html: `<streamline-button 
+              type="primary">
+             </streamline-button>`,
     });
     expect(page.root).toEqualHtml(`
 <streamline-button type="primary">
@@ -29,7 +31,10 @@ describe('Render button with', function () {
       stateLocal.active = 'fav';
       const page = await newSpecPage({
         components: [StreamlineButton],
-        html: `<streamline-button type="sidebar" icon="menu"></streamline-button>`,
+        html: `<streamline-button 
+                type="sidebar" 
+                icon="menu">
+               </streamline-button>`,
       });
       expect(page.root).toEqualHtml(`
 <streamline-button icon="menu" type="sidebar">
@@ -51,7 +56,10 @@ describe('Render button with', function () {
       stateLocal.active = 'menu';
       const page = await newSpecPage({
         components: [StreamlineButton],
-        html: `<streamline-button type="sidebar" icon="menu"></streamline-button>`,
+        html: `<streamline-button 
+                type="sidebar" 
+                icon="menu">
+               </streamline-button>`,
       });
       expect(page.root).toEqualHtml(`
 <streamline-button icon="menu" type="sidebar">
@@ -77,7 +85,9 @@ describe('Render button with', function () {
       stateLocal.entriesFavActive = [];
       const page = await newSpecPage({
         components: [StreamlineButton],
-        html: `<streamline-button type="main"></streamline-button>`,
+        html: `<streamline-button 
+                type="main">
+               </streamline-button>`,
       });
       expect(page.root).toEqualHtml(`
 <streamline-button type="main">
@@ -104,7 +114,9 @@ describe('Render button with', function () {
       stateLocal.active = 'menu';
       const page = await newSpecPage({
         components: [StreamlineButton],
-        html: `<streamline-button type="main"></streamline-button>`,
+        html: `<streamline-button 
+                type="main">
+               </streamline-button>`,
       });
       await page.waitForChanges();
       expect(page.root).toEqualHtml(`
