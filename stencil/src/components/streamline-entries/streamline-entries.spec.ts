@@ -11,8 +11,8 @@ beforeEach(async () => {
   setData();
 });
 
-describe('Render entries when', function () {
-  it("the mode is 'slash'", async () => {
+describe('Render entries with', function () {
+  it("mode set to 'slash'", async () => {
     stateInternal.isSlash = true;
     stateLocal.active = 'fav';
     const page = await newSpecPage({
@@ -23,7 +23,7 @@ describe('Render entries when', function () {
     const length = el.querySelectorAll('li').length;
     expect(length).toBe(2);
   });
-  it("the mode is 'sites'", async () => {
+  it("mode set to 'sites'", async () => {
     stateInternal.isSites = true;
     stateLocal.active = 'fav';
     const page = await newSpecPage({
@@ -35,8 +35,8 @@ describe('Render entries when', function () {
     expect(length).toBe(7);
   });
 
-  describe("the mode is 'favourites'", function () {
-    it('and all are shown', async () => {
+  describe("mode set to 'favourites'", function () {
+    it('and all elements shown', async () => {
       stateLocal.active = 'fav';
       const page = await newSpecPage({
         components: [StreamlineEntries],
@@ -57,7 +57,7 @@ describe('Render entries when', function () {
       const lengthLi = el.querySelectorAll('li').length;
       expect(lengthLi).toBe(4);
     });
-    it('and all entries are removed until there is none left', async () => {
+    it('and all favourites are removed until there is none left', async () => {
       stateLocal.active = 'fav';
       const page = await newSpecPage({
         components: [StreamlineEntries, StreamlineButton],
@@ -96,8 +96,8 @@ describe('Render entries when', function () {
     });
   });
 
-  describe("the mode is 'menu'", function () {
-    it('and all are shown', async () => {
+  describe("mode set to 'menu'", function () {
+    it('and all elements shown', async () => {
       stateLocal.active = 'menu';
       const page = await newSpecPage({
         components: [StreamlineEntries],
@@ -118,7 +118,7 @@ describe('Render entries when', function () {
       const lengthLi = el.querySelectorAll('li').length;
       expect(lengthLi).toBe(5);
     });
-    it('and menu contains favourites', async () => {
+    it('and three elements are favourites', async () => {
       stateLocal.active = 'menu';
       const page = await newSpecPage({
         components: [StreamlineEntries, StreamlineButton],

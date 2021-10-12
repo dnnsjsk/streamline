@@ -6,8 +6,8 @@ beforeEach(async () => {
   disposeLocal();
 });
 
-describe('Render button when the', function () {
-  it("type is 'primary' (WordPress icon)", async () => {
+describe('Render button with', function () {
+  it("'type' is 'primary' (WordPress icon)", async () => {
     const page = await newSpecPage({
       components: [StreamlineButton],
       html: `<streamline-button type="primary"></streamline-button>`,
@@ -24,7 +24,7 @@ describe('Render button when the', function () {
     </streamline-button>
   `);
   });
-  describe("type is 'sidebar'", function () {
+  describe("'type' set to 'sidebar'", function () {
     it('and not active', async () => {
       stateLocal.active = 'fav';
       const page = await newSpecPage({
@@ -70,8 +70,8 @@ describe('Render button when the', function () {
   `);
     });
   });
-  describe("type is 'main'", function () {
-    it("and is not a 'favourite", async () => {
+  describe("type set to 'main'", function () {
+    it('and not a favourite', async () => {
       stateLocal.active = 'fav';
       stateLocal.entriesFav = [];
       stateLocal.entriesFavActive = [];
@@ -100,7 +100,7 @@ describe('Render button when the', function () {
     </streamline-button>
   `);
     });
-    it('and is a favourite', async () => {
+    it('and a favourite', async () => {
       stateLocal.active = 'menu';
       const page = await newSpecPage({
         components: [StreamlineButton],
