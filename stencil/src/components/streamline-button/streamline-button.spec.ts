@@ -7,7 +7,7 @@ beforeEach(async () => {
 });
 
 describe('Render button with', function () {
-  it("'type' is 'primary' (WordPress icon)", async () => {
+  it("'type' set to 'primary' (WordPress icon)", async () => {
     const page = await newSpecPage({
       components: [StreamlineButton],
       html: `<streamline-button type="primary"></streamline-button>`,
@@ -70,7 +70,7 @@ describe('Render button with', function () {
   `);
     });
   });
-  describe("type set to 'main'", function () {
+  describe("'type' set to 'main'", function () {
     it('and not a favourite', async () => {
       stateLocal.active = 'fav';
       stateLocal.entriesFav = [];
