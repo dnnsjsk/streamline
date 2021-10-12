@@ -194,7 +194,7 @@ export class StreamlineButton {
       <svg
         class={`${
           this.type === 'sidebar'
-            ? `w-4 h-4 relative -mr-px fill-current`
+            ? `h-[14px] relative -mr-px fill-current`
             : `w-2 h-2`
         }`}
         xmlns="http://www.w3.org/2000/svg"
@@ -236,7 +236,7 @@ export class StreamlineButton {
         : ''
     }`;
 
-    const classNameIconSidebar = `w-6 h-6 fill-current`;
+    const classNameIconSidebar = `fill-current`;
 
     const iconWordpress = (
       <svg
@@ -250,21 +250,37 @@ export class StreamlineButton {
 
     const iconMenu = (
       <svg
-        class={classNameIconSidebar}
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
+        class={`${classNameIconSidebar} h-[18px]`}
+        viewBox="0 0 512 512"
       >
-        <path d="M5 5v1.5h14V5H5zm0 7.8h14v-1.5H5v1.5zM5 19h14v-1.5H5V19z" />
+        <path
+          fill="currentColor"
+          d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z"
+        />
       </svg>
     );
 
     const iconFlow = (
       <svg
-        class={classNameIconSidebar}
+        class={`${classNameIconSidebar} h-[16px]`}
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
       >
         <path d="M19.75 9c0-1.257-.565-2.197-1.39-2.858-.797-.64-1.827-1.017-2.815-1.247-1.802-.42-3.703-.403-4.383-.396L11 4.5V6l.177-.001c.696-.006 2.416-.02 4.028.356.887.207 1.67.518 2.216.957.52.416.829.945.829 1.688 0 .592-.167.966-.407 1.23-.255.281-.656.508-1.236.674-1.19.34-2.82.346-4.607.346h-.077c-1.692 0-3.527 0-4.942.404-.732.209-1.424.545-1.935 1.108-.526.579-.796 1.33-.796 2.238 0 1.257.565 2.197 1.39 2.858.797.64 1.827 1.017 2.815 1.247 1.802.42 3.703.403 4.383.396L13 19.5h.714V22L18 18.5 13.714 15v3H13l-.177.001c-.696.006-2.416.02-4.028-.356-.887-.207-1.67-.518-2.216-.957-.52-.416-.829-.945-.829-1.688 0-.592.167-.966.407-1.23.255-.281.656-.508 1.237-.674 1.189-.34 2.819-.346 4.606-.346h.077c1.692 0 3.527 0 4.941-.404.732-.209 1.425-.545 1.936-1.108.526-.579.796-1.33.796-2.238z" />
+      </svg>
+    );
+
+    const iconPost = (
+      <svg
+        class={`${classNameIconSidebar} h-[16px]`}
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 512 512"
+      >
+        <path
+          fill="currentColor"
+          d="M512 0C460.22 3.56 96.44 38.2 71.01 287.61c-3.09 26.66-4.84 53.44-5.99 80.24l178.87-178.69c6.25-6.25 16.4-6.25 22.65 0s6.25 16.38 0 22.63L7.04 471.03c-9.38 9.37-9.38 24.57 0 33.94 9.38 9.37 24.59 9.37 33.98 0l57.13-57.07c42.09-.14 84.15-2.53 125.96-7.36 53.48-5.44 97.02-26.47 132.58-56.54H255.74l146.79-48.88c11.25-14.89 21.37-30.71 30.45-47.12h-81.14l106.54-53.21C500.29 132.86 510.19 26.26 512 0z"
+        />
       </svg>
     );
 
@@ -273,6 +289,8 @@ export class StreamlineButton {
         ? iconWordpress
         : this.icon === 'menu'
         ? iconMenu
+        : this.icon === 'post'
+        ? iconPost
         : this.icon === 'flow'
         ? iconFlow
         : this.icon === 'fav' && this.getHeart();

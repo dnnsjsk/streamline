@@ -37,8 +37,8 @@ describe('Render button component when', function () {
         <div class="inline-flex relative w-full">
           <div class="focus focus--px">
             <button class="!content-center !grid !justify-items-center bg-transparent border-b border-gray-300 break-words cursor-pointer false flex flex-col h-[calc(var(--sl-side-w))] hover:bg-gray-100 hover:text-gray-900 items-center justify-center p-0 sm:!grid-rows-[20px,20px] text-center text-gray-500 text-gray-900 underline-none w-[calc(var(--sl-side-w)-1px)] w-[max-content] whitespace-no-wrap" tabindex="0" style="border-bottom: 1px solid rgba(209,213,219,var(--tw-border-opacity));">
-              <svg class="fill-current h-6 w-6" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M5 5v1.5h14V5H5zm0 7.8h14v-1.5H5v1.5zM5 19h14v-1.5H5V19z"></path>
+              <svg class="fill-current h-[18px]" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                <path d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z" fill="currentColor"></path>
               </svg>
             </button>
           </div>
@@ -59,8 +59,8 @@ describe('Render button component when', function () {
         <div class="inline-flex relative w-full">
           <div class="focus focus--px">
             <button class="!content-center !grid !justify-items-center -right-px bg-transparent bg-white border-b border-gray-300 border-r border-white break-words cursor-pointer flex flex-col h-[calc(var(--sl-side-w))] hover:!bg-white hover:bg-gray-100 hover:text-gray-900 items-center justify-center p-0 pointer-events-none relative sm:!grid-rows-[20px,20px] text-center text-gray-500 text-gray-900 text-indigo-700 underline-none w-[calc(var(--sl-side-w)-1px)] w-[max-content] whitespace-no-wrap" tabindex="-1" style="border-bottom: 1px solid rgba(209,213,219,var(--tw-border-opacity));">
-              <svg class="fill-current h-6 w-6" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M5 5v1.5h14V5H5zm0 7.8h14v-1.5H5v1.5zM5 19h14v-1.5H5V19z"></path>
+              <svg class="fill-current h-[18px]" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                <path d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z" fill="currentColor"></path>
               </svg>
             </button>
           </div>

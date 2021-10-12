@@ -24,6 +24,7 @@ export class StreamlineSidebar {
         <div class={`grid-flow-row grid auto-rows-max`}>
           <streamline-button type="sidebar" text="Fav" icon="fav" />
           <streamline-button type="sidebar" text="Menu" icon="menu" />
+          <streamline-button type="sidebar" text="Post" icon="post" />
         </div>
       </nav>
     );

@@ -14,6 +14,7 @@ it('Render sidebar component', async () => {
           <div class="auto-rows-max grid grid-flow-row">
             <streamline-button icon="fav" text="Fav" type="sidebar"></streamline-button>
             <streamline-button icon="menu" text="Menu" type="sidebar"></streamline-button>
+            <streamline-button icon="post" text="Post" type="sidebar"></streamline-button>
           </div>
         </nav>
       </mock:shadow-root>
