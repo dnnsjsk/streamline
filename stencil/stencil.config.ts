@@ -35,7 +35,7 @@ export const config: Config = {
     initializeNextTick: false,
   },
   testing: {
-    setupFilesAfterEnv: ['./test.config.ts'],
+    setupFilesAfterEnv: ['./jest.config.ts'],
     transform: {
       '^.+\\.(ts|tsx|js|jsx|css)$':
         '<rootDir>/node_modules/@stencil/core/testing/jest-preprocessor.js',
