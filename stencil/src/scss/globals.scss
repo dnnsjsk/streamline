@@ -1,9 +1,9 @@
 :root {
-  --sl-focus-color: #4F46E5;
+  --sl-focus-color: #4f46e5;
   --sl-border-radius: 0.25rem;
   --sl-side-w: 48px;
 
-  @media(min-width: 640px) {
+  @media (min-width: 640px) {
     --sl-side-w: 64px;
   }
 }

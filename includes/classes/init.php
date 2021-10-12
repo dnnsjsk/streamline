@@ -13,7 +13,7 @@ class Init {
 	function getScript() {
 
 		$localizeArray = [
-			'ajax'   => admin_url( 'admin-ajax.php' ),
+			'ajax'  => admin_url( 'admin-ajax.php' ),
 			'nonce' => wp_create_nonce( 'ajax-nonce' )
 		];
 
@@ -90,12 +90,15 @@ class Init {
 	 */
 	function getData() {
 
+		$currentSite = get_sites( [ 'ID' => get_current_blog_id() ] );
+
 		echo '<script id="streamline-data">';
 		echo 'window.streamlineData =';
 		echo json_encode( [
-			'adminUrl'      => admin_url(),
-			'currentSiteId' => get_current_blog_id(),
-			'isMultisite'   => is_multisite(),
+			'adminUrl'    => admin_url(),
+			'isMultisite' => is_multisite(),
+			'path'        => $currentSite[0]->path,
+			'siteId'      => get_current_blog_id(),
 		] );
 		echo '</script>';
 
@@ -124,10 +127,14 @@ class Init {
 		$container = '<streamline-container></streamline-container>';
 
 		add_action( 'admin_footer', function () use ( $container ) {
-			echo $container;
+			if ( is_user_logged_in() ) {
+				echo $container;
+			}
 		} );
 		add_action( 'wp_footer', function () use ( $container ) {
-			echo $container;
+			if ( is_user_logged_in() ) {
+				echo $container;
+			}
 		} );
 
 	}

@@ -22,6 +22,7 @@ export class StreamlineSidebar {
           onClick={() => (stateInternal.visible = false)}
         />
         <div class={`grid-flow-row grid auto-rows-max`}>
+          <streamline-button type="sidebar" text="Fav" icon="fav" />
           <streamline-button type="sidebar" text="Menu" icon="menu" />
         </div>
       </nav>

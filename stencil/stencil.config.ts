@@ -34,4 +34,12 @@ export const config: Config = {
   extras: {
     initializeNextTick: false,
   },
+  testing: {
+    setupFilesAfterEnv: ['./test.config.ts'],
+    transform: {
+      '^.+\\.(ts|tsx|js|jsx|css)$':
+        '<rootDir>/node_modules/@stencil/core/testing/jest-preprocessor.js',
+    },
+    transformIgnorePatterns: ['/node_modules/(?!deepdash-es|lodash-es)'],
+  },
 };

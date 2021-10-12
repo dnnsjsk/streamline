@@ -1,9 +1,9 @@
 import { createLocalStore } from 'stencil-store-storage';
 
-const { state } = createLocalStore('streamline', {
+const { state, dispose } = createLocalStore('streamline', {
   active: 'menu',
-  menuMode: '',
-  menuFavourites: [],
+  entriesFav: [],
+  entriesFavActive: [],
 });
 
-export { state as stateLocal };
+export { state as stateLocal, dispose as disposeLocal };

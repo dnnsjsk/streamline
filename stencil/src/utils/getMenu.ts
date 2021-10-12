@@ -1,12 +1,15 @@
-import { stateLocal } from '../store/local';
 import { stateInternal } from '../store/internal';
-import { setActiveEntries } from './setActiveEntries';
+import { setEntries } from './setEntries';
+import { resetView } from './resetView';
+import { stateLocal } from '../store/local';
 
-export function getMenu() {
+export function getMenu(obj = {} as any) {
   let data = [];
-  const menu = [];
+  const menu = {};
 
-  const isAdmin = document.querySelector('#adminmenuwrap');
+  const isAdmin = document.querySelector('#adminmenuwrap') && !obj.adminUrl;
+  const adminUrl = obj.adminUrl || stateInternal.data.adminUrl;
+  const siteId = obj.siteId || stateInternal.data.siteId;
 
   function get(doc) {
     doc.querySelectorAll('.menu-top > a').forEach((item, index) => {
@@ -16,7 +19,7 @@ export function getMenu() {
       );
 
       const subMenu = item.closest('li.menu-top');
-      const subArr = [];
+      const subArr = {};
 
       if (subMenu) {
         const subSubMenu = subMenu.querySelectorAll('a');
@@ -28,53 +31,57 @@ export function getMenu() {
             const nameSub = itemSub.innerText.replace(/(\r\n|\n|\r)/gm, '');
             const hrefSub = itemSub.getAttribute('href');
 
-            subArr.push({
+            subArr[hrefSub] = {
+              adminUrl,
+              href: stateInternal.data.adminUrl + hrefSub,
               index: subSubMenu.length === 1 ? indexSub : indexSub - 1,
-              type: 'menu',
               name: nameSub,
               nameParent: name,
-              href: stateInternal.data.adminUrl + hrefSub,
-              favourite: !!stateLocal.menuFavourites.includes(
-                stateInternal.data.adminUrl + hrefSub
-              ),
-            });
+              path: hrefSub,
+              siteId: Number(siteId),
+              type: 'menu',
+            };
           }
         });
       }
 
-      menu.push({
+      menu[name] = {
         index,
         name,
         children: subArr,
-      });
+      };
     });
 
     data = [
-      ...data,
       {
-        index: 0,
-        type: 'menu',
-        name: 'Navigate to',
+        adminUrl,
         children: menu,
+        name:
+          obj.site || stateInternal.data.isMultisite
+            ? `Navigate to (site: ${obj.site || stateInternal.data.path})`
+            : `Navigate to`,
+        siteId: Number(siteId),
+        type: 'menu',
       },
     ];
 
-    stateInternal.entries = data;
-    stateInternal.entriesActive = data;
-    setActiveEntries();
+    stateInternal.entriesMenu = data;
+    stateInternal.entriesMenuActive = data;
+    setEntries();
   }
 
   if (isAdmin) {
     get(document);
   } else {
     stateInternal.isLoading = true;
-    fetch(stateInternal.data.adminUrl)
+    fetch(obj.adminUrl || stateInternal.data.adminUrl)
       .then((response) => response.text())
       .then((data) => {
         const parser = new DOMParser();
         const html = parser.parseFromString(data, 'text/html');
         get(html);
-        stateInternal.isLoading = false;
+        resetView();
+        stateLocal.active = 'menu';
       });
   }
 }

@@ -1,1 +1,0 @@
-import{f as r}from"./p-675a79f6.js";function t(t,e){return r(t.filter((r=>0!==Object.keys(r).length)),(r=>!0===r.favourite&&r.type===e),{childrenPath:["children"]})}export{t as g}

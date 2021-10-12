@@ -10,6 +10,7 @@
     "react/jsx-no-bind": 0
   },
   "env": {
+    "jest/globals": true,
     "browser": true,
     "es2020": true
   },
@@ -18,7 +19,7 @@
     "ecmaVersion": 11,
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "jest"],
   "extends": [
     "standard",
     "plugin:@stencil/recommended",

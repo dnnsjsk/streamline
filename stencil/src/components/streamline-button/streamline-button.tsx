@@ -1,11 +1,12 @@
 // eslint-disable-next-line no-unused-vars
-import { Component, h, Prop } from '@stencil/core';
+import { Component, h, Method, Prop } from '@stencil/core';
 import { stateLocal } from '../../store/local';
 import { stateInternal } from '../../store/internal';
-import { without } from 'lodash-es';
-import { setActiveEntries } from '../../utils/setActiveEntries';
-import { getFavourites } from '../../utils/getFavourites';
+import { setEntries } from '../../utils/setEntries';
 import tippy, { hideAll } from 'tippy.js';
+import { merge, unset, get, compact } from 'lodash-es';
+import { someDeep, findDeep, filterDeep } from 'deepdash-es/standalone';
+import { getMenu } from '../../utils/getMenu';
 
 /**
  * Box.
@@ -20,17 +21,25 @@ export class StreamlineButton {
   private link: HTMLElement;
   private tooltip: HTMLElement;
 
-  @Prop({ reflect: true, mutable: true }) favourite: boolean;
-  @Prop({ reflect: true }) header: string;
-  @Prop({ reflect: true }) href: string;
-  @Prop({ reflect: true }) icon: string;
-  @Prop({ reflect: true }) ident: string;
-  @Prop({ reflect: true }) index: number;
-  @Prop({ reflect: true }) indexInner: number;
-  @Prop({ reflect: true }) indexSub: number;
-  @Prop({ reflect: true }) text: string;
-  @Prop({ reflect: true }) type: string;
-  @Prop({ reflect: true }) typeSub: string;
+  @Prop() adminUrl: string;
+  @Prop() header: string;
+  @Prop() href: string;
+  @Prop() icon: string;
+  @Prop() index: number;
+  @Prop() indexInner: number;
+  @Prop() indexSub: number;
+  @Prop({ mutable: true, reflect: true }) isFavourite: boolean;
+  @Prop() path: string;
+  @Prop() siteId: number;
+  @Prop() text: string;
+  @Prop() type: string;
+  @Prop() typeSub: string;
+
+  componentWillRender() {
+    if (this.type === 'main') {
+      this.checkIfFav();
+    }
+  }
 
   componentDidLoad() {
     const hideOnPopperBlur = {
@@ -53,7 +62,7 @@ export class StreamlineButton {
       },
     };
 
-    if (this.type === 'main') {
+    if (this.type === 'main' && this.link) {
       const template = this.tooltip;
       template.style.display = 'block';
 
@@ -72,59 +81,121 @@ export class StreamlineButton {
       stateLocal.active = this.icon;
     }
 
-    if (this.type === 'header') {
-      if (stateLocal[this.typeSub + 'Mode'] === this.header) {
-        stateLocal[this.typeSub + 'Mode'] = '';
-      } else {
-        stateLocal[this.typeSub + 'Mode'] = this.header;
-      }
+    if (
+      stateLocal.active === 'menu' &&
+      stateInternal.entriesMenu.length === 0
+    ) {
+      getMenu();
     }
 
-    setActiveEntries();
+    setEntries();
   };
 
   private handleFavClick = () => {
-    const fav = stateLocal[this.typeSub + 'Favourites'];
+    const arr = [...stateLocal.entriesFav];
 
-    const id = this.href;
+    const filter = filterDeep(
+      stateInternal.entriesMenu,
+      (o) => {
+        return o.href === this.href && o.adminUrl === this.adminUrl;
+      },
+      { childrenPath: ['children'] }
+    );
 
-    if (fav.includes(id)) {
-      stateLocal[this.typeSub + 'Favourites'] = without(fav, id);
-      this.favourite = false;
+    if (!this.isFavourite) {
+      const path = findDeep(
+        stateLocal.entriesFav,
+        (o) => {
+          return o.type === this.typeSub && o.siteId === this.siteId;
+        },
+        { childrenPath: ['children'] }
+      );
+      const index = path?.key;
+
+      if (stateLocal.entriesFav.length === 0) {
+        const mergeArr = [...merge(stateLocal.entriesFav, filter)];
+        stateLocal.entriesFav = mergeArr;
+        stateLocal.entriesFavActive = mergeArr;
+      } else if (!path) {
+        stateLocal.entriesFav = [...arr, filter[0]];
+        stateLocal.entriesFavActive = [...arr, filter[0]];
+      } else {
+        const mergeArr = merge(
+          [
+            {
+              ...arr[index],
+            },
+          ],
+          filter
+        );
+        arr[index] = mergeArr[0];
+        stateLocal.entriesFav = arr;
+        stateLocal.entriesFavActive = arr;
+      }
     } else {
-      stateLocal[this.typeSub + 'Favourites'] = [...fav, id];
-      this.favourite = true;
+      const path = findDeep(
+        stateLocal.entriesFav,
+        (o) => {
+          return (
+            o.href === this.href &&
+            o.adminUrl === this.adminUrl &&
+            o.siteId === this.siteId
+          );
+        },
+        { childrenPath: ['children'] }
+      );
+
+      const currentPath = path.context['_item'].strPath;
+
+      unset(arr, currentPath);
+
+      const parentPath = path.context['_item'].parent.path;
+      const parentChildrenLength = Object.values(
+        get(stateLocal.entriesFav, `${parentPath}.children`)
+      ).length;
+
+      if (parentChildrenLength === 0) {
+        unset(arr, parentPath);
+      }
+
+      const topPath = path.context['_item'].parent.parent.path;
+      const topChildrenLength = Object.values(
+        get(stateLocal.entriesFav, `${topPath}.children`)
+      ).length;
+
+      if (topChildrenLength === 0) {
+        unset(arr, topPath);
+      }
+
+      const removeArr =
+        arr.length === 1 && arr[0] === undefined ? [] : [...compact(arr)];
+      stateLocal.entriesFav = removeArr;
+      stateLocal.entriesFavActive = removeArr;
+
+      setEntries();
     }
 
-    const obj = stateInternal.entries;
-    obj[this.index].children[this.indexInner].children[
-      this.indexSub
-    ].favourite = this.favourite;
-
-    stateInternal.entries = obj;
-
-    setActiveEntries();
-
-    if (
-      this.typeSub === 'menu' &&
-      getFavourites(stateInternal.entries, 'menu') === null
-    ) {
-      (document.activeElement as HTMLElement).blur();
-    }
-
+    this.checkIfFav();
     hideAll();
+  };
+
+  private checkIfFav = () => {
+    this.isFavourite = someDeep(
+      stateLocal.entriesFav,
+      (o) => {
+        return o?.path === this.path && o?.siteId === this.siteId;
+      },
+      { childrenPath: ['children'] }
+    );
   };
 
   private getHeart() {
     return (
       <svg
         class={`${
-          this.type === 'header' ? `w-3 h-3 fill-current` : `w-2 h-2`
-        } ${
-          this.type === 'header' &&
-          stateLocal[this.typeSub + 'Mode'] === this.header
-            ? 'text-red-500'
-            : ''
+          this.type === 'sidebar'
+            ? `w-4 h-4 relative -mr-px fill-current`
+            : `w-2 h-2`
         }`}
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 512 512"
@@ -137,32 +208,31 @@ export class StreamlineButton {
     );
   }
 
-  render() {
-    const isFavourite =
-      stateInternal.entries[this.index]?.children[this.indexInner]?.children[
-        this.indexSub
-      ]?.favourite;
+  @Method()
+  async toggleFavourite() {
+    return this.handleFavClick();
+  }
 
+  render() {
     const className = `break-words w-[max-content] underline-none cursor-pointer text-center whitespace-no-wrap ${
       this.type === 'main'
         ? `text-sm px-3 py-2.5 leading-none border border-gray-200 bg-gray-50 text-indigo-600 min-w-[75px] hover:border-indigo-600`
         : this.type === 'sidebar' || this.type === 'primary'
-        ? `h-[calc(var(--sl-side-w)+8px)] w-[calc(var(--sl-side-w)-1px)] flex flex-col items-center justify-center p-0 text-gray-900 bg-transparent border-b border-gray-300 ${
+        ? `h-[calc(var(--sl-side-w))] w-[calc(var(--sl-side-w)-1px)] flex flex-col items-center justify-center p-0 text-gray-900 bg-transparent border-b border-gray-300 ${
             this.type === 'primary'
               ? `bg-[#191E23] border-none text-white fill-current h-[var(--sl-side-w)] w-[var(--sl-side-w)] hover:bg-[#0e1114]`
               : this.type === 'sidebar' &&
-                `border-b border-gray-300 hover:bg-gray-100 ${
-                  stateLocal.active === this.icon && 'text-indigo-700'
+                `!grid sm:!grid-rows-[20px,20px] !justify-items-center !content-center text-gray-500 border-b border-gray-300 hover:bg-gray-100 hover:text-gray-900 ${
+                  stateLocal.active === this.icon &&
+                  'text-indigo-700 bg-white border-r border-white pointer-events-none relative -right-px hover:!bg-white'
                 }`
           }`
-        : this.type === 'header'
-        ? `flex items-center justify-center w-8 h-8 p-0 bg-transparent text-gray-900 bg-gray-50 border border-gray-200`
         : ''
     }`;
 
     const classNameText = `${
       this.type === 'sidebar'
-        ? 'hidden sm:inline-block text-xs font-bold uppercase mt-1.5'
+        ? 'hidden sm:inline-block text-xs font-bold leading-1 uppercase mt-1.5'
         : ''
     }`;
 
@@ -205,7 +275,7 @@ export class StreamlineButton {
         ? iconMenu
         : this.icon === 'flow'
         ? iconFlow
-        : this.icon === 'heart' && this.getHeart();
+        : this.icon === 'fav' && this.getHeart();
 
     const text = this.text && <span class={classNameText}>{this.text}</span>;
 
@@ -226,12 +296,22 @@ export class StreamlineButton {
               {text}
             </a>
           ) : (
-            <button onClick={this.handleClick} class={className}>
+            <button
+              onClick={this.handleClick}
+              tabIndex={stateLocal.active === this.icon ? -1 : 0}
+              style={{
+                borderBottom:
+                  this.type === 'primary'
+                    ? ''
+                    : '1px solid rgba(209,213,219,var(--tw-border-opacity))',
+              }}
+              class={className}
+            >
               {icon}
               {text}
             </button>
           )}
-          {isFavourite && stateLocal.menuMode !== 'favourite' && (
+          {this.isFavourite && stateLocal.active !== 'fav' && (
             <span
               class={`absolute rounded-full -top-1 -right-1 w-4 h-4 text-red-500 pointer-events-none bg-white flex items-center justify-center border border-gray-200`}
             >
@@ -243,11 +323,12 @@ export class StreamlineButton {
           <div
             class={`!grid divide-x divide-gray-200 auto-cols-max grid-flow-col`}
             ref={(el) => (this.tooltip = el as HTMLElement)}
+            style={{ display: 'block' }}
           >
             {[
               {
                 onClick: this.handleFavClick,
-                condition: isFavourite,
+                condition: this.isFavourite,
               },
             ].map((item) => {
               return (
@@ -256,7 +337,7 @@ export class StreamlineButton {
                   onClick={item.onClick}
                 >
                   <span
-                    class={`w-8 h-8 flex items-center scale-125 justify-center ${
+                    class={`w-8 h-8 flex items-center justify-center ${
                       item.condition ? 'text-red-500' : ''
                     }`}
                   >

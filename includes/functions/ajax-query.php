@@ -10,10 +10,25 @@ function streamlineQuery() {
 	if ( wp_verify_nonce( $_POST['nonce'], 'ajax-nonce' ) ) {
 		$callback = $_POST['callback'];
 		$query    = $_POST['query'];
+		$get      = '';
 
-		$get = call_user_func( $callback, [
-			'search' => $query
-		] );
+		if ( $callback == 'get_sites' ) {
+			$arr = call_user_func( $callback, [
+				'search' => $query
+			] );
+
+			$index = - 1;
+			foreach ( $arr as $site ) {
+				$id = $site->blog_id;
+				$index ++;
+				switch_to_blog( $id );
+				$arr[ $index ]->siteId   = $id;
+				$arr[ $index ]->adminUrl = get_admin_url();
+				restore_current_blog();
+			}
+
+			$get = $arr;
+		}
 
 		wp_send_json_success( $get );
 	}

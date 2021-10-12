@@ -1,7 +1,8 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, Element, h, Host } from '@stencil/core';
 import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
-import { setActiveEntries } from '../../utils/setActiveEntries';
+import { setEntries } from '../../utils/setEntries';
+import { focusSearch } from '../../utils/focusSearch';
 
 /**
  * Box.
@@ -17,15 +18,12 @@ export class StreamlineBox {
 
   connectedCallback() {
     disableBodyScroll(this.el);
-    setActiveEntries();
+    setEntries();
   }
 
   componentDidLoad() {
     setTimeout(() => {
-      this.el.shadowRoot
-        .querySelector('streamline-search')
-        .shadowRoot.querySelector('input')
-        .focus();
+      focusSearch();
     }, 50);
   }
 
