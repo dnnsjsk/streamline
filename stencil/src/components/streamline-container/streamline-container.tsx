@@ -2,6 +2,7 @@
 import { Component, h } from '@stencil/core';
 import { stateInternal } from '../../store/internal';
 import hotkeys from 'hotkeys-js';
+import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
 
 /**
  * Container.
@@ -12,7 +13,9 @@ import hotkeys from 'hotkeys-js';
   styleUrl: 'streamline-container.scss',
 })
 export class StreamlineContainer {
-  componentDidLoad() {
+  connectedCallback() {
+    setSearchPlaceholder();
+
     hotkeys('command+k', function () {
       stateInternal.visible = !stateInternal.visible;
       return false;

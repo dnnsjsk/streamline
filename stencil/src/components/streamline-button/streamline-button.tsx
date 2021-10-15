@@ -1,12 +1,14 @@
 // eslint-disable-next-line no-unused-vars
-import { Component, h, Method, Prop } from '@stencil/core';
+import { Component, h, Prop } from '@stencil/core';
 import { stateLocal } from '../../store/local';
 import { stateInternal } from '../../store/internal';
-import { setEntries } from '../../utils/setEntries';
-import tippy, { hideAll } from 'tippy.js';
-import { merge, unset, get, compact } from 'lodash-es';
-import { someDeep, findDeep, filterDeep } from 'deepdash-es/standalone';
+import tippy from 'tippy.js';
+import { someDeep } from 'deepdash-es/standalone';
 import { getMenu } from '../../utils/getMenu';
+import { resetView } from '../../utils/resetView';
+import { setFavourite } from '../../utils/setFavourite';
+import { Fav } from '../../elements/Fav';
+import { Heart } from '../../elements/Heart';
 
 /**
  * Box.
@@ -28,12 +30,12 @@ export class StreamlineButton {
   @Prop() index: number;
   @Prop() indexInner: number;
   @Prop() indexSub: number;
-  @Prop({ mutable: true, reflect: true }) isFavourite: boolean;
   @Prop() path: string;
   @Prop() siteId: number;
   @Prop() text: string;
   @Prop() type: string;
   @Prop() typeSub: string;
+  @Prop({ mutable: true, reflect: true }) favourite: boolean;
 
   componentWillRender() {
     if (this.type === 'main') {
@@ -79,6 +81,7 @@ export class StreamlineButton {
   private handleClick = () => {
     if (this.type === 'sidebar') {
       stateLocal.active = this.icon;
+      resetView();
     }
 
     if (
@@ -87,100 +90,31 @@ export class StreamlineButton {
     ) {
       getMenu();
     }
-
-    setEntries();
   };
 
   private handleFavClick = () => {
-    const arr = [...stateLocal.entriesFav];
-
-    const filter = filterDeep(
-      stateInternal.entriesMenu,
-      (o) => {
+    setFavourite({
+      favourite: this.favourite,
+      callback: this.checkIfFav,
+      type: 'menu',
+      filter: (o) => {
         return o.href === this.href && o.adminUrl === this.adminUrl;
       },
-      { childrenPath: ['children'] }
-    );
-
-    if (!this.isFavourite) {
-      const path = findDeep(
-        stateLocal.entriesFav,
-        (o) => {
-          return o.type === this.typeSub && o.siteId === this.siteId;
-        },
-        { childrenPath: ['children'] }
-      );
-      const index = path?.key;
-
-      if (stateLocal.entriesFav.length === 0) {
-        const mergeArr = [...merge(stateLocal.entriesFav, filter)];
-        stateLocal.entriesFav = mergeArr;
-        stateLocal.entriesFavActive = mergeArr;
-      } else if (!path) {
-        stateLocal.entriesFav = [...arr, filter[0]];
-        stateLocal.entriesFavActive = [...arr, filter[0]];
-      } else {
-        const mergeArr = merge(
-          [
-            {
-              ...arr[index],
-            },
-          ],
-          filter
+      path: (o) => {
+        return o.type === this.typeSub && o.siteId === this.siteId;
+      },
+      pathFav: (o) => {
+        return (
+          o.href === this.href &&
+          o.adminUrl === this.adminUrl &&
+          o.siteId === this.siteId
         );
-        arr[index] = mergeArr[0];
-        stateLocal.entriesFav = arr;
-        stateLocal.entriesFavActive = arr;
-      }
-    } else {
-      const path = findDeep(
-        stateLocal.entriesFav,
-        (o) => {
-          return (
-            o.href === this.href &&
-            o.adminUrl === this.adminUrl &&
-            o.siteId === this.siteId
-          );
-        },
-        { childrenPath: ['children'] }
-      );
-
-      const currentPath = path.context['_item'].strPath;
-
-      unset(arr, currentPath);
-
-      const parentPath = path.context['_item'].parent.path;
-      const parentChildrenLength = Object.values(
-        get(stateLocal.entriesFav, `${parentPath}.children`)
-      ).length;
-
-      if (parentChildrenLength === 0) {
-        unset(arr, parentPath);
-      }
-
-      const topPath = path.context['_item'].parent.parent.path;
-      const topChildrenLength = Object.values(
-        get(stateLocal.entriesFav, `${topPath}.children`)
-      ).length;
-
-      if (topChildrenLength === 0) {
-        unset(arr, topPath);
-      }
-
-      const removeArr =
-        arr.length === 1 && arr[0] === undefined ? [] : [...compact(arr)];
-      stateLocal.entriesFav = removeArr;
-      stateLocal.entriesFavActive = removeArr;
-
-      setEntries();
-    }
-
-    this.checkIfFav();
-    hideAll();
+      },
+    });
   };
 
   private checkIfFav = () => {
-    this.isFavourite = someDeep(
+    this.favourite = someDeep(
       stateLocal.entriesFav,
       (o) => {
         return o?.path === this.path && o?.siteId === this.siteId;
@@ -188,30 +122,6 @@ export class StreamlineButton {
       { childrenPath: ['children'] }
     );
   };
-
-  private getHeart() {
-    return (
-      <svg
-        class={`${
-          this.type === 'sidebar'
-            ? `h-[14px] relative -mr-px fill-current`
-            : `w-2 h-2`
-        }`}
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 512 512"
-      >
-        <path
-          fill="currentColor"
-          d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"
-        />
-      </svg>
-    );
-  }
-
-  @Method()
-  async toggleFavourite() {
-    return this.handleFavClick();
-  }
 
   render() {
     const className = `break-words w-[max-content] underline-none cursor-pointer text-center whitespace-no-wrap ${
@@ -240,7 +150,7 @@ export class StreamlineButton {
 
     const iconWordpress = (
       <svg
-        class={`w-8 h-8`}
+        class={`w-10 h-10`}
         xmlns="http://www.w3.org/2000/svg"
         viewBox="-2 -2 24 24"
       >
@@ -293,7 +203,7 @@ export class StreamlineButton {
         ? iconPost
         : this.icon === 'flow'
         ? iconFlow
-        : this.icon === 'fav' && this.getHeart();
+        : this.icon === 'fav' && <Heart type={this.type} />;
 
     const text = this.text && <span class={classNameText}>{this.text}</span>;
 
@@ -301,7 +211,13 @@ export class StreamlineButton {
       <div class={`relative inline-flex w-full`}>
         <div
           ref={(el) => (this.container = el as HTMLElement)}
-          class={`focus focus--px`}
+          class={`focus ${
+            this.type === 'main'
+              ? 'focus--border'
+              : this.type === 'sidebar'
+              ? 'focus--px-x focus--px-y'
+              : ''
+          }`}
         >
           {this.type === 'main' && this.href ? (
             <a
@@ -329,12 +245,8 @@ export class StreamlineButton {
               {text}
             </button>
           )}
-          {this.isFavourite && stateLocal.active !== 'fav' && (
-            <span
-              class={`absolute rounded-full -top-1 -right-1 w-4 h-4 text-red-500 pointer-events-none bg-white flex items-center justify-center border border-gray-200`}
-            >
-              <span>{this.getHeart()}</span>
-            </span>
+          {this.favourite && stateLocal.active !== 'fav' && (
+            <Fav class={`absolute -top-1 -right-1`} />
           )}
         </div>
         {this.type === 'main' && (
@@ -346,20 +258,17 @@ export class StreamlineButton {
             {[
               {
                 onClick: this.handleFavClick,
-                condition: this.isFavourite,
+                condition: this.favourite,
               },
             ].map((item) => {
               return (
-                <button
-                  class={`border-none focus focus--px`}
-                  onClick={item.onClick}
-                >
+                <button class={`border-none focus`} onClick={item.onClick}>
                   <span
                     class={`w-8 h-8 flex items-center justify-center ${
                       item.condition ? 'text-red-500' : ''
                     }`}
                   >
-                    {this.getHeart()}
+                    <Heart />
                   </span>
                 </button>
               );

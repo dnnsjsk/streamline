@@ -4,6 +4,7 @@ import { stateInternal } from '../../store/internal';
 import { getMenu } from '../../utils/getMenu';
 import { stateLocal } from '../../store/local';
 import { setEntries } from '../../utils/setEntries';
+import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
 
 /**
  * Entries.
@@ -16,13 +17,16 @@ import { setEntries } from '../../utils/setEntries';
 export class StreamlineEntries {
   private h2 = 'text-base text-gray-900 font-medium';
   private p = 'text-gray-600 text-base font-normal';
-  private tag = 'px-2.5 py-1.5 bg-gray-200 text-gray-500';
+  private tag =
+    'px-2.5 py-1.5 bg-gray-200 text-gray-500 inline-block h-[max-content] leading-1';
+
+  private border = 'border-t border-gray-100 first-of-type:border-none';
 
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineEntriesElement;
 
   connectedCallback() {
-    if (stateLocal.active !== 'fav') {
+    if (stateLocal.active !== 'fav' && stateLocal.active !== 'post') {
       this[`g${stateLocal.active}`]();
     }
     setEntries();
@@ -42,16 +46,30 @@ export class StreamlineEntries {
       >
         <h1
           class={`text-gray-900 font-medium text-xl mb-2 sm:text-2xl`}
-          innerHTML={item.name}
+          innerHTML={
+            stateLocal.active === 'fav'
+              ? item.title
+              : item.titleAlt || item.title
+          }
         />
       </div>
     );
   }
 
+  private getArr = (arr, type) => {
+    return (
+      (arr.length >= 1 && arr) ||
+      (stateInternal[`entries${capitalizeFirstLetter(type)}Active`]?.length >=
+        1 &&
+        (stateInternal[`entries${capitalizeFirstLetter(type)}Active`] ||
+          stateInternal[`entries${capitalizeFirstLetter(type)}`]))
+    );
+  };
+
   private slash = () => {
     return (
       <div>
-        {StreamlineEntries.getHeader({ name: 'Available commands' })}
+        {StreamlineEntries.getHeader({ title: 'Available commands' })}
         <ul>
           {Object.values(stateInternal.commands).map((item) => {
             const type = item.name.substring(item.name.indexOf('[') - 1);
@@ -92,7 +110,7 @@ export class StreamlineEntries {
                   <div
                     class={`${this.h2} inline-grid grid-flow-col auto-cols-max py-3 items-center`}
                   >
-                    <div class={`focus focus--px`}>
+                    <div class={`focus`}>
                       <div
                         role="button"
                         tabIndex={0}
@@ -124,12 +142,23 @@ export class StreamlineEntries {
   };
 
   // @ts-ignore
+  private fav = () => {
+    return (
+      stateLocal.entriesFavActive?.length >= 1 &&
+      (stateLocal.entriesFavActive || stateLocal.entriesFav) &&
+      Object.values(stateLocal.entriesFavActive || stateLocal.entriesFav).map(
+        (item) => {
+          return item.type
+            ? this[item.type]([item])
+            : StreamlineEntries.getHeader(item);
+        }
+      )
+    );
+  };
+
+  // @ts-ignore
   private menu = (arr = []) => {
-    return Object.values(
-      (arr.length >= 1 && arr) ||
-        (stateInternal.entriesMenuActive?.length >= 1 &&
-          (stateInternal.entriesMenuActive || stateInternal.entriesMenu))
-    ).map((item) => {
+    return Object.values(this.getArr(arr, 'menu') as unknown).map((item) => {
       return (
         <div>
           {StreamlineEntries.getHeader(item)}
@@ -139,10 +168,10 @@ export class StreamlineEntries {
                 return (
                   <li
                     key={indexInner}
-                    class={`border-t border-gray-100 flex flex-col sm:flex-row first-of-type:border-none`}
+                    class={`${this.border} flex flex-col sm:flex-row`}
                   >
                     <h2
-                      class={`${this.h2} mt-3.5 mr-4 leading-1 inline-block  break-words sm:min-w-[120px] md:min-w-[200px]`}
+                      class={`${this.h2} mt-3.5 mr-4 leading-1 inline-block break-words sm:min-w-[120px] md:min-w-[200px]`}
                     >
                       {itemInner.name}
                     </h2>
@@ -188,18 +217,30 @@ export class StreamlineEntries {
   };
 
   // @ts-ignore
-  private fav = () => {
-    return (
-      stateLocal.entriesFavActive?.length >= 1 &&
-      (stateLocal.entriesFavActive || stateLocal.entriesFav) &&
-      Object.values(stateLocal.entriesFavActive || stateLocal.entriesFav).map(
-        (item) => {
-          return item.type
-            ? this[item.type]([item])
-            : StreamlineEntries.getHeader(item);
-        }
-      )
-    );
+  private post = (arr = []) => {
+    return Object.values(this.getArr(arr, 'post') as unknown).map((item) => {
+      return (
+        <div>
+          {StreamlineEntries.getHeader(item)}
+          <ul>
+            {Object.values(item.children as unknown).map((itemInner) => {
+              return (
+                <li class={`${this.border} flex flex-col pt-4 pb-3`}>
+                  <streamline-post
+                    href-edit={itemInner.hrefEdit}
+                    href-view={itemInner.guid}
+                    post-id={itemInner.ID}
+                    post-title={itemInner.post_title}
+                    post-type={itemInner.post_type}
+                    site-id={itemInner.siteId}
+                  />
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      );
+    });
   };
 
   render() {

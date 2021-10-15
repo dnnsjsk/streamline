@@ -56,10 +56,10 @@ export function getMenu(obj = {} as any) {
       {
         adminUrl,
         children: menu,
-        name:
+        title:
           obj.site || stateInternal.data.isMultisite
-            ? `Navigate to (site: ${obj.site || stateInternal.data.path})`
-            : `Navigate to`,
+            ? `Admin menu (site: ${obj.site || stateInternal.data.path})`
+            : `Admin menu`,
         siteId: Number(siteId),
         type: 'menu',
       },

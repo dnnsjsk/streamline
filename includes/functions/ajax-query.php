@@ -30,6 +30,28 @@ function streamlineQuery() {
 			$get = $arr;
 		}
 
+		if ( $callback == 'get_posts' ) {
+			$arr = call_user_func( $callback, [
+				's'         => $query,
+				'post_type' => 'any'
+			] );
+
+			$index = - 1;
+			foreach ( $arr as $post ) {
+				$index ++;
+				$arr[ $index ]->hrefEdit = get_edit_post_link( $post->ID );
+				$arr[ $index ]->name     = $post->post_title;
+				$arr[ $index ]->siteId   = get_current_blog_id();
+			}
+
+			$newArr = [];
+			foreach ( $arr as $post ) {
+				$newArr[ $post->ID ] = $post;
+			}
+
+			$get = $newArr;
+		}
+
 		wp_send_json_success( $get );
 	}
 	die ();

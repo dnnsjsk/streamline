@@ -12,11 +12,13 @@
 ### Depends on
 
 - [streamline-button](../streamline-button)
+- [streamline-post](../streamline-post)
 
 ### Graph
 ```mermaid
 graph TD;
   streamline-entries --> streamline-button
+  streamline-entries --> streamline-post
   streamline-box --> streamline-entries
   style streamline-entries fill:#f9f,stroke:#333,stroke-width:4px
 ```

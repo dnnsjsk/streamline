@@ -26,5 +26,5 @@ export function setEntries() {
   state[`entries${capitalizeFirstLetter(stateLocal.active)}Active`] =
     result?.length >= 1
       ? result
-      : [{ name: stateInternal.searchNoValue, children: [] }];
+      : [{ title: stateInternal.searchNoValue, children: [] }];
 }

@@ -10,23 +10,31 @@ export namespace Components {
     }
     interface StreamlineButton {
         "adminUrl": string;
+        "favourite": boolean;
         "header": string;
         "href": string;
         "icon": string;
         "index": number;
         "indexInner": number;
         "indexSub": number;
-        "isFavourite": boolean;
         "path": string;
         "siteId": number;
         "text": string;
-        "toggleFavourite": () => Promise<void>;
         "type": string;
         "typeSub": string;
     }
     interface StreamlineContainer {
     }
     interface StreamlineEntries {
+    }
+    interface StreamlinePost {
+        "favourite": boolean;
+        "hrefEdit": string;
+        "hrefView": string;
+        "postId": number;
+        "postTitle": string;
+        "postType": string;
+        "siteId": number;
     }
     interface StreamlineSearch {
     }
@@ -58,6 +66,12 @@ declare global {
         prototype: HTMLStreamlineEntriesElement;
         new (): HTMLStreamlineEntriesElement;
     };
+    interface HTMLStreamlinePostElement extends Components.StreamlinePost, HTMLStencilElement {
+    }
+    var HTMLStreamlinePostElement: {
+        prototype: HTMLStreamlinePostElement;
+        new (): HTMLStreamlinePostElement;
+    };
     interface HTMLStreamlineSearchElement extends Components.StreamlineSearch, HTMLStencilElement {
     }
     var HTMLStreamlineSearchElement: {
@@ -75,6 +89,7 @@ declare global {
         "streamline-button": HTMLStreamlineButtonElement;
         "streamline-container": HTMLStreamlineContainerElement;
         "streamline-entries": HTMLStreamlineEntriesElement;
+        "streamline-post": HTMLStreamlinePostElement;
         "streamline-search": HTMLStreamlineSearchElement;
         "streamline-sidebar": HTMLStreamlineSidebarElement;
     }
@@ -84,13 +99,13 @@ declare namespace LocalJSX {
     }
     interface StreamlineButton {
         "adminUrl"?: string;
+        "favourite"?: boolean;
         "header"?: string;
         "href"?: string;
         "icon"?: string;
         "index"?: number;
         "indexInner"?: number;
         "indexSub"?: number;
-        "isFavourite"?: boolean;
         "path"?: string;
         "siteId"?: number;
         "text"?: string;
@@ -101,6 +116,15 @@ declare namespace LocalJSX {
     }
     interface StreamlineEntries {
     }
+    interface StreamlinePost {
+        "favourite"?: boolean;
+        "hrefEdit"?: string;
+        "hrefView"?: string;
+        "postId"?: number;
+        "postTitle"?: string;
+        "postType"?: string;
+        "siteId"?: number;
+    }
     interface StreamlineSearch {
     }
     interface StreamlineSidebar {
@@ -110,6 +134,7 @@ declare namespace LocalJSX {
         "streamline-button": StreamlineButton;
         "streamline-container": StreamlineContainer;
         "streamline-entries": StreamlineEntries;
+        "streamline-post": StreamlinePost;
         "streamline-search": StreamlineSearch;
         "streamline-sidebar": StreamlineSidebar;
     }
@@ -122,6 +147,7 @@ declare module "@stencil/core" {
             "streamline-button": LocalJSX.StreamlineButton & JSXBase.HTMLAttributes<HTMLStreamlineButtonElement>;
             "streamline-container": LocalJSX.StreamlineContainer & JSXBase.HTMLAttributes<HTMLStreamlineContainerElement>;
             "streamline-entries": LocalJSX.StreamlineEntries & JSXBase.HTMLAttributes<HTMLStreamlineEntriesElement>;
+            "streamline-post": LocalJSX.StreamlinePost & JSXBase.HTMLAttributes<HTMLStreamlinePostElement>;
             "streamline-search": LocalJSX.StreamlineSearch & JSXBase.HTMLAttributes<HTMLStreamlineSearchElement>;
             "streamline-sidebar": LocalJSX.StreamlineSidebar & JSXBase.HTMLAttributes<HTMLStreamlineSidebarElement>;
         }
