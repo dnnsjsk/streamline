@@ -5,9 +5,9 @@ import { setEntries } from '../../utils/setEntries';
 import { checkIfStringStartsWith } from '../../utils/checkIfStringStartsWith';
 import { getQuery } from '../../utils/getQuery';
 import { stateLocal } from '../../store/local';
-import { isGlobalCommands } from '../../utils/isGlobalCommands';
 import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
 import { resetView } from '../../utils/resetView';
+import { isLocalCommands } from '../../utils/isLocalCommands';
 
 /**
  * Search.
@@ -28,7 +28,7 @@ export class StreamlineSearch {
 
   connectedCallback() {
     const arr = [];
-    Object.keys(stateInternal.commands).forEach((item) => {
+    Object.keys(stateInternal.commands.local).forEach((item) => {
       arr.push(`/${item} `);
     });
     this.commands = arr;
@@ -50,10 +50,14 @@ export class StreamlineSearch {
         stateInternal.isEnter = true;
         this.command = 'post';
       }
-    } else if (e.target.value.startsWith('/') && isGlobalCommands()) {
+    } else if (e.target.value.startsWith('/') && isLocalCommands()) {
       stateInternal.isSlash = true;
-      stateInternal.entriesMenuActive = [];
-      if (checkIfStringStartsWith(stateInternal.searchValue, this.commands)) {
+      if (
+        checkIfStringStartsWith(
+          stateInternal.searchValue,
+          stateInternal.menu[stateLocal.active].commands
+        )
+      ) {
         stateInternal.isEnter = true;
         this.command = stateInternal.searchValue.split(' ')[0].slice(1);
       } else {
@@ -75,7 +79,7 @@ export class StreamlineSearch {
       this.value = stateInternal.searchValue
         .replace(`/${this.command}`, '')
         .trim();
-      this.callback = stateInternal.commands[this.command].callback;
+      this.callback = stateInternal.commands.local[this.command].callback;
     } else if (stateLocal.active === 'post') {
       this.value = stateInternal.searchValue;
       this.callback = 'get_posts';
@@ -109,8 +113,6 @@ export class StreamlineSearch {
         if (this.callback === 'get_sites') {
           stateInternal.isSites = true;
         } else if (this.callback === 'get_posts') {
-          console.log(stateInternal.entriesPost);
-          console.log(stateInternal.entriesMenu);
           resetView();
         }
         stateInternal.isLoading = false;

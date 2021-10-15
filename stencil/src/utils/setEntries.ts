@@ -4,10 +4,8 @@ import { filterDeep } from 'deepdash-es/standalone';
 import { capitalizeFirstLetter } from './capitalizeFirstLetter';
 
 export function setEntries() {
-  const state = stateLocal.active === 'fav' ? stateLocal : stateInternal;
-
   const result = filterDeep(
-    state[`entries${capitalizeFirstLetter(stateLocal.active)}`],
+    stateInternal[`entries${capitalizeFirstLetter(stateLocal.active)}`],
     (o) => {
       return (
         (o.name &&
@@ -23,7 +21,7 @@ export function setEntries() {
     { childrenPath: ['children'] }
   );
 
-  state[`entries${capitalizeFirstLetter(stateLocal.active)}Active`] =
+  stateInternal[`entries${capitalizeFirstLetter(stateLocal.active)}Active`] =
     result?.length >= 1
       ? result
       : [{ title: stateInternal.searchNoValue, children: [] }];

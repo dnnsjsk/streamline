@@ -69,9 +69,11 @@ export class StreamlineEntries {
   private slash = () => {
     return (
       <div>
-        {StreamlineEntries.getHeader({ title: 'Available commands' })}
+        {StreamlineEntries.getHeader({
+          title: 'Available commands current mode',
+        })}
         <ul>
-          {Object.values(stateInternal.commands).map((item) => {
+          {Object.values(stateInternal.commands.local).map((item) => {
             const type = item.name.substring(item.name.indexOf('[') - 1);
             const cmd = item.name.replace(type, '');
 
@@ -144,15 +146,15 @@ export class StreamlineEntries {
   // @ts-ignore
   private fav = () => {
     return (
-      stateLocal.entriesFavActive?.length >= 1 &&
-      (stateLocal.entriesFavActive || stateLocal.entriesFav) &&
-      Object.values(stateLocal.entriesFavActive || stateLocal.entriesFav).map(
-        (item) => {
-          return item.type
-            ? this[item.type]([item])
-            : StreamlineEntries.getHeader(item);
-        }
-      )
+      stateInternal.entriesFavActive?.length >= 1 &&
+      (stateInternal.entriesFavActive || stateInternal.entriesFav) &&
+      Object.values(
+        (stateInternal.entriesFavActive || stateInternal.entriesFav) as unknown
+      ).map((item) => {
+        return item.type
+          ? this[item.type]([item])
+          : StreamlineEntries.getHeader(item);
+      })
     );
   };
 
@@ -179,13 +181,6 @@ export class StreamlineEntries {
                       <ul class={`flex flex-wrap gap-x-4 pb-4`}>
                         {Object.values(itemInner.children as unknown).map(
                           (itemSub, indexSub) => {
-                            if (
-                              indexInner + 1 === itemInner.children.length &&
-                              indexSub + 1 ===
-                                Object.values(itemInner.children).length
-                              // eslint-disable-next-line no-empty
-                            ) {
-                            }
                             return (
                               <li key={indexSub} class={`mt-4`}>
                                 <streamline-button

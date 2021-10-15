@@ -24,6 +24,8 @@ export class StreamlineButton {
   private tooltip: HTMLElement;
 
   @Prop() adminUrl: string;
+  // eslint-disable-next-line @stencil/strict-mutable
+  @Prop({ mutable: true, reflect: true }) favourite: boolean;
   @Prop() header: string;
   @Prop() href: string;
   @Prop() icon: string;
@@ -35,7 +37,6 @@ export class StreamlineButton {
   @Prop() text: string;
   @Prop() type: string;
   @Prop() typeSub: string;
-  @Prop({ mutable: true, reflect: true }) favourite: boolean;
 
   componentWillRender() {
     if (this.type === 'main') {
@@ -104,18 +105,14 @@ export class StreamlineButton {
         return o.type === this.typeSub && o.siteId === this.siteId;
       },
       pathFav: (o) => {
-        return (
-          o.href === this.href &&
-          o.adminUrl === this.adminUrl &&
-          o.siteId === this.siteId
-        );
+        return o.path === this.path && o.siteId === this.siteId;
       },
     });
   };
 
   private checkIfFav = () => {
     this.favourite = someDeep(
-      stateLocal.entriesFav,
+      stateInternal.entriesFav,
       (o) => {
         return o?.path === this.path && o?.siteId === this.siteId;
       },

@@ -3,6 +3,7 @@ import { Component, Element, h, Prop } from '@stencil/core';
 import { setFavourite } from '../../utils/setFavourite';
 import { someDeep } from 'deepdash-es/standalone';
 import { stateLocal } from '../../store/local';
+import { stateInternal } from '../../store/internal';
 import { Fav } from '../../elements/Fav';
 
 /**
@@ -53,7 +54,7 @@ export class StreamlinePost {
 
   private checkIfFav = () => {
     this.favourite = someDeep(
-      stateLocal.entriesFav,
+      stateInternal.entriesFav,
       (o) => {
         return o?.ID === this.postId && o?.siteId === this.siteId;
       },
@@ -91,7 +92,7 @@ export class StreamlinePost {
               },
               {
                 text: 'Edit',
-                href: this.hrefEdit,
+                href: atob(this.hrefEdit).replace('&amp;', '&'),
               },
             ].map((item) => {
               const className =

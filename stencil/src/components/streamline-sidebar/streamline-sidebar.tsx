@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, h } from '@stencil/core';
 import { stateInternal } from '../../store/internal';
+import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
 
 /**
  * Sidebar.
@@ -22,9 +23,15 @@ export class StreamlineSidebar {
           onClick={() => (stateInternal.visible = false)}
         />
         <div class={`grid-flow-row grid auto-rows-max`}>
-          <streamline-button type="sidebar" text="Fav" icon="fav" />
-          <streamline-button type="sidebar" text="Menu" icon="menu" />
-          <streamline-button type="sidebar" text="Post" icon="post" />
+          {Object.values(stateInternal.menu).map((item) => {
+            return (
+              <streamline-button
+                type="sidebar"
+                text={capitalizeFirstLetter(item.name)}
+                icon={item.name}
+              />
+            );
+          })}
         </div>
       </nav>
     );

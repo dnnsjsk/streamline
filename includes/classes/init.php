@@ -82,6 +82,22 @@ class Init {
 
 	}
 
+	function ArrayReplace( $Array, $Find, $Replace ) {
+		if ( is_array( $Array ) ) {
+			foreach ( $Array as $Key => $Val ) {
+				if ( is_array( $Array[ $Key ] ) ) {
+					$Array[ $Key ] = ArrayReplace( $Array[ $Key ], $Find, $Replace );
+				} else {
+					if ( $Key === $Find ) {
+						$Array[ $Key ] = $Replace;
+					}
+				}
+			}
+		}
+
+		return $Array;
+	}
+
 	/**
 	 * Get data
 	 *
@@ -92,6 +108,23 @@ class Init {
 
 		$currentSite = get_sites( [ 'ID' => get_current_blog_id() ] );
 
+		$favs = get_option( 'streamline' )['favourites'] ?: [];
+
+		foreach ( $favs as $fav ) {
+			if ( $fav->type === 'menu' ) {
+				$siteId        = $fav->siteId;
+				$adminUrl      = get_admin_url( $siteId );
+				$fav->adminUrl = $adminUrl;
+
+				foreach ( $fav->children as $children ) {
+					foreach ( $children->children as $link ) {
+						$link->adminUrl = $adminUrl;
+						$link->href     = $adminUrl . $link->path;
+					}
+				}
+			}
+		}
+
 		echo '<script id="streamline-data">';
 		echo 'window.streamlineData =';
 		echo json_encode( [
@@ -99,7 +132,9 @@ class Init {
 			'isMultisite' => is_multisite(),
 			'path'        => $currentSite[0]->path,
 			'siteId'      => get_current_blog_id(),
+			'favourites'  => json_encode( $favs )
 		] );
+		echo ';';
 		echo '</script>';
 
 	}

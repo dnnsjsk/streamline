@@ -1,5 +1,4 @@
 import { stateInternal } from '../store/internal';
-import { stateLocal } from '../store/local';
 
 export function setData() {
   stateInternal.entriesSite = [
@@ -426,8 +425,8 @@ export function setData() {
       siteId: 305,
     },
   ];
-  stateLocal.entriesFav = fav;
-  stateLocal.entriesFavActive = fav;
+  stateInternal.entriesFav = fav;
+  stateInternal.entriesFavActive = fav;
 
   const menu = [
     {

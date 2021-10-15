@@ -3,8 +3,6 @@ import { setSearchPlaceholder } from '../utils/setSearchPlaceholder';
 
 const { state, dispose, onChange } = createLocalStore('streamline', {
   active: 'menu',
-  entriesFav: [],
-  entriesFavActive: [],
 });
 
 onChange('active', () => {

@@ -74,27 +74,27 @@ describe('Render entries with', function () {
         const lengthLi = el.querySelectorAll('li').length;
         if (index === 0) {
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(stateLocal.entriesFav.length).toBe(4);
+          expect(stateInternal.entriesFav.length).toBe(4);
           // eslint-disable-next-line jest/no-conditional-expect
           expect(lengthLi).toBe(21);
         } else if (index === 2) {
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(stateLocal.entriesFav.length).toBe(3);
+          expect(stateInternal.entriesFav.length).toBe(3);
           // eslint-disable-next-line jest/no-conditional-expect
           expect(lengthLi).toBe(18);
         } else if (index === 8) {
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(stateLocal.entriesFav.length).toBe(2);
+          expect(stateInternal.entriesFav.length).toBe(2);
           // eslint-disable-next-line jest/no-conditional-expect
           expect(lengthLi).toBe(8);
         } else if (index === 11) {
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(stateLocal.entriesFav.length).toBe(1);
+          expect(stateInternal.entriesFav.length).toBe(1);
           // eslint-disable-next-line jest/no-conditional-expect
           expect(lengthLi).toBe(3);
         } else if (index === 14) {
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(stateLocal.entriesFav.length).toBe(0);
+          expect(stateInternal.entriesFav.length).toBe(0);
           // eslint-disable-next-line jest/no-conditional-expect
           expect(lengthLi).toBe(0);
         }
@@ -133,6 +133,7 @@ describe('Render entries with', function () {
       await page.waitForChanges();
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
       const buttons = el.querySelectorAll('streamline-button');
+      await page.waitForChanges();
       let favs = 0;
       for (const item of Array.from(buttons)) {
         if (item.getAttribute('favourite') === '') {

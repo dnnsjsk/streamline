@@ -12,7 +12,7 @@ function streamlineQuery() {
 		$query    = $_POST['query'];
 		$get      = '';
 
-		if ( $callback == 'get_sites' ) {
+		if ( $callback === 'get_sites' ) {
 			$arr = call_user_func( $callback, [
 				'search' => $query
 			] );
@@ -28,9 +28,11 @@ function streamlineQuery() {
 			}
 
 			$get = $arr;
+
+			wp_send_json_success( $get );
 		}
 
-		if ( $callback == 'get_posts' ) {
+		if ( $callback === 'get_posts' ) {
 			$arr = call_user_func( $callback, [
 				's'         => $query,
 				'post_type' => 'any'
@@ -39,7 +41,7 @@ function streamlineQuery() {
 			$index = - 1;
 			foreach ( $arr as $post ) {
 				$index ++;
-				$arr[ $index ]->hrefEdit = get_edit_post_link( $post->ID );
+				$arr[ $index ]->hrefEdit = base64_encode( get_edit_post_link( $post->ID ) );
 				$arr[ $index ]->name     = $post->post_title;
 				$arr[ $index ]->siteId   = get_current_blog_id();
 			}
@@ -50,9 +52,19 @@ function streamlineQuery() {
 			}
 
 			$get = $newArr;
+
+			wp_send_json_success( $get );
 		}
 
-		wp_send_json_success( $get );
+		if ( $callback === 'fav' ) {
+			$options               = get_option( 'streamline' ) ?: [];
+			$fav                   = json_decode( stripslashes( html_entity_decode( $query ) ) );
+			$options['favourites'] = $fav;
+
+			update_option( 'streamline', $options );
+
+			wp_send_json_success( $fav );
+		}
 	}
 	die ();
 }
