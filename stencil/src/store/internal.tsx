@@ -40,6 +40,7 @@ const { state, dispose } = createStore({
   isLoading: false,
   isSites: false,
   isSlash: false,
+  isProcessing: false,
   searchNoValue: 'No entries found',
   searchPlaceholder: '',
   searchValue: '',

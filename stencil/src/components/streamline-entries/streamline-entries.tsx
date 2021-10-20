@@ -263,7 +263,9 @@ export class StreamlineEntries {
           </div>
         ) : (
           <div
-            class={`inner pb-3 sm:pb-6 relative px-3 h-[calc(100%-var(--sl-side-w))] overflow-y-scroll overflow-x-hidden w-full bg-white sm:px-6 lg:px-8`}
+            class={`inner pb-3 sm:pb-6 relative px-3 h-[calc(100%-var(--sl-side-w))] overflow-y-scroll overflow-x-hidden w-full bg-white sm:px-6 lg:px-8 ${
+              stateInternal.isProcessing ? 'pointer-events-none opacity-50' : ''
+            }`}
             tabIndex={-1}
           >
             {stateInternal.isSlash && !stateInternal.isSites

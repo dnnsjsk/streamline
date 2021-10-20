@@ -1,7 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, h, Prop } from '@stencil/core';
 import { stateInternal } from '../../store/internal';
-import hotkeys from 'hotkeys-js';
 import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
 
 /**
@@ -16,13 +15,16 @@ export class StreamlineContainer {
   @Prop() visible: boolean;
 
   connectedCallback() {
-    stateInternal.visible = this.visible;
+    stateInternal.visible = this.visible || false;
+  }
 
+  componentDidLoad() {
     setSearchPlaceholder();
 
-    hotkeys('command+k', function () {
-      stateInternal.visible = !stateInternal.visible;
-      return false;
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'k' && e.metaKey) {
+        stateInternal.visible = !stateInternal.visible;
+      }
     });
   }
 

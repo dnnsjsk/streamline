@@ -108,7 +108,7 @@ class Init {
 
 		$currentSite = get_sites( [ 'ID' => get_current_blog_id() ] );
 
-		$favs = get_option( 'streamline' )['favourites'] ?: [];
+		$favs = get_user_meta( get_current_user_id(), 'streamline' )[0]['favourites'] ?: [];
 
 		foreach ( $favs as $fav ) {
 			if ( $fav->type === 'menu' ) {
@@ -129,10 +129,12 @@ class Init {
 		echo 'window.streamlineData =';
 		echo json_encode( [
 			'adminUrl'    => admin_url(),
+			'favourites'  => json_encode( $favs ),
+			'fav'         => json_encode( get_user_meta( get_current_user_id(), 'streamline' ) ),
 			'isMultisite' => is_multisite(),
 			'path'        => $currentSite[0]->path,
 			'siteId'      => get_current_blog_id(),
-			'favourites'  => json_encode( $favs )
+			'userId'      => get_current_user_id(),
 		] );
 		echo ';';
 		echo '</script>';
@@ -159,7 +161,7 @@ class Init {
 	 * @since   1.0.0
 	 */
 	private static function addContainer() {
-		$container = '<streamline-container></streamline-container>';
+		$container = '<streamline-container visible></streamline-container>';
 
 		add_action( 'admin_footer', function () use ( $container ) {
 			if ( is_user_logged_in() ) {

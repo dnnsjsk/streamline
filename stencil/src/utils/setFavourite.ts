@@ -79,6 +79,8 @@ export function setFavourite(obj) {
     setEntries();
   }
 
+  stateInternal.isProcessing = true;
+
   // @ts-ignore
   // eslint-disable-next-line no-undef
   const streamline = window.streamline || false;
@@ -92,12 +94,10 @@ export function setFavourite(obj) {
       stateInternal.entriesFav
       // @ts-ignore
       // eslint-disable-next-line no-undef
-    )}&nonce=${streamline.nonce}`,
-  });
-  /*
+    )}&nonce=${streamline.nonce}&userId=${String(stateInternal.data.userId)}`,
+  })
     .then((response) => response.json())
-    .then((data) => console.log(data));
-   */
+    .then(() => (stateInternal.isProcessing = false));
 
   obj.callback && obj.callback();
   hideAll();

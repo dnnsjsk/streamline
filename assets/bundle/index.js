@@ -405,6 +405,7 @@ const { state: state$1, dispose: dispose$1 } = createStore({
     isLoading: false,
     isSites: false,
     isSlash: false,
+    isProcessing: false,
     searchNoValue: "No entries found",
     searchPlaceholder: "",
     searchValue: "",
@@ -9697,6 +9698,7 @@ function setFavourite(obj) {
     state$1.entriesFavActive = removeArr;
     setEntries();
   }
+  state$1.isProcessing = true;
   // @ts-ignore
   // eslint-disable-next-line no-undef
   const streamline = window.streamline || false;
@@ -9709,12 +9711,10 @@ function setFavourite(obj) {
     body: `action=streamlineQuery&callback=fav&query=${JSON.stringify(state$1.entriesFav
     // @ts-ignore
     // eslint-disable-next-line no-undef
-    )}&nonce=${streamline.nonce}`,
-  });
-  /*
+    )}&nonce=${streamline.nonce}&userId=${String(state$1.data.userId)}`,
+  })
     .then((response) => response.json())
-    .then((data) => console.log(data));
-   */
+    .then(() => (state$1.isProcessing = false));
   obj.callback && obj.callback();
   hideAll();
 }
@@ -9732,7 +9732,7 @@ function Fav(props) {
     return (h("span", { class: `${props.class} rounded-full w-4 h-4 text-red-500 pointer-events-none bg-white flex items-center justify-center border border-gray-200` }, h("span", { class: `h-full w-full flex items-center justify-center` }, h(Heart, null))));
 }
 
-const streamlineButtonCss = ".tippy-box[data-animation=fade][data-state=hidden]{opacity:0}[data-tippy-root]{max-width:calc(100vw - 10px)}.tippy-box{background-color:#333;border-radius:4px;border-radius:0!important;color:#fff;font-size:14px;line-height:1.4;outline:0;position:relative;transition-property:transform,visibility,opacity;white-space:normal}.tippy-box[data-placement^=top]>.tippy-arrow{bottom:0}.tippy-box[data-placement^=top]>.tippy-arrow:before{border-top-color:initial;border-width:8px 8px 0;bottom:-7px;left:0;transform-origin:center top}.tippy-box[data-placement^=bottom]>.tippy-arrow{top:0}.tippy-box[data-placement^=bottom]>.tippy-arrow:before{border-bottom-color:initial;border-width:0 8px 8px;left:0;top:-7px;transform-origin:center bottom}.tippy-box[data-placement^=left]>.tippy-arrow{right:0}.tippy-box[data-placement^=left]>.tippy-arrow:before{border-left-color:initial;border-width:8px 0 8px 8px;right:-7px;transform-origin:center left}.tippy-box[data-placement^=right]>.tippy-arrow{left:0}.tippy-box[data-placement^=right]>.tippy-arrow:before{border-right-color:initial;border-width:8px 8px 8px 0;left:-7px;transform-origin:center right}.tippy-box[data-inertia][data-state=visible]{transition-timing-function:cubic-bezier(.54,1.5,.38,1.11)}.tippy-arrow{color:#333;height:16px;width:16px}.tippy-arrow:before{border-color:transparent;border-style:solid;content:\"\";position:absolute}.tippy-content{padding:0;position:relative;z-index:1}:host .focus{box-sizing:border-box;display:inline-flex;outline:none;position:relative}:host .focus [role=button]:focus,:host .focus a:focus,:host .focus button:focus,:host .focus input:focus{outline:none}:host .focus:focus-within:before{box-shadow:inset 0 0 0 2px var(--sl-focus-color)}:host .focus:before{box-sizing:border-box;content:\"\";height:calc(100% - 8px);left:4px;pointer-events:none;position:absolute;top:4px;width:calc(100% - 8px)}:host .focus--px-y:before{height:calc(100% - 9px)!important}:host .focus--px-x:before{width:calc(100% - 9px)!important}:host .focus--border:before{height:calc(100% - 10px)!important;left:5px;top:5px;width:calc(100% - 10px)!important}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-border-opacity:1;border:0 solid;box-sizing:border-box}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-gray-200{--tw-bg-opacity:1;background-color:rgba(229,231,235,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-gray-500{--tw-text-opacity:1;color:rgba(107,114,128,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */.pointer-events-none{pointer-events:none}.flex{display:flex}.h-4{height:1rem}.h-full{height:100%}.w-4{width:1rem}.w-full{width:100%}.items-center{align-items:center}.justify-center{justify-content:center}.rounded-full{border-radius:9999px}.border{border-width:1px}.border-gray-200{--tw-border-opacity:1;border-color:rgba(229,231,235,var(--tw-border-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.text-red-500{--tw-text-opacity:1;color:rgba(239,68,68,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */svg{display:block;vertical-align:middle}.relative{position:relative}.-mr-px{margin-right:-1px}.h-\\[14px\\]{height:14px}.fill-current{fill:currentColor}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
+const streamlineButtonCss = ".tippy-box[data-animation=fade][data-state=hidden]{opacity:0}[data-tippy-root]{max-width:calc(100vw - 10px)}.tippy-box{background-color:#333;border-radius:4px;border-radius:0!important;color:#fff;font-size:14px;line-height:1.4;outline:0;position:relative;transition-property:transform,visibility,opacity;white-space:normal}.tippy-box[data-placement^=top]>.tippy-arrow{bottom:0}.tippy-box[data-placement^=top]>.tippy-arrow:before{border-top-color:initial;border-width:8px 8px 0;bottom:-7px;left:0;transform-origin:center top}.tippy-box[data-placement^=bottom]>.tippy-arrow{top:0}.tippy-box[data-placement^=bottom]>.tippy-arrow:before{border-bottom-color:initial;border-width:0 8px 8px;left:0;top:-7px;transform-origin:center bottom}.tippy-box[data-placement^=left]>.tippy-arrow{right:0}.tippy-box[data-placement^=left]>.tippy-arrow:before{border-left-color:initial;border-width:8px 0 8px 8px;right:-7px;transform-origin:center left}.tippy-box[data-placement^=right]>.tippy-arrow{left:0}.tippy-box[data-placement^=right]>.tippy-arrow:before{border-right-color:initial;border-width:8px 8px 8px 0;left:-7px;transform-origin:center right}.tippy-box[data-inertia][data-state=visible]{transition-timing-function:cubic-bezier(.54,1.5,.38,1.11)}.tippy-arrow{color:#333;height:16px;width:16px}.tippy-arrow:before{border-color:transparent;border-style:solid;content:\"\";position:absolute}.tippy-content{padding:0;position:relative;z-index:1}:host .focus{box-sizing:border-box;display:inline-flex;outline:none;position:relative}:host .focus [role=button]:focus,:host .focus a:focus,:host .focus button:focus,:host .focus input:focus{outline:none}:host .focus:focus-within:before{box-shadow:inset 0 0 0 2px var(--sl-focus-color)}:host .focus:before{box-sizing:border-box;content:\"\";height:calc(100% - 8px);left:4px;pointer-events:none;position:absolute;top:4px;width:calc(100% - 8px)}:host .focus--px-y:before{height:calc(100% - 9px)!important}:host .focus--px-x:before{width:calc(100% - 9px)!important}:host .focus--border:before{height:calc(100% - 10px)!important;left:5px;top:5px;width:calc(100% - 10px)!important}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-border-opacity:1;border:0 solid;border:0 solid rgba(229,231,235,var(--tw-border-opacity));box-sizing:border-box}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-gray-200{--tw-bg-opacity:1;background-color:rgba(229,231,235,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-gray-500{--tw-text-opacity:1;color:rgba(107,114,128,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */.pointer-events-none{pointer-events:none}.flex{display:flex}.h-4{height:1rem}.h-full{height:100%}.w-4{width:1rem}.w-full{width:100%}.items-center{align-items:center}.justify-center{justify-content:center}.rounded-full{border-radius:9999px}.border{border-width:1px}.border-gray-200{--tw-border-opacity:1;border-color:rgba(229,231,235,var(--tw-border-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.text-red-500{--tw-text-opacity:1;color:rgba(239,68,68,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */svg{display:block;vertical-align:middle}.relative{position:relative}.-mr-px{margin-right:-1px}.h-\\[14px\\]{height:14px}.fill-current{fill:currentColor}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
 
 const StreamlineButton$1 = class extends HTMLElement {
     constructor() {
@@ -9854,577 +9854,6 @@ const StreamlineButton$1 = class extends HTMLElement {
     static get style() { return streamlineButtonCss + '/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-border-opacity:1;--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;border-color:rgba(229,231,235,var(--tw-border-opacity));box-sizing:border-box}button{background-color:transparent;background-image:none;color:inherit;cursor:pointer;font-family:inherit;font-size:100%;line-height:1.15;line-height:inherit;margin:0;padding:0;text-transform:none}[type=button],button{-webkit-appearance:button}a{color:inherit;text-decoration:inherit}svg{display:block;vertical-align:middle}[hidden]{display:none}.pointer-events-none{pointer-events:none}.absolute{position:absolute}.relative{position:relative}.-right-px{right:-1px}.-top-1{top:-.25rem}.-right-1{right:-.25rem}.mt-1\\.5{margin-top:.375rem}.mt-1{margin-top:.25rem}.block{display:block}.flex{display:flex}.inline-flex{display:inline-flex}.\\!grid{display:grid!important}.hidden{display:none}.h-\\[calc\\(var\\(--sl-side-w\\)\\)\\]{height:calc(var(--sl-side-w))}.h-\\[var\\(--sl-side-w\\)\\]{height:var(--sl-side-w)}.h-10{height:2.5rem}.h-\\[18px\\]{height:18px}.h-\\[16px\\]{height:16px}.h-8{height:2rem}.w-\\[max-content\\]{width:-webkit-max-content;width:-moz-max-content;width:max-content}.w-\\[calc\\(var\\(--sl-side-w\\)-1px\\)\\]{width:calc(var(--sl-side-w) - 1px)}.w-\\[var\\(--sl-side-w\\)\\]{width:var(--sl-side-w)}.w-10{width:2.5rem}.w-full{width:100%}.w-8{width:2rem}.min-w-\\[75px\\]{min-width:75px}.cursor-pointer{cursor:pointer}.auto-cols-max{grid-auto-columns:-webkit-max-content;grid-auto-columns:max-content}.grid-flow-col{grid-auto-flow:column}.flex-col{flex-direction:column}.\\!content-center{align-content:center!important}.items-center{align-items:center}.justify-center{justify-content:center}.\\!justify-items-center{justify-items:center!important}.divide-x>:not([hidden])~:not([hidden]){--tw-divide-x-reverse:0;border-left-width:calc(1px*(1 - var(--tw-divide-x-reverse)));border-right-width:calc(1px*var(--tw-divide-x-reverse))}.divide-gray-200>:not([hidden])~:not([hidden]){--tw-divide-opacity:1;border-color:rgba(229,231,235,var(--tw-divide-opacity))}.break-words{overflow-wrap:break-word}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-r{border-right-width:1px}.border-none{border-style:none}.border-gray-200{--tw-border-opacity:1;border-color:rgba(229,231,235,var(--tw-border-opacity))}.border-gray-300{--tw-border-opacity:1;border-color:rgba(209,213,219,var(--tw-border-opacity))}.border-white{--tw-border-opacity:1;border-color:rgba(255,255,255,var(--tw-border-opacity))}.bg-gray-50{--tw-bg-opacity:1;background-color:rgba(249,250,251,var(--tw-bg-opacity))}.bg-transparent{background-color:transparent}.bg-\\[\\#191E23\\]{--tw-bg-opacity:1;background-color:rgba(25,30,35,var(--tw-bg-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.fill-current{fill:currentColor}.p-0{padding:0}.px-3{padding-left:.75rem;padding-right:.75rem}.py-2\\.5{padding-bottom:.625rem;padding-top:.625rem}.py-2{padding-bottom:.5rem;padding-top:.5rem}.text-center{text-align:center}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xs{font-size:.75rem;line-height:1rem}.font-bold{font-weight:700}.uppercase{text-transform:uppercase}.leading-none{line-height:1}.text-indigo-600{--tw-text-opacity:1;color:rgba(79,70,229,var(--tw-text-opacity))}.text-gray-900{--tw-text-opacity:1;color:rgba(17,24,39,var(--tw-text-opacity))}.text-white{--tw-text-opacity:1;color:rgba(255,255,255,var(--tw-text-opacity))}.text-gray-500{--tw-text-opacity:1;color:rgba(107,114,128,var(--tw-text-opacity))}.text-indigo-700{--tw-text-opacity:1;color:rgba(67,56,202,var(--tw-text-opacity))}.text-red-500{--tw-text-opacity:1;color:rgba(239,68,68,var(--tw-text-opacity))}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.filter{filter:var(--tw-filter)}.container{width:100%}.hover\\:border-indigo-600:hover{--tw-border-opacity:1;border-color:rgba(79,70,229,var(--tw-border-opacity))}.hover\\:bg-\\[\\#0e1114\\]:hover{--tw-bg-opacity:1;background-color:rgba(14,17,20,var(--tw-bg-opacity))}.hover\\:bg-gray-100:hover{--tw-bg-opacity:1;background-color:rgba(243,244,246,var(--tw-bg-opacity))}.hover\\:\\!bg-white:hover{--tw-bg-opacity:1!important;background-color:rgba(255,255,255,var(--tw-bg-opacity))!important}.hover\\:text-gray-900:hover{--tw-text-opacity:1;color:rgba(17,24,39,var(--tw-text-opacity))}@media (min-width:640px){.container{max-width:640px}.sm\\:inline-block{display:inline-block}.sm\\:\\!grid-rows-\\[20px\\2c 20px\\]{grid-template-rows:20px 20px!important}}@media (min-width:768px){.container{max-width:768px}}@media (min-width:1024px){.container{max-width:1024px}}@media (min-width:1280px){.container{max-width:1280px}}@media (min-width:1536px){.container{max-width:1536px}}'; }
 };
 
-/*!
- * hotkeys-js v3.8.7
- * A simple micro-library for defining and dispatching keyboard shortcuts. It has no dependencies.
- * 
- * Copyright (c) 2021 kenny wong <wowohoo@qq.com>
- * http://jaywcjlove.github.io/hotkeys
- * 
- * Licensed under the MIT license.
- */
-
-var isff = typeof navigator !== 'undefined' ? navigator.userAgent.toLowerCase().indexOf('firefox') > 0 : false; // 绑定事件
-
-function addEvent(object, event, method) {
-  if (object.addEventListener) {
-    object.addEventListener(event, method, false);
-  } else if (object.attachEvent) {
-    object.attachEvent("on".concat(event), function () {
-      method(window.event);
-    });
-  }
-} // 修饰键转换成对应的键码
-
-
-function getMods(modifier, key) {
-  var mods = key.slice(0, key.length - 1);
-
-  for (var i = 0; i < mods.length; i++) {
-    mods[i] = modifier[mods[i].toLowerCase()];
-  }
-
-  return mods;
-} // 处理传的key字符串转换成数组
-
-
-function getKeys(key) {
-  if (typeof key !== 'string') key = '';
-  key = key.replace(/\s/g, ''); // 匹配任何空白字符,包括空格、制表符、换页符等等
-
-  var keys = key.split(','); // 同时设置多个快捷键，以','分割
-
-  var index = keys.lastIndexOf(''); // 快捷键可能包含','，需特殊处理
-
-  for (; index >= 0;) {
-    keys[index - 1] += ',';
-    keys.splice(index, 1);
-    index = keys.lastIndexOf('');
-  }
-
-  return keys;
-} // 比较修饰键的数组
-
-
-function compareArray(a1, a2) {
-  var arr1 = a1.length >= a2.length ? a1 : a2;
-  var arr2 = a1.length >= a2.length ? a2 : a1;
-  var isIndex = true;
-
-  for (var i = 0; i < arr1.length; i++) {
-    if (arr2.indexOf(arr1[i]) === -1) isIndex = false;
-  }
-
-  return isIndex;
-}
-
-var _keyMap = {
-  backspace: 8,
-  tab: 9,
-  clear: 12,
-  enter: 13,
-  return: 13,
-  esc: 27,
-  escape: 27,
-  space: 32,
-  left: 37,
-  up: 38,
-  right: 39,
-  down: 40,
-  del: 46,
-  delete: 46,
-  ins: 45,
-  insert: 45,
-  home: 36,
-  end: 35,
-  pageup: 33,
-  pagedown: 34,
-  capslock: 20,
-  num_0: 96,
-  num_1: 97,
-  num_2: 98,
-  num_3: 99,
-  num_4: 100,
-  num_5: 101,
-  num_6: 102,
-  num_7: 103,
-  num_8: 104,
-  num_9: 105,
-  num_multiply: 106,
-  num_add: 107,
-  num_enter: 108,
-  num_subtract: 109,
-  num_decimal: 110,
-  num_divide: 111,
-  '⇪': 20,
-  ',': 188,
-  '.': 190,
-  '/': 191,
-  '`': 192,
-  '-': isff ? 173 : 189,
-  '=': isff ? 61 : 187,
-  ';': isff ? 59 : 186,
-  '\'': 222,
-  '[': 219,
-  ']': 221,
-  '\\': 220
-}; // Modifier Keys
-
-var _modifier = {
-  // shiftKey
-  '⇧': 16,
-  shift: 16,
-  // altKey
-  '⌥': 18,
-  alt: 18,
-  option: 18,
-  // ctrlKey
-  '⌃': 17,
-  ctrl: 17,
-  control: 17,
-  // metaKey
-  '⌘': 91,
-  cmd: 91,
-  command: 91
-};
-var modifierMap = {
-  16: 'shiftKey',
-  18: 'altKey',
-  17: 'ctrlKey',
-  91: 'metaKey',
-  shiftKey: 16,
-  ctrlKey: 17,
-  altKey: 18,
-  metaKey: 91
-};
-var _mods = {
-  16: false,
-  18: false,
-  17: false,
-  91: false
-};
-var _handlers = {}; // F1~F12 special key
-
-for (var k = 1; k < 20; k++) {
-  _keyMap["f".concat(k)] = 111 + k;
-}
-
-var _downKeys = []; // 记录摁下的绑定键
-
-var _scope = 'all'; // 默认热键范围
-
-var elementHasBindEvent = []; // 已绑定事件的节点记录
-// 返回键码
-
-var code = function code(x) {
-  return _keyMap[x.toLowerCase()] || _modifier[x.toLowerCase()] || x.toUpperCase().charCodeAt(0);
-}; // 设置获取当前范围（默认为'所有'）
-
-
-function setScope(scope) {
-  _scope = scope || 'all';
-} // 获取当前范围
-
-
-function getScope() {
-  return _scope || 'all';
-} // 获取摁下绑定键的键值
-
-
-function getPressedKeyCodes() {
-  return _downKeys.slice(0);
-} // 表单控件控件判断 返回 Boolean
-// hotkey is effective only when filter return true
-
-
-function filter(event) {
-  var target = event.target || event.srcElement;
-  var tagName = target.tagName;
-  var flag = true; // ignore: isContentEditable === 'true', <input> and <textarea> when readOnly state is false, <select>
-
-  if (target.isContentEditable || (tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT') && !target.readOnly) {
-    flag = false;
-  }
-
-  return flag;
-} // 判断摁下的键是否为某个键，返回true或者false
-
-
-function isPressed(keyCode) {
-  if (typeof keyCode === 'string') {
-    keyCode = code(keyCode); // 转换成键码
-  }
-
-  return _downKeys.indexOf(keyCode) !== -1;
-} // 循环删除handlers中的所有 scope(范围)
-
-
-function deleteScope(scope, newScope) {
-  var handlers;
-  var i; // 没有指定scope，获取scope
-
-  if (!scope) scope = getScope();
-
-  for (var key in _handlers) {
-    if (Object.prototype.hasOwnProperty.call(_handlers, key)) {
-      handlers = _handlers[key];
-
-      for (i = 0; i < handlers.length;) {
-        if (handlers[i].scope === scope) handlers.splice(i, 1);else i++;
-      }
-    }
-  } // 如果scope被删除，将scope重置为all
-
-
-  if (getScope() === scope) setScope(newScope || 'all');
-} // 清除修饰键
-
-
-function clearModifier(event) {
-  var key = event.keyCode || event.which || event.charCode;
-
-  var i = _downKeys.indexOf(key); // 从列表中清除按压过的键
-
-
-  if (i >= 0) {
-    _downKeys.splice(i, 1);
-  } // 特殊处理 cmmand 键，在 cmmand 组合快捷键 keyup 只执行一次的问题
-
-
-  if (event.key && event.key.toLowerCase() === 'meta') {
-    _downKeys.splice(0, _downKeys.length);
-  } // 修饰键 shiftKey altKey ctrlKey (command||metaKey) 清除
-
-
-  if (key === 93 || key === 224) key = 91;
-
-  if (key in _mods) {
-    _mods[key] = false; // 将修饰键重置为false
-
-    for (var k in _modifier) {
-      if (_modifier[k] === key) hotkeys[k] = false;
-    }
-  }
-}
-
-function unbind(keysInfo) {
-  // unbind(), unbind all keys
-  if (!keysInfo) {
-    Object.keys(_handlers).forEach(function (key) {
-      return delete _handlers[key];
-    });
-  } else if (Array.isArray(keysInfo)) {
-    // support like : unbind([{key: 'ctrl+a', scope: 's1'}, {key: 'ctrl-a', scope: 's2', splitKey: '-'}])
-    keysInfo.forEach(function (info) {
-      if (info.key) eachUnbind(info);
-    });
-  } else if (typeof keysInfo === 'object') {
-    // support like unbind({key: 'ctrl+a, ctrl+b', scope:'abc'})
-    if (keysInfo.key) eachUnbind(keysInfo);
-  } else if (typeof keysInfo === 'string') {
-    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      args[_key - 1] = arguments[_key];
-    }
-
-    // support old method
-    // eslint-disable-line
-    var scope = args[0],
-        method = args[1];
-
-    if (typeof scope === 'function') {
-      method = scope;
-      scope = '';
-    }
-
-    eachUnbind({
-      key: keysInfo,
-      scope: scope,
-      method: method,
-      splitKey: '+'
-    });
-  }
-} // 解除绑定某个范围的快捷键
-
-
-var eachUnbind = function eachUnbind(_ref) {
-  var key = _ref.key,
-      scope = _ref.scope,
-      method = _ref.method,
-      _ref$splitKey = _ref.splitKey,
-      splitKey = _ref$splitKey === void 0 ? '+' : _ref$splitKey;
-  var multipleKeys = getKeys(key);
-  multipleKeys.forEach(function (originKey) {
-    var unbindKeys = originKey.split(splitKey);
-    var len = unbindKeys.length;
-    var lastKey = unbindKeys[len - 1];
-    var keyCode = lastKey === '*' ? '*' : code(lastKey);
-    if (!_handlers[keyCode]) return; // 判断是否传入范围，没有就获取范围
-
-    if (!scope) scope = getScope();
-    var mods = len > 1 ? getMods(_modifier, unbindKeys) : [];
-    _handlers[keyCode] = _handlers[keyCode].map(function (record) {
-      // 通过函数判断，是否解除绑定，函数相等直接返回
-      var isMatchingMethod = method ? record.method === method : true;
-
-      if (isMatchingMethod && record.scope === scope && compareArray(record.mods, mods)) {
-        return {};
-      }
-
-      return record;
-    });
-  });
-}; // 对监听对应快捷键的回调函数进行处理
-
-
-function eventHandler(event, handler, scope) {
-  var modifiersMatch; // 看它是否在当前范围
-
-  if (handler.scope === scope || handler.scope === 'all') {
-    // 检查是否匹配修饰符（如果有返回true）
-    modifiersMatch = handler.mods.length > 0;
-
-    for (var y in _mods) {
-      if (Object.prototype.hasOwnProperty.call(_mods, y)) {
-        if (!_mods[y] && handler.mods.indexOf(+y) > -1 || _mods[y] && handler.mods.indexOf(+y) === -1) {
-          modifiersMatch = false;
-        }
-      }
-    } // 调用处理程序，如果是修饰键不做处理
-
-
-    if (handler.mods.length === 0 && !_mods[16] && !_mods[18] && !_mods[17] && !_mods[91] || modifiersMatch || handler.shortcut === '*') {
-      if (handler.method(event, handler) === false) {
-        if (event.preventDefault) event.preventDefault();else event.returnValue = false;
-        if (event.stopPropagation) event.stopPropagation();
-        if (event.cancelBubble) event.cancelBubble = true;
-      }
-    }
-  }
-} // 处理keydown事件
-
-
-function dispatch(event) {
-  var asterisk = _handlers['*'];
-  var key = event.keyCode || event.which || event.charCode; // 表单控件过滤 默认表单控件不触发快捷键
-
-  if (!hotkeys.filter.call(this, event)) return; // Gecko(Firefox)的command键值224，在Webkit(Chrome)中保持一致
-  // Webkit左右 command 键值不一样
-
-  if (key === 93 || key === 224) key = 91;
-  /**
-   * Collect bound keys
-   * If an Input Method Editor is processing key input and the event is keydown, return 229.
-   * https://stackoverflow.com/questions/25043934/is-it-ok-to-ignore-keydown-events-with-keycode-229
-   * http://lists.w3.org/Archives/Public/www-dom/2010JulSep/att-0182/keyCode-spec.html
-   */
-
-  if (_downKeys.indexOf(key) === -1 && key !== 229) _downKeys.push(key);
-  /**
-   * Jest test cases are required.
-   * ===============================
-   */
-
-  ['ctrlKey', 'altKey', 'shiftKey', 'metaKey'].forEach(function (keyName) {
-    var keyNum = modifierMap[keyName];
-
-    if (event[keyName] && _downKeys.indexOf(keyNum) === -1) {
-      _downKeys.push(keyNum);
-    } else if (!event[keyName] && _downKeys.indexOf(keyNum) > -1) {
-      _downKeys.splice(_downKeys.indexOf(keyNum), 1);
-    } else if (keyName === 'metaKey' && event[keyName] && _downKeys.length === 3) {
-      /**
-       * Fix if Command is pressed:
-       * ===============================
-       */
-      if (!(event.ctrlKey || event.shiftKey || event.altKey)) {
-        _downKeys = _downKeys.slice(_downKeys.indexOf(keyNum));
-      }
-    }
-  });
-  /**
-   * -------------------------------
-   */
-
-  if (key in _mods) {
-    _mods[key] = true; // 将特殊字符的key注册到 hotkeys 上
-
-    for (var k in _modifier) {
-      if (_modifier[k] === key) hotkeys[k] = true;
-    }
-
-    if (!asterisk) return;
-  } // 将 modifierMap 里面的修饰键绑定到 event 中
-
-
-  for (var e in _mods) {
-    if (Object.prototype.hasOwnProperty.call(_mods, e)) {
-      _mods[e] = event[modifierMap[e]];
-    }
-  }
-  /**
-   * https://github.com/jaywcjlove/hotkeys/pull/129
-   * This solves the issue in Firefox on Windows where hotkeys corresponding to special characters would not trigger.
-   * An example of this is ctrl+alt+m on a Swedish keyboard which is used to type μ.
-   * Browser support: https://caniuse.com/#feat=keyboardevent-getmodifierstate
-   */
-
-
-  if (event.getModifierState && !(event.altKey && !event.ctrlKey) && event.getModifierState('AltGraph')) {
-    if (_downKeys.indexOf(17) === -1) {
-      _downKeys.push(17);
-    }
-
-    if (_downKeys.indexOf(18) === -1) {
-      _downKeys.push(18);
-    }
-
-    _mods[17] = true;
-    _mods[18] = true;
-  } // 获取范围 默认为 `all`
-
-
-  var scope = getScope(); // 对任何快捷键都需要做的处理
-
-  if (asterisk) {
-    for (var i = 0; i < asterisk.length; i++) {
-      if (asterisk[i].scope === scope && (event.type === 'keydown' && asterisk[i].keydown || event.type === 'keyup' && asterisk[i].keyup)) {
-        eventHandler(event, asterisk[i], scope);
-      }
-    }
-  } // key 不在 _handlers 中返回
-
-
-  if (!(key in _handlers)) return;
-
-  for (var _i = 0; _i < _handlers[key].length; _i++) {
-    if (event.type === 'keydown' && _handlers[key][_i].keydown || event.type === 'keyup' && _handlers[key][_i].keyup) {
-      if (_handlers[key][_i].key) {
-        var record = _handlers[key][_i];
-        var splitKey = record.splitKey;
-        var keyShortcut = record.key.split(splitKey);
-        var _downKeysCurrent = []; // 记录当前按键键值
-
-        for (var a = 0; a < keyShortcut.length; a++) {
-          _downKeysCurrent.push(code(keyShortcut[a]));
-        }
-
-        if (_downKeysCurrent.sort().join('') === _downKeys.sort().join('')) {
-          // 找到处理内容
-          eventHandler(event, record, scope);
-        }
-      }
-    }
-  }
-} // 判断 element 是否已经绑定事件
-
-
-function isElementBind(element) {
-  return elementHasBindEvent.indexOf(element) > -1;
-}
-
-function hotkeys(key, option, method) {
-  _downKeys = [];
-  var keys = getKeys(key); // 需要处理的快捷键列表
-
-  var mods = [];
-  var scope = 'all'; // scope默认为all，所有范围都有效
-
-  var element = document; // 快捷键事件绑定节点
-
-  var i = 0;
-  var keyup = false;
-  var keydown = true;
-  var splitKey = '+'; // 对为设定范围的判断
-
-  if (method === undefined && typeof option === 'function') {
-    method = option;
-  }
-
-  if (Object.prototype.toString.call(option) === '[object Object]') {
-    if (option.scope) scope = option.scope; // eslint-disable-line
-
-    if (option.element) element = option.element; // eslint-disable-line
-
-    if (option.keyup) keyup = option.keyup; // eslint-disable-line
-
-    if (option.keydown !== undefined) keydown = option.keydown; // eslint-disable-line
-
-    if (typeof option.splitKey === 'string') splitKey = option.splitKey; // eslint-disable-line
-  }
-
-  if (typeof option === 'string') scope = option; // 对于每个快捷键进行处理
-
-  for (; i < keys.length; i++) {
-    key = keys[i].split(splitKey); // 按键列表
-
-    mods = []; // 如果是组合快捷键取得组合快捷键
-
-    if (key.length > 1) mods = getMods(_modifier, key); // 将非修饰键转化为键码
-
-    key = key[key.length - 1];
-    key = key === '*' ? '*' : code(key); // *表示匹配所有快捷键
-    // 判断key是否在_handlers中，不在就赋一个空数组
-
-    if (!(key in _handlers)) _handlers[key] = [];
-
-    _handlers[key].push({
-      keyup: keyup,
-      keydown: keydown,
-      scope: scope,
-      mods: mods,
-      shortcut: keys[i],
-      method: method,
-      key: keys[i],
-      splitKey: splitKey
-    });
-  } // 在全局document上设置快捷键
-
-
-  if (typeof element !== 'undefined' && !isElementBind(element) && window) {
-    elementHasBindEvent.push(element);
-    addEvent(element, 'keydown', function (e) {
-      dispatch(e);
-    });
-    addEvent(window, 'focus', function () {
-      _downKeys = [];
-    });
-    addEvent(element, 'keyup', function (e) {
-      dispatch(e);
-      clearModifier(e);
-    });
-  }
-}
-
-var _api = {
-  setScope: setScope,
-  getScope: getScope,
-  deleteScope: deleteScope,
-  getPressedKeyCodes: getPressedKeyCodes,
-  isPressed: isPressed,
-  filter: filter,
-  unbind: unbind
-};
-
-for (var a in _api) {
-  if (Object.prototype.hasOwnProperty.call(_api, a)) {
-    hotkeys[a] = _api[a];
-  }
-}
-
-if (typeof window !== 'undefined') {
-  var _hotkeys = window.hotkeys;
-
-  hotkeys.noConflict = function (deep) {
-    if (deep && window.hotkeys === hotkeys) {
-      window.hotkeys = _hotkeys;
-    }
-
-    return hotkeys;
-  };
-
-  window.hotkeys = hotkeys;
-}
-
 const streamlineContainerCss = ":host{display:block;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif}:host *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{border:0 solid;box-sizing:border-box}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-gray-200{--tw-bg-opacity:1;background-color:rgba(229,231,235,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-gray-500{--tw-text-opacity:1;color:rgba(107,114,128,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
 
 const StreamlineContainer$1 = class extends HTMLElement {
@@ -10434,11 +9863,14 @@ const StreamlineContainer$1 = class extends HTMLElement {
         attachShadow(this);
     }
     connectedCallback() {
-        state$1.visible = this.visible;
+        state$1.visible = this.visible || false;
+    }
+    componentDidLoad() {
         setSearchPlaceholder();
-        hotkeys("command+k", function () {
-            state$1.visible = !state$1.visible;
-            return false;
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "k" && e.metaKey) {
+                state$1.visible = !state$1.visible;
+            }
         });
     }
     render() {
@@ -10447,7 +9879,7 @@ const StreamlineContainer$1 = class extends HTMLElement {
     static get style() { return streamlineContainerCss + '/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;border:0 solid;box-sizing:border-box}.visible{visibility:visible}.fixed{position:fixed}.top-0{top:0}.left-0{left:0}.z-\\[9999999999999999\\]{z-index:10000000000000000}.h-full{height:100%}.w-full{width:100%}.bg-black\\/90{background-color:rgba(0,0,0,.9)}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}'; }
 };
 
-const streamlineEntriesCss = ":host .focus{box-sizing:border-box;display:inline-flex;outline:none;position:relative}:host .focus [role=button]:focus,:host .focus a:focus,:host .focus button:focus,:host .focus input:focus{outline:none}:host .focus:focus-within:before{box-shadow:inset 0 0 0 2px var(--sl-focus-color)}:host .focus:before{box-sizing:border-box;content:\"\";height:calc(100% - 8px);left:4px;pointer-events:none;position:absolute;top:4px;width:calc(100% - 8px)}:host .focus--px-y:before{height:calc(100% - 9px)!important}:host .focus--px-x:before{width:calc(100% - 9px)!important}:host .focus--border:before{height:calc(100% - 10px)!important;left:5px;top:5px;width:calc(100% - 10px)!important}.inner::-webkit-scrollbar{width:10px}.inner::-webkit-scrollbar-track{background:#fff}.inner::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:0}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{border:0 solid;box-sizing:border-box}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-gray-200{--tw-bg-opacity:1;background-color:rgba(229,231,235,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-gray-500{--tw-text-opacity:1;color:rgba(107,114,128,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
+const streamlineEntriesCss = ":host .focus{box-sizing:border-box;display:inline-flex;outline:none;position:relative}:host .focus [role=button]:focus,:host .focus a:focus,:host .focus button:focus,:host .focus input:focus{outline:none}:host .focus:focus-within:before{box-shadow:inset 0 0 0 2px var(--sl-focus-color)}:host .focus:before{box-sizing:border-box;content:\"\";height:calc(100% - 8px);left:4px;pointer-events:none;position:absolute;top:4px;width:calc(100% - 8px)}:host .focus--px-y:before{height:calc(100% - 9px)!important}:host .focus--px-x:before{width:calc(100% - 9px)!important}:host .focus--border:before{height:calc(100% - 10px)!important;left:5px;top:5px;width:calc(100% - 10px)!important}.inner::-webkit-scrollbar{width:10px}.inner::-webkit-scrollbar-track{background:#fff}.inner::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:0}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{border:0 solid;box-sizing:border-box}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-gray-200{--tw-bg-opacity:1;background-color:rgba(229,231,235,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-gray-500{--tw-text-opacity:1;color:rgba(107,114,128,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
 
 const StreamlineEntries$1 = class extends HTMLElement {
     constructor() {
@@ -10539,17 +9971,17 @@ const StreamlineEntries$1 = class extends HTMLElement {
                 : item.titleAlt || item.title })));
     }
     render() {
-        return (h("div", { class: `h-full relative` }, state$1.isLoading ? (h("div", { class: `w-full h-[calc(100%-var(--sl-side-w))] flex items-center justify-center bg-white/50 absolute top-0 left-0 backdrop-blur-sm z-10` }, h("svg", { xmlns: "http://www.w3.org/2000/svg", "aria-hidden": "true", focusable: "false", "data-prefix": "far", "data-icon": "spinner-third", class: `w-10 h-10 animate-spin`, role: "img", viewBox: "0 0 512 512" }, h("path", { fill: "currentColor", d: "M460.116 373.846l-20.823-12.022c-5.541-3.199-7.54-10.159-4.663-15.874 30.137-59.886 28.343-131.652-5.386-189.946-33.641-58.394-94.896-95.833-161.827-99.676C261.028 55.961 256 50.751 256 44.352V20.309c0-6.904 5.808-12.337 12.703-11.982 83.556 4.306 160.163 50.864 202.11 123.677 42.063 72.696 44.079 162.316 6.031 236.832-3.14 6.148-10.75 8.461-16.728 5.01z" })))) : (h("div", { class: `inner pb-3 sm:pb-6 relative px-3 h-[calc(100%-var(--sl-side-w))] overflow-y-scroll overflow-x-hidden w-full bg-white sm:px-6 lg:px-8`, tabIndex: -1 }, state$1.isSlash && !state$1.isSites
+        return (h("div", { class: `h-full relative` }, state$1.isLoading ? (h("div", { class: `w-full h-[calc(100%-var(--sl-side-w))] flex items-center justify-center bg-white/50 absolute top-0 left-0 backdrop-blur-sm z-10` }, h("svg", { xmlns: "http://www.w3.org/2000/svg", "aria-hidden": "true", focusable: "false", "data-prefix": "far", "data-icon": "spinner-third", class: `w-10 h-10 animate-spin`, role: "img", viewBox: "0 0 512 512" }, h("path", { fill: "currentColor", d: "M460.116 373.846l-20.823-12.022c-5.541-3.199-7.54-10.159-4.663-15.874 30.137-59.886 28.343-131.652-5.386-189.946-33.641-58.394-94.896-95.833-161.827-99.676C261.028 55.961 256 50.751 256 44.352V20.309c0-6.904 5.808-12.337 12.703-11.982 83.556 4.306 160.163 50.864 202.11 123.677 42.063 72.696 44.079 162.316 6.031 236.832-3.14 6.148-10.75 8.461-16.728 5.01z" })))) : (h("div", { class: `inner pb-3 sm:pb-6 relative px-3 h-[calc(100%-var(--sl-side-w))] overflow-y-scroll overflow-x-hidden w-full bg-white sm:px-6 lg:px-8 ${state$1.isProcessing ? "pointer-events-none opacity-50" : ""}`, tabIndex: -1 }, state$1.isSlash && !state$1.isSites
             ? this.slash()
             : state$1.isSites
                 ? this.site()
                 : this[`${state.active}`]()))));
     }
     get el() { return this; }
-    static get style() { return streamlineEntriesCss + '/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-border-opacity:1;--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-backdrop-blur:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-invert:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-opacity:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);border:0 solid;border-color:rgba(229,231,235,var(--tw-border-opacity));box-sizing:border-box}button{background-color:transparent;background-image:none;color:inherit;font-family:inherit;font-size:100%;line-height:1.15;line-height:inherit;margin:0;padding:0;text-transform:none}[type=button],button{-webkit-appearance:button}h1,h2,p,ul{margin:0}ul{list-style:none;padding:0}img{border-style:solid;height:auto;max-width:100%}[role=button],button{cursor:pointer}h1,h2{font-size:inherit;font-weight:inherit}img,svg{display:block;vertical-align:middle}.static{position:static}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.-top-2{top:-.5rem}.top-0{top:0}.left-0{left:0}.z-10{z-index:10}.mb-4{margin-bottom:1rem}.mb-2{margin-bottom:.5rem}.ml-2{margin-left:.5rem}.mt-3\\.5{margin-top:.875rem}.mr-4{margin-right:1rem}.mt-3{margin-top:.75rem}.mt-4{margin-top:1rem}.inline-block{display:inline-block}.flex{display:flex}.inline-grid{display:inline-grid}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.h-full{height:100%}.h-\\[calc\\(100\\%-var\\(--sl-side-w\\)\\)\\]{height:calc(100% - var(--sl-side-w))}.h-10{height:2.5rem}.w-full{width:100%}.w-10{width:2.5rem}@-webkit-keyframes spin{to{transform:rotate(1turn)}}@keyframes spin{to{transform:rotate(1turn)}}.animate-spin{-webkit-animation:spin 1s linear infinite;animation:spin 1s linear infinite}.auto-cols-max{grid-auto-columns:-webkit-max-content;grid-auto-columns:max-content}.grid-flow-col{grid-auto-flow:column}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-end{align-items:flex-end}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-x-4{-moz-column-gap:1rem;column-gap:1rem}.overflow-x-hidden{overflow-x:hidden}.overflow-y-scroll{overflow-y:scroll}.break-words{overflow-wrap:break-word}.border{border-width:1px}.border-t{border-top-width:1px}.border-b{border-bottom-width:1px}.border-dotted{border-style:dotted}.border-gray-100{--tw-border-opacity:1;border-color:rgba(243,244,246,var(--tw-border-opacity))}.border-gray-900{--tw-border-opacity:1;border-color:rgba(17,24,39,var(--tw-border-opacity))}.bg-gray-200{--tw-bg-opacity:1;background-color:rgba(229,231,235,var(--tw-bg-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.bg-white\\/50{background-color:hsla(0,0%,100%,.5)}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.py-3{padding-bottom:.75rem;padding-top:.75rem}.px-3{padding-left:.75rem;padding-right:.75rem}.pt-5{padding-top:1.25rem}.pb-1{padding-bottom:.25rem}.pb-4{padding-bottom:1rem}.pt-4{padding-top:1rem}.pb-3{padding-bottom:.75rem}.text-base{font-size:1rem;line-height:1.5rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-medium{font-weight:500}.font-normal{font-weight:400}.font-semibold{font-weight:600}.text-gray-900{--tw-text-opacity:1;color:rgba(17,24,39,var(--tw-text-opacity))}.text-gray-600{--tw-text-opacity:1;color:rgba(75,85,99,var(--tw-text-opacity))}.text-gray-500{--tw-text-opacity:1;color:rgba(107,114,128,var(--tw-text-opacity))}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-filter);backdrop-filter:var(--tw-backdrop-filter)}.first-of-type\\:border-none:first-of-type{border-style:none}.hover\\:border-gray-900:hover{--tw-border-opacity:1;border-color:rgba(17,24,39,var(--tw-border-opacity))}.hover\\:bg-gray-900:hover{--tw-bg-opacity:1;background-color:rgba(17,24,39,var(--tw-bg-opacity))}.hover\\:text-gray-50:hover{--tw-text-opacity:1;color:rgba(249,250,251,var(--tw-text-opacity))}@media (min-width:640px){.sm\\:-top-2{top:-.5rem}.sm\\:min-w-\\[120px\\]{min-width:120px}.sm\\:flex-row{flex-direction:row}.sm\\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\\:pt-6{padding-top:1.5rem}.sm\\:pb-6{padding-bottom:1.5rem}.sm\\:text-2xl{font-size:1.5rem;line-height:2rem}}@media (min-width:768px){.md\\:min-w-\\[200px\\]{min-width:200px}}@media (min-width:1024px){.lg\\:-top-4{top:-1rem}.lg\\:px-8{padding-left:2rem;padding-right:2rem}.lg\\:pt-8{padding-top:2rem}}'; }
+    static get style() { return streamlineEntriesCss + '/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-border-opacity:1;--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-backdrop-blur:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-invert:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-opacity:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);border:0 solid;border-color:rgba(229,231,235,var(--tw-border-opacity));box-sizing:border-box}button{background-color:transparent;background-image:none;color:inherit;font-family:inherit;font-size:100%;line-height:1.15;line-height:inherit;margin:0;padding:0;text-transform:none}[type=button],button{-webkit-appearance:button}h1,h2,p,ul{margin:0}ul{list-style:none;padding:0}img{border-style:solid;height:auto;max-width:100%}[role=button],button{cursor:pointer}h1,h2{font-size:inherit;font-weight:inherit}img,svg{display:block;vertical-align:middle}.pointer-events-none{pointer-events:none}.static{position:static}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.-top-2{top:-.5rem}.top-0{top:0}.left-0{left:0}.z-10{z-index:10}.mb-4{margin-bottom:1rem}.mb-2{margin-bottom:.5rem}.ml-2{margin-left:.5rem}.mt-3\\.5{margin-top:.875rem}.mr-4{margin-right:1rem}.mt-3{margin-top:.75rem}.mt-4{margin-top:1rem}.inline-block{display:inline-block}.flex{display:flex}.inline-grid{display:inline-grid}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.h-full{height:100%}.h-\\[calc\\(100\\%-var\\(--sl-side-w\\)\\)\\]{height:calc(100% - var(--sl-side-w))}.h-10{height:2.5rem}.w-full{width:100%}.w-10{width:2.5rem}@-webkit-keyframes spin{to{transform:rotate(1turn)}}@keyframes spin{to{transform:rotate(1turn)}}.animate-spin{-webkit-animation:spin 1s linear infinite;animation:spin 1s linear infinite}.auto-cols-max{grid-auto-columns:-webkit-max-content;grid-auto-columns:max-content}.grid-flow-col{grid-auto-flow:column}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-end{align-items:flex-end}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-x-4{-moz-column-gap:1rem;column-gap:1rem}.overflow-x-hidden{overflow-x:hidden}.overflow-y-scroll{overflow-y:scroll}.break-words{overflow-wrap:break-word}.border{border-width:1px}.border-t{border-top-width:1px}.border-b{border-bottom-width:1px}.border-dotted{border-style:dotted}.border-gray-100{--tw-border-opacity:1;border-color:rgba(243,244,246,var(--tw-border-opacity))}.border-gray-900{--tw-border-opacity:1;border-color:rgba(17,24,39,var(--tw-border-opacity))}.bg-gray-200{--tw-bg-opacity:1;background-color:rgba(229,231,235,var(--tw-bg-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.bg-white\\/50{background-color:hsla(0,0%,100%,.5)}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.py-3{padding-bottom:.75rem;padding-top:.75rem}.px-3{padding-left:.75rem;padding-right:.75rem}.pt-5{padding-top:1.25rem}.pb-1{padding-bottom:.25rem}.pb-4{padding-bottom:1rem}.pt-4{padding-top:1rem}.pb-3{padding-bottom:.75rem}.text-base{font-size:1rem;line-height:1.5rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-medium{font-weight:500}.font-normal{font-weight:400}.font-semibold{font-weight:600}.text-gray-900{--tw-text-opacity:1;color:rgba(17,24,39,var(--tw-text-opacity))}.text-gray-600{--tw-text-opacity:1;color:rgba(75,85,99,var(--tw-text-opacity))}.text-gray-500{--tw-text-opacity:1;color:rgba(107,114,128,var(--tw-text-opacity))}.opacity-50{opacity:.5}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-filter);backdrop-filter:var(--tw-backdrop-filter)}.first-of-type\\:border-none:first-of-type{border-style:none}.hover\\:border-gray-900:hover{--tw-border-opacity:1;border-color:rgba(17,24,39,var(--tw-border-opacity))}.hover\\:bg-gray-900:hover{--tw-bg-opacity:1;background-color:rgba(17,24,39,var(--tw-bg-opacity))}.hover\\:text-gray-50:hover{--tw-text-opacity:1;color:rgba(249,250,251,var(--tw-text-opacity))}@media (min-width:640px){.sm\\:-top-2{top:-.5rem}.sm\\:min-w-\\[120px\\]{min-width:120px}.sm\\:flex-row{flex-direction:row}.sm\\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\\:pt-6{padding-top:1.5rem}.sm\\:pb-6{padding-bottom:1.5rem}.sm\\:text-2xl{font-size:1.5rem;line-height:2rem}}@media (min-width:768px){.md\\:min-w-\\[200px\\]{min-width:200px}}@media (min-width:1024px){.lg\\:-top-4{top:-1rem}.lg\\:px-8{padding-left:2rem;padding-right:2rem}.lg\\:pt-8{padding-top:2rem}}'; }
 };
 
-const streamlinePostCss = ":host .focus{box-sizing:border-box;display:inline-flex;outline:none;position:relative}:host .focus [role=button]:focus,:host .focus a:focus,:host .focus button:focus,:host .focus input:focus{outline:none}:host .focus:focus-within:before{box-shadow:inset 0 0 0 2px var(--sl-focus-color)}:host .focus:before{box-sizing:border-box;content:\"\";height:calc(100% - 8px);left:4px;pointer-events:none;position:absolute;top:4px;width:calc(100% - 8px)}:host .focus--px-y:before{height:calc(100% - 9px)!important}:host .focus--px-x:before{width:calc(100% - 9px)!important}:host .focus--border:before{height:calc(100% - 10px)!important;left:5px;top:5px;width:calc(100% - 10px)!important}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-border-opacity:1;border:0 solid;border:0 solid rgba(229,231,235,var(--tw-border-opacity));box-sizing:border-box}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-gray-200{--tw-bg-opacity:1;background-color:rgba(229,231,235,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-gray-500{--tw-text-opacity:1;color:rgba(107,114,128,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */.pointer-events-none{pointer-events:none}.flex{display:flex}.h-4{height:1rem}.h-full{height:100%}.w-4{width:1rem}.w-full{width:100%}.items-center{align-items:center}.justify-center{justify-content:center}.rounded-full{border-radius:9999px}.border{border-width:1px}.border-gray-200{--tw-border-opacity:1;border-color:rgba(229,231,235,var(--tw-border-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.text-red-500{--tw-text-opacity:1;color:rgba(239,68,68,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
+const streamlinePostCss = ":host .focus{box-sizing:border-box;display:inline-flex;outline:none;position:relative}:host .focus [role=button]:focus,:host .focus a:focus,:host .focus button:focus,:host .focus input:focus{outline:none}:host .focus:focus-within:before{box-shadow:inset 0 0 0 2px var(--sl-focus-color)}:host .focus:before{box-sizing:border-box;content:\"\";height:calc(100% - 8px);left:4px;pointer-events:none;position:absolute;top:4px;width:calc(100% - 8px)}:host .focus--px-y:before{height:calc(100% - 9px)!important}:host .focus--px-x:before{width:calc(100% - 9px)!important}:host .focus--border:before{height:calc(100% - 10px)!important;left:5px;top:5px;width:calc(100% - 10px)!important}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-border-opacity:1;border:0 solid;border:0 solid rgba(229,231,235,var(--tw-border-opacity));box-sizing:border-box}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-gray-200{--tw-bg-opacity:1;background-color:rgba(229,231,235,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-gray-500{--tw-text-opacity:1;color:rgba(107,114,128,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */.pointer-events-none{pointer-events:none}.flex{display:flex}.h-4{height:1rem}.h-full{height:100%}.w-4{width:1rem}.w-full{width:100%}.items-center{align-items:center}.justify-center{justify-content:center}.rounded-full{border-radius:9999px}.border{border-width:1px}.border-gray-200{--tw-border-opacity:1;border-color:rgba(229,231,235,var(--tw-border-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.text-red-500{--tw-text-opacity:1;color:rgba(239,68,68,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
 
 const StreamlinePost$1 = class extends HTMLElement {
     constructor() {
@@ -10626,7 +10058,7 @@ function getQuery(obj) {
   ];
 }
 
-const streamlineSearchCss = ":host .focus{box-sizing:border-box;display:inline-flex;outline:none;position:relative}:host .focus [role=button]:focus,:host .focus a:focus,:host .focus button:focus,:host .focus input:focus{outline:none}:host .focus:focus-within:before{box-shadow:inset 0 0 0 2px var(--sl-focus-color)}:host .focus:before{box-sizing:border-box;content:\"\";height:calc(100% - 8px);left:4px;pointer-events:none;position:absolute;top:4px;width:calc(100% - 8px)}:host .focus--px-y:before{height:calc(100% - 9px)!important}:host .focus--px-x:before{width:calc(100% - 9px)!important}:host .focus--border:before{height:calc(100% - 10px)!important;left:5px;top:5px;width:calc(100% - 10px)!important}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{border:0 solid;box-sizing:border-box}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-gray-200{--tw-bg-opacity:1;background-color:rgba(229,231,235,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-gray-500{--tw-text-opacity:1;color:rgba(107,114,128,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
+const streamlineSearchCss = ":host .focus{box-sizing:border-box;display:inline-flex;outline:none;position:relative}:host .focus [role=button]:focus,:host .focus a:focus,:host .focus button:focus,:host .focus input:focus{outline:none}:host .focus:focus-within:before{box-shadow:inset 0 0 0 2px var(--sl-focus-color)}:host .focus:before{box-sizing:border-box;content:\"\";height:calc(100% - 8px);left:4px;pointer-events:none;position:absolute;top:4px;width:calc(100% - 8px)}:host .focus--px-y:before{height:calc(100% - 9px)!important}:host .focus--px-x:before{width:calc(100% - 9px)!important}:host .focus--border:before{height:calc(100% - 10px)!important;left:5px;top:5px;width:calc(100% - 10px)!important}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{border:0 solid;box-sizing:border-box}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-gray-200{--tw-bg-opacity:1;background-color:rgba(229,231,235,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-gray-500{--tw-text-opacity:1;color:rgba(107,114,128,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
 
 const StreamlineSearch$1 = class extends HTMLElement {
     constructor() {

@@ -10,6 +10,7 @@ function streamlineQuery() {
 	if ( wp_verify_nonce( $_POST['nonce'], 'ajax-nonce' ) ) {
 		$callback = $_POST['callback'];
 		$query    = $_POST['query'];
+		$userId   = intval( $_POST['userId'] );
 		$get      = '';
 
 		if ( $callback === 'get_sites' ) {
@@ -57,13 +58,14 @@ function streamlineQuery() {
 		}
 
 		if ( $callback === 'fav' ) {
-			$options               = get_option( 'streamline' ) ?: [];
-			$fav                   = json_decode( stripslashes( html_entity_decode( $query ) ) );
-			$options['favourites'] = $fav;
+			$userMeta               = get_user_meta( $userId, 'streamline' ) ?: [];
+			$fav                    = json_decode( stripslashes( html_entity_decode( $query ) ) );
+			$userMeta['favourites'] = $fav;
 
-			update_option( 'streamline', $options );
+			delete_user_meta( $userId, 'streamline' );
+			update_user_meta( $userId, 'streamline', $userMeta );
 
-			wp_send_json_success( $fav );
+			wp_send_json_success( 'success' );
 		}
 	}
 	die ();
