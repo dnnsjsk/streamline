@@ -43,7 +43,7 @@ const { state, dispose } = createStore({
   searchNoValue: 'No entries found',
   searchPlaceholder: '',
   searchValue: '',
-  visible: true,
+  visible: false,
 });
 
 export { state as stateInternal, dispose as disposeInternal };

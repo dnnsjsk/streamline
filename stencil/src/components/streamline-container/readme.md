@@ -3,6 +3,13 @@
 <!-- Auto Generated Below -->
 
 
+## Properties
+
+| Property  | Attribute | Description | Type      | Default     |
+| --------- | --------- | ----------- | --------- | ----------- |
+| `visible` | `visible` |             | `boolean` | `undefined` |
+
+
 ## Dependencies
 
 ### Depends on

@@ -24,6 +24,7 @@ export namespace Components {
         "typeSub": string;
     }
     interface StreamlineContainer {
+        "visible": boolean;
     }
     interface StreamlineEntries {
     }
@@ -113,6 +114,7 @@ declare namespace LocalJSX {
         "typeSub"?: string;
     }
     interface StreamlineContainer {
+        "visible"?: boolean;
     }
     interface StreamlineEntries {
     }

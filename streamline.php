@@ -38,6 +38,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once plugin_dir_path( __FILE__ ) . 'includes/classes/init.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/functions/ajax-query.php';
 
+if ( ! class_exists( 'EDD_SL_Plugin_Updater' ) ) {
+	include( plugin_dir_path( __FILE__ ) . 'includes/admin/edd-sl-updater.php' );
+}
+
+require_once plugin_dir_path( __FILE__ ) . 'includes/admin/fabrikat-updater.php';
+
+/**
+ * Init plugin.
+ *
+ * @date    19/10/2021
+ * @since   1.0.0
+ */
+FabrikatPlugin::init( 'streamline_', STREAMLINE_ITEM_NAME, STREAMLINE_STORE_URL, STREAMLINE_ITEM_ID, STREAMLINE_LICENSE_PAGE, STREAMLINE );
+
 /**
  * Init Streamline.
  *

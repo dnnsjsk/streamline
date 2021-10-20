@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import { Component, h } from '@stencil/core';
+import { Component, h, Prop } from '@stencil/core';
 import { stateInternal } from '../../store/internal';
 import hotkeys from 'hotkeys-js';
 import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
@@ -13,7 +13,11 @@ import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
   styleUrl: 'streamline-container.scss',
 })
 export class StreamlineContainer {
+  @Prop() visible: boolean;
+
   connectedCallback() {
+    stateInternal.visible = this.visible;
+
     setSearchPlaceholder();
 
     hotkeys('command+k', function () {
