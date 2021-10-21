@@ -82,22 +82,6 @@ class Init {
 
 	}
 
-	function ArrayReplace( $Array, $Find, $Replace ) {
-		if ( is_array( $Array ) ) {
-			foreach ( $Array as $Key => $Val ) {
-				if ( is_array( $Array[ $Key ] ) ) {
-					$Array[ $Key ] = ArrayReplace( $Array[ $Key ], $Find, $Replace );
-				} else {
-					if ( $Key === $Find ) {
-						$Array[ $Key ] = $Replace;
-					}
-				}
-			}
-		}
-
-		return $Array;
-	}
-
 	/**
 	 * Get data
 	 *
@@ -161,7 +145,7 @@ class Init {
 	 * @since   1.0.0
 	 */
 	private static function addContainer() {
-		$container = '<streamline-container visible></streamline-container>';
+		$container = '<streamline-container></streamline-container>';
 
 		add_action( 'admin_footer', function () use ( $container ) {
 			if ( is_user_logged_in() ) {

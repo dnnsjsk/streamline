@@ -13,9 +13,9 @@
 define( 'STREAMLINE', __FILE__ );
 define( 'STREAMLINE_DIR', __DIR__ );
 define( 'STREAMLINE_STORE_URL', 'http://wpstreamline.com' );
-define( 'STREAMLINE_ITEM_ID', 31 );
+define( 'STREAMLINE_ITEM_ID', 45 );
 define( 'STREAMLINE_ITEM_NAME', 'Streamline' );
-define( 'STREAMLINE_LICENSE_PAGE', 'streamline-license' );
+define( 'STREAMLINE_LICENSE_PAGE', 'streamline' );
 
 use Streamline\init;
 

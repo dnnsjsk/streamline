@@ -68,7 +68,7 @@ function streamlineQuery() {
 			wp_send_json_success( 'success' );
 		}
 	}
-	die ();
+	die();
 }
 
 add_action( 'plugins_loaded', function () {
