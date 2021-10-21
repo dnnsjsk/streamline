@@ -11,7 +11,7 @@ function streamlineQuery() {
 		$callback = $_POST['callback'];
 		$query    = $_POST['query'];
 		$userId   = intval( $_POST['userId'] );
-		$get      = '';
+		$get      = [];
 
 		if ( $callback === 'get_sites' ) {
 			$arr = call_user_func( $callback, [
@@ -28,7 +28,7 @@ function streamlineQuery() {
 				restore_current_blog();
 			}
 
-			$get = $arr;
+			$get['children'] = $arr;
 
 			wp_send_json_success( $get );
 		}
@@ -39,12 +39,15 @@ function streamlineQuery() {
 				'post_type' => 'any'
 			] );
 
+			$path = get_site( get_current_blog_id() )->path;
+
 			$index = - 1;
 			foreach ( $arr as $post ) {
 				$index ++;
 				$arr[ $index ]->hrefEdit = base64_encode( get_edit_post_link( $post->ID ) );
 				$arr[ $index ]->name     = $post->post_title;
 				$arr[ $index ]->siteId   = get_current_blog_id();
+				$arr[ $index ]->sitePath = $path;
 			}
 
 			$newArr = [];
@@ -52,13 +55,14 @@ function streamlineQuery() {
 				$newArr[ $post->ID ] = $post;
 			}
 
-			$get = $newArr;
+			$get['children'] = $newArr;
+			$get['path']     = $path;
 
 			wp_send_json_success( $get );
 		}
 
 		if ( $callback === 'fav' ) {
-			$userMeta               = get_user_meta( $userId, 'streamline' ) ?: [];
+			$userMeta               = [];
 			$fav                    = json_decode( stripslashes( html_entity_decode( $query ) ) );
 			$userMeta['favourites'] = $fav;
 
@@ -71,6 +75,29 @@ function streamlineQuery() {
 	die();
 }
 
+/**
+ * Menu handler
+ *
+ * @date    21/10/2021
+ * @since   1.0.0
+ */
+function streamlineMenu() {
+	if ( wp_verify_nonce( $_POST['nonce'], 'ajax-nonce' ) ) {
+		$url = $_POST['url'];
+
+		$response = wp_remote_get( $url, [
+			'timeout'   => 15,
+			'sslverify' => FALSE
+		] );
+
+		$body = wp_remote_retrieve_body( $response );
+
+		wp_send_json( $body );
+	}
+	die();
+}
+
 add_action( 'plugins_loaded', function () {
 	add_action( 'wp_ajax_streamlineQuery', 'streamlineQuery' );
+	add_action( 'wp_ajax_streamlineMenu', 'streamlineMenu' );
 } );

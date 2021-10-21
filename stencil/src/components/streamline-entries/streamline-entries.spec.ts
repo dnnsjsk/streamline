@@ -22,7 +22,7 @@ describe('Render entries with', function () {
     });
     const el = page.doc.querySelector('streamline-entries').shadowRoot;
     const length = el.querySelectorAll('li').length;
-    expect(length).toBe(1);
+    expect(length).toBe(2);
   });
   it("mode set to 'sites'", async () => {
     stateInternal.isSites = true;

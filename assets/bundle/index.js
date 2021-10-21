@@ -377,7 +377,7 @@ const { state: state$1, dispose: dispose$1 } = createStore({
         },
         menu: {
             name: "menu",
-            commands: ["/site"],
+            commands: ["/site ", "/network"],
         },
         post: {
             name: "post",
@@ -386,9 +386,17 @@ const { state: state$1, dispose: dispose$1 } = createStore({
     commands: {
         local: {
             site: {
+                // @ts-ignore
+                condition: window.streamlineData.network,
                 name: "/site [name]",
                 description: `Display entries from a different site in the network.`,
                 callback: "get_sites",
+            },
+            network: {
+                // @ts-ignore
+                condition: window.streamlineData.network,
+                name: "/network",
+                description: `Display entries from a from network dashboard.`,
             },
         },
     },
@@ -398,6 +406,8 @@ const { state: state$1, dispose: dispose$1 } = createStore({
     entriesFavActive: JSON.parse(window.streamlineData.favourites),
     entriesMenu: [],
     entriesMenuActive: [],
+    entriesNetwork: [],
+    entriesNetworkActive: [],
     entriesPost: [],
     entriesPostActive: [],
     entriesSite: [],
@@ -416,7 +426,13 @@ const e=(t,e)=>{try{return JSON.parse(t.getItem(e))}catch(t){return null}},r=(r,
 
 function isLocalCommands() {
   var _a;
-  return ((_a = state$1.menu[state.active].commands) === null || _a === void 0 ? void 0 : _a.length) >= 1;
+  let index = 0;
+  Object.values(state$1.commands.local).forEach((item) => {
+    if (item.condition !== false) {
+      index++;
+    }
+  });
+  return (((_a = state$1.menu[state.active].commands) === null || _a === void 0 ? void 0 : _a.length) >= 1 && index >= 1);
 }
 
 function setSearchPlaceholder() {
@@ -9549,9 +9565,13 @@ function resetView() {
 function getMenu(obj = {}) {
   let data = [];
   const menu = {};
-  const isAdmin = document.querySelector('#adminmenuwrap') && !obj.adminUrl;
-  const adminUrl = obj.adminUrl || state$1.data.adminUrl;
-  const siteId = obj.siteId || state$1.data.siteId;
+  const isAdmin = document.querySelector('#adminmenuwrap') && !obj.adminUrl && !obj.network;
+  const isNetwork = obj.network || state$1.data.isNetwork;
+  const isMultisite = state$1.data.network;
+  const adminUrl = obj.adminUrl ||
+    (isNetwork ? state$1.data.network : state$1.data.adminUrl);
+  const siteId = obj.siteId || (isNetwork ? 0 : state$1.data.siteId);
+  const type = !obj.site && isNetwork ? 'networkMenu' : 'menu';
   function get(doc) {
     doc.querySelectorAll('.menu-top > a').forEach((item, index) => {
       const name = item.innerText.replace(/(\r\n|\n|\r)/gm, '');
@@ -9566,13 +9586,13 @@ function getMenu(obj = {}) {
             const hrefSub = itemSub.getAttribute('href');
             subArr[hrefSub] = {
               adminUrl,
-              href: state$1.data.adminUrl + hrefSub,
+              href: adminUrl + hrefSub,
               index: subSubMenu.length === 1 ? indexSub : indexSub - 1,
               name: nameSub,
               nameParent: name,
               path: hrefSub,
               siteId: Number(siteId),
-              type: 'menu',
+              type: type,
             };
           }
         });
@@ -9587,11 +9607,13 @@ function getMenu(obj = {}) {
       {
         adminUrl,
         children: menu,
-        title: obj.site || state$1.data.isMultisite
-          ? `Admin menu (site: ${obj.site || state$1.data.path})`
-          : `Admin menu`,
+        title: obj.site || (isMultisite && !isNetwork)
+          ? `Admin menu (Site: ${obj.site || state$1.data.path})`
+          : isNetwork
+            ? 'Network admin menu'
+            : `Admin menu`,
         siteId: Number(siteId),
-        type: 'menu',
+        type: type,
       },
     ];
     state$1.entriesMenu = data;
@@ -9603,7 +9625,7 @@ function getMenu(obj = {}) {
   }
   else {
     state$1.isLoading = true;
-    fetch(obj.adminUrl || state$1.data.adminUrl)
+    fetch(adminUrl)
       .then((response) => response.text())
       .then((data) => {
       const parser = new DOMParser();
@@ -9612,6 +9634,31 @@ function getMenu(obj = {}) {
       resetView();
       state.active = 'menu';
     });
+    // @ts-ignore
+    // eslint-disable-next-line no-undef
+    /*
+    fetch(streamline.ajax, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/x-www-form-urlencoded',
+      }),
+      body: `action=streamlineMenu&url=${
+        obj.adminUrl || stateInternal.data.adminUrl
+        // @ts-ignore
+        // eslint-disable-next-line no-undef
+      }&nonce=${streamline.nonce}`,
+    })
+      .then((response) => response.text())
+      .then((data) => {
+        const parser = new DOMParser();
+        const html = parser.parseFromString(data, 'text/html');
+        console.log(html);
+        get(html);
+        resetView();
+        stateLocal.active = 'menu';
+      });
+     */
   }
 }
 
@@ -9698,6 +9745,7 @@ function setFavourite(obj) {
     state$1.entriesFavActive = removeArr;
     setEntries();
   }
+  console.log(state$1.entriesFav);
   state$1.isProcessing = true;
   // @ts-ignore
   // eslint-disable-next-line no-undef
@@ -9732,7 +9780,7 @@ function Fav(props) {
     return (h("span", { class: `${props.class} rounded-full w-4 h-4 text-red-500 pointer-events-none bg-white flex items-center justify-center border border-gray-200` }, h("span", { class: `h-full w-full flex items-center justify-center` }, h(Heart, null))));
 }
 
-const streamlineButtonCss = ".tippy-box[data-animation=fade][data-state=hidden]{opacity:0}[data-tippy-root]{max-width:calc(100vw - 10px)}.tippy-box{background-color:#333;border-radius:4px;border-radius:0!important;color:#fff;font-size:14px;line-height:1.4;outline:0;position:relative;transition-property:transform,visibility,opacity;white-space:normal}.tippy-box[data-placement^=top]>.tippy-arrow{bottom:0}.tippy-box[data-placement^=top]>.tippy-arrow:before{border-top-color:initial;border-width:8px 8px 0;bottom:-7px;left:0;transform-origin:center top}.tippy-box[data-placement^=bottom]>.tippy-arrow{top:0}.tippy-box[data-placement^=bottom]>.tippy-arrow:before{border-bottom-color:initial;border-width:0 8px 8px;left:0;top:-7px;transform-origin:center bottom}.tippy-box[data-placement^=left]>.tippy-arrow{right:0}.tippy-box[data-placement^=left]>.tippy-arrow:before{border-left-color:initial;border-width:8px 0 8px 8px;right:-7px;transform-origin:center left}.tippy-box[data-placement^=right]>.tippy-arrow{left:0}.tippy-box[data-placement^=right]>.tippy-arrow:before{border-right-color:initial;border-width:8px 8px 8px 0;left:-7px;transform-origin:center right}.tippy-box[data-inertia][data-state=visible]{transition-timing-function:cubic-bezier(.54,1.5,.38,1.11)}.tippy-arrow{color:#333;height:16px;width:16px}.tippy-arrow:before{border-color:transparent;border-style:solid;content:\"\";position:absolute}.tippy-content{padding:0;position:relative;z-index:1}:host .focus{box-sizing:border-box;display:inline-flex;outline:none;position:relative}:host .focus [role=button]:focus,:host .focus a:focus,:host .focus button:focus,:host .focus input:focus{outline:none}:host .focus:focus-within:before{box-shadow:inset 0 0 0 2px var(--sl-focus-color)}:host .focus:before{box-sizing:border-box;content:\"\";height:calc(100% - 8px);left:4px;pointer-events:none;position:absolute;top:4px;width:calc(100% - 8px)}:host .focus--px-y:before{height:calc(100% - 9px)!important}:host .focus--px-x:before{width:calc(100% - 9px)!important}:host .focus--border:before{height:calc(100% - 10px)!important;left:5px;top:5px;width:calc(100% - 10px)!important}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-border-opacity:1;border:0 solid;border:0 solid rgba(229,231,235,var(--tw-border-opacity));box-sizing:border-box}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-gray-200{--tw-bg-opacity:1;background-color:rgba(229,231,235,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-gray-500{--tw-text-opacity:1;color:rgba(107,114,128,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */.pointer-events-none{pointer-events:none}.flex{display:flex}.h-4{height:1rem}.h-full{height:100%}.w-4{width:1rem}.w-full{width:100%}.items-center{align-items:center}.justify-center{justify-content:center}.rounded-full{border-radius:9999px}.border{border-width:1px}.border-gray-200{--tw-border-opacity:1;border-color:rgba(229,231,235,var(--tw-border-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.text-red-500{--tw-text-opacity:1;color:rgba(239,68,68,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */svg{display:block;vertical-align:middle}.relative{position:relative}.-mr-px{margin-right:-1px}.h-\\[14px\\]{height:14px}.fill-current{fill:currentColor}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
+const streamlineButtonCss = ".tippy-box[data-animation=fade][data-state=hidden]{opacity:0}[data-tippy-root]{max-width:calc(100vw - 10px)}.tippy-box{background-color:#333;border-radius:4px;border-radius:0!important;color:#fff;font-size:14px;line-height:1.4;outline:0;position:relative;transition-property:transform,visibility,opacity;white-space:normal}.tippy-box[data-placement^=top]>.tippy-arrow{bottom:0}.tippy-box[data-placement^=top]>.tippy-arrow:before{border-top-color:initial;border-width:8px 8px 0;bottom:-7px;left:0;transform-origin:center top}.tippy-box[data-placement^=bottom]>.tippy-arrow{top:0}.tippy-box[data-placement^=bottom]>.tippy-arrow:before{border-bottom-color:initial;border-width:0 8px 8px;left:0;top:-7px;transform-origin:center bottom}.tippy-box[data-placement^=left]>.tippy-arrow{right:0}.tippy-box[data-placement^=left]>.tippy-arrow:before{border-left-color:initial;border-width:8px 0 8px 8px;right:-7px;transform-origin:center left}.tippy-box[data-placement^=right]>.tippy-arrow{left:0}.tippy-box[data-placement^=right]>.tippy-arrow:before{border-right-color:initial;border-width:8px 8px 8px 0;left:-7px;transform-origin:center right}.tippy-box[data-inertia][data-state=visible]{transition-timing-function:cubic-bezier(.54,1.5,.38,1.11)}.tippy-arrow{color:#333;height:16px;width:16px}.tippy-arrow:before{border-color:transparent;border-style:solid;content:\"\";position:absolute}.tippy-content{padding:0;position:relative;z-index:1}:host .focus{box-sizing:border-box;display:inline-flex;outline:none;position:relative}:host .focus [role=button]:focus,:host .focus a:focus,:host .focus button:focus,:host .focus input:focus{outline:none}:host .focus:focus-within:before{box-shadow:inset 0 0 0 2px var(--sl-focus-color)}:host .focus:before{box-sizing:border-box;content:\"\";height:calc(100% - 8px);left:4px;pointer-events:none;position:absolute;top:4px;width:calc(100% - 8px)}:host .focus--px-y:before{height:calc(100% - 9px)!important}:host .focus--px-x:before{width:calc(100% - 9px)!important}:host .focus--border:before{height:calc(100% - 10px)!important;left:5px;top:5px;width:calc(100% - 10px)!important}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-border-opacity:1;border:0 solid;border:0 solid rgba(229,231,235,var(--tw-border-opacity));box-sizing:border-box}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-gray-200{--tw-bg-opacity:1;background-color:rgba(229,231,235,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-gray-500{--tw-text-opacity:1;color:rgba(107,114,128,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */.pointer-events-none{pointer-events:none}.flex{display:flex}.h-4{height:1rem}.h-full{height:100%}.w-4{width:1rem}.w-full{width:100%}.items-center{align-items:center}.justify-center{justify-content:center}.rounded-full{border-radius:9999px}.border{border-width:1px}.border-gray-200{--tw-border-opacity:1;border-color:rgba(229,231,235,var(--tw-border-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.text-red-500{--tw-text-opacity:1;color:rgba(239,68,68,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */svg{display:block;vertical-align:middle}.relative{position:relative}.-mr-px{margin-right:-1px}.h-\\[14px\\]{height:14px}.fill-current{fill:currentColor}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
 
 const StreamlineButton$1 = class extends HTMLElement {
     constructor() {
@@ -9908,9 +9956,10 @@ const StreamlineEntries$1 = class extends HTMLElement {
             return (h("div", null, StreamlineEntries$1.getHeader({
                 title: "Available commands current mode",
             }), h("ul", null, Object.values(state$1.commands.local).map((item) => {
+                const isEntry = item.name.includes("[");
                 const type = item.name.substring(item.name.indexOf("[") - 1);
-                const cmd = item.name.replace(type, "");
-                return (h("li", { class: `flex flex-col py-3` }, h("h2", { class: `${this.h2} mb-2` }, h("span", null, cmd, h("span", { class: `${this.tag} ml-2` }, type.trim()))), h("p", { class: `${this.p}` }, item.description)));
+                const cmd = isEntry ? item.name.replace(type, "") : item.name;
+                return (h("li", { class: `flex flex-col py-3` }, h("h2", { class: `${this.h2} mb-2` }, h("span", null, cmd, isEntry && (h("span", { class: `${this.tag} ml-2` }, type.trim())))), h("p", { class: `${this.p}` }, item.description)));
             }))));
         };
         this.site = () => {
@@ -9936,7 +9985,7 @@ const StreamlineEntries$1 = class extends HTMLElement {
                 (state$1.entriesFavActive || state$1.entriesFav) &&
                 Object.values((state$1.entriesFavActive || state$1.entriesFav)).map((item) => {
                     return item.type
-                        ? this[item.type]([item])
+                        ? this[item.type === "networkMenu" ? "menu" : item.type]([item])
                         : StreamlineEntries$1.getHeader(item);
                 }));
         };
@@ -10016,7 +10065,7 @@ const StreamlinePost$1 = class extends HTMLElement {
         this.checkIfFav();
     }
     render() {
-        return (h("div", { class: `flex` }, h("div", { class: `px-2.5 py-1.5 bg-gray-200 text-gray-500 inline-block h-[max-content] leading-1 mr-4 !text-xs relative top-1.5 font-semibold uppercase` }, this.postType), h("div", { class: `flex flex-col` }, h("div", { class: `focus w-[max-content]` }, h("a", { href: this.hrefView, target: "_blank", class: `inline-flex font-semibold flex-col px-2.5 text-base py-2 text-indigo-500 hover:underline` }, this.postTitle)), h("div", { class: `flex flex-wrap` }, [
+        return (h("div", { class: `flex` }, h("div", { class: `px-2.5 py-1.5 bg-gray-200 text-gray-500 inline-block h-[max-content] leading-1 mr-4 !text-xs relative top-1.5 font-semibold uppercase` }, this.postType), h("div", { class: `flex flex-col` }, h("div", { class: `focus w-[max-content]` }, h("a", { href: this.hrefView, target: "_blank", class: `inline-flex font-semibold flex-col px-2.5 text-base py-2 text-indigo-600 hover:underline` }, this.postTitle)), h("div", { class: `flex flex-wrap` }, [
             {
                 text: "Favourite",
                 onClick: this.handleFavClick,
@@ -10031,13 +10080,15 @@ const StreamlinePost$1 = class extends HTMLElement {
             },
         ].map((item) => {
             const className = "inline-block px-2.5 py-2 text-indigo-500 flex items-center hover:underline";
-            return (h("div", { class: `focus` }, item.href ? (h("a", { href: item.href, target: "_blank", class: className }, item.text)) : (h("button", { class: className, onClick: item.onClick }, this.favourite ? "Unfavourite" : item.text, this.favourite &&
+            return (h("div", { class: `focus` }, item.href ? (h("a", { href: item.href, target: "_blank", class: className }, item.text)) : (h("button", { class: className, onClick: item.onClick }, this.favourite && item.text === "Favourite"
+                ? "Unfavourite"
+                : item.text, this.favourite &&
                 item.text === "Favourite" &&
                 state.active !== "fav" && h(Fav, { class: "ml-2" })))));
         })))));
     }
     get el() { return this; }
-    static get style() { return streamlinePostCss + '/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;box-sizing:border-box}button{background-color:transparent;background-image:none;color:inherit;cursor:pointer;font-family:inherit;font-size:100%;line-height:1.15;line-height:inherit;margin:0;padding:0;text-transform:none}[type=button],button{-webkit-appearance:button}a{color:inherit;text-decoration:inherit}.relative{position:relative}.top-1\\.5{top:.375rem}.top-1{top:.25rem}.mr-4{margin-right:1rem}.ml-2{margin-left:.5rem}.inline-block{display:inline-block}.flex{display:flex}.inline-flex{display:inline-flex}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.w-\\[max-content\\]{width:-webkit-max-content;width:-moz-max-content;width:max-content}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.bg-gray-200{--tw-bg-opacity:1;background-color:rgba(229,231,235,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.py-2{padding-bottom:.5rem;padding-top:.5rem}.\\!text-xs{font-size:.75rem!important;line-height:1rem!important}.text-base{font-size:1rem;line-height:1.5rem}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.text-gray-500{--tw-text-opacity:1;color:rgba(107,114,128,var(--tw-text-opacity))}.text-indigo-500{--tw-text-opacity:1;color:rgba(99,102,241,var(--tw-text-opacity))}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.filter{filter:var(--tw-filter)}.hover\\:underline:hover{text-decoration:underline}'; }
+    static get style() { return streamlinePostCss + '/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;box-sizing:border-box}button{background-color:transparent;background-image:none;color:inherit;cursor:pointer;font-family:inherit;font-size:100%;line-height:1.15;line-height:inherit;margin:0;padding:0;text-transform:none}[type=button],button{-webkit-appearance:button}a{color:inherit;text-decoration:inherit}.relative{position:relative}.top-1\\.5{top:.375rem}.top-1{top:.25rem}.mr-4{margin-right:1rem}.ml-2{margin-left:.5rem}.inline-block{display:inline-block}.flex{display:flex}.inline-flex{display:inline-flex}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.w-\\[max-content\\]{width:-webkit-max-content;width:-moz-max-content;width:max-content}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.bg-gray-200{--tw-bg-opacity:1;background-color:rgba(229,231,235,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.py-2{padding-bottom:.5rem;padding-top:.5rem}.\\!text-xs{font-size:.75rem!important;line-height:1rem!important}.text-base{font-size:1rem;line-height:1.5rem}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.text-gray-500{--tw-text-opacity:1;color:rgba(107,114,128,var(--tw-text-opacity))}.text-indigo-600{--tw-text-opacity:1;color:rgba(79,70,229,var(--tw-text-opacity))}.text-indigo-500{--tw-text-opacity:1;color:rgba(99,102,241,var(--tw-text-opacity))}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.filter{filter:var(--tw-filter)}.hover\\:underline:hover{text-decoration:underline}'; }
 };
 
 function checkIfStringStartsWith(str, substrs) {
@@ -10045,9 +10096,14 @@ function checkIfStringStartsWith(str, substrs) {
 }
 
 function getQuery(obj) {
+  const isMultisite = state$1.data.network;
   state$1[`entries${capitalizeFirstLetter(obj.type)}`] = [
     {
-      title: `${capitalizeFirstLetter(obj.type)}s`,
+      title: obj.type === 'site'
+        ? `Sites`
+        : isMultisite
+          ? `Posts (Site: ${obj.path})`
+          : `Posts`,
       titleAlt: `Showing ${obj.children.length || Object.values(obj.children).length} ${obj.children.length === 1 || Object.values(obj.children).length === 1
         ? `result`
         : `results`} for <span style="font-style: italic;">${obj.search}</span>`,
@@ -10098,17 +10154,27 @@ const StreamlineSearch$1 = class extends HTMLElement {
             }
         };
         this.startQuery = () => {
-            if (checkIfStringStartsWith(state$1.searchValue, this.commands)) {
-                this.value = state$1.searchValue
-                    .replace(`/${this.command}`, "")
-                    .trim();
-                this.callback = state$1.commands.local[this.command].callback;
+            var _a;
+            this.callback =
+                ((_a = state$1.commands.local[this.command]) === null || _a === void 0 ? void 0 : _a.callback) || false;
+            if (this.callback || state.active === "post") {
+                if (checkIfStringStartsWith(state$1.searchValue, this.commands) &&
+                    this.callback) {
+                    this.value = state$1.searchValue
+                        .replace(`/${this.command}`, "")
+                        .trim();
+                }
+                else if (state.active === "post") {
+                    this.value = state$1.searchValue;
+                    this.callback = "get_posts";
+                }
+                this.query();
             }
-            else if (state.active === "post") {
-                this.value = state$1.searchValue;
-                this.callback = "get_posts";
+            else if (this.command === "network") {
+                getMenu({
+                    network: true,
+                });
             }
-            this.query();
         };
         this.query = () => {
             state$1.isLoading = true;
@@ -10129,7 +10195,8 @@ const StreamlineSearch$1 = class extends HTMLElement {
                 getQuery({
                     type: this.command,
                     search: this.value,
-                    children: data.data,
+                    children: data.data.children,
+                    path: data.data.path,
                 });
                 setSearchPlaceholder();
                 if (this.callback === "get_sites") {

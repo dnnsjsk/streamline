@@ -74,15 +74,18 @@ export class StreamlineEntries {
         })}
         <ul>
           {Object.values(stateInternal.commands.local).map((item) => {
+            const isEntry = item.name.includes('[');
             const type = item.name.substring(item.name.indexOf('[') - 1);
-            const cmd = item.name.replace(type, '');
+            const cmd = isEntry ? item.name.replace(type, '') : item.name;
 
             return (
               <li class={`flex flex-col py-3`}>
                 <h2 class={`${this.h2} mb-2`}>
                   <span>
                     {cmd}
-                    <span class={`${this.tag} ml-2`}>{type.trim()}</span>
+                    {isEntry && (
+                      <span class={`${this.tag} ml-2`}>{type.trim()}</span>
+                    )}
                   </span>
                 </h2>
                 <p class={`${this.p}`}>{item.description}</p>
@@ -152,7 +155,7 @@ export class StreamlineEntries {
         (stateInternal.entriesFavActive || stateInternal.entriesFav) as unknown
       ).map((item) => {
         return item.type
-          ? this[item.type]([item])
+          ? this[item.type === 'networkMenu' ? 'menu' : item.type]([item])
           : StreamlineEntries.getHeader(item);
       })
     );

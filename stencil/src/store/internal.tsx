@@ -12,7 +12,7 @@ const { state, dispose } = createStore({
     },
     menu: {
       name: 'menu',
-      commands: ['/site'],
+      commands: ['/site ', '/network'],
     },
     post: {
       name: 'post',
@@ -21,9 +21,17 @@ const { state, dispose } = createStore({
   commands: {
     local: {
       site: {
+        // @ts-ignore
+        condition: window.streamlineData.network,
         name: '/site [name]',
         description: `Display entries from a different site in the network.`,
         callback: 'get_sites',
+      },
+      network: {
+        // @ts-ignore
+        condition: window.streamlineData.network,
+        name: '/network',
+        description: `Display entries from a from network dashboard.`,
       },
     },
   },
@@ -33,6 +41,8 @@ const { state, dispose } = createStore({
   entriesFavActive: JSON.parse(window.streamlineData.favourites),
   entriesMenu: [],
   entriesMenuActive: [],
+  entriesNetwork: [],
+  entriesNetworkActive: [],
   entriesPost: [],
   entriesPostActive: [],
   entriesSite: [],

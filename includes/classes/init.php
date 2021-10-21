@@ -75,15 +75,13 @@ class Init {
 		} );
 
 		add_action( 'admin_head', function () use ( &$str ) {
-
 			echo '<style id="streamline-css">' . $str . '</style>';
-
 		} );
 
 	}
 
 	/**
-	 * Get data
+	 * Get data and rewrite URLs.
 	 *
 	 * @date    04/05/2021
 	 * @since   1.0.0
@@ -107,18 +105,36 @@ class Init {
 					}
 				}
 			}
+			if ( $fav->type === 'networkMenu' ) {
+				$adminUrl      = network_admin_url();
+				$fav->adminUrl = $adminUrl;
+
+				foreach ( $fav->children as $children ) {
+					foreach ( $children->children as $link ) {
+						$link->adminUrl = $adminUrl;
+						$link->href     = $adminUrl . $link->path;
+					}
+				}
+			}
+			if ( $fav->type === 'post' ) {
+				foreach ( $fav->children as $post ) {
+					$post->guid     = get_the_guid( $post->ID );
+					$post->hrefEdit = base64_encode( get_edit_post_link( $post->ID ) );
+				}
+			}
 		}
 
 		echo '<script id="streamline-data">';
 		echo 'window.streamlineData =';
 		echo json_encode( [
-			'adminUrl'    => admin_url(),
-			'favourites'  => json_encode( $favs ),
-			'fav'         => json_encode( get_user_meta( get_current_user_id(), 'streamline' ) ),
-			'isMultisite' => is_multisite(),
-			'path'        => $currentSite[0]->path,
-			'siteId'      => get_current_blog_id(),
-			'userId'      => get_current_user_id(),
+			'adminUrl'   => admin_url(),
+			'favourites' => json_encode( $favs ),
+			'fav'        => json_encode( get_user_meta( get_current_user_id(), 'streamline' ) ),
+			'network'    => ! is_multisite() ? FALSE : network_admin_url(),
+			'isNetwork'  => is_network_admin(),
+			'path'       => $currentSite[0]->path,
+			'siteId'     => get_current_blog_id(),
+			'userId'     => get_current_user_id(),
 		] );
 		echo ';';
 		echo '</script>';

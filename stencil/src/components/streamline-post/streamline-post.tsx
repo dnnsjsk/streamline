@@ -75,7 +75,7 @@ export class StreamlinePost {
             <a
               href={this.hrefView}
               target="_blank"
-              class={`inline-flex font-semibold flex-col px-2.5 text-base py-2 text-indigo-500 hover:underline`}
+              class={`inline-flex font-semibold flex-col px-2.5 text-base py-2 text-indigo-600 hover:underline`}
             >
               {this.postTitle}
             </a>
@@ -106,7 +106,9 @@ export class StreamlinePost {
                     </a>
                   ) : (
                     <button class={className} onClick={item.onClick}>
-                      {this.favourite ? 'Unfavourite' : item.text}
+                      {this.favourite && item.text === 'Favourite'
+                        ? 'Unfavourite'
+                        : item.text}
                       {this.favourite &&
                         item.text === 'Favourite' &&
                         stateLocal.active !== 'fav' && <Fav class={'ml-2'} />}

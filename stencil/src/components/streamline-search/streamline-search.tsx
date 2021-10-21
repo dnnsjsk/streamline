@@ -8,6 +8,7 @@ import { stateLocal } from '../../store/local';
 import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
 import { resetView } from '../../utils/resetView';
 import { isLocalCommands } from '../../utils/isLocalCommands';
+import { getMenu } from '../../utils/getMenu';
 
 /**
  * Search.
@@ -75,17 +76,28 @@ export class StreamlineSearch {
   };
 
   private startQuery = () => {
-    if (checkIfStringStartsWith(stateInternal.searchValue, this.commands)) {
-      this.value = stateInternal.searchValue
-        .replace(`/${this.command}`, '')
-        .trim();
-      this.callback = stateInternal.commands.local[this.command].callback;
-    } else if (stateLocal.active === 'post') {
-      this.value = stateInternal.searchValue;
-      this.callback = 'get_posts';
-    }
+    this.callback =
+      stateInternal.commands.local[this.command]?.callback || false;
 
-    this.query();
+    if (this.callback || stateLocal.active === 'post') {
+      if (
+        checkIfStringStartsWith(stateInternal.searchValue, this.commands) &&
+        this.callback
+      ) {
+        this.value = stateInternal.searchValue
+          .replace(`/${this.command}`, '')
+          .trim();
+      } else if (stateLocal.active === 'post') {
+        this.value = stateInternal.searchValue;
+        this.callback = 'get_posts';
+      }
+
+      this.query();
+    } else if (this.command === 'network') {
+      getMenu({
+        network: true,
+      });
+    }
   };
 
   private query = () => {
@@ -107,7 +119,8 @@ export class StreamlineSearch {
         getQuery({
           type: this.command,
           search: this.value,
-          children: data.data,
+          children: data.data.children,
+          path: data.data.path,
         });
         setSearchPlaceholder();
         if (this.callback === 'get_sites') {

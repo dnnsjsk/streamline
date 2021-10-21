@@ -7,9 +7,15 @@ export function getMenu(obj = {} as any) {
   let data = [];
   const menu = {};
 
-  const isAdmin = document.querySelector('#adminmenuwrap') && !obj.adminUrl;
-  const adminUrl = obj.adminUrl || stateInternal.data.adminUrl;
-  const siteId = obj.siteId || stateInternal.data.siteId;
+  const isAdmin =
+    document.querySelector('#adminmenuwrap') && !obj.adminUrl && !obj.network;
+  const isNetwork = obj.network || stateInternal.data.isNetwork;
+  const isMultisite = stateInternal.data.network;
+  const adminUrl =
+    obj.adminUrl ||
+    (isNetwork ? stateInternal.data.network : stateInternal.data.adminUrl);
+  const siteId = obj.siteId || (isNetwork ? 0 : stateInternal.data.siteId);
+  const type = !obj.site && isNetwork ? 'networkMenu' : 'menu';
 
   function get(doc) {
     doc.querySelectorAll('.menu-top > a').forEach((item, index) => {
@@ -33,13 +39,13 @@ export function getMenu(obj = {} as any) {
 
             subArr[hrefSub] = {
               adminUrl,
-              href: stateInternal.data.adminUrl + hrefSub,
+              href: adminUrl + hrefSub,
               index: subSubMenu.length === 1 ? indexSub : indexSub - 1,
               name: nameSub,
               nameParent: name,
               path: hrefSub,
               siteId: Number(siteId),
-              type: 'menu',
+              type: type,
             };
           }
         });
@@ -57,11 +63,13 @@ export function getMenu(obj = {} as any) {
         adminUrl,
         children: menu,
         title:
-          obj.site || stateInternal.data.isMultisite
-            ? `Admin menu (site: ${obj.site || stateInternal.data.path})`
+          obj.site || (isMultisite && !isNetwork)
+            ? `Admin menu (Site: ${obj.site || stateInternal.data.path})`
+            : isNetwork
+            ? 'Network admin menu'
             : `Admin menu`,
         siteId: Number(siteId),
-        type: 'menu',
+        type: type,
       },
     ];
 
@@ -74,7 +82,7 @@ export function getMenu(obj = {} as any) {
     get(document);
   } else {
     stateInternal.isLoading = true;
-    fetch(obj.adminUrl || stateInternal.data.adminUrl)
+    fetch(adminUrl)
       .then((response) => response.text())
       .then((data) => {
         const parser = new DOMParser();
@@ -83,5 +91,30 @@ export function getMenu(obj = {} as any) {
         resetView();
         stateLocal.active = 'menu';
       });
+    // @ts-ignore
+    // eslint-disable-next-line no-undef
+    /*
+    fetch(streamline.ajax, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/x-www-form-urlencoded',
+      }),
+      body: `action=streamlineMenu&url=${
+        obj.adminUrl || stateInternal.data.adminUrl
+        // @ts-ignore
+        // eslint-disable-next-line no-undef
+      }&nonce=${streamline.nonce}`,
+    })
+      .then((response) => response.text())
+      .then((data) => {
+        const parser = new DOMParser();
+        const html = parser.parseFromString(data, 'text/html');
+        console.log(html);
+        get(html);
+        resetView();
+        stateLocal.active = 'menu';
+      });
+     */
   }
 }

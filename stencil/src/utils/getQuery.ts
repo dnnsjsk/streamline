@@ -2,9 +2,16 @@ import { stateInternal } from '../store/internal';
 import { capitalizeFirstLetter } from './capitalizeFirstLetter';
 
 export function getQuery(obj) {
+  const isMultisite = stateInternal.data.network;
+
   stateInternal[`entries${capitalizeFirstLetter(obj.type)}`] = [
     {
-      title: `${capitalizeFirstLetter(obj.type)}s`,
+      title:
+        obj.type === 'site'
+          ? `Sites`
+          : isMultisite
+          ? `Posts (Site: ${obj.path})`
+          : `Posts`,
       titleAlt: `Showing ${
         obj.children.length || Object.values(obj.children).length
       } ${
