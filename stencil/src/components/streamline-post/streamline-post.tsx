@@ -66,7 +66,7 @@ export class StreamlinePost {
     return (
       <div class={`flex`}>
         <div
-          class={`px-2.5 py-1.5 bg-gray-200 text-gray-500 inline-block h-[max-content] leading-1 mr-4 !text-xs relative top-1.5 font-semibold uppercase`}
+          class={`px-2.5 py-1.5 bg-blue-gray-200 text-blue-gray-500 inline-block h-[max-content] leading-1 mr-4 !text-xs relative top-1.5 font-semibold uppercase`}
         >
           {this.postType}
         </div>
@@ -75,7 +75,7 @@ export class StreamlinePost {
             <a
               href={this.hrefView}
               target="_blank"
-              class={`inline-flex font-semibold flex-col px-2.5 text-base py-2 text-indigo-600 hover:underline`}
+              class={`inline-flex font-semibold flex-col px-2.5 text-base py-2 text-blue-600 hover:underline`}
             >
               {this.postTitle}
             </a>
@@ -96,7 +96,7 @@ export class StreamlinePost {
               },
             ].map((item) => {
               const className =
-                'inline-block px-2.5 py-2 text-indigo-500 flex items-center hover:underline';
+                'inline-block px-2.5 py-2 text-blue-500 flex items-center hover:underline';
 
               return (
                 <div class={`focus`}>

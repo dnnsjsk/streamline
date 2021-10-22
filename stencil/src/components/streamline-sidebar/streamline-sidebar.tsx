@@ -15,7 +15,7 @@ export class StreamlineSidebar {
   render() {
     return (
       <nav
-        class={`bg-gray-50 h-full w-[var(--sl-side-w)] grid-flow-row grid auto-rows-max border-r border-gray-300`}
+        class={`bg-blue-gray-50 h-full w-[var(--sl-side-w)] grid-flow-row grid auto-rows-max border-r border-blue-gray-300`}
       >
         <streamline-button
           type="primary"

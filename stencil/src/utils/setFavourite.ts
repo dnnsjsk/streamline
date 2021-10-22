@@ -79,7 +79,7 @@ export function setFavourite(obj) {
     setEntries();
   }
 
-  console.log(stateInternal.entriesFav);
+  // console.log(stateInternal.entriesFav);
 
   stateInternal.isProcessing = true;
 

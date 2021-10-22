@@ -4,7 +4,7 @@ const { state, dispose } = createStore({
   // @ts-ignore
   data: window.streamlineData,
   class: {
-    tag: 'px-2.5 py-1.5 bg-gray-200 text-gray-500 inline-block h-[max-content] leading-1',
+    tag: 'px-2.5 py-1.5 bg-blue-gray-200 text-blue-gray-500 inline-block h-[max-content] leading-1',
   },
   menu: {
     fav: {

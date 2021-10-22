@@ -9,7 +9,7 @@ it('Render sidebar', async () => {
   expect(page.root).toEqualHtml(`
 <streamline-sidebar>
       <mock:shadow-root>
-        <nav class="auto-rows-max bg-gray-50 border-gray-300 border-r grid grid-flow-row h-full w-[var(--sl-side-w)]">
+        <nav class="auto-rows-max bg-blue-gray-50 border-blue-gray-300 border-r grid grid-flow-row h-full w-[var(--sl-side-w)]">
           <streamline-button icon="wordpress" type="primary"></streamline-button>
           <div class="auto-rows-max grid grid-flow-row">
             <streamline-button icon="fav" text="Fav" type="sidebar"></streamline-button>

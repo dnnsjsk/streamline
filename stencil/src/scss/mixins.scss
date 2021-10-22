@@ -2,10 +2,10 @@
   .focus {
     box-sizing: border-box;
     position: relative;
-display: inline-flex;
+    display: inline-flex;
     outline: none;
 
-    [role="button"],
+    [role='button'],
     input,
     button,
     a {

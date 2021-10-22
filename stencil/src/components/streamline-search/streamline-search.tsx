@@ -138,7 +138,7 @@ export class StreamlineSearch {
         <div class="w-full focus focus--px-y h-[var(--sl-side-w)]">
           <input
             part="search"
-            class="w-full bg-gray-50 px-4 text-[1.15rem] h-full w-full m-0 p-0 border-b border-gray-300 font-medium placeholder-gray-500 sm:px-6"
+            class="w-full bg-blue-gray-50 px-4 text-[1.15rem] h-full w-full m-0 p-0 border-b border-blue-gray-300 font-medium placeholder-blue-gray-500 sm:px-6"
             type="text"
             placeholder={stateInternal.searchPlaceholder}
             value={stateInternal.searchValue}
@@ -151,7 +151,7 @@ export class StreamlineSearch {
             <div class={`focus focus--border/`}>
               <button
                 onClick={this.startQuery}
-                class={`inline-flex items-center text-xs px-2 py-1 font-medium bg-white border border-gray-200 text-gray-600 hover:text-gray-50 hover:bg-gray-900 hover:border-gray-900 sm:text-sm sm:px-3 sm:py-1.5`}
+                class={`inline-flex items-center text-xs px-2 py-1 font-medium bg-white border border-blue-gray-200 text-blue-gray-600 hover:text-blue-gray-50 hover:bg-blue-gray-900 hover:border-blue-gray-900 sm:text-sm sm:px-3 sm:py-1.5`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

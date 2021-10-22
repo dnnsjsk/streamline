@@ -15,12 +15,12 @@ import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
   styleUrl: 'streamline-entries.scss',
 })
 export class StreamlineEntries {
-  private h2 = 'text-base text-gray-900 font-medium';
-  private p = 'text-gray-600 text-base font-normal';
+  private h2 = 'text-base text-blue-gray-900 font-medium';
+  private p = 'text-blue-gray-600 text-base font-normal';
   private tag =
-    'px-2.5 py-1.5 bg-gray-200 text-gray-500 inline-block h-[max-content] leading-1';
+    'px-2.5 py-1.5 bg-blue-gray-200 text-blue-gray-500 inline-block h-[max-content] leading-1';
 
-  private border = 'border-t border-gray-100 first-of-type:border-none';
+  private border = 'border-t border-blue-gray-100 first-of-type:border-none';
 
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineEntriesElement;
@@ -42,10 +42,10 @@ export class StreamlineEntries {
   private static getHeader(item) {
     return (
       <div
-        class={`pt-5 mb-4 pb-1 flex justify-between items-end sticky -top-2 bg-white z-10 border-b border-dotted border-gray-900 sm:pt-6 sm:-top-2 lg:pt-8 lg:-top-4`}
+        class={`pt-5 mb-4 pb-1 flex justify-between items-end sticky -top-2 bg-white z-10 border-b border-dotted border-blue-gray-900 sm:pt-6 sm:-top-2 lg:pt-8 lg:-top-4`}
       >
         <h1
-          class={`text-gray-900 font-medium text-xl mb-2 sm:text-2xl`}
+          class={`text-blue-gray-900 font-medium text-xl mb-2 sm:text-2xl`}
           innerHTML={
             stateLocal.active === 'fav'
               ? item.title
@@ -125,7 +125,7 @@ export class StreamlineEntries {
                             getMenu(obj);
                           }
                         }}
-                        class={`${this.tag} hover:text-gray-50 hover:bg-gray-900 hover:border-gray-900`}
+                        class={`${this.tag} hover:text-blue-gray-50 hover:bg-blue-gray-900 hover:border-blue-gray-900`}
                       >
                         {itemInner.domain}
                       </div>

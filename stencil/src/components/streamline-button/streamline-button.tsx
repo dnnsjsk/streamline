@@ -123,15 +123,15 @@ export class StreamlineButton {
   render() {
     const className = `break-words w-[max-content] underline-none cursor-pointer text-center whitespace-no-wrap ${
       this.type === 'main'
-        ? `text-sm px-3 py-2.5 leading-none border border-gray-200 bg-gray-50 text-indigo-600 min-w-[75px] hover:border-indigo-600`
+        ? `text-sm px-3 py-2.5 leading-none border border-blue-gray-200 bg-blue-gray-50 text-blue-600 min-w-[75px] hover:border-blue-600`
         : this.type === 'sidebar' || this.type === 'primary'
-        ? `h-[calc(var(--sl-side-w))] w-[calc(var(--sl-side-w)-1px)] flex flex-col items-center justify-center p-0 text-gray-900 bg-transparent border-b border-gray-300 ${
+        ? `h-[calc(var(--sl-side-w))] w-[calc(var(--sl-side-w)-1px)] flex flex-col items-center justify-center p-0 text-blue-gray-900 bg-transparent border-b border-blue-gray-300 ${
             this.type === 'primary'
               ? `bg-[#191E23] border-none text-white fill-current h-[var(--sl-side-w)] w-[var(--sl-side-w)] hover:bg-[#0e1114]`
               : this.type === 'sidebar' &&
-                `!grid sm:!grid-rows-[20px,20px] !justify-items-center !content-center text-gray-500 border-b border-gray-300 hover:bg-gray-100 hover:text-gray-900 ${
+                `!grid sm:!grid-rows-[20px,20px] !justify-items-center !content-center text-blue-gray-500 border-b border-blue-gray-300 hover:bg-blue-gray-100 hover:text-blue-gray-900 ${
                   stateLocal.active === this.icon &&
-                  'text-indigo-700 bg-white border-r border-white pointer-events-none relative -right-px hover:!bg-white'
+                  'text-blue-700 bg-white border-r border-white pointer-events-none relative -right-px hover:!bg-white'
                 }`
           }`
         : ''
@@ -248,7 +248,7 @@ export class StreamlineButton {
         </div>
         {this.type === 'main' && (
           <div
-            class={`!grid divide-x divide-gray-200 auto-cols-max grid-flow-col`}
+            class={`!grid divide-x divide-blue-gray-200 auto-cols-max grid-flow-col`}
             ref={(el) => (this.tooltip = el as HTMLElement)}
             style={{ display: 'block' }}
           >
