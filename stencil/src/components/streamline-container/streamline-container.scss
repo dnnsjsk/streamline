@@ -1,10 +1,11 @@
 :host {
   display: block;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
 
   * {
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: blue-grayscale;
+    -moz-osx-font-smoothing: grayscale;
+    pointer-events: auto;
   }
 }

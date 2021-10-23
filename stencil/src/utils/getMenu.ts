@@ -15,7 +15,7 @@ export function getMenu(obj = {} as any) {
     obj.adminUrl ||
     (isNetwork ? stateInternal.data.network : stateInternal.data.adminUrl);
   const siteId = obj.siteId || (isNetwork ? 0 : stateInternal.data.siteId);
-  const type = !obj.site && isNetwork ? 'networkMenu' : 'menu';
+  const type = !obj.path && isNetwork ? 'networkMenu' : 'menu';
 
   function get(doc) {
     doc.querySelectorAll('.menu-top > a').forEach((item, index) => {
@@ -71,6 +71,9 @@ export function getMenu(obj = {} as any) {
 
     stateInternal.entriesMenu = data;
     stateInternal.entriesMenuActive = data;
+    stateInternal.entriesMenuCurrentPath = obj.path || stateInternal.data.path;
+    stateInternal.entriesMenuIsNetwork = isNetwork;
+
     setEntries();
   }
 

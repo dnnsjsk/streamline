@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import { Component, h, Prop, Method } from '@stencil/core';
+import { Component, h, Prop, Method, Host } from '@stencil/core';
 import { stateInternal } from '../../store/internal';
 import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
 import { setTestData } from '../../utils/setTestData';
@@ -13,6 +13,7 @@ import { setTestData } from '../../utils/setTestData';
   styleUrl: 'streamline-container.scss',
 })
 export class StreamlineContainer {
+  // eslint-disable-next-line @stencil/strict-mutable
   @Prop({ reflect: true, mutable: true }) visible: boolean;
 
   connectedCallback() {
@@ -48,18 +49,25 @@ export class StreamlineContainer {
     stateInternal.visible = !stateInternal.visible;
   }
 
+  @Method()
+  async toggleTest() {
+    stateInternal.testFull = !stateInternal.testFull;
+  }
+
   render() {
     return (
-      stateInternal.visible && (
-        <div class="fixed top-0 left-0 w-full h-full z-[9999999999999999]">
-          <div
-            tabIndex={-1}
-            class="fixed top-0 left-0 w-full h-full bg-black/90 backdrop-blur-sm"
-            onClick={() => (stateInternal.visible = false)}
-          />
-          <streamline-box />
-        </div>
-      )
+      <Host>
+        {stateInternal.visible && (
+          <div class="fixed top-0 left-0 w-full h-full z-[9999999999999999]">
+            <div
+              tabIndex={-1}
+              class="fixed top-0 left-0 w-full h-full bg-black/90 backdrop-blur-sm"
+              onClick={() => (stateInternal.visible = false)}
+            />
+            <streamline-box />
+          </div>
+        )}
+      </Host>
     );
   }
 }

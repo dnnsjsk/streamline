@@ -41,6 +41,8 @@ const { state, dispose, onChange } = createStore({
   entriesFavActive: JSON.parse(window.streamlineData.favourites),
   entriesMenu: [],
   entriesMenuActive: [],
+  entriesMenuCurrentPath: '',
+  entriesMenuIsNetwork: false,
   entriesNetwork: [],
   entriesNetworkActive: [],
   entriesPost: [],
@@ -56,6 +58,7 @@ const { state, dispose, onChange } = createStore({
   searchValue: '',
   // @ts-ignore
   test: window.streamlineTest,
+  testFull: false,
   visible: false,
 });
 

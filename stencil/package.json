@@ -6,7 +6,8 @@
     "build": "stencil build --docs",
     "start:stencil": "stencil build --dev --watch --serve",
     "start:bs": "browser-sync start --proxy 'https://fabrikat.local/harmoni/wp-admin/options-reading.php' --files './../assets/components/build/*.js' -w",
-    "test:unit": "stencil test --spec"
+    "test:unit": "stencil test --spec",
+    "test:screen": "stencil test --e2e --screenshot"
   },
   "devDependencies": {
     "@stencil/core": "^2.5.2",
@@ -33,6 +34,7 @@
     "jest-cli": "^26.6.3",
     "lodash-es": "^4.17.21",
     "prettier": "^2.2.1",
+    "puppeteer": "^10.0.0",
     "resize-observer-polyfill": "^1.5.1",
     "shepherd.js": "^8.3.1",
     "stencil-store-storage": "^0.2.0",

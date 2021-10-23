@@ -22,6 +22,16 @@ Type: `Promise<void>`
 
 
 
+### `toggleTest() => Promise<void>`
+
+
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
 
 ## Dependencies
 

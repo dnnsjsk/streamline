@@ -52,7 +52,10 @@ export class StreamlineSearch {
         stateInternal.isEnter = true;
         this.command = 'post';
       }
-    } else if (e.target.value.startsWith('/') && isLocalCommands()) {
+    } else if (
+      (e.target.value.startsWith('/') && isLocalCommands()) ||
+      (e.target.value.startsWith('/') && stateInternal.testFull)
+    ) {
       stateInternal.isSlash = true;
       if (
         checkIfStringStartsWith(
@@ -117,14 +120,15 @@ export class StreamlineSearch {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
+        // console.log(data);
 
         getQuery({
-          type: this.command,
-          search: this.value,
           children: data.data.children,
-          path: data.data.path,
           isMultisite: data.data.isMultisite,
+          path: data.data.path,
+          search: this.value,
+          type: this.command,
+          queryValue: this.value,
         });
         setSearchPlaceholder();
         if (this.callback === 'get_sites') {

@@ -118,8 +118,10 @@ class Init {
 			}
 			if ( $fav->type === 'post' ) {
 				foreach ( $fav->children as $post ) {
+					switch_to_blog( $post->siteId );
 					$post->guid     = get_the_guid( $post->ID );
 					$post->hrefEdit = base64_encode( get_edit_post_link( $post->ID ) );
+					restore_current_blog();
 				}
 			}
 		}
@@ -170,7 +172,9 @@ class Init {
 			}
 		} );
 		add_action( 'wp_footer', function () use ( $container ) {
-			if ( is_user_logged_in() && apply_filters( 'streamline/enable', TRUE ) ) {
+			if ( is_user_logged_in() &&
+			     apply_filters( 'streamline/enable', TRUE ) &&
+			     ! defined( 'OXYGEN_IFRAME' ) ) {
 				echo $container;
 			}
 		} );

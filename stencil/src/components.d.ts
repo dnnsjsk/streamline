@@ -25,6 +25,7 @@ export namespace Components {
     }
     interface StreamlineContainer {
         "toggle": () => Promise<void>;
+        "toggleTest": () => Promise<void>;
         "visible": boolean;
     }
     interface StreamlineEntries {

@@ -24,5 +24,12 @@ export function setEntries() {
   stateInternal[`entries${capitalizeFirstLetter(stateLocal.active)}Active`] =
     result?.length >= 1
       ? result
-      : [{ title: stateInternal.searchNoValue, children: [] }];
+      : [
+          {
+            title: stateInternal.searchNoValue,
+            children: [],
+            isMultisite: stateInternal.data.network,
+            path: stateInternal.entriesMenuCurrentPath,
+          },
+        ];
 }

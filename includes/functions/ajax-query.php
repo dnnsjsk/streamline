@@ -18,21 +18,18 @@ function streamlineQuery() {
 				'search' => $query
 			] );
 
-			$path = '';
-
 			$index = - 1;
 			foreach ( $arr as $site ) {
-				$id   = $site->blog_id;
-				$path = get_site( $id )->path;
+				$id = $site->blog_id;
 				$index ++;
 				switch_to_blog( $id );
 				$arr[ $index ]->siteId   = $id;
 				$arr[ $index ]->adminUrl = get_admin_url();
+				$arr[ $index ]->path     = get_site( $id )->path;
 				restore_current_blog();
 			}
 
 			$get['children'] = $arr;
-			$get['path']     = $path;
 
 			wp_send_json_success( $get );
 		}
@@ -59,8 +56,8 @@ function streamlineQuery() {
 				$newArr[ $post->ID ] = $post;
 			}
 
-			$get['children'] = $newArr;
-			$get['path']     = $path;
+			$get['children']    = $newArr;
+			$get['path']        = $path;
 			$get['isMultisite'] = is_multisite();
 
 			wp_send_json_success( $get );

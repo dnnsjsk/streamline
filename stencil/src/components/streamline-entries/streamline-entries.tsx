@@ -67,7 +67,8 @@ export class StreamlineEntries {
     }
     `;
 
-    const path = item.isMultisite ? ` (subsite: ${item.path})` : '';
+    const path =
+      item.isMultisite && !stateInternal.test ? ` (subsite: ${item.path})` : '';
 
     return (
       <div
@@ -78,11 +79,16 @@ export class StreamlineEntries {
           innerHTML={`${
             stateInternal.isSlash && !stateInternal.isSites
               ? item.title
-              : item.type === 'networkMenu'
+              : item.type === 'networkMenu' ||
+                (stateInternal.entriesMenuIsNetwork &&
+                  stateLocal.active === 'menu' &&
+                  !stateInternal.isSites)
               ? 'Network admin'
-              : item.type === 'menu'
+              : (stateLocal.active === 'menu' && !stateInternal.isSlash) ||
+                item.type === 'menu' ||
+                item.type === 'networkMenu'
               ? 'Admin menu' + path
-              : (item.type === 'post' || item.type === 'site') &&
+              : (stateLocal.active === 'post' || item.type === 'site') &&
                 stateLocal.active !== 'fav' &&
                 stateInternal[
                   `entries${stateLocal.active === 'post' ? 'Post' : 'Site'}`
@@ -101,9 +107,12 @@ export class StreamlineEntries {
               : (item.type === 'post' || item.type === 'site') &&
                 stateLocal.active === 'fav'
               ? `${capitalizeFirstLetter(item.type)}s` + path
-              : stateInternal.test
+              : stateInternal.test &&
+                stateLocal.active === 'post' &&
+                Object.values(stateInternal.entriesPostActive[0].children)
+                  .length >= 1
               ? 'Search results'
-              : 'No search'
+              : 'No results'
           }`}
         />
         <div class={`flex flex-wrap space-x-4 divide-x`}>
@@ -111,8 +120,9 @@ export class StreamlineEntries {
             {
               text: results,
               condition:
-                (stateInternal.isSlash && !stateInternal.isSites) ||
-                stateLocal.active !== 'fav',
+                stateInternal.isSites ||
+                stateLocal.active === 'post' ||
+                (stateLocal.active === 'menu' && !stateInternal.isSlash),
             },
           ]).map((itemInner, itemIndex) => {
             return (
@@ -146,7 +156,7 @@ export class StreamlineEntries {
     return (
       <div>
         {StreamlineEntries.getHeader({
-          title: 'Available commands current mode',
+          title: 'Available commands for current mode',
         })}
         <ul>
           {Object.values(stateInternal.commands.local).map((item) => {
@@ -183,8 +193,7 @@ export class StreamlineEntries {
               const obj = {
                 siteId: itemInner.siteId,
                 adminUrl: itemInner.adminUrl,
-                site: itemInner.path,
-                path: item.path,
+                path: itemInner.path,
               };
 
               return (
