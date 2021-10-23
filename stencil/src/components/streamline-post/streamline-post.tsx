@@ -73,7 +73,7 @@ export class StreamlinePost {
         <div class={`flex flex-col`}>
           <div class={`focus w-[max-content]`}>
             <a
-              href={this.hrefView}
+              href={stateInternal.test ? '#' : this.hrefView}
               target="_blank"
               class={`inline-flex font-semibold flex-col px-2.5 text-base py-2 text-blue-600 hover:underline`}
             >
@@ -88,20 +88,22 @@ export class StreamlinePost {
               },
               {
                 text: 'View',
-                href: this.hrefView,
+                href: stateInternal.test ? '#' : this.hrefView,
               },
               {
                 text: 'Edit',
-                href: atob(this.hrefEdit).replace('&amp;', '&'),
+                href: stateInternal.test
+                  ? '#'
+                  : atob(this.hrefEdit).replace('&amp;', '&'),
               },
             ].map((item) => {
               const className =
-                'inline-block px-2.5 py-2 text-blue-500 flex items-center hover:underline';
+                'inline-block px-2.5 py-2 text-blue-500 text-sm flex items-center hover:underline';
 
               return (
                 <div class={`focus`}>
                   {item.href ? (
-                    <a href={item.href} target="_blank" class={className}>
+                    <a href={item.href} class={className}>
                       {item.text}
                     </a>
                   ) : (

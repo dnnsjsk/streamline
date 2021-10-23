@@ -40,18 +40,94 @@ export class StreamlineEntries {
   };
 
   private static getHeader(item) {
+    let menuNumber = 0;
+    Object.values(stateInternal.entriesMenuActive).forEach((item) => {
+      Object.values(item.children).forEach(() => {
+        menuNumber++;
+      });
+    });
+
+    const results = `Showing ${
+      stateLocal.active === 'post'
+        ? Object.values(stateInternal.entriesPostActive[0].children).length
+        : stateInternal.isSites
+        ? Object.values(stateInternal.entriesSite[0].children).length
+        : stateLocal.active === 'menu'
+        ? menuNumber
+        : ''
+    } ${
+      (stateLocal.active === 'post' &&
+        Object.values(stateInternal.entriesPostActive[0].children).length ===
+          1) ||
+      (stateInternal.isSites &&
+        Object.values(stateInternal.entriesSite[0].children).length === 1) ||
+      (stateLocal.active === 'menu' && menuNumber === 1)
+        ? `result`
+        : `results`
+    }
+    `;
+
+    const path = item.isMultisite ? ` (subsite: ${item.path})` : '';
+
     return (
       <div
-        class={`pt-5 mb-4 pb-1 flex justify-between items-end sticky -top-2 bg-white z-10 border-b border-dotted border-blue-gray-900 sm:pt-6 sm:-top-2 lg:pt-8 lg:-top-4`}
+        class={`pt-5 flex flex-wrap mb-4 pb-1 flex justify-between items-center sticky -top-2 bg-white z-10 border-b border-dotted border-blue-gray-900 sm:pt-6 sm:-top-2 lg:pt-8 lg:-top-4`}
       >
         <h1
-          class={`text-blue-gray-900 font-medium text-xl mb-2 sm:text-2xl`}
-          innerHTML={
-            stateLocal.active === 'fav'
+          class={`text-blue-gray-900 font-medium text-xl mr-4 mb-2 sm:text-2xl`}
+          innerHTML={`${
+            stateInternal.isSlash && !stateInternal.isSites
               ? item.title
-              : item.titleAlt || item.title
-          }
+              : item.type === 'networkMenu'
+              ? 'Network admin'
+              : item.type === 'menu'
+              ? 'Admin menu' + path
+              : (item.type === 'post' || item.type === 'site') &&
+                stateLocal.active !== 'fav' &&
+                stateInternal[
+                  `entries${stateLocal.active === 'post' ? 'Post' : 'Site'}`
+                ][0]?.queryValue
+              ? `${
+                  stateInternal.isSites
+                    ? 'Site'
+                    : capitalizeFirstLetter(stateLocal.active)
+                }s for: ` +
+                `<span class="text-gray-400 italic">${
+                  stateInternal[
+                    `entries${stateLocal.active === 'post' ? 'Post' : 'Site'}`
+                  ][0]?.queryValue
+                }</span>` +
+                path
+              : (item.type === 'post' || item.type === 'site') &&
+                stateLocal.active === 'fav'
+              ? `${capitalizeFirstLetter(item.type)}s` + path
+              : stateInternal.test
+              ? 'Search results'
+              : 'No search'
+          }`}
         />
+        <div class={`flex flex-wrap space-x-4 divide-x`}>
+          {Object.values([
+            {
+              text: results,
+              condition:
+                (stateInternal.isSlash && !stateInternal.isSites) ||
+                stateLocal.active !== 'fav',
+            },
+          ]).map((itemInner, itemIndex) => {
+            return (
+              itemInner.condition && (
+                <span
+                  class={`text-sm font-medium text-gray-700 ${
+                    itemIndex === 0 ? '' : 'pl-4'
+                  }`}
+                >
+                  {itemInner.text}
+                </span>
+              )
+            );
+          })}
+        </div>
       </div>
     );
   }
@@ -108,6 +184,7 @@ export class StreamlineEntries {
                 siteId: itemInner.siteId,
                 adminUrl: itemInner.adminUrl,
                 site: itemInner.path,
+                path: item.path,
               };
 
               return (

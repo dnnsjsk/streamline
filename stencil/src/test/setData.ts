@@ -4,7 +4,6 @@ export function setData() {
   stateInternal.entriesSite = [
     {
       index: 0,
-      title: 'Showing 7 results for <span style="font-style: italic;"></span>',
       children: [
         {
           blog_id: '1',
@@ -170,7 +169,6 @@ export function setData() {
           },
         },
       },
-      title: 'Admin menu (site: /harmoni/)',
       siteId: 305,
       type: 'menu',
     },
@@ -262,7 +260,6 @@ export function setData() {
           },
         },
       },
-      title: 'Admin menu (site: /spx/)',
       siteId: 303,
       type: 'menu',
     },
@@ -296,7 +293,6 @@ export function setData() {
           },
         },
       },
-      title: 'Admin menu (site: /blockstudio/)',
       siteId: 309,
       type: 'menu',
     },
@@ -320,14 +316,10 @@ export function setData() {
           },
         },
       },
-      name: 'Admin menu (site: /dennis/)',
       siteId: 312,
       type: 'menu',
     },
     {
-      title: 'Posts',
-      titleAlt:
-        'Showing 3 results for <span style="font-style: italic;">e</span>',
       children: {
         '1': {
           ID: 1,
@@ -879,7 +871,6 @@ export function setData() {
           },
         },
       },
-      title: 'Admin menu (site: /harmoni/)',
       siteId: 305,
       type: 'menu',
     },
@@ -890,8 +881,6 @@ export function setData() {
   const post = [
     {
       title: 'Posts',
-      titleAlt:
-        'Showing 3 results for <span style="font-style: italic;">e</span>',
       children: {
         '1': {
           ID: 1,

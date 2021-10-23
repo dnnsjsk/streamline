@@ -24,6 +24,7 @@ export namespace Components {
         "typeSub": string;
     }
     interface StreamlineContainer {
+        "toggle": () => Promise<void>;
         "visible": boolean;
     }
     interface StreamlineEntries {

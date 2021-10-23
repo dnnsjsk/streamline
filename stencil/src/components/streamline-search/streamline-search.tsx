@@ -46,7 +46,8 @@ export class StreamlineSearch {
 
       if (
         stateInternal.searchValue.length >= 1 &&
-        stateLocal.active === 'post'
+        stateLocal.active === 'post' &&
+        !stateInternal.test
       ) {
         stateInternal.isEnter = true;
         this.command = 'post';
@@ -70,7 +71,7 @@ export class StreamlineSearch {
   };
 
   private handleKeydown = (e) => {
-    if (e.key === 'Enter' && stateInternal.isEnter) {
+    if (e.key === 'Enter' && stateInternal.isEnter && !stateInternal.test) {
       this.startQuery();
     }
   };
@@ -116,11 +117,14 @@ export class StreamlineSearch {
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log(data);
+
         getQuery({
           type: this.command,
           search: this.value,
           children: data.data.children,
           path: data.data.path,
+          isMultisite: data.data.isMultisite,
         });
         setSearchPlaceholder();
         if (this.callback === 'get_sites') {

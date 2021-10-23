@@ -365,7 +365,7 @@ const createStore = (defaultState, shouldUpdate) => {
     return map;
 };
 
-const { state: state$1, dispose: dispose$1 } = createStore({
+const { state: state$1, dispose: dispose$1, onChange: onChange$1 } = createStore({
     // @ts-ignore
     data: window.streamlineData,
     class: {
@@ -387,14 +387,14 @@ const { state: state$1, dispose: dispose$1 } = createStore({
         local: {
             site: {
                 // @ts-ignore
-                condition: window.streamlineData.network,
+                condition: window.streamlineData.network && !window.streamlineTest,
                 name: "/site [name]",
                 description: `Display entries from a different site in the network.`,
                 callback: "get_sites",
             },
             network: {
                 // @ts-ignore
-                condition: window.streamlineData.network,
+                condition: window.streamlineData.network && !window.streamlineTest,
                 name: "/network",
                 description: `Display entries from a from network dashboard.`,
             },
@@ -419,6 +419,8 @@ const { state: state$1, dispose: dispose$1 } = createStore({
     searchNoValue: "No entries found",
     searchPlaceholder: "",
     searchValue: "",
+    // @ts-ignore
+    test: window.streamlineTest,
     visible: false,
 });
 
@@ -441,7 +443,11 @@ function setSearchPlaceholder() {
     : '';
   state$1.searchPlaceholder =
     state.active === 'post'
-      ? `Search for a post${commands}`
+      ? `${state$1.test
+        ? 'Filter entries'
+        : Object.values(state$1.entriesPost).length >= 1
+          ? 'Search for a post or filter entries'
+          : 'Search for a post'}${commands}`
       : `Search entries${commands}`;
 }
 
@@ -9610,11 +9616,8 @@ function getMenu(obj = {}) {
       {
         adminUrl,
         children: menu,
-        title: obj.site || (isMultisite && !isNetwork)
-          ? `Admin menu (Site: ${obj.site || state$1.data.path})`
-          : isNetwork
-            ? 'Network admin menu'
-            : `Admin menu`,
+        isMultisite: isMultisite,
+        path: obj.path || state$1.data.path,
         siteId: Number(siteId),
         type: type,
       },
@@ -9636,6 +9639,7 @@ function getMenu(obj = {}) {
       get(html);
       resetView();
       state.active = 'menu';
+      // console.log(stateInternal.entriesMenu);
     });
     // @ts-ignore
     // eslint-disable-next-line no-undef
@@ -9749,23 +9753,25 @@ function setFavourite(obj) {
     setEntries();
   }
   // console.log(stateInternal.entriesFav);
-  state$1.isProcessing = true;
-  // @ts-ignore
-  // eslint-disable-next-line no-undef
-  const streamline = window.streamline || false;
-  fetch(streamline.ajax, {
-    method: 'POST',
-    credentials: 'same-origin',
-    headers: new Headers({
-      'Content-Type': 'application/x-www-form-urlencoded',
-    }),
-    body: `action=streamlineQuery&callback=fav&query=${JSON.stringify(state$1.entriesFav
+  if (!state$1.test) {
+    state$1.isProcessing = true;
     // @ts-ignore
     // eslint-disable-next-line no-undef
-    )}&nonce=${streamline.nonce}&userId=${String(state$1.data.userId)}`,
-  })
-    .then((response) => response.json())
-    .then(() => (state$1.isProcessing = false));
+    const streamline = window.streamline || false;
+    fetch(streamline.ajax, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/x-www-form-urlencoded',
+      }),
+      body: `action=streamlineQuery&callback=fav&query=${JSON.stringify(state$1.entriesFav
+      // @ts-ignore
+      // eslint-disable-next-line no-undef
+      )}&nonce=${streamline.nonce}&userId=${String(state$1.data.userId)}`,
+    })
+      .then((response) => response.json())
+      .then(() => (state$1.isProcessing = false));
+  }
   obj.callback && obj.callback();
   hideAll();
 }
@@ -9783,7 +9789,7 @@ function Fav(props) {
     return (h("span", { class: `${props.class} rounded-full w-4 h-4 text-red-500 pointer-events-none bg-white flex items-center justify-center border border-blue-gray-200` }, h("span", { class: `h-full w-full flex items-center justify-center` }, h(Heart, null))));
 }
 
-const streamlineButtonCss = ".tippy-box[data-animation=fade][data-state=hidden]{opacity:0}[data-tippy-root]{max-width:calc(100vw - 10px)}.tippy-box{background-color:#333;border-radius:4px;border-radius:0!important;color:#fff;font-size:14px;line-height:1.4;outline:0;position:relative;transition-property:transform,visibility,opacity;white-space:normal}.tippy-box[data-placement^=top]>.tippy-arrow{bottom:0}.tippy-box[data-placement^=top]>.tippy-arrow:before{border-top-color:initial;border-width:8px 8px 0;bottom:-7px;left:0;transform-origin:center top}.tippy-box[data-placement^=bottom]>.tippy-arrow{top:0}.tippy-box[data-placement^=bottom]>.tippy-arrow:before{border-bottom-color:initial;border-width:0 8px 8px;left:0;top:-7px;transform-origin:center bottom}.tippy-box[data-placement^=left]>.tippy-arrow{right:0}.tippy-box[data-placement^=left]>.tippy-arrow:before{border-left-color:initial;border-width:8px 0 8px 8px;right:-7px;transform-origin:center left}.tippy-box[data-placement^=right]>.tippy-arrow{left:0}.tippy-box[data-placement^=right]>.tippy-arrow:before{border-right-color:initial;border-width:8px 8px 8px 0;left:-7px;transform-origin:center right}.tippy-box[data-inertia][data-state=visible]{transition-timing-function:cubic-bezier(.54,1.5,.38,1.11)}.tippy-arrow{color:#333;height:16px;width:16px}.tippy-arrow:before{border-color:transparent;border-style:solid;content:\"\";position:absolute}.tippy-content{padding:0;position:relative;z-index:1}:host .focus{box-sizing:border-box;display:inline-flex;outline:none;position:relative}:host .focus [role=button]:focus,:host .focus a:focus,:host .focus button:focus,:host .focus input:focus{outline:none}:host .focus:focus-within:before{box-shadow:inset 0 0 0 2px var(--sl-focus-color)}:host .focus:before{box-sizing:border-box;content:\"\";height:calc(100% - 8px);left:4px;pointer-events:none;position:absolute;top:4px;width:calc(100% - 8px)}:host .focus--px-y:before{height:calc(100% - 9px)!important}:host .focus--px-x:before{width:calc(100% - 9px)!important}:host .focus--border:before{height:calc(100% - 10px)!important;left:5px;top:5px;width:calc(100% - 10px)!important}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-border-opacity:1;border:0 solid;box-sizing:border-box}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */.pointer-events-none{pointer-events:none}.flex{display:flex}.h-4{height:1rem}.h-full{height:100%}.w-4{width:1rem}.w-full{width:100%}.items-center{align-items:center}.justify-center{justify-content:center}.rounded-full{border-radius:9999px}.border{border-width:1px}.border-blue-gray-200{--tw-border-opacity:1;border-color:rgba(226,232,240,var(--tw-border-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.text-red-500{--tw-text-opacity:1;color:rgba(239,68,68,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */svg{display:block;vertical-align:middle}.relative{position:relative}.-mr-px{margin-right:-1px}.h-\\[14px\\]{height:14px}.fill-current{fill:currentColor}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
+const streamlineButtonCss = ".tippy-box[data-animation=fade][data-state=hidden]{opacity:0}[data-tippy-root]{max-width:calc(100vw - 10px)}.tippy-box{background-color:#333;border-radius:4px;border-radius:0!important;color:#fff;font-size:14px;line-height:1.4;outline:0;position:relative;transition-property:transform,visibility,opacity;white-space:normal}.tippy-box[data-placement^=top]>.tippy-arrow{bottom:0}.tippy-box[data-placement^=top]>.tippy-arrow:before{border-top-color:initial;border-width:8px 8px 0;bottom:-7px;left:0;transform-origin:center top}.tippy-box[data-placement^=bottom]>.tippy-arrow{top:0}.tippy-box[data-placement^=bottom]>.tippy-arrow:before{border-bottom-color:initial;border-width:0 8px 8px;left:0;top:-7px;transform-origin:center bottom}.tippy-box[data-placement^=left]>.tippy-arrow{right:0}.tippy-box[data-placement^=left]>.tippy-arrow:before{border-left-color:initial;border-width:8px 0 8px 8px;right:-7px;transform-origin:center left}.tippy-box[data-placement^=right]>.tippy-arrow{left:0}.tippy-box[data-placement^=right]>.tippy-arrow:before{border-right-color:initial;border-width:8px 8px 8px 0;left:-7px;transform-origin:center right}.tippy-box[data-inertia][data-state=visible]{transition-timing-function:cubic-bezier(.54,1.5,.38,1.11)}.tippy-arrow{color:#333;height:16px;width:16px}.tippy-arrow:before{border-color:transparent;border-style:solid;content:\"\";position:absolute}.tippy-content{padding:0;position:relative;z-index:1}:host .focus{box-sizing:border-box;display:inline-flex;outline:none;position:relative}:host .focus [role=button]:focus,:host .focus a:focus,:host .focus button:focus,:host .focus input:focus{outline:none}:host .focus:focus-within:before{box-shadow:inset 0 0 0 2px var(--sl-focus-color)}:host .focus:before{box-sizing:border-box;content:\"\";height:calc(100% - 8px);left:4px;pointer-events:none;position:absolute;top:4px;width:calc(100% - 8px)}:host .focus--px-y:before{height:calc(100% - 9px)!important}:host .focus--px-x:before{width:calc(100% - 9px)!important}:host .focus--border:before{height:calc(100% - 10px)!important;left:5px;top:5px;width:calc(100% - 10px)!important}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-border-opacity:1;border:0 solid;box-sizing:border-box}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */.pointer-events-none{pointer-events:none}.flex{display:flex}.h-4{height:1rem}.h-full{height:100%}.w-4{width:1rem}.w-full{width:100%}.items-center{align-items:center}.justify-center{justify-content:center}.rounded-full{border-radius:9999px}.border{border-width:1px}.border-blue-gray-200{--tw-border-opacity:1;border-color:rgba(226,232,240,var(--tw-border-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.text-red-500{--tw-text-opacity:1;color:rgba(239,68,68,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */svg{display:block;vertical-align:middle}.relative{position:relative}.-mr-px{margin-right:-1px}.h-\\[14px\\]{height:14px}.fill-current{fill:currentColor}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
 
 const StreamlineButton$1 = class extends HTMLElement {
     constructor() {
@@ -9871,7 +9877,7 @@ const StreamlineButton$1 = class extends HTMLElement {
             ? "hidden sm:inline-block text-xs font-bold leading-1 uppercase mt-1.5"
             : ""}`;
         const classNameIconSidebar = `fill-current`;
-        const iconWordpress = (h("svg", { class: `w-10 h-10`, xmlns: "http://www.w3.org/2000/svg", viewBox: "-2 -2 24 24" }, h("path", { d: "M20 10c0-5.51-4.49-10-10-10C4.48 0 0 4.49 0 10c0 5.52 4.48 10 10 10 5.51 0 10-4.48 10-10zM7.78 15.37L4.37 6.22c.55-.02 1.17-.08 1.17-.08.5-.06.44-1.13-.06-1.11 0 0-1.45.11-2.37.11-.18 0-.37 0-.58-.01C4.12 2.69 6.87 1.11 10 1.11c2.33 0 4.45.87 6.05 2.34-.68-.11-1.65.39-1.65 1.58 0 .74.45 1.36.9 2.1.35.61.55 1.36.55 2.46 0 1.49-1.4 5-1.4 5l-3.03-8.37c.54-.02.82-.17.82-.17.5-.05.44-1.25-.06-1.22 0 0-1.44.12-2.38.12-.87 0-2.33-.12-2.33-.12-.5-.03-.56 1.2-.06 1.22l.92.08 1.26 3.41zM17.41 10c.24-.64.74-1.87.43-4.25.7 1.29 1.05 2.71 1.05 4.25 0 3.29-1.73 6.24-4.4 7.78.97-2.59 1.94-5.2 2.92-7.78zM6.1 18.09C3.12 16.65 1.11 13.53 1.11 10c0-1.3.23-2.48.72-3.59C3.25 10.3 4.67 14.2 6.1 18.09zm4.03-6.63l2.58 6.98c-.86.29-1.76.45-2.71.45-.79 0-1.57-.11-2.29-.33.81-2.38 1.62-4.74 2.42-7.1z" })));
+        const iconWordpress = (h("svg", { class: `w-8 h-8 sm:w-10 sm:h-10`, xmlns: "http://www.w3.org/2000/svg", viewBox: "-2 -2 24 24" }, h("path", { d: "M20 10c0-5.51-4.49-10-10-10C4.48 0 0 4.49 0 10c0 5.52 4.48 10 10 10 5.51 0 10-4.48 10-10zM7.78 15.37L4.37 6.22c.55-.02 1.17-.08 1.17-.08.5-.06.44-1.13-.06-1.11 0 0-1.45.11-2.37.11-.18 0-.37 0-.58-.01C4.12 2.69 6.87 1.11 10 1.11c2.33 0 4.45.87 6.05 2.34-.68-.11-1.65.39-1.65 1.58 0 .74.45 1.36.9 2.1.35.61.55 1.36.55 2.46 0 1.49-1.4 5-1.4 5l-3.03-8.37c.54-.02.82-.17.82-.17.5-.05.44-1.25-.06-1.22 0 0-1.44.12-2.38.12-.87 0-2.33-.12-2.33-.12-.5-.03-.56 1.2-.06 1.22l.92.08 1.26 3.41zM17.41 10c.24-.64.74-1.87.43-4.25.7 1.29 1.05 2.71 1.05 4.25 0 3.29-1.73 6.24-4.4 7.78.97-2.59 1.94-5.2 2.92-7.78zM6.1 18.09C3.12 16.65 1.11 13.53 1.11 10c0-1.3.23-2.48.72-3.59C3.25 10.3 4.67 14.2 6.1 18.09zm4.03-6.63l2.58 6.98c-.86.29-1.76.45-2.71.45-.79 0-1.57-.11-2.29-.33.81-2.38 1.62-4.74 2.42-7.1z" })));
         const iconMenu = (h("svg", { xmlns: "http://www.w3.org/2000/svg", class: `${classNameIconSidebar} h-[18px]`, viewBox: "0 0 512 512" }, h("path", { fill: "currentColor", d: "M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z" })));
         const iconFlow = (h("svg", { class: `${classNameIconSidebar} h-[16px]`, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24" }, h("path", { d: "M19.75 9c0-1.257-.565-2.197-1.39-2.858-.797-.64-1.827-1.017-2.815-1.247-1.802-.42-3.703-.403-4.383-.396L11 4.5V6l.177-.001c.696-.006 2.416-.02 4.028.356.887.207 1.67.518 2.216.957.52.416.829.945.829 1.688 0 .592-.167.966-.407 1.23-.255.281-.656.508-1.236.674-1.19.34-2.82.346-4.607.346h-.077c-1.692 0-3.527 0-4.942.404-.732.209-1.424.545-1.935 1.108-.526.579-.796 1.33-.796 2.238 0 1.257.565 2.197 1.39 2.858.797.64 1.827 1.017 2.815 1.247 1.802.42 3.703.403 4.383.396L13 19.5h.714V22L18 18.5 13.714 15v3H13l-.177.001c-.696.006-2.416.02-4.028-.356-.887-.207-1.67-.518-2.216-.957-.52-.416-.829-.945-.829-1.688 0-.592.167-.966.407-1.23.255-.281.656-.508 1.237-.674 1.189-.34 2.819-.346 4.606-.346h.077c1.692 0 3.527 0 4.941-.404.732-.209 1.425-.545 1.936-1.108.526-.579.796-1.33.796-2.238z" })));
         const iconPost = (h("svg", { class: `${classNameIconSidebar} h-[16px]`, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 512 512" }, h("path", { fill: "currentColor", d: "M512 0C460.22 3.56 96.44 38.2 71.01 287.61c-3.09 26.66-4.84 53.44-5.99 80.24l178.87-178.69c6.25-6.25 16.4-6.25 22.65 0s6.25 16.38 0 22.63L7.04 471.03c-9.38 9.37-9.38 24.57 0 33.94 9.38 9.37 24.59 9.37 33.98 0l57.13-57.07c42.09-.14 84.15-2.53 125.96-7.36 53.48-5.44 97.02-26.47 132.58-56.54H255.74l146.79-48.88c11.25-14.89 21.37-30.71 30.45-47.12h-81.14l106.54-53.21C500.29 132.86 510.19 26.26 512 0z" })));
@@ -9889,7 +9895,7 @@ const StreamlineButton$1 = class extends HTMLElement {
                 ? "focus--border"
                 : this.type === "sidebar"
                     ? "focus--px-x focus--px-y"
-                    : ""}` }, this.type === "main" && this.href ? (h("a", { ref: (el) => (this.link = el), href: this.href, onClick: this.handleClick, class: className }, icon, text)) : (h("button", { onClick: this.handleClick, tabIndex: state.active === this.icon ? -1 : 0, style: {
+                    : ""}` }, this.type === "main" && this.href ? (h("a", { ref: (el) => (this.link = el), href: !state$1.test ? this.href : "#", onClick: this.handleClick, class: className }, icon, text)) : (h("button", { onClick: this.handleClick, tabIndex: state.active === this.icon ? -1 : 0, style: {
                 borderBottom: this.type === "primary"
                     ? ""
                     : "1px solid rgba(209,213,219,var(--tw-border-opacity))",
@@ -9902,8 +9908,1018 @@ const StreamlineButton$1 = class extends HTMLElement {
             return (h("button", { class: `border-none focus`, onClick: item.onClick }, h("span", { class: `w-8 h-8 flex items-center justify-center ${item.condition ? "text-red-500" : ""}` }, h(Heart, null))));
         })))));
     }
-    static get style() { return streamlineButtonCss + '/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-border-opacity:1;--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;border-color:rgba(228,228,231,var(--tw-border-opacity));box-sizing:border-box}button{background-color:transparent;background-image:none;color:inherit;cursor:pointer;font-family:inherit;font-size:100%;line-height:1.15;line-height:inherit;margin:0;padding:0;text-transform:none}[type=button],button{-webkit-appearance:button}a{color:inherit;text-decoration:inherit}svg{display:block;vertical-align:middle}[hidden]{display:none}.pointer-events-none{pointer-events:none}.absolute{position:absolute}.relative{position:relative}.-right-px{right:-1px}.-top-1{top:-.25rem}.-right-1{right:-.25rem}.mt-1\\.5{margin-top:.375rem}.mt-1{margin-top:.25rem}.block{display:block}.flex{display:flex}.inline-flex{display:inline-flex}.\\!grid{display:grid!important}.hidden{display:none}.h-\\[calc\\(var\\(--sl-side-w\\)\\)\\]{height:calc(var(--sl-side-w))}.h-\\[var\\(--sl-side-w\\)\\]{height:var(--sl-side-w)}.h-10{height:2.5rem}.h-\\[18px\\]{height:18px}.h-\\[16px\\]{height:16px}.h-8{height:2rem}.w-\\[max-content\\]{width:-webkit-max-content;width:-moz-max-content;width:max-content}.w-\\[calc\\(var\\(--sl-side-w\\)-1px\\)\\]{width:calc(var(--sl-side-w) - 1px)}.w-\\[var\\(--sl-side-w\\)\\]{width:var(--sl-side-w)}.w-10{width:2.5rem}.w-full{width:100%}.w-8{width:2rem}.min-w-\\[75px\\]{min-width:75px}.cursor-pointer{cursor:pointer}.auto-cols-max{grid-auto-columns:-webkit-max-content;grid-auto-columns:max-content}.grid-flow-col{grid-auto-flow:column}.flex-col{flex-direction:column}.\\!content-center{align-content:center!important}.items-center{align-items:center}.justify-center{justify-content:center}.\\!justify-items-center{justify-items:center!important}.divide-x>:not([hidden])~:not([hidden]){--tw-divide-x-reverse:0;border-left-width:calc(1px*(1 - var(--tw-divide-x-reverse)));border-right-width:calc(1px*var(--tw-divide-x-reverse))}.divide-blue-gray-200>:not([hidden])~:not([hidden]){--tw-divide-opacity:1;border-color:rgba(226,232,240,var(--tw-divide-opacity))}.break-words{overflow-wrap:break-word}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-r{border-right-width:1px}.border-none{border-style:none}.border-blue-gray-200{--tw-border-opacity:1;border-color:rgba(226,232,240,var(--tw-border-opacity))}.border-blue-gray-300{--tw-border-opacity:1;border-color:rgba(203,213,225,var(--tw-border-opacity))}.border-white{--tw-border-opacity:1;border-color:rgba(255,255,255,var(--tw-border-opacity))}.bg-blue-gray-50{--tw-bg-opacity:1;background-color:rgba(248,250,252,var(--tw-bg-opacity))}.bg-transparent{background-color:transparent}.bg-\\[\\#191E23\\]{--tw-bg-opacity:1;background-color:rgba(25,30,35,var(--tw-bg-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.fill-current{fill:currentColor}.p-0{padding:0}.px-3{padding-left:.75rem;padding-right:.75rem}.py-2\\.5{padding-bottom:.625rem;padding-top:.625rem}.py-2{padding-bottom:.5rem;padding-top:.5rem}.text-center{text-align:center}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xs{font-size:.75rem;line-height:1rem}.font-bold{font-weight:700}.uppercase{text-transform:uppercase}.leading-none{line-height:1}.text-blue-600{--tw-text-opacity:1;color:rgba(37,99,235,var(--tw-text-opacity))}.text-blue-gray-900{--tw-text-opacity:1;color:rgba(15,23,42,var(--tw-text-opacity))}.text-white{--tw-text-opacity:1;color:rgba(255,255,255,var(--tw-text-opacity))}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.text-blue-700{--tw-text-opacity:1;color:rgba(29,78,216,var(--tw-text-opacity))}.text-red-500{--tw-text-opacity:1;color:rgba(239,68,68,var(--tw-text-opacity))}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.filter{filter:var(--tw-filter)}.container{width:100%}.hover\\:border-blue-600:hover{--tw-border-opacity:1;border-color:rgba(37,99,235,var(--tw-border-opacity))}.hover\\:bg-\\[\\#0e1114\\]:hover{--tw-bg-opacity:1;background-color:rgba(14,17,20,var(--tw-bg-opacity))}.hover\\:bg-blue-gray-100:hover{--tw-bg-opacity:1;background-color:rgba(241,245,249,var(--tw-bg-opacity))}.hover\\:\\!bg-white:hover{--tw-bg-opacity:1!important;background-color:rgba(255,255,255,var(--tw-bg-opacity))!important}.hover\\:text-blue-gray-900:hover{--tw-text-opacity:1;color:rgba(15,23,42,var(--tw-text-opacity))}@media (min-width:640px){.container{max-width:640px}.sm\\:inline-block{display:inline-block}.sm\\:\\!grid-rows-\\[20px\\2c 20px\\]{grid-template-rows:20px 20px!important}}@media (min-width:768px){.container{max-width:768px}}@media (min-width:1024px){.container{max-width:1024px}}@media (min-width:1280px){.container{max-width:1280px}}@media (min-width:1536px){.container{max-width:1536px}}'; }
+    static get style() { return streamlineButtonCss + '/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-border-opacity:1;--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;border-color:rgba(228,228,231,var(--tw-border-opacity));box-sizing:border-box}button{background-color:transparent;background-image:none;color:inherit;cursor:pointer;font-family:inherit;font-size:100%;line-height:1.15;line-height:inherit;margin:0;padding:0;text-transform:none}[type=button],button{-webkit-appearance:button}a{color:inherit;text-decoration:inherit}svg{display:block;vertical-align:middle}[hidden]{display:none}.pointer-events-none{pointer-events:none}.absolute{position:absolute}.relative{position:relative}.-right-px{right:-1px}.-top-1{top:-.25rem}.-right-1{right:-.25rem}.mt-1\\.5{margin-top:.375rem}.mt-1{margin-top:.25rem}.block{display:block}.flex{display:flex}.inline-flex{display:inline-flex}.\\!grid{display:grid!important}.hidden{display:none}.h-\\[calc\\(var\\(--sl-side-w\\)\\)\\]{height:calc(var(--sl-side-w))}.h-\\[var\\(--sl-side-w\\)\\]{height:var(--sl-side-w)}.h-8{height:2rem}.h-\\[18px\\]{height:18px}.h-\\[16px\\]{height:16px}.w-\\[max-content\\]{width:-webkit-max-content;width:-moz-max-content;width:max-content}.w-\\[calc\\(var\\(--sl-side-w\\)-1px\\)\\]{width:calc(var(--sl-side-w) - 1px)}.w-\\[var\\(--sl-side-w\\)\\]{width:var(--sl-side-w)}.w-8{width:2rem}.w-full{width:100%}.min-w-\\[75px\\]{min-width:75px}.cursor-pointer{cursor:pointer}.auto-cols-max{grid-auto-columns:-webkit-max-content;grid-auto-columns:max-content}.grid-flow-col{grid-auto-flow:column}.flex-col{flex-direction:column}.\\!content-center{align-content:center!important}.items-center{align-items:center}.justify-center{justify-content:center}.\\!justify-items-center{justify-items:center!important}.divide-x>:not([hidden])~:not([hidden]){--tw-divide-x-reverse:0;border-left-width:calc(1px*(1 - var(--tw-divide-x-reverse)));border-right-width:calc(1px*var(--tw-divide-x-reverse))}.divide-blue-gray-200>:not([hidden])~:not([hidden]){--tw-divide-opacity:1;border-color:rgba(226,232,240,var(--tw-divide-opacity))}.break-words{overflow-wrap:break-word}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-r{border-right-width:1px}.border-none{border-style:none}.border-blue-gray-200{--tw-border-opacity:1;border-color:rgba(226,232,240,var(--tw-border-opacity))}.border-blue-gray-300{--tw-border-opacity:1;border-color:rgba(203,213,225,var(--tw-border-opacity))}.border-white{--tw-border-opacity:1;border-color:rgba(255,255,255,var(--tw-border-opacity))}.bg-blue-gray-50{--tw-bg-opacity:1;background-color:rgba(248,250,252,var(--tw-bg-opacity))}.bg-transparent{background-color:transparent}.bg-\\[\\#191E23\\]{--tw-bg-opacity:1;background-color:rgba(25,30,35,var(--tw-bg-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.fill-current{fill:currentColor}.p-0{padding:0}.px-3{padding-left:.75rem;padding-right:.75rem}.py-2\\.5{padding-bottom:.625rem;padding-top:.625rem}.py-2{padding-bottom:.5rem;padding-top:.5rem}.text-center{text-align:center}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xs{font-size:.75rem;line-height:1rem}.font-bold{font-weight:700}.uppercase{text-transform:uppercase}.leading-none{line-height:1}.text-blue-600{--tw-text-opacity:1;color:rgba(37,99,235,var(--tw-text-opacity))}.text-blue-gray-900{--tw-text-opacity:1;color:rgba(15,23,42,var(--tw-text-opacity))}.text-white{--tw-text-opacity:1;color:rgba(255,255,255,var(--tw-text-opacity))}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.text-blue-700{--tw-text-opacity:1;color:rgba(29,78,216,var(--tw-text-opacity))}.text-red-500{--tw-text-opacity:1;color:rgba(239,68,68,var(--tw-text-opacity))}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.filter{filter:var(--tw-filter)}.container{width:100%}.hover\\:border-blue-600:hover{--tw-border-opacity:1;border-color:rgba(37,99,235,var(--tw-border-opacity))}.hover\\:bg-\\[\\#0e1114\\]:hover{--tw-bg-opacity:1;background-color:rgba(14,17,20,var(--tw-bg-opacity))}.hover\\:bg-blue-gray-100:hover{--tw-bg-opacity:1;background-color:rgba(241,245,249,var(--tw-bg-opacity))}.hover\\:\\!bg-white:hover{--tw-bg-opacity:1!important;background-color:rgba(255,255,255,var(--tw-bg-opacity))!important}.hover\\:text-blue-gray-900:hover{--tw-text-opacity:1;color:rgba(15,23,42,var(--tw-text-opacity))}@media (min-width:640px){.container{max-width:640px}.sm\\:inline-block{display:inline-block}.sm\\:h-10{height:2.5rem}.sm\\:w-10{width:2.5rem}.sm\\:\\!grid-rows-\\[20px\\2c 20px\\]{grid-template-rows:20px 20px!important}}@media (min-width:768px){.container{max-width:768px}}@media (min-width:1024px){.container{max-width:1024px}}@media (min-width:1280px){.container{max-width:1280px}}@media (min-width:1536px){.container{max-width:1536px}}'; }
 };
+
+function setTestData() {
+  const menu = [
+    {
+      adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+      children: {
+        Dashboard: {
+          index: 0,
+          name: 'Dashboard',
+          children: {
+            'index.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/index.php',
+              index: 0,
+              name: 'Home',
+              nameParent: 'Dashboard',
+              path: 'index.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'index.php?page=relevanssi/relevanssi.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/index.php?page=relevanssi/relevanssi.php',
+              index: 1,
+              name: 'User searches',
+              nameParent: 'Dashboard',
+              path: 'index.php?page=relevanssi/relevanssi.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'index.php?page=relevanssi_admin_search': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/index.php?page=relevanssi_admin_search',
+              index: 2,
+              name: 'Admin search',
+              nameParent: 'Dashboard',
+              path: 'index.php?page=relevanssi_admin_search',
+              siteId: 314,
+              type: 'menu',
+            },
+          },
+        },
+        Posts: {
+          index: 1,
+          name: 'Posts',
+          children: {
+            'edit.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit.php',
+              index: 0,
+              name: 'All Posts',
+              nameParent: 'Posts',
+              path: 'edit.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'post-new.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/post-new.php',
+              index: 1,
+              name: 'Add New',
+              nameParent: 'Posts',
+              path: 'post-new.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'edit-tags.php?taxonomy=category': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit-tags.php?taxonomy=category',
+              index: 2,
+              name: 'Categories',
+              nameParent: 'Posts',
+              path: 'edit-tags.php?taxonomy=category',
+              siteId: 314,
+              type: 'menu',
+            },
+            'edit-tags.php?taxonomy=post_tag': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit-tags.php?taxonomy=post_tag',
+              index: 3,
+              name: 'Tags',
+              nameParent: 'Posts',
+              path: 'edit-tags.php?taxonomy=post_tag',
+              siteId: 314,
+              type: 'menu',
+            },
+          },
+        },
+        Media: {
+          index: 2,
+          name: 'Media',
+          children: {
+            'upload.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/upload.php',
+              index: 0,
+              name: 'Library',
+              nameParent: 'Media',
+              path: 'upload.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'media-new.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/media-new.php',
+              index: 1,
+              name: 'Add New',
+              nameParent: 'Media',
+              path: 'media-new.php',
+              siteId: 314,
+              type: 'menu',
+            },
+          },
+        },
+        Pages: {
+          index: 3,
+          name: 'Pages',
+          children: {
+            'edit.php?post_type=page': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit.php?post_type=page',
+              index: 0,
+              name: 'All Pages',
+              nameParent: 'Pages',
+              path: 'edit.php?post_type=page',
+              siteId: 314,
+              type: 'menu',
+            },
+            'post-new.php?post_type=page': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/post-new.php?post_type=page',
+              index: 1,
+              name: 'Add New',
+              nameParent: 'Pages',
+              path: 'post-new.php?post_type=page',
+              siteId: 314,
+              type: 'menu',
+            },
+          },
+        },
+        Downloads: {
+          index: 4,
+          name: 'Downloads',
+          children: {
+            'edit.php?post_type=download': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit.php?post_type=download',
+              index: 0,
+              name: 'All Downloads',
+              nameParent: 'Downloads',
+              path: 'edit.php?post_type=download',
+              siteId: 314,
+              type: 'menu',
+            },
+            'post-new.php?post_type=download': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/post-new.php?post_type=download',
+              index: 1,
+              name: 'Add New',
+              nameParent: 'Downloads',
+              path: 'post-new.php?post_type=download',
+              siteId: 314,
+              type: 'menu',
+            },
+            'edit-tags.php?taxonomy=download_category&post_type=download': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit-tags.php?taxonomy=download_category&post_type=download',
+              index: 2,
+              name: 'Categories',
+              nameParent: 'Downloads',
+              path: 'edit-tags.php?taxonomy=download_category&post_type=download',
+              siteId: 314,
+              type: 'menu',
+            },
+            'edit-tags.php?taxonomy=download_tag&post_type=download': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit-tags.php?taxonomy=download_tag&post_type=download',
+              index: 3,
+              name: 'Tags',
+              nameParent: 'Downloads',
+              path: 'edit-tags.php?taxonomy=download_tag&post_type=download',
+              siteId: 314,
+              type: 'menu',
+            },
+            'edit.php?post_type=download&page=edd-payment-history': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit.php?post_type=download&page=edd-payment-history',
+              index: 4,
+              name: 'Payment History',
+              nameParent: 'Downloads',
+              path: 'edit.php?post_type=download&page=edd-payment-history',
+              siteId: 314,
+              type: 'menu',
+            },
+            'edit.php?post_type=download&page=edd-customers': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit.php?post_type=download&page=edd-customers',
+              index: 5,
+              name: 'Customers',
+              nameParent: 'Downloads',
+              path: 'edit.php?post_type=download&page=edd-customers',
+              siteId: 314,
+              type: 'menu',
+            },
+            'edit.php?post_type=download&page=edd-discounts': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit.php?post_type=download&page=edd-discounts',
+              index: 6,
+              name: 'Discount Codes',
+              nameParent: 'Downloads',
+              path: 'edit.php?post_type=download&page=edd-discounts',
+              siteId: 314,
+              type: 'menu',
+            },
+            'edit.php?post_type=download&page=edd-reports': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit.php?post_type=download&page=edd-reports',
+              index: 7,
+              name: 'Reports',
+              nameParent: 'Downloads',
+              path: 'edit.php?post_type=download&page=edd-reports',
+              siteId: 314,
+              type: 'menu',
+            },
+            'edit.php?post_type=download&page=edd-settings': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit.php?post_type=download&page=edd-settings',
+              index: 8,
+              name: 'Settings',
+              nameParent: 'Downloads',
+              path: 'edit.php?post_type=download&page=edd-settings',
+              siteId: 314,
+              type: 'menu',
+            },
+            'edit.php?post_type=download&page=edd-tools': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit.php?post_type=download&page=edd-tools',
+              index: 9,
+              name: 'Tools',
+              nameParent: 'Downloads',
+              path: 'edit.php?post_type=download&page=edd-tools',
+              siteId: 314,
+              type: 'menu',
+            },
+            'edit.php?post_type=download&page=edd-addons': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit.php?post_type=download&page=edd-addons',
+              index: 10,
+              name: 'Extensions',
+              nameParent: 'Downloads',
+              path: 'edit.php?post_type=download&page=edd-addons',
+              siteId: 314,
+              type: 'menu',
+            },
+            'edit.php?post_type=download&page=edd-licenses': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit.php?post_type=download&page=edd-licenses',
+              index: 11,
+              name: 'Licenses',
+              nameParent: 'Downloads',
+              path: 'edit.php?post_type=download&page=edd-licenses',
+              siteId: 314,
+              type: 'menu',
+            },
+          },
+        },
+        Appearance: {
+          index: 5,
+          name: 'Appearance',
+          children: {
+            'themes.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/themes.php',
+              index: 0,
+              name: 'Themes ',
+              nameParent: 'Appearance',
+              path: 'themes.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'customize.php?return=%2Fstreamline%2Fwp-admin%2F': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/customize.php?return=%2Fstreamline%2Fwp-admin%2F',
+              index: 1,
+              name: 'Customize',
+              nameParent: 'Appearance',
+              path: 'customize.php?return=%2Fstreamline%2Fwp-admin%2F',
+              siteId: 314,
+              type: 'menu',
+            },
+          },
+        },
+        'Plugins ': {
+          index: 6,
+          name: 'Plugins ',
+          children: {
+            'plugins.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/plugins.php',
+              index: 0,
+              name: 'Plugins ',
+              nameParent: 'Plugins ',
+              path: 'plugins.php',
+              siteId: 314,
+              type: 'menu',
+            },
+          },
+        },
+        Users: {
+          index: 7,
+          name: 'Users',
+          children: {
+            'users.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/users.php',
+              index: 0,
+              name: 'All Users',
+              nameParent: 'Users',
+              path: 'users.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'user-new.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/user-new.php',
+              index: 1,
+              name: 'Add New',
+              nameParent: 'Users',
+              path: 'user-new.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'profile.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/profile.php',
+              index: 2,
+              name: 'Profile',
+              nameParent: 'Users',
+              path: 'profile.php',
+              siteId: 314,
+              type: 'menu',
+            },
+          },
+        },
+        Tools: {
+          index: 8,
+          name: 'Tools',
+          children: {
+            'tools.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/tools.php',
+              index: 0,
+              name: 'Available Tools',
+              nameParent: 'Tools',
+              path: 'tools.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'import.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/import.php',
+              index: 1,
+              name: 'Import',
+              nameParent: 'Tools',
+              path: 'import.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'export.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/export.php',
+              index: 2,
+              name: 'Export',
+              nameParent: 'Tools',
+              path: 'export.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'site-health.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/site-health.php',
+              index: 3,
+              name: 'Site Health',
+              nameParent: 'Tools',
+              path: 'site-health.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'export-personal-data.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/export-personal-data.php',
+              index: 4,
+              name: 'Export Personal Data',
+              nameParent: 'Tools',
+              path: 'export-personal-data.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'erase-personal-data.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/erase-personal-data.php',
+              index: 5,
+              name: 'Erase Personal Data',
+              nameParent: 'Tools',
+              path: 'erase-personal-data.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'ms-delete-site.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/ms-delete-site.php',
+              index: 6,
+              name: 'Delete Site',
+              nameParent: 'Tools',
+              path: 'ms-delete-site.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'tools.php?page=ssl-insecure-content-fixer-tests': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/tools.php?page=ssl-insecure-content-fixer-tests',
+              index: 7,
+              name: 'SSL Tests',
+              nameParent: 'Tools',
+              path: 'tools.php?page=ssl-insecure-content-fixer-tests',
+              siteId: 314,
+              type: 'menu',
+            },
+            'tools.php?page=wp-migrate-db-pro': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/tools.php?page=wp-migrate-db-pro',
+              index: 8,
+              name: 'Migrate DB Pro',
+              nameParent: 'Tools',
+              path: 'tools.php?page=wp-migrate-db-pro',
+              siteId: 314,
+              type: 'menu',
+            },
+            'tools.php?page=streamline': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/tools.php?page=streamline',
+              index: 9,
+              name: 'Streamline',
+              nameParent: 'Tools',
+              path: 'tools.php?page=streamline',
+              siteId: 314,
+              type: 'menu',
+            },
+            'tools.php?page=spx-license': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/tools.php?page=spx-license',
+              index: 10,
+              name: 'spx',
+              nameParent: 'Tools',
+              path: 'tools.php?page=spx-license',
+              siteId: 314,
+              type: 'menu',
+            },
+          },
+        },
+        Settings: {
+          index: 9,
+          name: 'Settings',
+          children: {
+            'options-general.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/options-general.php',
+              index: 0,
+              name: 'General',
+              nameParent: 'Settings',
+              path: 'options-general.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'options-writing.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/options-writing.php',
+              index: 1,
+              name: 'Writing',
+              nameParent: 'Settings',
+              path: 'options-writing.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'options-reading.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/options-reading.php',
+              index: 2,
+              name: 'Reading',
+              nameParent: 'Settings',
+              path: 'options-reading.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'options-media.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/options-media.php',
+              index: 3,
+              name: 'Media',
+              nameParent: 'Settings',
+              path: 'options-media.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'options-permalink.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/options-permalink.php',
+              index: 4,
+              name: 'Permalinks',
+              nameParent: 'Settings',
+              path: 'options-permalink.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'options-privacy.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/options-privacy.php',
+              index: 5,
+              name: 'Privacy',
+              nameParent: 'Settings',
+              path: 'options-privacy.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'options-general.php?page=relevanssi/relevanssi.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/options-general.php?page=relevanssi/relevanssi.php',
+              index: 6,
+              name: 'Relevanssi',
+              nameParent: 'Settings',
+              path: 'options-general.php?page=relevanssi/relevanssi.php',
+              siteId: 314,
+              type: 'menu',
+            },
+            'options-general.php?page=ssl-insecure-content-fixer': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/options-general.php?page=ssl-insecure-content-fixer',
+              index: 7,
+              name: 'SSL Insecure Content',
+              nameParent: 'Settings',
+              path: 'options-general.php?page=ssl-insecure-content-fixer',
+              siteId: 314,
+              type: 'menu',
+            },
+            'options-general.php?page=somfrp_options_page': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/options-general.php?page=somfrp_options_page',
+              index: 8,
+              name: 'Frontend Reset Password',
+              nameParent: 'Settings',
+              path: 'options-general.php?page=somfrp_options_page',
+              siteId: 314,
+              type: 'menu',
+            },
+          },
+        },
+        'Custom Fields': {
+          index: 10,
+          name: 'Custom Fields',
+          children: {
+            'edit.php?post_type=acf-field-group': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit.php?post_type=acf-field-group',
+              index: 0,
+              name: 'Field Groups',
+              nameParent: 'Custom Fields',
+              path: 'edit.php?post_type=acf-field-group',
+              siteId: 314,
+              type: 'menu',
+            },
+            'post-new.php?post_type=acf-field-group': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/post-new.php?post_type=acf-field-group',
+              index: 1,
+              name: 'Add New',
+              nameParent: 'Custom Fields',
+              path: 'post-new.php?post_type=acf-field-group',
+              siteId: 314,
+              type: 'menu',
+            },
+            'edit.php?post_type=acf-field-group&page=acf-tools': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit.php?post_type=acf-field-group&page=acf-tools',
+              index: 2,
+              name: 'Tools',
+              nameParent: 'Custom Fields',
+              path: 'edit.php?post_type=acf-field-group&page=acf-tools',
+              siteId: 314,
+              type: 'menu',
+            },
+            'edit.php?post_type=acf-field-group&page=acf-settings-updates': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit.php?post_type=acf-field-group&page=acf-settings-updates',
+              index: 3,
+              name: 'Updates',
+              nameParent: 'Custom Fields',
+              path: 'edit.php?post_type=acf-field-group&page=acf-settings-updates',
+              siteId: 314,
+              type: 'menu',
+            },
+          },
+        },
+        SEO: {
+          index: 11,
+          name: 'SEO',
+          children: {
+            'admin.php?page=theseoframework-settings': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/admin.php?page=theseoframework-settings',
+              index: 0,
+              name: 'SEO',
+              nameParent: 'SEO',
+              path: 'admin.php?page=theseoframework-settings',
+              siteId: 314,
+              type: 'menu',
+            },
+          },
+        },
+        'WP Mail SMTP': {
+          index: 12,
+          name: 'WP Mail SMTP',
+          children: {
+            'admin.php?page=wp-mail-smtp': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/admin.php?page=wp-mail-smtp',
+              index: 0,
+              name: 'Settings',
+              nameParent: 'WP Mail SMTP',
+              path: 'admin.php?page=wp-mail-smtp',
+              siteId: 314,
+              type: 'menu',
+            },
+            'admin.php?page=wp-mail-smtp-logs': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/admin.php?page=wp-mail-smtp-logs',
+              index: 1,
+              name: 'Email Log',
+              nameParent: 'WP Mail SMTP',
+              path: 'admin.php?page=wp-mail-smtp-logs',
+              siteId: 314,
+              type: 'menu',
+            },
+            'admin.php?page=wp-mail-smtp-reports': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/admin.php?page=wp-mail-smtp-reports',
+              index: 2,
+              name: 'Email Reports',
+              nameParent: 'WP Mail SMTP',
+              path: 'admin.php?page=wp-mail-smtp-reports',
+              siteId: 314,
+              type: 'menu',
+            },
+            'admin.php?page=wp-mail-smtp-tools': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/admin.php?page=wp-mail-smtp-tools',
+              index: 3,
+              name: 'Tools',
+              nameParent: 'WP Mail SMTP',
+              path: 'admin.php?page=wp-mail-smtp-tools',
+              siteId: 314,
+              type: 'menu',
+            },
+            'admin.php?page=wp-mail-smtp-about': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/admin.php?page=wp-mail-smtp-about',
+              index: 4,
+              name: 'About Us',
+              nameParent: 'WP Mail SMTP',
+              path: 'admin.php?page=wp-mail-smtp-about',
+              siteId: 314,
+              type: 'menu',
+            },
+          },
+        },
+      },
+      siteId: 314,
+      type: 'menu',
+    },
+  ];
+  const fav = [
+    {
+      adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+      children: {
+        Posts: {
+          index: 1,
+          name: 'Posts',
+          children: {
+            'post-new.php': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/post-new.php',
+              index: 1,
+              name: 'Add New',
+              nameParent: 'Posts',
+              path: 'post-new.php',
+              siteId: 314,
+              type: 'menu',
+            },
+          },
+        },
+        Downloads: {
+          index: 4,
+          name: 'Downloads',
+          children: {
+            'edit.php?post_type=download': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit.php?post_type=download',
+              index: 0,
+              name: 'All Downloads',
+              nameParent: 'Downloads',
+              path: 'edit.php?post_type=download',
+              siteId: 314,
+              type: 'menu',
+            },
+            'edit.php?post_type=download&page=edd-discounts': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit.php?post_type=download&page=edd-discounts',
+              index: 6,
+              name: 'Discount Codes',
+              nameParent: 'Downloads',
+              path: 'edit.php?post_type=download&page=edd-discounts',
+              siteId: 314,
+              type: 'menu',
+            },
+          },
+        },
+        Tools: {
+          index: 8,
+          name: 'Tools',
+          children: {
+            'tools.php?page=wp-migrate-db-pro': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/tools.php?page=wp-migrate-db-pro',
+              index: 8,
+              name: 'Migrate DB Pro',
+              nameParent: 'Tools',
+              path: 'tools.php?page=wp-migrate-db-pro',
+              siteId: 314,
+              type: 'menu',
+            },
+            'tools.php?page=streamline': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/tools.php?page=streamline',
+              index: 9,
+              name: 'Streamline',
+              nameParent: 'Tools',
+              path: 'tools.php?page=streamline',
+              siteId: 314,
+              type: 'menu',
+            },
+          },
+        },
+        'Custom Fields': {
+          index: 10,
+          name: 'Custom Fields',
+          children: {
+            'edit.php?post_type=acf-field-group': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/edit.php?post_type=acf-field-group',
+              index: 0,
+              name: 'Field Groups',
+              nameParent: 'Custom Fields',
+              path: 'edit.php?post_type=acf-field-group',
+              siteId: 314,
+              type: 'menu',
+            },
+            'post-new.php?post_type=acf-field-group': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/post-new.php?post_type=acf-field-group',
+              index: 1,
+              name: 'Add New',
+              nameParent: 'Custom Fields',
+              path: 'post-new.php?post_type=acf-field-group',
+              siteId: 314,
+              type: 'menu',
+            },
+          },
+        },
+        'WP Mail SMTP': {
+          index: 12,
+          name: 'WP Mail SMTP',
+          children: {
+            'admin.php?page=wp-mail-smtp': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/admin.php?page=wp-mail-smtp',
+              index: 0,
+              name: 'Settings',
+              nameParent: 'WP Mail SMTP',
+              path: 'admin.php?page=wp-mail-smtp',
+              siteId: 314,
+              type: 'menu',
+            },
+            'admin.php?page=wp-mail-smtp-tools': {
+              adminUrl: 'https://fabrikat.local/streamline/wp-admin/',
+              href: 'https://fabrikat.local/streamline/wp-admin/admin.php?page=wp-mail-smtp-tools',
+              index: 3,
+              name: 'Tools',
+              nameParent: 'WP Mail SMTP',
+              path: 'admin.php?page=wp-mail-smtp-tools',
+              siteId: 314,
+              type: 'menu',
+            },
+          },
+        },
+      },
+      siteId: 314,
+      type: 'menu',
+    },
+    {
+      children: {
+        '226': {
+          ID: 226,
+          post_author: '1',
+          post_date: '2020-05-29 22:01:43',
+          post_date_gmt: '2020-05-29 22:01:43',
+          post_content: '',
+          post_title: 'Changelog',
+          post_excerpt: '',
+          post_status: 'publish',
+          comment_status: 'closed',
+          ping_status: 'closed',
+          post_password: '',
+          post_name: 'changelog',
+          to_ping: '',
+          pinged: '',
+          post_modified: '2020-05-29 22:03:14',
+          post_modified_gmt: '2020-05-29 22:03:14',
+          post_content_filtered: '',
+          post_parent: 0,
+          guid: 'https://spx.dev/?page_id=226',
+          menu_order: 0,
+          post_type: 'page',
+          post_mime_type: '',
+          comment_count: '0',
+          filter: 'raw',
+          hrefEdit: 'aHR0cHM6Ly9mYWJyaWthdC5sb2NhbC9zcHgvd3AtYWRtaW4vcG9zdC5waHA/cG9zdD0yMjYmYW1wO2FjdGlvbj1lZGl0',
+          name: 'Changelog',
+          siteId: 303,
+          sitePath: '/spx/',
+        },
+        '1179': {
+          ID: 1179,
+          post_author: '1',
+          post_date: '2020-12-30 14:58:08',
+          post_date_gmt: '2020-12-30 14:58:08',
+          post_content: '<!-- wp:paragraph -->\n<p>What a year it has been. With 2020 being such a rollercoaster for many of us, we are glad, excited and full of motivation for what 2021 will have in store.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2>🎊 The year for spx</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>Little over 6 months ago, version 1.0 was released into the wild. It being our first commercial product, we didn’t know what to expect at first. Since spx is such a user-centric product, listening to feedback and suggestions has been crucial and pivotal in moving the plugin forward. In fact, some of the new features in 3.0 are completely inspired by your messages! Let’s dive into all the new features and enhancements.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2>🚨 Removal of singular Oxygen elements</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>Singular Oxygen elements are being deprecated in favor of the master component. spx is not a page builder centric plugin, but is instead able to adapt to new tools in the WordPress space. If you wanna know more about the reasoning for this, please visit the 2.0 post.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading {"level":3} -->\n<h3>What this means for your current sites:</h3>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>If you are using any of the singular Oxygen elements on your sites, it is advised to swap them out for the master component before updating to 3.0. If you are already using the master component, you have nothing to worry about.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2>🍰 Shortcodes</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>The following components are now also available as shortcodes. This greatly improves the areas that spx can be used in. For more details on the exact usage, please visit the documentation. Please keep in mind that the following components are currently not available as shortcodes.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:list -->\n<ul><li>Navigation</li><li>Group</li><li>Scrollspy</li><li>Snackbar</li></ul>\n<!-- /wp:list -->\n\n<!-- wp:paragraph -->\n<p>Furthermore, it is currently not possible to use helper functions with the following components when used as shortcodes:</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:list -->\n<ul><li>Slider</li><li>Slideshow</li><li>Masonry</li></ul>\n<!-- /wp:list -->\n\n<!-- wp:heading -->\n<h2>🧬 Data API</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>Although not entirely new, we have given the Data API a structural overhaul and added a documentation entry for it. Located within the plugin root folder, you will find a JSON file for every component which contains valuable information such as the default value, data type, methods, events, and much more. That same dataset is used internally to generate a good portion of the documentation and all of the shortcodes, so the possibilities are endless!</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2>💠 Component updates</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>Besides a new didLoad event for all components and various bug fixes, following components received some new features:</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading {"level":3} -->\n<h3>Accordion</h3>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>Accordions can now be linked together. This means that it is possible to open or close all other accordions with the same id on click.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading {"level":3} -->\n<h3>Code</h3>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>The code component now supports JSON along with options to display line numbers and a “Copy to clipboard” button. Since providing the best experience for the user is at the forefront of every design decision, we have decided to display both by default. Of course, it is also possible to disable these features.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2>3️⃣ Semantic versioning</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>spx is now following the Semver versioning pattern, so breaking changes will be limited to major releases. (3.0.0, 4.0.0 etc.)</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>That’s a wrap! The next steps and new features for spx are already planned out and currently in development. Watch out for some new components, tighter integrations and some other neat surprises.</p>\n<!-- /wp:paragraph -->',
+          post_title: '3.0 is here!',
+          post_excerpt: '',
+          post_status: 'publish',
+          comment_status: 'closed',
+          ping_status: 'closed',
+          post_password: '',
+          post_name: '3-0-is-here',
+          to_ping: '',
+          pinged: '',
+          post_modified: '2021-01-04 11:33:38',
+          post_modified_gmt: '2021-01-04 11:33:38',
+          post_content_filtered: '',
+          post_parent: 0,
+          guid: 'https://fabrikat.local/spx/?p=1179',
+          menu_order: 0,
+          post_type: 'post',
+          post_mime_type: '',
+          comment_count: '0',
+          filter: 'raw',
+          hrefEdit: 'aHR0cHM6Ly9mYWJyaWthdC5sb2NhbC9zcHgvd3AtYWRtaW4vcG9zdC5waHA/cG9zdD0xMTc5JmFtcDthY3Rpb249ZWRpdA==',
+          name: '3.0 is here!',
+          siteId: 303,
+          sitePath: '/spx/',
+        },
+      },
+      type: 'post',
+      siteId: 314,
+    },
+  ];
+  const post = [
+    {
+      children: {
+        '226': {
+          ID: 226,
+          post_author: '1',
+          post_date: '2020-05-29 22:01:43',
+          post_date_gmt: '2020-05-29 22:01:43',
+          post_content: '',
+          post_title: 'Changelog',
+          post_excerpt: '',
+          post_status: 'publish',
+          comment_status: 'closed',
+          ping_status: 'closed',
+          post_password: '',
+          post_name: 'changelog',
+          to_ping: '',
+          pinged: '',
+          post_modified: '2020-05-29 22:03:14',
+          post_modified_gmt: '2020-05-29 22:03:14',
+          post_content_filtered: '',
+          post_parent: 0,
+          guid: 'https://spx.dev/?page_id=226',
+          menu_order: 0,
+          post_type: 'page',
+          post_mime_type: '',
+          comment_count: '0',
+          filter: 'raw',
+          hrefEdit: 'aHR0cHM6Ly9mYWJyaWthdC5sb2NhbC9zcHgvd3AtYWRtaW4vcG9zdC5waHA/cG9zdD0yMjYmYW1wO2FjdGlvbj1lZGl0',
+          name: 'Changelog',
+          siteId: 303,
+          sitePath: '/spx/',
+        },
+        '684': {
+          ID: 684,
+          post_author: '610',
+          post_date: '2020-09-22 07:42:33',
+          post_date_gmt: '2020-09-22 07:42:33',
+          post_content: '<!-- wp:paragraph -->\n<p>Here at spx, we have been working hard to deliver to you the next cutting edge update for our favourite plugin. That\'s why we are more than excited to present you this brand new version.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2>🎨 Brand &amp; Website redesign</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>When we initially brought you spx, the website was laid out in a fixed-width format. Understandably this created issues when viewing the site on larger screens and generally wasn\'t aesthetically pleasing. During the 2.0 incubation stage, we had to rethink the entire design as we felt it wasn\'t as progressive as the plugin itself. Fast forward to now and we are excited to present to you the overhauled identity. Adjusting to any screen responsively in a non-fixed format, the new design showcases the plugin in a more sophisticated and unified light.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2>📖 New documentation</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>While we were brainstorming the new features of spx 2.0, there was a constant question: how could we introduce these new features, while simultaneously teaching our customers how to use them? We realised that it was possible to automatically generate <a href="https://fabrikat.local/spx/documentation/" data-type="page" data-id="97">documentation</a> directly from the source files of the plugin, using the common <a rel="noreferrer noopener" href="https://jsdoc.app/index.html" target="_blank">JSDoc</a> format. This technique eliminates room for errors, making the users experience more upfront and \'straight from the source\', no pun intended. 😏</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2>🧬 New components</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>At spx, we believe the more components we can create to make your life easier the better. So why not have a plugin that can do it all? We are happy to present you following new elements:</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading {"level":3} -->\n<h3>Slider</h3>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>Based on <a rel="noreferrer noopener" href="https://swiperjs.com/" data-type="URL" data-id="https://swiperjs.com/" target="_blank">Swiper.js</a>, the slider feature will help you flawlessly create a completely functional slider without the time and effort of writing the code yourself. With less time and energy spent on the time-consuming part of setting up a slider, you can now direct your time to something else, like baking a cake or going outside.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading {"level":3} -->\n<h3>Notation</h3>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>A notation is a crafty way to draw emphasis on sections of your content without the permanency of a constant highlight or bracket around what you want to emphasize.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading {"level":3} -->\n<h3>Slideshow</h3>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>It is now possible to create a customizable and infinite slideshow with full control over the speed parameters. Check the <a href="https://fabrikat.local/spx/" data-type="page" data-id="48">landing page</a> for an example!</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading {"level":3} -->\n<h3>Code-highlighter</h3>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>Using this component you can demonstrate what code would look like as if it was written in a normal code editor, including colour coding and indenting. Perfect for creating examples and showcasing your unique code.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2>🔮 New Oxygen integration</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>With our new Oxygen integration, you will now be able to implement components in one master wrapper. This is groundbreaking for us as the developers behind the plugin because it spares us the monotonous task of single-handedly integrating each feature into the Oxygen editor. </p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>Since version 3.5 of Oxygen introduced the ability to add data-attributes to elements, this new way is now perfectly feasible.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>The remaining elements that were introduced before 2.0 will be available until 3.0. However, it is now advised to use the newly introduced master wrapper.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2>🧱 New section system</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>We are excited to announce that we have developed a new section system that makes creating beautiful and cohesive websites easier than ever. With our new system, you can now change elements of your website all at once by editing just a fraction of the code. </p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>For example, by editing global variables like colour and spacing you are able to change multiple elements at once, creating cohesion with a simplistic approach. We love it so much we used it to create our new landing page and will continue to use this feature on all of our future pages. As exciting as this new development is, it is currently in BETA mode so we would love for you to try it and send us your feedback.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>All in all, we are extremely excited by what we have achieved with 2.0. We aimed to create a cohesive and appealing design to showcase how our software can be used, specifically our section system while adding new components such as the slider, notation, code-highlighter and slideshow. The future of spx is looking bright and we are happy for everyone that is on this road with us.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>Stay tuned for more exciting news and features!</p>\n<!-- /wp:paragraph -->',
+          post_title: '2.0 is here!',
+          post_excerpt: '',
+          post_status: 'publish',
+          comment_status: 'closed',
+          ping_status: 'closed',
+          post_password: '',
+          post_name: '2-0-is-here',
+          to_ping: '',
+          pinged: '',
+          post_modified: '2020-12-30 15:09:00',
+          post_modified_gmt: '2020-12-30 15:09:00',
+          post_content_filtered: '',
+          post_parent: 0,
+          guid: 'https://fabrikat.local/spx/?p=684',
+          menu_order: 0,
+          post_type: 'post',
+          post_mime_type: '',
+          comment_count: '0',
+          filter: 'raw',
+          hrefEdit: 'aHR0cHM6Ly9mYWJyaWthdC5sb2NhbC9zcHgvd3AtYWRtaW4vcG9zdC5waHA/cG9zdD02ODQmYW1wO2FjdGlvbj1lZGl0',
+          name: '2.0 is here!',
+          siteId: 303,
+          sitePath: '/spx/',
+        },
+        '699': {
+          ID: 699,
+          post_author: '1',
+          post_date: '2020-09-28 07:47:54',
+          post_date_gmt: '2020-09-28 07:47:54',
+          post_content: '',
+          post_title: 'Playground',
+          post_excerpt: '',
+          post_status: 'publish',
+          comment_status: 'closed',
+          ping_status: 'closed',
+          post_password: '',
+          post_name: 'playground',
+          to_ping: '',
+          pinged: '',
+          post_modified: '2020-09-28 07:47:54',
+          post_modified_gmt: '2020-09-28 07:47:54',
+          post_content_filtered: '',
+          post_parent: 0,
+          guid: 'https://fabrikat.local/spx/?page_id=699',
+          menu_order: 0,
+          post_type: 'page',
+          post_mime_type: '',
+          comment_count: '0',
+          filter: 'raw',
+          hrefEdit: 'aHR0cHM6Ly9mYWJyaWthdC5sb2NhbC9zcHgvd3AtYWRtaW4vcG9zdC5waHA/cG9zdD02OTkmYW1wO2FjdGlvbj1lZGl0',
+          name: 'Playground',
+          siteId: 303,
+          sitePath: '/spx/',
+        },
+        '1179': {
+          ID: 1179,
+          post_author: '1',
+          post_date: '2020-12-30 14:58:08',
+          post_date_gmt: '2020-12-30 14:58:08',
+          post_content: '<!-- wp:paragraph -->\n<p>What a year it has been. With 2020 being such a rollercoaster for many of us, we are glad, excited and full of motivation for what 2021 will have in store.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2>🎊 The year for spx</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>Little over 6 months ago, version 1.0 was released into the wild. It being our first commercial product, we didn’t know what to expect at first. Since spx is such a user-centric product, listening to feedback and suggestions has been crucial and pivotal in moving the plugin forward. In fact, some of the new features in 3.0 are completely inspired by your messages! Let’s dive into all the new features and enhancements.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2>🚨 Removal of singular Oxygen elements</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>Singular Oxygen elements are being deprecated in favor of the master component. spx is not a page builder centric plugin, but is instead able to adapt to new tools in the WordPress space. If you wanna know more about the reasoning for this, please visit the 2.0 post.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading {"level":3} -->\n<h3>What this means for your current sites:</h3>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>If you are using any of the singular Oxygen elements on your sites, it is advised to swap them out for the master component before updating to 3.0. If you are already using the master component, you have nothing to worry about.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2>🍰 Shortcodes</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>The following components are now also available as shortcodes. This greatly improves the areas that spx can be used in. For more details on the exact usage, please visit the documentation. Please keep in mind that the following components are currently not available as shortcodes.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:list -->\n<ul><li>Navigation</li><li>Group</li><li>Scrollspy</li><li>Snackbar</li></ul>\n<!-- /wp:list -->\n\n<!-- wp:paragraph -->\n<p>Furthermore, it is currently not possible to use helper functions with the following components when used as shortcodes:</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:list -->\n<ul><li>Slider</li><li>Slideshow</li><li>Masonry</li></ul>\n<!-- /wp:list -->\n\n<!-- wp:heading -->\n<h2>🧬 Data API</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>Although not entirely new, we have given the Data API a structural overhaul and added a documentation entry for it. Located within the plugin root folder, you will find a JSON file for every component which contains valuable information such as the default value, data type, methods, events, and much more. That same dataset is used internally to generate a good portion of the documentation and all of the shortcodes, so the possibilities are endless!</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2>💠 Component updates</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>Besides a new didLoad event for all components and various bug fixes, following components received some new features:</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading {"level":3} -->\n<h3>Accordion</h3>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>Accordions can now be linked together. This means that it is possible to open or close all other accordions with the same id on click.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading {"level":3} -->\n<h3>Code</h3>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>The code component now supports JSON along with options to display line numbers and a “Copy to clipboard” button. Since providing the best experience for the user is at the forefront of every design decision, we have decided to display both by default. Of course, it is also possible to disable these features.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2>3️⃣ Semantic versioning</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>spx is now following the Semver versioning pattern, so breaking changes will be limited to major releases. (3.0.0, 4.0.0 etc.)</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>That’s a wrap! The next steps and new features for spx are already planned out and currently in development. Watch out for some new components, tighter integrations and some other neat surprises.</p>\n<!-- /wp:paragraph -->',
+          post_title: '3.0 is here!',
+          post_excerpt: '',
+          post_status: 'publish',
+          comment_status: 'closed',
+          ping_status: 'closed',
+          post_password: '',
+          post_name: '3-0-is-here',
+          to_ping: '',
+          pinged: '',
+          post_modified: '2021-01-04 11:33:38',
+          post_modified_gmt: '2021-01-04 11:33:38',
+          post_content_filtered: '',
+          post_parent: 0,
+          guid: 'https://fabrikat.local/spx/?p=1179',
+          menu_order: 0,
+          post_type: 'post',
+          post_mime_type: '',
+          comment_count: '0',
+          filter: 'raw',
+          hrefEdit: 'aHR0cHM6Ly9mYWJyaWthdC5sb2NhbC9zcHgvd3AtYWRtaW4vcG9zdC5waHA/cG9zdD0xMTc5JmFtcDthY3Rpb249ZWRpdA==',
+          name: '3.0 is here!',
+          siteId: 303,
+          sitePath: '/spx/',
+        },
+      },
+      type: 'post',
+      siteId: 303,
+    },
+  ];
+  state.active = 'menu';
+  state$1.entriesMenu = menu;
+  state$1.entriesMenuActive = menu;
+  state$1.entriesFav = fav;
+  state$1.entriesFavActive = fav;
+  state$1.entriesPost = post;
+  state$1.entriesPostActive = post;
+}
 
 const streamlineContainerCss = ":host{display:block;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif}:host *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:blue-grayscale}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{border:0 solid;box-sizing:border-box}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
 
@@ -9915,22 +10931,35 @@ const StreamlineContainer$1 = class extends HTMLElement {
     }
     connectedCallback() {
         state$1.visible = this.visible || false;
-    }
-    componentDidLoad() {
-        setSearchPlaceholder();
+        if (state$1.test) {
+            setTestData();
+        }
         document.addEventListener("keydown", (e) => {
-            if (e.key === "k" && e.metaKey) {
+            const isGutenberg = document.body.classList.contains("block-editor-page");
+            if (e.key === "k" && e.metaKey && !isGutenberg) {
                 state$1.visible = !state$1.visible;
+            }
+            if (e.key === "k" && e.metaKey && e.shiftKey && isGutenberg) {
+                state$1.visible = !state$1.visible;
+            }
+            if (e.key === "Escape") {
+                state$1.visible = false;
             }
         });
     }
-    render() {
-        return (state$1.visible && (h("div", { class: "fixed top-0 left-0 w-full h-full z-[9999999999999999]" }, h("div", { tabIndex: -1, class: "fixed top-0 left-0 w-full h-full bg-black/90", onClick: () => (state$1.visible = false) }), h("streamline-box", null))));
+    componentDidLoad() {
+        setSearchPlaceholder();
     }
-    static get style() { return streamlineContainerCss + '/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;border:0 solid;box-sizing:border-box}.visible{visibility:visible}.fixed{position:fixed}.top-0{top:0}.left-0{left:0}.z-\\[9999999999999999\\]{z-index:10000000000000000}.h-full{height:100%}.w-full{width:100%}.bg-black\\/90{background-color:rgba(0,0,0,.9)}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}'; }
+    async toggle() {
+        state$1.visible = !state$1.visible;
+    }
+    render() {
+        return (state$1.visible && (h("div", { class: "fixed top-0 left-0 w-full h-full z-[9999999999999999]" }, h("div", { tabIndex: -1, class: "fixed top-0 left-0 w-full h-full bg-black/90 backdrop-blur-sm", onClick: () => (state$1.visible = false) }), h("streamline-box", null))));
+    }
+    static get style() { return streamlineContainerCss + '/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-backdrop-blur:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-invert:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-opacity:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);border:0 solid;box-sizing:border-box}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;font-family:inherit;line-height:inherit;margin:0}.visible{visibility:visible}.fixed{position:fixed}.top-0{top:0}.left-0{left:0}.z-\\[9999999999999999\\]{z-index:10000000000000000}.h-full{height:100%}.w-full{width:100%}.bg-black\\/90{background-color:rgba(0,0,0,.9)}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-filter);backdrop-filter:var(--tw-backdrop-filter)}'; }
 };
 
-const streamlineEntriesCss = ":host .focus{box-sizing:border-box;display:inline-flex;outline:none;position:relative}:host .focus [role=button]:focus,:host .focus a:focus,:host .focus button:focus,:host .focus input:focus{outline:none}:host .focus:focus-within:before{box-shadow:inset 0 0 0 2px var(--sl-focus-color)}:host .focus:before{box-sizing:border-box;content:\"\";height:calc(100% - 8px);left:4px;pointer-events:none;position:absolute;top:4px;width:calc(100% - 8px)}:host .focus--px-y:before{height:calc(100% - 9px)!important}:host .focus--px-x:before{width:calc(100% - 9px)!important}:host .focus--border:before{height:calc(100% - 10px)!important;left:5px;top:5px;width:calc(100% - 10px)!important}.inner::-webkit-scrollbar{width:10px}.inner::-webkit-scrollbar-track{background:#fff}.inner::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:0}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{border:0 solid;box-sizing:border-box}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
+const streamlineEntriesCss = ":host .focus{box-sizing:border-box;display:inline-flex;outline:none;position:relative}:host .focus [role=button]:focus,:host .focus a:focus,:host .focus button:focus,:host .focus input:focus{outline:none}:host .focus:focus-within:before{box-shadow:inset 0 0 0 2px var(--sl-focus-color)}:host .focus:before{box-sizing:border-box;content:\"\";height:calc(100% - 8px);left:4px;pointer-events:none;position:absolute;top:4px;width:calc(100% - 8px)}:host .focus--px-y:before{height:calc(100% - 9px)!important}:host .focus--px-x:before{width:calc(100% - 9px)!important}:host .focus--border:before{height:calc(100% - 10px)!important;left:5px;top:5px;width:calc(100% - 10px)!important}.inner::-webkit-scrollbar{width:10px}.inner::-webkit-scrollbar-track{background:#fff}.inner::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:0}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{border:0 solid;box-sizing:border-box}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
 
 const StreamlineEntries$1 = class extends HTMLElement {
     constructor() {
@@ -9972,6 +11001,7 @@ const StreamlineEntries$1 = class extends HTMLElement {
                         siteId: itemInner.siteId,
                         adminUrl: itemInner.adminUrl,
                         site: itemInner.path,
+                        path: item.path,
                     };
                     return (h("li", { class: `flex flex-col` }, h("div", { class: `${this.h2} inline-grid grid-flow-col auto-cols-max py-3 items-center` }, h("div", { class: `focus` }, h("div", { role: "button", tabIndex: 0, onClick: () => getMenu(obj), onKeyPress: (e) => {
                             if (e.key === "Enter") {
@@ -10018,9 +11048,57 @@ const StreamlineEntries$1 = class extends HTMLElement {
         setEntries();
     }
     static getHeader(item) {
-        return (h("div", { class: `pt-5 mb-4 pb-1 flex justify-between items-end sticky -top-2 bg-white z-10 border-b border-dotted border-blue-gray-900 sm:pt-6 sm:-top-2 lg:pt-8 lg:-top-4` }, h("h1", { class: `text-blue-gray-900 font-medium text-xl mb-2 sm:text-2xl`, innerHTML: state.active === "fav"
+        var _a, _b;
+        let menuNumber = 0;
+        Object.values(state$1.entriesMenuActive).forEach((item) => {
+            Object.values(item.children).forEach(() => {
+                menuNumber++;
+            });
+        });
+        const results = `Showing ${state.active === "post"
+            ? Object.values(state$1.entriesPostActive[0].children).length
+            : state$1.isSites
+                ? Object.values(state$1.entriesSite[0].children).length
+                : state.active === "menu"
+                    ? menuNumber
+                    : ""} ${(state.active === "post" &&
+            Object.values(state$1.entriesPostActive[0].children).length ===
+                1) ||
+            (state$1.isSites &&
+                Object.values(state$1.entriesSite[0].children).length === 1) ||
+            (state.active === "menu" && menuNumber === 1)
+            ? `result`
+            : `results`}
+    `;
+        const path = item.isMultisite ? ` (subsite: ${item.path})` : "";
+        return (h("div", { class: `pt-5 flex flex-wrap mb-4 pb-1 flex justify-between items-center sticky -top-2 bg-white z-10 border-b border-dotted border-blue-gray-900 sm:pt-6 sm:-top-2 lg:pt-8 lg:-top-4` }, h("h1", { class: `text-blue-gray-900 font-medium text-xl mr-4 mb-2 sm:text-2xl`, innerHTML: `${state$1.isSlash && !state$1.isSites
                 ? item.title
-                : item.titleAlt || item.title })));
+                : item.type === "networkMenu"
+                    ? "Network admin"
+                    : item.type === "menu"
+                        ? "Admin menu" + path
+                        : (item.type === "post" || item.type === "site") &&
+                            state.active !== "fav" &&
+                            ((_a = state$1[`entries${state.active === "post" ? "Post" : "Site"}`][0]) === null || _a === void 0 ? void 0 : _a.queryValue)
+                            ? `${state$1.isSites
+                                ? "Site"
+                                : capitalizeFirstLetter(state.active)}s for: ` +
+                                `<span class="text-gray-400 italic">${(_b = state$1[`entries${state.active === "post" ? "Post" : "Site"}`][0]) === null || _b === void 0 ? void 0 : _b.queryValue}</span>` +
+                                path
+                            : (item.type === "post" || item.type === "site") &&
+                                state.active === "fav"
+                                ? `${capitalizeFirstLetter(item.type)}s` + path
+                                : state$1.test
+                                    ? "Search results"
+                                    : "No search"}` }), h("div", { class: `flex flex-wrap space-x-4 divide-x` }, Object.values([
+            {
+                text: results,
+                condition: (state$1.isSlash && !state$1.isSites) ||
+                    state.active !== "fav",
+            },
+        ]).map((itemInner, itemIndex) => {
+            return (itemInner.condition && (h("span", { class: `text-sm font-medium text-gray-700 ${itemIndex === 0 ? "" : "pl-4"}` }, itemInner.text)));
+        }))));
     }
     render() {
         return (h("div", { class: `h-full relative` }, state$1.isLoading ? (h("div", { class: `w-full h-[calc(100%-var(--sl-side-w))] flex items-center justify-center bg-white/50 absolute top-0 left-0 backdrop-blur-sm z-10` }, h("svg", { xmlns: "http://www.w3.org/2000/svg", "aria-hidden": "true", focusable: "false", "data-prefix": "far", "data-icon": "spinner-third", class: `w-10 h-10 animate-spin`, role: "img", viewBox: "0 0 512 512" }, h("path", { fill: "currentColor", d: "M460.116 373.846l-20.823-12.022c-5.541-3.199-7.54-10.159-4.663-15.874 30.137-59.886 28.343-131.652-5.386-189.946-33.641-58.394-94.896-95.833-161.827-99.676C261.028 55.961 256 50.751 256 44.352V20.309c0-6.904 5.808-12.337 12.703-11.982 83.556 4.306 160.163 50.864 202.11 123.677 42.063 72.696 44.079 162.316 6.031 236.832-3.14 6.148-10.75 8.461-16.728 5.01z" })))) : (h("div", { class: `inner pb-3 sm:pb-6 relative px-3 h-[calc(100%-var(--sl-side-w))] overflow-y-scroll overflow-x-hidden w-full bg-white sm:px-6 lg:px-8 ${state$1.isProcessing ? "pointer-events-none opacity-50" : ""}`, tabIndex: -1 }, state$1.isSlash && !state$1.isSites
@@ -10030,10 +11108,10 @@ const StreamlineEntries$1 = class extends HTMLElement {
                 : this[`${state.active}`]()))));
     }
     get el() { return this; }
-    static get style() { return streamlineEntriesCss + '/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-border-opacity:1;--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-backdrop-blur:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-invert:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-opacity:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);border:0 solid;border-color:rgba(228,228,231,var(--tw-border-opacity));box-sizing:border-box}button{background-color:transparent;background-image:none;color:inherit;font-family:inherit;font-size:100%;line-height:1.15;line-height:inherit;margin:0;padding:0;text-transform:none}[type=button],button{-webkit-appearance:button}h1,h2,p,ul{margin:0}ul{list-style:none;padding:0}img{border-style:solid;height:auto;max-width:100%}[role=button],button{cursor:pointer}h1,h2{font-size:inherit;font-weight:inherit}img,svg{display:block;vertical-align:middle}.pointer-events-none{pointer-events:none}.static{position:static}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.-top-2{top:-.5rem}.top-0{top:0}.left-0{left:0}.z-10{z-index:10}.mb-4{margin-bottom:1rem}.mb-2{margin-bottom:.5rem}.ml-2{margin-left:.5rem}.mt-3\\.5{margin-top:.875rem}.mr-4{margin-right:1rem}.mt-3{margin-top:.75rem}.mt-4{margin-top:1rem}.inline-block{display:inline-block}.flex{display:flex}.inline-grid{display:inline-grid}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.h-full{height:100%}.h-\\[calc\\(100\\%-var\\(--sl-side-w\\)\\)\\]{height:calc(100% - var(--sl-side-w))}.h-10{height:2.5rem}.w-full{width:100%}.w-10{width:2.5rem}@-webkit-keyframes spin{to{transform:rotate(1turn)}}@keyframes spin{to{transform:rotate(1turn)}}.animate-spin{-webkit-animation:spin 1s linear infinite;animation:spin 1s linear infinite}.auto-cols-max{grid-auto-columns:-webkit-max-content;grid-auto-columns:max-content}.grid-flow-col{grid-auto-flow:column}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-end{align-items:flex-end}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-x-4{-moz-column-gap:1rem;column-gap:1rem}.overflow-x-hidden{overflow-x:hidden}.overflow-y-scroll{overflow-y:scroll}.break-words{overflow-wrap:break-word}.border{border-width:1px}.border-t{border-top-width:1px}.border-b{border-bottom-width:1px}.border-dotted{border-style:dotted}.border-blue-gray-100{--tw-border-opacity:1;border-color:rgba(241,245,249,var(--tw-border-opacity))}.border-blue-gray-900{--tw-border-opacity:1;border-color:rgba(15,23,42,var(--tw-border-opacity))}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.bg-white\\/50{background-color:hsla(0,0%,100%,.5)}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.py-3{padding-bottom:.75rem;padding-top:.75rem}.px-3{padding-left:.75rem;padding-right:.75rem}.pt-5{padding-top:1.25rem}.pb-1{padding-bottom:.25rem}.pb-4{padding-bottom:1rem}.pt-4{padding-top:1rem}.pb-3{padding-bottom:.75rem}.text-base{font-size:1rem;line-height:1.5rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-medium{font-weight:500}.font-normal{font-weight:400}.font-semibold{font-weight:600}.text-blue-gray-900{--tw-text-opacity:1;color:rgba(15,23,42,var(--tw-text-opacity))}.text-blue-gray-600{--tw-text-opacity:1;color:rgba(71,85,105,var(--tw-text-opacity))}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.opacity-50{opacity:.5}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-filter);backdrop-filter:var(--tw-backdrop-filter)}.first-of-type\\:border-none:first-of-type{border-style:none}.hover\\:border-blue-gray-900:hover{--tw-border-opacity:1;border-color:rgba(15,23,42,var(--tw-border-opacity))}.hover\\:bg-blue-gray-900:hover{--tw-bg-opacity:1;background-color:rgba(15,23,42,var(--tw-bg-opacity))}.hover\\:text-blue-gray-50:hover{--tw-text-opacity:1;color:rgba(248,250,252,var(--tw-text-opacity))}@media (min-width:640px){.sm\\:-top-2{top:-.5rem}.sm\\:min-w-\\[120px\\]{min-width:120px}.sm\\:flex-row{flex-direction:row}.sm\\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\\:pt-6{padding-top:1.5rem}.sm\\:pb-6{padding-bottom:1.5rem}.sm\\:text-2xl{font-size:1.5rem;line-height:2rem}}@media (min-width:768px){.md\\:min-w-\\[200px\\]{min-width:200px}}@media (min-width:1024px){.lg\\:-top-4{top:-1rem}.lg\\:px-8{padding-left:2rem;padding-right:2rem}.lg\\:pt-8{padding-top:2rem}}'; }
+    static get style() { return streamlineEntriesCss + '/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-border-opacity:1;--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-backdrop-blur:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-invert:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-opacity:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);border:0 solid;border-color:rgba(228,228,231,var(--tw-border-opacity));box-sizing:border-box}button{background-color:transparent;background-image:none;color:inherit;font-family:inherit;font-size:100%;line-height:1.15;line-height:inherit;margin:0;padding:0;text-transform:none}[type=button],button{-webkit-appearance:button}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}h1,h2,p,ul{margin:0}ul{list-style:none;padding:0}img{border-style:solid;height:auto;max-width:100%}[role=button],button{cursor:pointer}h1,h2{font-size:inherit;font-weight:inherit}img,svg{display:block;vertical-align:middle}.pointer-events-none{pointer-events:none}.static{position:static}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.-top-2{top:-.5rem}.top-0{top:0}.left-0{left:0}.z-10{z-index:10}.mb-4{margin-bottom:1rem}.mr-4{margin-right:1rem}.mb-2{margin-bottom:.5rem}.ml-2{margin-left:.5rem}.mt-3\\.5{margin-top:.875rem}.mt-3{margin-top:.75rem}.mt-4{margin-top:1rem}.inline-block{display:inline-block}.flex{display:flex}.inline-grid{display:inline-grid}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.h-full{height:100%}.h-\\[calc\\(100\\%-var\\(--sl-side-w\\)\\)\\]{height:calc(100% - var(--sl-side-w))}.h-10{height:2.5rem}.w-full{width:100%}.w-10{width:2.5rem}@-webkit-keyframes spin{to{transform:rotate(1turn)}}@keyframes spin{to{transform:rotate(1turn)}}.animate-spin{-webkit-animation:spin 1s linear infinite;animation:spin 1s linear infinite}.auto-cols-max{grid-auto-columns:-webkit-max-content;grid-auto-columns:max-content}.grid-flow-col{grid-auto-flow:column}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-x-4{-moz-column-gap:1rem;column-gap:1rem}.space-x-4>:not([hidden])~:not([hidden]){--tw-space-x-reverse:0;margin-left:calc(1rem*(1 - var(--tw-space-x-reverse)));margin-right:calc(1rem*var(--tw-space-x-reverse))}.divide-x>:not([hidden])~:not([hidden]){--tw-divide-x-reverse:0;border-left-width:calc(1px*(1 - var(--tw-divide-x-reverse)));border-right-width:calc(1px*var(--tw-divide-x-reverse))}.overflow-x-hidden{overflow-x:hidden}.overflow-y-scroll{overflow-y:scroll}.break-words{overflow-wrap:break-word}.border{border-width:1px}.border-t{border-top-width:1px}.border-b{border-bottom-width:1px}.border-dotted{border-style:dotted}.border-blue-gray-100{--tw-border-opacity:1;border-color:rgba(241,245,249,var(--tw-border-opacity))}.border-blue-gray-900{--tw-border-opacity:1;border-color:rgba(15,23,42,var(--tw-border-opacity))}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.bg-white\\/50{background-color:hsla(0,0%,100%,.5)}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.py-3{padding-bottom:.75rem;padding-top:.75rem}.px-3{padding-left:.75rem;padding-right:.75rem}.pt-5{padding-top:1.25rem}.pb-1{padding-bottom:.25rem}.pl-4{padding-left:1rem}.pb-4{padding-bottom:1rem}.pt-4{padding-top:1rem}.pb-3{padding-bottom:.75rem}.text-base{font-size:1rem;line-height:1.5rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-sm{font-size:.875rem;line-height:1.25rem}.font-medium{font-weight:500}.font-normal{font-weight:400}.font-semibold{font-weight:600}.italic{font-style:italic}.text-blue-gray-900{--tw-text-opacity:1;color:rgba(15,23,42,var(--tw-text-opacity))}.text-blue-gray-600{--tw-text-opacity:1;color:rgba(71,85,105,var(--tw-text-opacity))}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.text-gray-400{--tw-text-opacity:1;color:rgba(161,161,170,var(--tw-text-opacity))}.text-gray-700{--tw-text-opacity:1;color:rgba(63,63,70,var(--tw-text-opacity))}.opacity-50{opacity:.5}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-filter);backdrop-filter:var(--tw-backdrop-filter)}.first-of-type\\:border-none:first-of-type{border-style:none}.hover\\:border-blue-gray-900:hover{--tw-border-opacity:1;border-color:rgba(15,23,42,var(--tw-border-opacity))}.hover\\:bg-blue-gray-900:hover{--tw-bg-opacity:1;background-color:rgba(15,23,42,var(--tw-bg-opacity))}.hover\\:text-blue-gray-50:hover{--tw-text-opacity:1;color:rgba(248,250,252,var(--tw-text-opacity))}@media (min-width:640px){.sm\\:-top-2{top:-.5rem}.sm\\:min-w-\\[120px\\]{min-width:120px}.sm\\:flex-row{flex-direction:row}.sm\\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\\:pt-6{padding-top:1.5rem}.sm\\:pb-6{padding-bottom:1.5rem}.sm\\:text-2xl{font-size:1.5rem;line-height:2rem}}@media (min-width:768px){.md\\:min-w-\\[200px\\]{min-width:200px}}@media (min-width:1024px){.lg\\:-top-4{top:-1rem}.lg\\:px-8{padding-left:2rem;padding-right:2rem}.lg\\:pt-8{padding-top:2rem}}'; }
 };
 
-const streamlinePostCss = ":host .focus{box-sizing:border-box;display:inline-flex;outline:none;position:relative}:host .focus [role=button]:focus,:host .focus a:focus,:host .focus button:focus,:host .focus input:focus{outline:none}:host .focus:focus-within:before{box-shadow:inset 0 0 0 2px var(--sl-focus-color)}:host .focus:before{box-sizing:border-box;content:\"\";height:calc(100% - 8px);left:4px;pointer-events:none;position:absolute;top:4px;width:calc(100% - 8px)}:host .focus--px-y:before{height:calc(100% - 9px)!important}:host .focus--px-x:before{width:calc(100% - 9px)!important}:host .focus--border:before{height:calc(100% - 10px)!important;left:5px;top:5px;width:calc(100% - 10px)!important}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-border-opacity:1;border:0 solid;border:0 solid rgba(228,228,231,var(--tw-border-opacity));box-sizing:border-box}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */.pointer-events-none{pointer-events:none}.flex{display:flex}.h-4{height:1rem}.h-full{height:100%}.w-4{width:1rem}.w-full{width:100%}.items-center{align-items:center}.justify-center{justify-content:center}.rounded-full{border-radius:9999px}.border{border-width:1px}.border-blue-gray-200{--tw-border-opacity:1;border-color:rgba(226,232,240,var(--tw-border-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.text-red-500{--tw-text-opacity:1;color:rgba(239,68,68,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
+const streamlinePostCss = ":host .focus{box-sizing:border-box;display:inline-flex;outline:none;position:relative}:host .focus [role=button]:focus,:host .focus a:focus,:host .focus button:focus,:host .focus input:focus{outline:none}:host .focus:focus-within:before{box-shadow:inset 0 0 0 2px var(--sl-focus-color)}:host .focus:before{box-sizing:border-box;content:\"\";height:calc(100% - 8px);left:4px;pointer-events:none;position:absolute;top:4px;width:calc(100% - 8px)}:host .focus--px-y:before{height:calc(100% - 9px)!important}:host .focus--px-x:before{width:calc(100% - 9px)!important}:host .focus--border:before{height:calc(100% - 10px)!important;left:5px;top:5px;width:calc(100% - 10px)!important}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-border-opacity:1;border:0 solid;border:0 solid rgba(228,228,231,var(--tw-border-opacity));box-sizing:border-box}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */.pointer-events-none{pointer-events:none}.flex{display:flex}.h-4{height:1rem}.h-full{height:100%}.w-4{width:1rem}.w-full{width:100%}.items-center{align-items:center}.justify-center{justify-content:center}.rounded-full{border-radius:9999px}.border{border-width:1px}.border-blue-gray-200{--tw-border-opacity:1;border-color:rgba(226,232,240,var(--tw-border-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.text-red-500{--tw-text-opacity:1;color:rgba(239,68,68,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
 
 const StreamlinePost$1 = class extends HTMLElement {
     constructor() {
@@ -10068,22 +11146,24 @@ const StreamlinePost$1 = class extends HTMLElement {
         this.checkIfFav();
     }
     render() {
-        return (h("div", { class: `flex` }, h("div", { class: `px-2.5 py-1.5 bg-blue-gray-200 text-blue-gray-500 inline-block h-[max-content] leading-1 mr-4 !text-xs relative top-1.5 font-semibold uppercase` }, this.postType), h("div", { class: `flex flex-col` }, h("div", { class: `focus w-[max-content]` }, h("a", { href: this.hrefView, target: "_blank", class: `inline-flex font-semibold flex-col px-2.5 text-base py-2 text-blue-600 hover:underline` }, this.postTitle)), h("div", { class: `flex flex-wrap` }, [
+        return (h("div", { class: `flex` }, h("div", { class: `px-2.5 py-1.5 bg-blue-gray-200 text-blue-gray-500 inline-block h-[max-content] leading-1 mr-4 !text-xs relative top-1.5 font-semibold uppercase` }, this.postType), h("div", { class: `flex flex-col` }, h("div", { class: `focus w-[max-content]` }, h("a", { href: state$1.test ? "#" : this.hrefView, target: "_blank", class: `inline-flex font-semibold flex-col px-2.5 text-base py-2 text-blue-600 hover:underline` }, this.postTitle)), h("div", { class: `flex flex-wrap` }, [
             {
                 text: "Favourite",
                 onClick: this.handleFavClick,
             },
             {
                 text: "View",
-                href: this.hrefView,
+                href: state$1.test ? "#" : this.hrefView,
             },
             {
                 text: "Edit",
-                href: atob(this.hrefEdit).replace("&amp;", "&"),
+                href: state$1.test
+                    ? "#"
+                    : atob(this.hrefEdit).replace("&amp;", "&"),
             },
         ].map((item) => {
-            const className = "inline-block px-2.5 py-2 text-blue-500 flex items-center hover:underline";
-            return (h("div", { class: `focus` }, item.href ? (h("a", { href: item.href, target: "_blank", class: className }, item.text)) : (h("button", { class: className, onClick: item.onClick }, this.favourite && item.text === "Favourite"
+            const className = "inline-block px-2.5 py-2 text-blue-500 text-sm flex items-center hover:underline";
+            return (h("div", { class: `focus` }, item.href ? (h("a", { href: item.href, class: className }, item.text)) : (h("button", { class: className, onClick: item.onClick }, this.favourite && item.text === "Favourite"
                 ? "Unfavourite"
                 : item.text, this.favourite &&
                 item.text === "Favourite" &&
@@ -10091,7 +11171,7 @@ const StreamlinePost$1 = class extends HTMLElement {
         })))));
     }
     get el() { return this; }
-    static get style() { return streamlinePostCss + '/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;box-sizing:border-box}button{background-color:transparent;background-image:none;color:inherit;cursor:pointer;font-family:inherit;font-size:100%;line-height:1.15;line-height:inherit;margin:0;padding:0;text-transform:none}[type=button],button{-webkit-appearance:button}a{color:inherit;text-decoration:inherit}.relative{position:relative}.top-1\\.5{top:.375rem}.top-1{top:.25rem}.mr-4{margin-right:1rem}.ml-2{margin-left:.5rem}.inline-block{display:inline-block}.flex{display:flex}.inline-flex{display:inline-flex}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.w-\\[max-content\\]{width:-webkit-max-content;width:-moz-max-content;width:max-content}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.py-2{padding-bottom:.5rem;padding-top:.5rem}.\\!text-xs{font-size:.75rem!important;line-height:1rem!important}.text-base{font-size:1rem;line-height:1.5rem}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.text-blue-600{--tw-text-opacity:1;color:rgba(37,99,235,var(--tw-text-opacity))}.text-blue-500{--tw-text-opacity:1;color:rgba(59,130,246,var(--tw-text-opacity))}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.filter{filter:var(--tw-filter)}.hover\\:underline:hover{text-decoration:underline}'; }
+    static get style() { return streamlinePostCss + '/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;box-sizing:border-box}button{background-color:transparent;background-image:none;color:inherit;cursor:pointer;font-family:inherit;font-size:100%;line-height:1.15;line-height:inherit;margin:0;padding:0;text-transform:none}[type=button],button{-webkit-appearance:button}a{color:inherit;text-decoration:inherit}.relative{position:relative}.top-1\\.5{top:.375rem}.top-1{top:.25rem}.mr-4{margin-right:1rem}.ml-2{margin-left:.5rem}.inline-block{display:inline-block}.flex{display:flex}.inline-flex{display:inline-flex}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.w-\\[max-content\\]{width:-webkit-max-content;width:-moz-max-content;width:max-content}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.py-2{padding-bottom:.5rem;padding-top:.5rem}.\\!text-xs{font-size:.75rem!important;line-height:1rem!important}.text-base{font-size:1rem;line-height:1.5rem}.text-sm{font-size:.875rem;line-height:1.25rem}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.text-blue-600{--tw-text-opacity:1;color:rgba(37,99,235,var(--tw-text-opacity))}.text-blue-500{--tw-text-opacity:1;color:rgba(59,130,246,var(--tw-text-opacity))}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,0.1),0 1px 2px 0 rgba(0,0,0,0.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.filter{filter:var(--tw-filter)}.hover\\:underline:hover{text-decoration:underline}'; }
 };
 
 function checkIfStringStartsWith(str, substrs) {
@@ -10099,25 +11179,20 @@ function checkIfStringStartsWith(str, substrs) {
 }
 
 function getQuery(obj) {
-  const isMultisite = state$1.data.network;
   state$1[`entries${capitalizeFirstLetter(obj.type)}`] = [
     {
-      title: obj.type === 'site'
-        ? `Sites`
-        : isMultisite
-          ? `Posts (Site: ${obj.path})`
-          : `Posts`,
-      titleAlt: `Showing ${obj.children.length || Object.values(obj.children).length} ${obj.children.length === 1 || Object.values(obj.children).length === 1
-        ? `result`
-        : `results`} for <span style="font-style: italic;">${obj.search}</span>`,
       children: obj.children,
-      type: obj.type,
+      isMultisite: obj.isMultisite,
+      path: obj.path,
+      queryValue: obj.search,
       siteId: state$1.data.siteId,
+      type: obj.type,
     },
   ];
+  // console.log(stateInternal[`entries${capitalizeFirstLetter(obj.type)}`]);
 }
 
-const streamlineSearchCss = ":host .focus{box-sizing:border-box;display:inline-flex;outline:none;position:relative}:host .focus [role=button]:focus,:host .focus a:focus,:host .focus button:focus,:host .focus input:focus{outline:none}:host .focus:focus-within:before{box-shadow:inset 0 0 0 2px var(--sl-focus-color)}:host .focus:before{box-sizing:border-box;content:\"\";height:calc(100% - 8px);left:4px;pointer-events:none;position:absolute;top:4px;width:calc(100% - 8px)}:host .focus--px-y:before{height:calc(100% - 9px)!important}:host .focus--px-x:before{width:calc(100% - 9px)!important}:host .focus--border:before{height:calc(100% - 10px)!important;left:5px;top:5px;width:calc(100% - 10px)!important}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{border:0 solid;box-sizing:border-box}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
+const streamlineSearchCss = ":host .focus{box-sizing:border-box;display:inline-flex;outline:none;position:relative}:host .focus [role=button]:focus,:host .focus a:focus,:host .focus button:focus,:host .focus input:focus{outline:none}:host .focus:focus-within:before{box-shadow:inset 0 0 0 2px var(--sl-focus-color)}:host .focus:before{box-sizing:border-box;content:\"\";height:calc(100% - 8px);left:4px;pointer-events:none;position:absolute;top:4px;width:calc(100% - 8px)}:host .focus--px-y:before{height:calc(100% - 9px)!important}:host .focus--px-x:before{width:calc(100% - 9px)!important}:host .focus--border:before{height:calc(100% - 10px)!important;left:5px;top:5px;width:calc(100% - 10px)!important}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{border:0 solid;box-sizing:border-box}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
 
 const StreamlineSearch$1 = class extends HTMLElement {
     constructor() {
@@ -10133,7 +11208,8 @@ const StreamlineSearch$1 = class extends HTMLElement {
                 state$1.isEnter = false;
                 setEntries();
                 if (state$1.searchValue.length >= 1 &&
-                    state.active === "post") {
+                    state.active === "post" &&
+                    !state$1.test) {
                     state$1.isEnter = true;
                     this.command = "post";
                 }
@@ -10152,7 +11228,7 @@ const StreamlineSearch$1 = class extends HTMLElement {
             }
         };
         this.handleKeydown = (e) => {
-            if (e.key === "Enter" && state$1.isEnter) {
+            if (e.key === "Enter" && state$1.isEnter && !state$1.test) {
                 this.startQuery();
             }
         };
@@ -10195,11 +11271,13 @@ const StreamlineSearch$1 = class extends HTMLElement {
             })
                 .then((response) => response.json())
                 .then((data) => {
+                console.log(data);
                 getQuery({
                     type: this.command,
                     search: this.value,
                     children: data.data.children,
                     path: data.data.path,
+                    isMultisite: data.data.isMultisite,
                 });
                 setSearchPlaceholder();
                 if (this.callback === "get_sites") {
@@ -10244,7 +11322,7 @@ const StreamlineSidebar$1 = class extends HTMLElement {
 
 const StreamlineBox = /*@__PURE__*/proxyCustomElement(StreamlineBox$1, [1,"streamline-box"]);
 const StreamlineButton = /*@__PURE__*/proxyCustomElement(StreamlineButton$1, [1,"streamline-button",{"adminUrl":[1,"admin-url"],"favourite":[1540],"header":[1],"href":[1],"icon":[1],"index":[2],"indexInner":[2,"index-inner"],"indexSub":[2,"index-sub"],"path":[1],"siteId":[2,"site-id"],"text":[1],"type":[1],"typeSub":[1,"type-sub"]}]);
-const StreamlineContainer = /*@__PURE__*/proxyCustomElement(StreamlineContainer$1, [1,"streamline-container",{"visible":[4]}]);
+const StreamlineContainer = /*@__PURE__*/proxyCustomElement(StreamlineContainer$1, [1,"streamline-container",{"visible":[1540]}]);
 const StreamlineEntries = /*@__PURE__*/proxyCustomElement(StreamlineEntries$1, [1,"streamline-entries"]);
 const StreamlinePost = /*@__PURE__*/proxyCustomElement(StreamlinePost$1, [1,"streamline-post",{"hrefEdit":[1,"href-edit"],"hrefView":[1,"href-view"],"postTitle":[1,"post-title"],"postId":[2,"post-id"],"postType":[1,"post-type"],"siteId":[2,"site-id"],"favourite":[1540]}]);
 const StreamlineSearch = /*@__PURE__*/proxyCustomElement(StreamlineSearch$1, [1,"streamline-search"]);

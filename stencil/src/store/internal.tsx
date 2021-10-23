@@ -1,6 +1,6 @@
 import { createStore } from '@stencil/store';
 
-const { state, dispose } = createStore({
+const { state, dispose, onChange } = createStore({
   // @ts-ignore
   data: window.streamlineData,
   class: {
@@ -22,14 +22,14 @@ const { state, dispose } = createStore({
     local: {
       site: {
         // @ts-ignore
-        condition: window.streamlineData.network,
+        condition: window.streamlineData.network && !window.streamlineTest,
         name: '/site [name]',
         description: `Display entries from a different site in the network.`,
         callback: 'get_sites',
       },
       network: {
         // @ts-ignore
-        condition: window.streamlineData.network,
+        condition: window.streamlineData.network && !window.streamlineTest,
         name: '/network',
         description: `Display entries from a from network dashboard.`,
       },
@@ -54,7 +54,13 @@ const { state, dispose } = createStore({
   searchNoValue: 'No entries found',
   searchPlaceholder: '',
   searchValue: '',
+  // @ts-ignore
+  test: window.streamlineTest,
   visible: false,
 });
 
-export { state as stateInternal, dispose as disposeInternal };
+export {
+  state as stateInternal,
+  dispose as disposeInternal,
+  onChange as onChangeInternal,
+};

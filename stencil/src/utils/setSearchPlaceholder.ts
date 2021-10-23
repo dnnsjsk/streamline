@@ -9,6 +9,12 @@ export function setSearchPlaceholder() {
 
   stateInternal.searchPlaceholder =
     stateLocal.active === 'post'
-      ? `Search for a post${commands}`
+      ? `${
+          stateInternal.test
+            ? 'Filter entries'
+            : Object.values(stateInternal.entriesPost).length >= 1
+            ? 'Search for a post or filter entries'
+            : 'Search for a post'
+        }${commands}`
       : `Search entries${commands}`;
 }

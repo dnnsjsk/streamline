@@ -8,6 +8,7 @@ beforeEach(async () => {
 
 describe('Render container', function () {
   it('closed', async () => {
+    stateInternal.visible = true;
     const page = await newSpecPage({
       components: [StreamlineContainer],
       html: `<streamline-container></streamline-container>`,
@@ -27,7 +28,7 @@ describe('Render container', function () {
 <streamline-container visible="">
       <mock:shadow-root>
         <div class="fixed h-full left-0 top-0 w-full z-[9999999999999999]">
-          <div class="bg-black/90 fixed h-full left-0 top-0 w-full" tabindex="-1"></div>
+          <div class="backdrop-blur-sm bg-black/90 fixed h-full left-0 top-0 w-full" tabindex="-1"></div>
           <streamline-box></streamline-box>
         </div>
       </mock:shadow-root>
@@ -37,6 +38,7 @@ describe('Render container', function () {
 });
 
 it('Open app', async () => {
+  stateInternal.visible = true;
   const page = await newSpecPage({
     components: [StreamlineContainer],
     html: `<streamline-container></streamline-container>`,

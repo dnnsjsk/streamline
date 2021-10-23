@@ -161,6 +161,7 @@ class Init {
 	 * @since   1.0.0
 	 */
 	private static function addContainer() {
+
 		$container = '<streamline-container></streamline-container>';
 
 		add_action( 'admin_footer', function () use ( $container ) {
@@ -169,7 +170,7 @@ class Init {
 			}
 		} );
 		add_action( 'wp_footer', function () use ( $container ) {
-			if ( is_user_logged_in() ) {
+			if ( is_user_logged_in() && apply_filters( 'streamline/enable', TRUE ) ) {
 				echo $container;
 			}
 		} );

@@ -10,6 +10,19 @@
 | `visible` | `visible` |             | `boolean` | `undefined` |
 
 
+## Methods
+
+### `toggle() => Promise<void>`
+
+
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
+
 ## Dependencies
 
 ### Depends on

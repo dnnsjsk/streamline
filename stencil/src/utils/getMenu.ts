@@ -62,12 +62,8 @@ export function getMenu(obj = {} as any) {
       {
         adminUrl,
         children: menu,
-        title:
-          obj.site || (isMultisite && !isNetwork)
-            ? `Admin menu (Site: ${obj.site || stateInternal.data.path})`
-            : isNetwork
-            ? 'Network admin menu'
-            : `Admin menu`,
+        isMultisite: isMultisite,
+        path: obj.path || stateInternal.data.path,
         siteId: Number(siteId),
         type: type,
       },
@@ -90,6 +86,8 @@ export function getMenu(obj = {} as any) {
         get(html);
         resetView();
         stateLocal.active = 'menu';
+
+        // console.log(stateInternal.entriesMenu);
       });
     // @ts-ignore
     // eslint-disable-next-line no-undef

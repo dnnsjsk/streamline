@@ -147,7 +147,7 @@ export class StreamlineButton {
 
     const iconWordpress = (
       <svg
-        class={`w-10 h-10`}
+        class={`w-8 h-8 sm:w-10 sm:h-10`}
         xmlns="http://www.w3.org/2000/svg"
         viewBox="-2 -2 24 24"
       >
@@ -219,7 +219,7 @@ export class StreamlineButton {
           {this.type === 'main' && this.href ? (
             <a
               ref={(el) => (this.link = el as HTMLElement)}
-              href={this.href}
+              href={!stateInternal.test ? this.href : '#'}
               onClick={this.handleClick}
               class={className}
             >
