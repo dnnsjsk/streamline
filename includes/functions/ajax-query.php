@@ -40,7 +40,13 @@ function streamlineQuery() {
 				'post_type' => 'any'
 			] );
 
-			$path = get_site( get_current_blog_id() )->path;
+			$path = '';
+
+			if (is_multisite() && function_exists('get_site')) {
+				$path = get_site( get_current_blog_id() )->path;
+			} else {
+				$path = '/';
+			}
 
 			$index = - 1;
 			foreach ( $arr as $post ) {
