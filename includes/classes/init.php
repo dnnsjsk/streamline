@@ -90,7 +90,7 @@ class Init {
 
 		$currentSite = '';
 
-		if ( is_multisite() && function_exists('get_sites') ) {
+		if ( is_multisite() && function_exists( 'get_sites' ) ) {
 			$currentSite = get_sites( [ 'ID' => get_current_blog_id() ] );
 		}
 
@@ -122,10 +122,14 @@ class Init {
 			}
 			if ( $fav->type === 'post' ) {
 				foreach ( $fav->children as $post ) {
-					switch_to_blog( $post->siteId );
+					if ( is_multisite() && function_exists( 'switch_to_blog' ) ) {
+						switch_to_blog( $post->siteId );
+					}
 					$post->guid     = get_the_guid( $post->ID );
 					$post->hrefEdit = base64_encode( get_edit_post_link( $post->ID ) );
-					restore_current_blog();
+					if ( is_multisite() && function_exists( 'restore_current_blog' ) ) {
+						restore_current_blog();
+					}
 				}
 			}
 		}
