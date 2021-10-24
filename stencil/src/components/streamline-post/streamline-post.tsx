@@ -71,15 +71,13 @@ export class StreamlinePost {
           {this.postType}
         </div>
         <div class={`flex flex-col`}>
-          <div class={`focus w-[max-content]`}>
-            <a
-              href={stateInternal.test ? '#' : this.hrefView}
-              target="_blank"
-              class={`inline-flex font-semibold flex-col px-2.5 text-base py-2 text-blue-600 hover:underline`}
-            >
-              {this.postTitle}
-            </a>
-          </div>
+          <a
+            href={stateInternal.test ? '#' : this.hrefView}
+            target="_blank"
+            class={`focus-white inline-flex max-w-max font-semibold flex-col px-2.5 text-base py-2 text-blue-600 hover:underline`}
+          >
+            {this.postTitle}
+          </a>
           <div class={`flex flex-wrap`}>
             {[
               {
@@ -100,23 +98,22 @@ export class StreamlinePost {
               const className =
                 'inline-block px-2.5 py-2 text-blue-500 text-sm flex items-center hover:underline';
 
-              return (
-                <div class={`focus`}>
-                  {item.href ? (
-                    <a href={item.href} class={className}>
-                      {item.text}
-                    </a>
-                  ) : (
-                    <button class={className} onClick={item.onClick}>
-                      {this.favourite && item.text === 'Favourite'
-                        ? 'Unfavourite'
-                        : item.text}
-                      {this.favourite &&
-                        item.text === 'Favourite' &&
-                        stateLocal.active !== 'fav' && <Fav class={'ml-2'} />}
-                    </button>
-                  )}
-                </div>
+              return item.href ? (
+                <a href={item.href} class={className + ` focus-white`}>
+                  {item.text}
+                </a>
+              ) : (
+                <button
+                  class={className + ` focus-white`}
+                  onClick={item.onClick}
+                >
+                  {this.favourite && item.text === 'Favourite'
+                    ? 'Unfavourite'
+                    : item.text}
+                  {this.favourite &&
+                    item.text === 'Favourite' &&
+                    stateLocal.active !== 'fav' && <Fav class={'ml-2'} />}
+                </button>
               );
             })}
           </div>

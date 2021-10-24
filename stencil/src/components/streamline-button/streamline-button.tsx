@@ -19,7 +19,6 @@ import { Heart } from '../../elements/Heart';
   styleUrl: 'streamline-button.scss',
 })
 export class StreamlineButton {
-  private container: HTMLElement;
   private link: HTMLElement;
   private tooltip: HTMLElement;
 
@@ -71,7 +70,6 @@ export class StreamlineButton {
 
       tippy(this.link, {
         content: template,
-        appendTo: this.container,
         interactive: true,
         plugins: [hideOnPopperBlur],
         delay: [500, null],
@@ -123,11 +121,11 @@ export class StreamlineButton {
   render() {
     const className = `break-words w-[max-content] underline-none cursor-pointer text-center whitespace-no-wrap ${
       this.type === 'main'
-        ? `text-sm px-3 py-2.5 leading-none border border-blue-gray-200 bg-blue-gray-50 text-blue-600 min-w-[75px] hover:border-blue-600`
+        ? `text-sm px-3 py-2.5 leading-none border border-blue-gray-200 bg-blue-gray-50 text-blue-600 hover:border-blue-600`
         : this.type === 'sidebar' || this.type === 'primary'
         ? `h-[calc(var(--sl-side-w))] w-[calc(var(--sl-side-w)-1px)] flex flex-col items-center justify-center p-0 text-blue-gray-900 bg-transparent border-b border-blue-gray-300 ${
             this.type === 'primary'
-              ? `bg-[#191E23] border-none text-white fill-current h-[var(--sl-side-w)] w-[var(--sl-side-w)] hover:bg-[#0e1114]`
+              ? `bg-blue-gray-900 border-none text-white fill-current h-[var(--sl-side-w)] w-[var(--sl-side-w)] hover:bg-[#0e1114]`
               : this.type === 'sidebar' &&
                 `!grid sm:!grid-rows-[20px,20px] !justify-items-center !content-center text-blue-gray-500 border-b border-blue-gray-300 hover:bg-blue-gray-100 hover:text-blue-gray-900 ${
                   stateLocal.active === this.icon &&
@@ -205,47 +203,38 @@ export class StreamlineButton {
     const text = this.text && <span class={classNameText}>{this.text}</span>;
 
     return (
-      <div class={`relative inline-flex w-full`}>
-        <div
-          ref={(el) => (this.container = el as HTMLElement)}
-          class={`focus ${
-            this.type === 'main'
-              ? 'focus--border'
-              : this.type === 'sidebar'
-              ? 'focus--px-x focus--px-y'
-              : ''
-          }`}
-        >
-          {this.type === 'main' && this.href ? (
-            <a
-              ref={(el) => (this.link = el as HTMLElement)}
-              href={!stateInternal.test ? this.href : '#'}
-              onClick={this.handleClick}
-              class={className}
-            >
-              {icon}
-              {text}
-            </a>
-          ) : (
-            <button
-              onClick={this.handleClick}
-              tabIndex={stateLocal.active === this.icon ? -1 : 0}
-              style={{
-                borderBottom:
-                  this.type === 'primary'
-                    ? ''
-                    : '1px solid rgba(209,213,219,var(--tw-border-opacity))',
-              }}
-              class={className}
-            >
-              {icon}
-              {text}
-            </button>
-          )}
-          {this.favourite && stateLocal.active !== 'fav' && (
-            <Fav class={`absolute -top-1 -right-1`} />
-          )}
-        </div>
+      <div class={`relative flex w-full`}>
+        {this.type === 'main' && this.href ? (
+          <a
+            ref={(el) => (this.link = el as HTMLElement)}
+            href={!stateInternal.test ? this.href : '#'}
+            onClick={this.handleClick}
+            class={className + ` focus`}
+          >
+            {icon}
+            {text}
+          </a>
+        ) : (
+          <button
+            onClick={this.handleClick}
+            tabIndex={stateLocal.active === this.icon ? -1 : 0}
+            style={{
+              borderBottom:
+                this.type === 'primary'
+                  ? ''
+                  : '1px solid rgba(209,213,219,var(--tw-border-opacity))',
+            }}
+            class={
+              className + ` ${this.type === 'primary' ? 'focus-dark' : 'focus'}`
+            }
+          >
+            {icon}
+            {text}
+          </button>
+        )}
+        {this.favourite && stateLocal.active !== 'fav' && (
+          <Fav class={`absolute -top-1.5 -right-1.5`} />
+        )}
         {this.type === 'main' && (
           <div
             class={`!grid divide-x divide-blue-gray-200 auto-cols-max grid-flow-col`}
@@ -259,7 +248,7 @@ export class StreamlineButton {
               },
             ].map((item) => {
               return (
-                <button class={`border-none focus`} onClick={item.onClick}>
+                <button class={`border-none focus-dark`} onClick={item.onClick}>
                   <span
                     class={`w-8 h-8 flex items-center justify-center ${
                       item.condition ? 'text-red-500' : ''

@@ -15,6 +15,9 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.7 =
+* Fix: make cross browser styling more cohesive
+
 = 1.0.6 =
 * New: add capability settings
 

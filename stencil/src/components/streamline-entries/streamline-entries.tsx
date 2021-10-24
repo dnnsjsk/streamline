@@ -201,20 +201,18 @@ export class StreamlineEntries {
                   <div
                     class={`${this.h2} inline-grid grid-flow-col auto-cols-max py-3 items-center`}
                   >
-                    <div class={`focus`}>
-                      <div
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => getMenu(obj)}
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            getMenu(obj);
-                          }
-                        }}
-                        class={`${this.tag} hover:text-blue-gray-50 hover:bg-blue-gray-900 hover:border-blue-gray-900`}
-                      >
-                        {itemInner.domain}
-                      </div>
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => getMenu(obj)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          getMenu(obj);
+                        }
+                      }}
+                      class={`${this.tag} focus-gray hover:text-blue-gray-50 hover:bg-blue-gray-900 hover:border-blue-gray-900`}
+                    >
+                      {itemInner.domain}
                     </div>
                     <p class={`${this.p} ml-2`}>
                       <span class={`font-semibold`}>Path: </span>
@@ -259,19 +257,19 @@ export class StreamlineEntries {
                 return (
                   <li
                     key={indexInner}
-                    class={`${this.border} flex flex-col sm:flex-row`}
+                    class={`${this.border} flex flex-col pb-4 sm:flex-row`}
                   >
                     <h2
-                      class={`${this.h2} mt-3.5 mr-4 leading-1 inline-block break-words sm:min-w-[120px] md:min-w-[200px]`}
+                      class={`${this.h2} mt-4 mr-4 leading-1 inline-block break-words sm:min-w-[120px] md:min-w-[200px]`}
                     >
                       {itemInner.name}
                     </h2>
                     {itemInner.children && (
-                      <ul class={`flex flex-wrap gap-x-4 pb-4`}>
+                      <ul class={`flex flex-wrap gap-4 mt-4`}>
                         {Object.values(itemInner.children as unknown).map(
                           (itemSub, indexSub) => {
                             return (
-                              <li key={indexSub} class={`mt-4`}>
+                              <li key={indexSub}>
                                 <streamline-button
                                   type="main"
                                   adminUrl={item.adminUrl}
@@ -352,10 +350,10 @@ export class StreamlineEntries {
           </div>
         ) : (
           <div
-            class={`inner pb-3 sm:pb-6 relative px-3 h-[calc(100%-var(--sl-side-w))] overflow-y-scroll overflow-x-hidden w-full bg-white sm:px-6 lg:px-8 ${
+            tabindex={-1}
+            class={`focus-none inner pb-3 sm:pb-6 relative px-3 h-[calc(100%-var(--sl-side-w))] overflow-y-scroll overflow-x-hidden w-full bg-white sm:px-6 lg:px-8 ${
               stateInternal.isProcessing ? 'pointer-events-none opacity-50' : ''
             }`}
-            tabIndex={-1}
           >
             {stateInternal.isSlash && !stateInternal.isSites
               ? this.slash()
