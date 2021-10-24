@@ -1,6 +1,8 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { StreamlineContainer } from './streamline-container';
 import { disposeInternal, stateInternal } from '../../store/internal';
+import { StreamlineSearch } from '../streamline-search/streamline-search';
+import { setTestMode } from '../../test/setTestMode';
 
 beforeEach(async () => {
   disposeInternal();
@@ -47,4 +49,18 @@ it('Open app', async () => {
   page.doc.dispatchEvent(event);
   await page.waitForChanges();
   expect(stateInternal.visible).toBe(true);
+});
+
+describe('In test mode', function () {
+  it('render search with correct placeholder', async () => {
+    setTestMode();
+    stateInternal.test = true;
+    const page = await newSpecPage({
+      components: [StreamlineContainer, StreamlineSearch],
+      html: `<streamline-container true></streamline-container>`,
+    });
+    await page.waitForChanges();
+    const placeholder = stateInternal.searchPlaceholder;
+    expect(placeholder).toBe('Search entries');
+  });
 });

@@ -24,6 +24,7 @@ describe('Render entries with', function () {
     const length = el.querySelectorAll('li').length;
     expect(length).toBe(2);
   });
+  // what is this doing?
   it("mode set to 'sites'", async () => {
     stateInternal.isSites = true;
     stateLocal.active = 'fav';
@@ -111,7 +112,9 @@ describe('Render entries with', function () {
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
       const lengthLi = el.querySelectorAll('li').length;
+      const results = el.querySelector('h1 + div span').innerHTML.trim();
       expect(lengthLi).toBe(49);
+      expect(results).toBe('Showing 11 results');
     });
     it("and search is 'med'", async () => {
       stateLocal.active = 'menu';
@@ -122,7 +125,35 @@ describe('Render entries with', function () {
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
       const lengthLi = el.querySelectorAll('li').length;
+      const results = el.querySelector('h1 + div span').innerHTML.trim();
       expect(lengthLi).toBe(5);
+      expect(results).toBe('Showing 2 results');
+    });
+    it("and search is 'All pages'", async () => {
+      stateLocal.active = 'menu';
+      stateInternal.searchValue = 'All pages';
+      const page = await newSpecPage({
+        components: [StreamlineEntries],
+        html: `<streamline-entries></streamline-entries>`,
+      });
+      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const lengthLi = el.querySelectorAll('li').length;
+      const results = el.querySelector('h1 + div span').innerHTML.trim();
+      expect(lengthLi).toBe(2);
+      expect(results).toBe('Showing 1 result');
+    });
+    it("and search is 'xlsbvhaysgf'", async () => {
+      stateLocal.active = 'menu';
+      stateInternal.searchValue = 'xlsbvhaysgf';
+      const page = await newSpecPage({
+        components: [StreamlineEntries],
+        html: `<streamline-entries></streamline-entries>`,
+      });
+      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const lengthLi = el.querySelectorAll('li').length;
+      const results = el.querySelector('h1 + div span').innerHTML.trim();
+      expect(lengthLi).toBe(0);
+      expect(results).toBe('Showing 0 results');
     });
     it('and three elements are favourites', async () => {
       stateLocal.active = 'menu';
@@ -164,7 +195,35 @@ describe('Render entries with', function () {
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
       const lengthLi = el.querySelectorAll('li').length;
+      const results = el.querySelector('h1 + div span').innerHTML.trim();
       expect(lengthLi).toBe(2);
+      expect(results).toBe('Showing 2 results');
+    });
+    it("and search is 'Hello world'", async () => {
+      stateLocal.active = 'post';
+      stateInternal.searchValue = 'Hello world';
+      const page = await newSpecPage({
+        components: [StreamlineEntries],
+        html: `<streamline-entries></streamline-entries>`,
+      });
+      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const lengthLi = el.querySelectorAll('li').length;
+      const results = el.querySelector('h1 + div span').innerHTML.trim();
+      expect(lengthLi).toBe(1);
+      expect(results).toBe('Showing 1 result');
+    });
+    it("and search is 'xlsbvhaysgf'", async () => {
+      stateLocal.active = 'post';
+      stateInternal.searchValue = 'xlsbvhaysgf';
+      const page = await newSpecPage({
+        components: [StreamlineEntries],
+        html: `<streamline-entries></streamline-entries>`,
+      });
+      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const lengthLi = el.querySelectorAll('li').length;
+      const results = el.querySelector('h1 + div span').innerHTML.trim();
+      expect(lengthLi).toBe(0);
+      expect(results).toBe('Showing 0 results');
     });
     it('and three elements are favourites', async () => {
       stateLocal.active = 'post';

@@ -15,5 +15,8 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.6 =
+* New: add capability settings
+
 = 1.0.0 =
 * New: initial release

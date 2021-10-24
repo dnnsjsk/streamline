@@ -23,7 +23,8 @@ class FabrikatPlugin {
 		add_action( 'admin_menu', [ __CLASS__, 'menu' ], 11 );
 
 		add_action( 'plugins_loaded', function () {
-			add_action( 'wp_ajax_fabrikatAdminQuery', [ __CLASS__, 'fabrikatAdminQuery' ] );
+			add_action( 'wp_ajax_fabrikatLicenseQuery', [ __CLASS__, 'fabrikatLicenseQuery' ] );
+			add_action( 'wp_ajax_fabrikatSettingsQuery', [ __CLASS__, 'fabrikatSettingsQuery' ] );
 		} );
 	}
 
@@ -103,7 +104,8 @@ class FabrikatPlugin {
           productId: '<?php echo self::$item_id; ?>',
           currentUrl: '<?php echo home_url(); ?>',
           licenseStatus: '<?php echo get_option( self::$prefix . 'license_status' ); ?>',
-          licenseCode: '<?php echo trim( get_option( self::$prefix . 'license_key' ) ); ?>'
+          licenseCode: '<?php echo trim( get_option( self::$prefix . 'license_key' ) ); ?>',
+          settings: '<?php echo json_encode( get_option( self::$prefix . 'settings' ) ); ?>'
         };
       </script>
       <div id="fabrikat-plugin"></div>
@@ -134,11 +136,11 @@ class FabrikatPlugin {
 	}
 
 	/**
-	 * AJAX query.
+	 * License query.
 	 *
 	 * @since 1.0
 	 */
-	static function fabrikatAdminQuery() {
+	static function fabrikatLicenseQuery() {
 		if ( wp_verify_nonce( $_POST['nonce'], 'ajax-nonce' ) ) {
 			$license = $_POST['license'] ? sanitize_text_field( $_POST['license'] ) : FALSE;
 			$action  = $_POST['type'];
@@ -170,6 +172,24 @@ class FabrikatPlugin {
 			}
 
 			wp_send_json( $license_data );
+
+			die();
+		}
+	}
+
+	/**
+	 * Settings query.
+	 *
+	 * @since 1.0
+	 */
+	static function fabrikatSettingsQuery() {
+		if ( wp_verify_nonce( $_POST['nonce'], 'ajax-nonce' ) ) {
+			$settings = $_POST['settings'];
+
+			delete_option( self::$prefix . 'settings' );
+			update_option( self::$prefix . 'settings', json_decode( stripslashes( html_entity_decode( $settings ) ) ) );
+
+			wp_send_json( [ 'success' => TRUE ] );
 
 			die();
 		}

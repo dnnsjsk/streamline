@@ -1,5 +1,9 @@
 import { createStore } from '@stencil/store';
 
+const isTest = document
+  .querySelector('streamline-container')
+  ?.hasAttribute('test');
+
 const { state, dispose, onChange } = createStore({
   // @ts-ignore
   data: window.streamlineData,
@@ -22,14 +26,14 @@ const { state, dispose, onChange } = createStore({
     local: {
       site: {
         // @ts-ignore
-        condition: window.streamlineData.network && !window.streamlineTest,
+        condition: window.streamlineData.network && !isTest,
         name: '/site [name]',
         description: `Display entries from a different site in the network.`,
         callback: 'get_sites',
       },
       network: {
         // @ts-ignore
-        condition: window.streamlineData.network && !window.streamlineTest,
+        condition: window.streamlineData.network && !isTest,
         name: '/network',
         description: `Display entries from a from network dashboard.`,
       },
@@ -56,8 +60,7 @@ const { state, dispose, onChange } = createStore({
   searchNoValue: 'No entries found',
   searchPlaceholder: '',
   searchValue: '',
-  // @ts-ignore
-  test: window.streamlineTest,
+  test: isTest,
   testFull: false,
   visible: false,
 });

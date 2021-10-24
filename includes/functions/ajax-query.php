@@ -42,7 +42,7 @@ function streamlineQuery() {
 
 			$path = '';
 
-			if (is_multisite() && function_exists('get_site')) {
+			if ( is_multisite() && function_exists( 'get_site' ) ) {
 				$path = get_site( get_current_blog_id() )->path;
 			} else {
 				$path = '/';
@@ -70,12 +70,10 @@ function streamlineQuery() {
 		}
 
 		if ( $callback === 'fav' ) {
-			$userMeta               = [];
-			$fav                    = json_decode( stripslashes( html_entity_decode( $query ) ) );
-			$userMeta['favourites'] = $fav;
-
-			delete_user_meta( $userId, 'streamline' );
-			update_user_meta( $userId, 'streamline', $userMeta );
+			$fav = json_decode( stripslashes( html_entity_decode( $query ) ) );
+			
+			delete_user_meta( $userId, 'streamline_favourites' );
+			update_user_meta( $userId, 'streamline_favourites', $fav );
 
 			wp_send_json_success( 'success' );
 		}

@@ -28,6 +28,12 @@ class Init {
 
 	}
 
+	static private function isAllowed(): bool {
+		return ( current_user_can( get_option( 'streamline_settings' )->capability ?: 'activate_plugins' ) ) &&
+		       apply_filters( 'streamline/enable', TRUE ) &&
+		       ! defined( 'OXYGEN_IFRAME' );
+	}
+
 	/**
 	 * Enqueue scripts.
 	 *
@@ -94,7 +100,7 @@ class Init {
 			$currentSite = get_sites( [ 'ID' => get_current_blog_id() ] );
 		}
 
-		$favs = get_user_meta( get_current_user_id(), 'streamline' )[0]['favourites'] ?: [];
+		$favs = get_user_meta( get_current_user_id(), 'streamline_favourites' )[0] ?: [];
 
 		foreach ( $favs as $fav ) {
 			if ( $fav->type === 'menu' ) {
@@ -175,14 +181,12 @@ class Init {
 		$container = '<streamline-container></streamline-container>';
 
 		add_action( 'admin_footer', function () use ( $container ) {
-			if ( is_user_logged_in() ) {
+			if ( self::isAllowed() ) {
 				echo $container;
 			}
 		} );
 		add_action( 'wp_footer', function () use ( $container ) {
-			if ( is_user_logged_in() &&
-			     apply_filters( 'streamline/enable', TRUE ) &&
-			     ! defined( 'OXYGEN_IFRAME' ) ) {
+			if ( self::isAllowed() ) {
 				echo $container;
 			}
 		} );
