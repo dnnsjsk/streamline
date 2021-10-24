@@ -88,7 +88,11 @@ class Init {
 	 */
 	function getData() {
 
-		$currentSite = get_sites( [ 'ID' => get_current_blog_id() ] );
+		$currentSite = '';
+
+		if ( is_multisite() && function_exists('get_sites') ) {
+			$currentSite = get_sites( [ 'ID' => get_current_blog_id() ] );
+		}
 
 		$favs = get_user_meta( get_current_user_id(), 'streamline' )[0]['favourites'] ?: [];
 
@@ -134,7 +138,7 @@ class Init {
 			'fav'        => json_encode( get_user_meta( get_current_user_id(), 'streamline' ) ),
 			'network'    => ! is_multisite() ? FALSE : network_admin_url(),
 			'isNetwork'  => is_network_admin(),
-			'path'       => $currentSite[0]->path,
+			'path'       => is_multisite() ? $currentSite[0]->path : '/',
 			'siteId'     => get_current_blog_id(),
 			'userId'     => get_current_user_id(),
 		] );
