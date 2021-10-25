@@ -24,6 +24,8 @@ export class StreamlineContainer {
     }
 
     document.addEventListener('keydown', (e) => {
+      e.preventDefault();
+
       const isGutenberg = document.body.classList.contains('block-editor-page');
 
       if (e.key === 'k' && e.metaKey && !isGutenberg) {

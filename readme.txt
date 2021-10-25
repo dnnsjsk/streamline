@@ -15,6 +15,9 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.8 =
+* Fix: prevent default behaviour when using the key combination
+
 = 1.0.7 =
 * Fix: make cross browser styling more cohesive
 
