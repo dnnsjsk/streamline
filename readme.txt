@@ -15,6 +15,9 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.9 =
+* Fix: don't prevent all key presses
+
 = 1.0.8 =
 * Fix: prevent default behaviour when using the key combination
 

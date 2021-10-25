@@ -24,19 +24,20 @@ export class StreamlineContainer {
     }
 
     document.addEventListener('keydown', (e) => {
-      e.preventDefault();
-
       const isGutenberg = document.body.classList.contains('block-editor-page');
 
       if (e.key === 'k' && e.metaKey && !isGutenberg) {
+        e.preventDefault();
         stateInternal.visible = !stateInternal.visible;
       }
 
       if (e.key === 'k' && e.metaKey && e.shiftKey && isGutenberg) {
+        e.preventDefault();
         stateInternal.visible = !stateInternal.visible;
       }
 
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && stateInternal.visible) {
+        e.preventDefault();
         stateInternal.visible = false;
       }
     });
