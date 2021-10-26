@@ -15,6 +15,10 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.11 =
+* Enhancement: change notice if no post query has been made yet
+* Fix: counts not showing for network menus
+
 = 1.0.10 =
 * Enhancement: add counters to favourite mode
 * Enhancement: count actual menu items and not parent items

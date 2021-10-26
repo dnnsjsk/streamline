@@ -7,6 +7,7 @@
     "@stencil/prefer-vdom-listener": 0,
     "@stencil/async-methods": 0,
     "@stencil/ban-prefix": 0,
+    "@stencil/decorators-context": 0,
     "react/jsx-no-bind": 0
   },
   "env": {

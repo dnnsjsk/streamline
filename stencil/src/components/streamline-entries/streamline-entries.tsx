@@ -41,7 +41,7 @@ export class StreamlineEntries {
 
   private static getHeader(item) {
     let menuNumber = 0;
-    if (item.type === 'menu') {
+    if (item.type === 'menu' || item.type === 'networkMenu') {
       Object.values(item.children as unknown).forEach((itemNested) => {
         Object.values(itemNested.children as unknown).forEach(() => {
           menuNumber++;
@@ -54,13 +54,14 @@ export class StreamlineEntries {
         ? Object.values(item.children).length
         : stateInternal.isSites
         ? Object.values(item.children).length
-        : item.type === 'menu'
+        : item.type === 'menu' || item.type === 'networkMenu'
         ? menuNumber
         : '0'
     } ${
       (item.type === 'post' && Object.values(item.children).length === 1) ||
       (stateInternal.isSites && Object.values(item.children).length === 1) ||
-      (item.type === 'menu' && menuNumber === 1)
+      ((item.type === 'menu' || item.type === 'networkMenu') &&
+        menuNumber === 1)
         ? `result`
         : `results`
     }

@@ -72,7 +72,7 @@ export function getMenu(obj = {} as any) {
     stateInternal.entriesMenu = data;
     stateInternal.entriesMenuActive = data;
     stateInternal.entriesMenuCurrentPath = obj.path || stateInternal.data.path;
-    stateInternal.entriesMenuIsNetwork = isNetwork;
+    stateInternal.entriesMenuIsNetwork = obj.network;
 
     setEntries();
   }
