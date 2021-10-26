@@ -15,6 +15,9 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.12 =
+* Fix: update not available
+
 = 1.0.11 =
 * Enhancement: change notice if no post query has been made yet
 * Fix: counts not showing for network menus
