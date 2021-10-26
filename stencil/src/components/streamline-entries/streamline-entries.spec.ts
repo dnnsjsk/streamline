@@ -24,10 +24,9 @@ describe('Render entries with', function () {
     const length = el.querySelectorAll('li').length;
     expect(length).toBe(2);
   });
-  // what is this doing?
   it("mode set to 'sites'", async () => {
     stateInternal.isSites = true;
-    stateLocal.active = 'fav';
+    stateLocal.active = 'menu';
     const page = await newSpecPage({
       components: [StreamlineEntries],
       html: `<streamline-entries></streamline-entries>`,
