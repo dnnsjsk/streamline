@@ -3,6 +3,7 @@ import { Component, h, Prop, Method, Host } from '@stencil/core';
 import { stateInternal } from '../../store/internal';
 import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
 import { setTestData } from '../../utils/setTestData';
+import { stateLocal } from '../../store/local';
 
 /**
  * Container.
@@ -36,9 +37,21 @@ export class StreamlineContainer {
         stateInternal.visible = !stateInternal.visible;
       }
 
-      if (e.key === 'Escape' && stateInternal.visible) {
-        e.preventDefault();
-        stateInternal.visible = false;
+      if (stateInternal.visible) {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          stateInternal.visible = false;
+        }
+
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          this.cycle('up');
+        }
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          this.cycle('down');
+        }
       }
     });
   }
@@ -46,6 +59,27 @@ export class StreamlineContainer {
   componentDidLoad() {
     setSearchPlaceholder();
   }
+
+  private cycle = (mode) => {
+    const index = stateInternal.menus.indexOf(stateLocal.active);
+    const length = stateInternal.menus.length;
+
+    if (mode === 'up') {
+      if (index === 0) {
+        stateLocal.active = stateInternal.menus[length - 1];
+      } else {
+        stateLocal.active = stateInternal.menus[index - 1];
+      }
+    }
+
+    if (mode === 'down') {
+      if (index + 1 === length) {
+        stateLocal.active = stateInternal.menus[0];
+      } else {
+        stateLocal.active = stateInternal.menus[index + 1];
+      }
+    }
+  };
 
   @Method()
   async toggle() {

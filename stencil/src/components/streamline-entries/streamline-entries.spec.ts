@@ -114,7 +114,7 @@ describe('Render entries with', function () {
       const lengthLi = el.querySelectorAll('li').length;
       const results = el.querySelector('h1 + div span').innerHTML.trim();
       expect(lengthLi).toBe(49);
-      expect(results).toBe('Showing 11 results');
+      expect(results).toBe('Showing 38 results');
     });
     it("and search is 'med'", async () => {
       stateLocal.active = 'menu';
@@ -127,7 +127,7 @@ describe('Render entries with', function () {
       const lengthLi = el.querySelectorAll('li').length;
       const results = el.querySelector('h1 + div span').innerHTML.trim();
       expect(lengthLi).toBe(5);
-      expect(results).toBe('Showing 2 results');
+      expect(results).toBe('Showing 3 results');
     });
     it("and search is 'All pages'", async () => {
       stateLocal.active = 'menu';

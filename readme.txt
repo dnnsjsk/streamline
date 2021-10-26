@@ -15,6 +15,15 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.10 =
+* Enhancement: add counters to favourite mode
+* Enhancement: count actual menu items and not parent items
+* Enhancement: show post slugs when in post mode
+* Fix: don't use flex-gap for menu entries
+* Fix: entries not scrollable on mobile
+* Fix: minor UI enhancements
+* Fix: prevent console errors
+
 = 1.0.9 =
 * Fix: don't prevent all key presses
 

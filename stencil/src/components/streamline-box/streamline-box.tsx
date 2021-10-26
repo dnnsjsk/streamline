@@ -17,13 +17,19 @@ export class StreamlineBox {
   @Element() el: HTMLStreamlineBoxElement;
 
   connectedCallback() {
-    disableBodyScroll(this.el, {
-      reserveScrollBarGap: true,
-    });
     setEntries();
   }
 
   componentDidLoad() {
+    disableBodyScroll(
+      this.el.shadowRoot
+        .querySelector('streamline-entries')
+        .shadowRoot.querySelector('div > div'),
+      {
+        reserveScrollBarGap: true,
+      }
+    );
+
     this.el.shadowRoot.querySelector('.inner').classList.add('animate');
 
     setTimeout(() => {

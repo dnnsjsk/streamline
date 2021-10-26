@@ -41,27 +41,26 @@ export class StreamlineEntries {
 
   private static getHeader(item) {
     let menuNumber = 0;
-    Object.values(stateInternal.entriesMenuActive).forEach((item) => {
-      Object.values(item.children).forEach(() => {
-        menuNumber++;
+    if (item.type === 'menu') {
+      Object.values(item.children as unknown).forEach((itemNested) => {
+        Object.values(itemNested.children as unknown).forEach(() => {
+          menuNumber++;
+        });
       });
-    });
+    }
 
     const results = `Showing ${
-      stateLocal.active === 'post'
-        ? Object.values(stateInternal.entriesPostActive[0].children).length
+      item.type === 'post'
+        ? Object.values(item.children).length
         : stateInternal.isSites
-        ? Object.values(stateInternal.entriesSite[0].children).length
-        : stateLocal.active === 'menu'
+        ? Object.values(item.children).length
+        : item.type === 'menu'
         ? menuNumber
-        : ''
+        : '0'
     } ${
-      (stateLocal.active === 'post' &&
-        Object.values(stateInternal.entriesPostActive[0].children).length ===
-          1) ||
-      (stateInternal.isSites &&
-        Object.values(stateInternal.entriesSite[0].children).length === 1) ||
-      (stateLocal.active === 'menu' && menuNumber === 1)
+      (item.type === 'post' && Object.values(item.children).length === 1) ||
+      (stateInternal.isSites && Object.values(item.children).length === 1) ||
+      (item.type === 'menu' && menuNumber === 1)
         ? `result`
         : `results`
     }
@@ -72,10 +71,10 @@ export class StreamlineEntries {
 
     return (
       <div
-        class={`pt-5 flex flex-wrap mb-4 pb-1 flex justify-between items-center sticky -top-2 bg-white z-10 border-b border-dotted border-blue-gray-900 sm:pt-6 sm:-top-2 lg:pt-8 lg:-top-4`}
+        class={`pt-5 flex flex-wrap mb-4 pb-1 flex justify-between items-center sticky -top-2 bg-white z-10 border-b border-dotted border-blue-gray-900 sm:pt-6 sm:pb-2 sm:-top-2 lg:pt-8 lg:-top-4`}
       >
         <h1
-          class={`text-blue-gray-900 font-medium text-xl mr-4 mb-2 sm:text-2xl`}
+          class={`text-blue-gray-900 font-medium text-xl mr-6 sm:text-2xl`}
           innerHTML={`${
             stateInternal.isSlash && !stateInternal.isSites
               ? item.title
@@ -107,11 +106,11 @@ export class StreamlineEntries {
               : (item.type === 'post' || item.type === 'site') &&
                 stateLocal.active === 'fav'
               ? `${capitalizeFirstLetter(item.type)}s` + path
-              : stateInternal.test &&
-                stateLocal.active === 'post' &&
+              : stateLocal.active === 'post' &&
                 Object.values(stateInternal.entriesPostActive[0].children)
-                  .length >= 1
-              ? 'Search results'
+                  .length === 0 &&
+                !item.queryValue
+              ? 'No query, search for a post in the search bar'
               : 'No results'
           }`}
         />
@@ -122,6 +121,7 @@ export class StreamlineEntries {
               condition:
                 stateInternal.isSites ||
                 stateLocal.active === 'post' ||
+                stateLocal.active === 'fav' ||
                 (stateLocal.active === 'menu' && !stateInternal.isSlash),
             },
           ]).map((itemInner, itemIndex) => {
@@ -265,11 +265,11 @@ export class StreamlineEntries {
                       {itemInner.name}
                     </h2>
                     {itemInner.children && (
-                      <ul class={`flex flex-wrap gap-4 mt-4`}>
+                      <ul class={`flex flex-wrap`}>
                         {Object.values(itemInner.children as unknown).map(
                           (itemSub, indexSub) => {
                             return (
-                              <li key={indexSub}>
+                              <li key={indexSub} class={`mt-4 mr-4`}>
                                 <streamline-button
                                   type="main"
                                   adminUrl={item.adminUrl}
@@ -314,6 +314,7 @@ export class StreamlineEntries {
                     post-id={itemInner.ID}
                     post-title={itemInner.post_title}
                     post-type={itemInner.post_type}
+                    post-slug={itemInner.post_name}
                     site-id={itemInner.siteId}
                   />
                 </li>

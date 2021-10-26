@@ -13,6 +13,7 @@
 | `hrefEdit`  | `href-edit`  |             | `string`  | `undefined` |
 | `hrefView`  | `href-view`  |             | `string`  | `undefined` |
 | `postId`    | `post-id`    |             | `number`  | `undefined` |
+| `postSlug`  | `post-slug`  |             | `string`  | `undefined` |
 | `postTitle` | `post-title` |             | `string`  | `undefined` |
 | `postType`  | `post-type`  |             | `string`  | `undefined` |
 | `siteId`    | `site-id`    |             | `number`  | `undefined` |

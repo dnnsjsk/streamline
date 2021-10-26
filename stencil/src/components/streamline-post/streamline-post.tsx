@@ -22,6 +22,7 @@ export class StreamlinePost {
   @Prop() hrefView: string;
   @Prop() postTitle: string;
   @Prop() postId: number;
+  @Prop() postSlug: string;
   @Prop() postType: string;
   @Prop() siteId: number;
   // eslint-disable-next-line @stencil/strict-mutable
@@ -71,13 +72,18 @@ export class StreamlinePost {
           {this.postType}
         </div>
         <div class={`flex flex-col`}>
-          <a
-            href={stateInternal.test ? '#' : this.hrefView}
-            target="_blank"
-            class={`focus-white inline-flex max-w-max font-semibold flex-col px-2.5 text-base py-2 text-blue-600 hover:underline`}
-          >
-            {this.postTitle}
-          </a>
+          <div class={`flex flex-wrap items-center`}>
+            <a
+              href={stateInternal.test ? '#' : this.hrefView}
+              target="_blank"
+              class={`focus-white inline-flex max-w-max font-semibold flex-col px-2.5 text-base py-2 text-blue-600 hover:underline`}
+            >
+              {this.postTitle}
+            </a>
+            <span class={`text-sm inline-block ml-2 text-gray-600`}>
+              (<strong>slug:</strong> {this.postSlug})
+            </span>
+          </div>
           <div class={`flex flex-wrap`}>
             {[
               {

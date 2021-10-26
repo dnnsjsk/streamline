@@ -10,6 +10,7 @@ const { state, dispose, onChange } = createStore({
   class: {
     tag: 'px-2.5 py-1.5 bg-blue-gray-200 text-blue-gray-500 inline-block h-[max-content] leading-1',
   },
+  menus: ['fav', 'menu', 'post'],
   menu: {
     fav: {
       name: 'fav',
@@ -21,6 +22,10 @@ const { state, dispose, onChange } = createStore({
     post: {
       name: 'post',
     },
+  },
+  settings: {
+    key: 'k',
+    toggleArrows: true,
   },
   commands: {
     local: {

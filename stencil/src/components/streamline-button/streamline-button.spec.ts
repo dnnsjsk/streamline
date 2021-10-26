@@ -118,13 +118,6 @@ describe('Render button with', function () {
       <mock:shadow-root>
         <div class="flex relative w-full">
           <button class="bg-blue-gray-50 border border-blue-gray-200 break-words cursor-pointer focus hover:border-blue-600 leading-none px-3 py-2.5 text-blue-600 text-center text-sm underline-none w-[max-content] whitespace-no-wrap" tabindex="0" style="border-bottom: 1px solid rgba(209,213,219,var(--tw-border-opacity));"></button>
-          <span class="-right-1.5 -top-1.5 absolute bg-white border border-blue-gray-200 flex h-4 items-center justify-center pointer-events-none rounded-full text-red-500 w-4">
-            <span class="flex h-full items-center justify-center w-full">
-              <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="width: 8px; height: 8px;">
-                <path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z" fill="currentColor"></path>
-              </svg>
-            </span>
-          </span>
           <div class="!grid auto-cols-max divide-blue-gray-200 divide-x grid-flow-col" style="display: block;">
             <button class="border-none focus-dark">
               <span class="flex h-8 items-center justify-center text-red-500 w-8">

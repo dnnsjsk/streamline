@@ -5,7 +5,6 @@ import { stateInternal } from '../../store/internal';
 import tippy from 'tippy.js';
 import { someDeep } from 'deepdash-es/standalone';
 import { getMenu } from '../../utils/getMenu';
-import { resetView } from '../../utils/resetView';
 import { setFavourite } from '../../utils/setFavourite';
 import { Fav } from '../../elements/Fav';
 import { Heart } from '../../elements/Heart';
@@ -24,7 +23,7 @@ export class StreamlineButton {
 
   @Prop() adminUrl: string;
   // eslint-disable-next-line @stencil/strict-mutable
-  @Prop({ mutable: true, reflect: true }) favourite: boolean;
+  @Prop({ mutable: true, reflect: true }) favourite: boolean = false;
   @Prop() header: string;
   @Prop() href: string;
   @Prop() icon: string;
@@ -80,7 +79,6 @@ export class StreamlineButton {
   private handleClick = () => {
     if (this.type === 'sidebar') {
       stateLocal.active = this.icon;
-      resetView();
     }
 
     if (
@@ -213,6 +211,9 @@ export class StreamlineButton {
           >
             {icon}
             {text}
+            {this.favourite && stateLocal.active !== 'fav' && (
+              <Fav class={`absolute -top-1.5 -right-1.5`} />
+            )}
           </a>
         ) : (
           <button
@@ -231,9 +232,6 @@ export class StreamlineButton {
             {icon}
             {text}
           </button>
-        )}
-        {this.favourite && stateLocal.active !== 'fav' && (
-          <Fav class={`absolute -top-1.5 -right-1.5`} />
         )}
         {this.type === 'main' && (
           <div

@@ -8,7 +8,7 @@
 | Property     | Attribute     | Description | Type      | Default     |
 | ------------ | ------------- | ----------- | --------- | ----------- |
 | `adminUrl`   | `admin-url`   |             | `string`  | `undefined` |
-| `favourite`  | `favourite`   |             | `boolean` | `undefined` |
+| `favourite`  | `favourite`   |             | `boolean` | `false`     |
 | `header`     | `header`      |             | `string`  | `undefined` |
 | `href`       | `href`        |             | `string`  | `undefined` |
 | `icon`       | `icon`        |             | `string`  | `undefined` |

@@ -35,6 +35,7 @@ export namespace Components {
         "hrefEdit": string;
         "hrefView": string;
         "postId": number;
+        "postSlug": string;
         "postTitle": string;
         "postType": string;
         "siteId": number;
@@ -125,6 +126,7 @@ declare namespace LocalJSX {
         "hrefEdit"?: string;
         "hrefView"?: string;
         "postId"?: number;
+        "postSlug"?: string;
         "postTitle"?: string;
         "postType"?: string;
         "siteId"?: number;
