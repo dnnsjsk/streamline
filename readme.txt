@@ -15,6 +15,19 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.13 =
+* Enhancement: adjust focus styles
+* Enhancement: make backdrop not blurry by default
+* Enhancement: replace WordPress logo with loading indicator when updating user meta
+* Enhancement: switch post and site queries to REST
+* Fix: always show subsite when filtering posts
+* Fix: minor UI enhancements
+* New: setting to activate/deactivate arrow key navigation
+* New: setting to activate/deactivate backdrop blur
+* New: setting to activate/deactivate escape key to exit
+* New: setting to activate/deactivate search input reset when switching modes
+* New: settings panel
+
 = 1.0.12 =
 * Fix: update not available
 

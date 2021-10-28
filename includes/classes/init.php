@@ -8,204 +8,228 @@ namespace Streamline;
  * @date    03/05/2021
  * @since   1.0.0
  */
-class Init {
+class Init
+{
+    function getScript()
+    {
+        $localizeArray = [
+            "ajax" => admin_url("admin-ajax.php"),
+            "rest" => esc_url_raw(rest_url()),
+            "nonce" => wp_create_nonce("ajax-nonce"),
+            "nonceRest" => wp_create_nonce("wp_rest"),
+        ];
 
-	function getScript() {
+        wp_enqueue_script(
+            "streamline",
+            plugins_url(
+                "../assets/components/build/streamline.esm.js",
+                dirname(__FILE__)
+            ),
+            [],
+            filemtime(
+                STREAMLINE_DIR . "/assets/components/build/streamline.esm.js"
+            ),
+            true
+        );
 
-		$localizeArray = [
-			'ajax'  => admin_url( 'admin-ajax.php' ),
-			'nonce' => wp_create_nonce( 'ajax-nonce' )
-		];
+        wp_localize_script("streamline", "streamline", $localizeArray);
+    }
 
-		wp_enqueue_script(
-			'streamline',
-			plugins_url( '../assets/components/build/streamline.esm.js', dirname( __FILE__ ) ),
-			[],
-			filemtime( STREAMLINE_DIR . '/assets/components/build/streamline.esm.js' ),
-			TRUE );
+    public static function isAllowed(): bool
+    {
+        return current_user_can(
+            get_option("streamline_settings")->capability ?: "activate_plugins"
+        ) &&
+            apply_filters("streamline/enable", true) &&
+            !defined("OXYGEN_IFRAME");
+    }
 
-		wp_localize_script( 'streamline', 'streamline', $localizeArray );
+    /**
+     * Enqueue scripts.
+     *
+     * @date    03/05/2021
+     * @since   1.0.0
+     */
+    private function enqueueScripts()
+    {
+        add_action("admin_enqueue_scripts", [$this, "getScript"]);
+        add_action("wp_enqueue_scripts", [$this, "getScript"]);
+    }
 
-	}
+    /**
+     * Add correct script tags.
+     *
+     * @date    28/07/2020
+     * @since   1.0.0
+     */
+    private function addScriptTags()
+    {
+        add_filter(
+            "script_loader_tag",
+            function ($tag, $handle, $source) {
+                if ("streamline" === $handle) {
+                    $tag =
+                        '<script type="module" id="streamline-js" src="' .
+                        $source .
+                        '"></script>';
+                }
 
-	static private function isAllowed(): bool {
-		return ( current_user_can( get_option( 'streamline_settings' )->capability ?: 'activate_plugins' ) ) &&
-		       apply_filters( 'streamline/enable', TRUE ) &&
-		       ! defined( 'OXYGEN_IFRAME' );
-	}
+                return $tag;
+            },
+            10,
+            3
+        );
+    }
 
-	/**
-	 * Enqueue scripts.
-	 *
-	 * @date    03/05/2021
-	 * @since   1.0.0
-	 */
-	private function enqueueScripts() {
+    /**
+     * Inline CSS.
+     *
+     * @date    13/05/2021
+     * @since   1.0.0
+     */
+    private function addCss()
+    {
+        $str = file_get_contents(
+            STREAMLINE_DIR . "/assets/components/build/streamline.css"
+        );
 
-		add_action( 'admin_enqueue_scripts', [ $this, 'getScript' ] );
-		add_action( 'wp_enqueue_scripts', [ $this, 'getScript' ] );
+        add_action("wp_head", function () use (&$str) {
+            echo '<style id="streamline-css">' . $str . "</style>";
+        });
 
-	}
+        add_action("admin_head", function () use (&$str) {
+            echo '<style id="streamline-css">' . $str . "</style>";
+        });
+    }
 
-	/**
-	 * Add correct script tags.
-	 *
-	 * @date    28/07/2020
-	 * @since   1.0.0
-	 */
-	private function addScriptTags() {
+    /**
+     * Get data and rewrite URLs.
+     *
+     * @date    04/05/2021
+     * @since   1.0.0
+     */
+    function getData()
+    {
+        $currentSite = "";
 
-		add_filter( 'script_loader_tag', function ( $tag, $handle, $source ) {
+        if (is_multisite() && function_exists("get_sites")) {
+            $currentSite = get_sites(["ID" => get_current_blog_id()]);
+        }
 
-			if ( 'streamline' === $handle ) {
-				$tag = '<script type="module" id="streamline-js" src="' . $source . '"></script>';
-			}
+        $favs =
+            get_user_meta(get_current_user_id(), "streamline_favourites")[0] ?:
+            [];
 
-			return $tag;
-		}, 10, 3 );
+        $settings =
+            get_user_meta(get_current_user_id(), "streamline_settings")[0] ?:
+            [];
 
-	}
+        foreach ($favs as $fav) {
+            if ($fav->type === "menu") {
+                $siteId = $fav->siteId;
+                $adminUrl = get_admin_url($siteId);
+                $fav->adminUrl = $adminUrl;
 
-	/**
-	 * Inline CSS.
-	 *
-	 * @date    13/05/2021
-	 * @since   1.0.0
-	 */
-	public static function addCss() {
+                foreach ($fav->children as $children) {
+                    foreach ($children->children as $link) {
+                        $link->adminUrl = $adminUrl;
+                        $link->href = $adminUrl . $link->path;
+                    }
+                }
+            }
+            if ($fav->type === "networkMenu") {
+                $adminUrl = network_admin_url();
+                $fav->adminUrl = $adminUrl;
 
-		$str = file_get_contents( STREAMLINE_DIR . '/assets/components/build/streamline.css' );
+                foreach ($fav->children as $children) {
+                    foreach ($children->children as $link) {
+                        $link->adminUrl = $adminUrl;
+                        $link->href = $adminUrl . $link->path;
+                    }
+                }
+            }
+            if ($fav->type === "post") {
+                foreach ($fav->children as $post) {
+                    if (is_multisite() && function_exists("switch_to_blog")) {
+                        switch_to_blog($post->siteId);
+                    }
+                    $post->guid = get_the_guid($post->ID);
+                    $post->hrefEdit = base64_encode(
+                        get_edit_post_link($post->ID)
+                    );
+                    if (
+                        is_multisite() &&
+                        function_exists("restore_current_blog")
+                    ) {
+                        restore_current_blog();
+                    }
+                }
+            }
+        }
 
-		add_action( 'wp_head', function () use ( &$str ) {
-			echo '<style id="streamline-css">' . $str . '</style>';
-		} );
+        echo '<script id="streamline-data">';
+        echo "window.streamlineData =";
+        echo json_encode([
+            "adminUrl" => admin_url(),
+            "favourites" => json_encode($favs),
+            "network" => !is_multisite() ? false : network_admin_url(),
+            "isNetwork" => is_network_admin(),
+            "path" => is_multisite() ? $currentSite[0]->path : "/",
+            "settings" => json_encode($settings),
+            "siteId" => get_current_blog_id(),
+            "userId" => get_current_user_id(),
+        ]);
+        echo ";";
+        //echo "console.log(JSON.parse(streamlineData.favourites));";
+        echo "</script>";
+    }
 
-		add_action( 'admin_head', function () use ( &$str ) {
-			echo '<style id="streamline-css">' . $str . '</style>';
-		} );
+    /**
+     * Inject data.
+     *
+     * @date    04/05/2021
+     * @since   1.0.0
+     */
+    private function injectData()
+    {
+        add_action("admin_footer", [$this, "getData"]);
+        add_action("wp_head", [$this, "getData"]);
+    }
 
-	}
+    /**
+     * Add container.
+     *
+     * @date    04/05/2021
+     * @since   1.0.0
+     */
+    private function addContainer()
+    {
+        $container = "<streamline-container></streamline-container>";
 
-	/**
-	 * Get data and rewrite URLs.
-	 *
-	 * @date    04/05/2021
-	 * @since   1.0.0
-	 */
-	function getData() {
+        add_action("admin_footer", function () use ($container) {
+            if (self::isAllowed()) {
+                echo $container;
+            }
+        });
+        add_action("wp_footer", function () use ($container) {
+            if (self::isAllowed()) {
+                echo $container;
+            }
+        });
+    }
 
-		$currentSite = '';
-
-		if ( is_multisite() && function_exists( 'get_sites' ) ) {
-			$currentSite = get_sites( [ 'ID' => get_current_blog_id() ] );
-		}
-
-		$favs = get_user_meta( get_current_user_id(), 'streamline_favourites' )[0] ?: [];
-
-		foreach ( $favs as $fav ) {
-			if ( $fav->type === 'menu' ) {
-				$siteId        = $fav->siteId;
-				$adminUrl      = get_admin_url( $siteId );
-				$fav->adminUrl = $adminUrl;
-
-				foreach ( $fav->children as $children ) {
-					foreach ( $children->children as $link ) {
-						$link->adminUrl = $adminUrl;
-						$link->href     = $adminUrl . $link->path;
-					}
-				}
-			}
-			if ( $fav->type === 'networkMenu' ) {
-				$adminUrl      = network_admin_url();
-				$fav->adminUrl = $adminUrl;
-
-				foreach ( $fav->children as $children ) {
-					foreach ( $children->children as $link ) {
-						$link->adminUrl = $adminUrl;
-						$link->href     = $adminUrl . $link->path;
-					}
-				}
-			}
-			if ( $fav->type === 'post' ) {
-				foreach ( $fav->children as $post ) {
-					if ( is_multisite() && function_exists( 'switch_to_blog' ) ) {
-						switch_to_blog( $post->siteId );
-					}
-					$post->guid     = get_the_guid( $post->ID );
-					$post->hrefEdit = base64_encode( get_edit_post_link( $post->ID ) );
-					if ( is_multisite() && function_exists( 'restore_current_blog' ) ) {
-						restore_current_blog();
-					}
-				}
-			}
-		}
-
-		echo '<script id="streamline-data">';
-		echo 'window.streamlineData =';
-		echo json_encode( [
-			'adminUrl'   => admin_url(),
-			'favourites' => json_encode( $favs ),
-			'fav'        => json_encode( get_user_meta( get_current_user_id(), 'streamline' ) ),
-			'network'    => ! is_multisite() ? FALSE : network_admin_url(),
-			'isNetwork'  => is_network_admin(),
-			'path'       => is_multisite() ? $currentSite[0]->path : '/',
-			'siteId'     => get_current_blog_id(),
-			'userId'     => get_current_user_id(),
-		] );
-		echo ';';
-		echo '</script>';
-
-	}
-
-	/**
-	 * Inject data.
-	 *
-	 * @date    04/05/2021
-	 * @since   1.0.0
-	 */
-	private function injectData() {
-
-		add_action( 'admin_footer', [ $this, 'getData' ] );
-		add_action( 'wp_head', [ $this, 'getData' ] );
-
-	}
-
-	/**
-	 * Add container.
-	 *
-	 * @date    04/05/2021
-	 * @since   1.0.0
-	 */
-	private static function addContainer() {
-
-		$container = '<streamline-container></streamline-container>';
-
-		add_action( 'admin_footer', function () use ( $container ) {
-			if ( self::isAllowed() ) {
-				echo $container;
-			}
-		} );
-		add_action( 'wp_footer', function () use ( $container ) {
-			if ( self::isAllowed() ) {
-				echo $container;
-			}
-		} );
-
-	}
-
-	/**
-	 * Construct.
-	 *
-	 * @date    03/05/2021
-	 * @since   1.0.0
-	 */
-	public function __construct() {
-		self::enqueueScripts();
-		self::addScriptTags();
-		self::addCss();
-		self::injectData();
-		self::addContainer();
-	}
-
+    /**
+     * Construct.
+     *
+     * @date    03/05/2021
+     * @since   1.0.0
+     */
+    function __construct()
+    {
+        self::enqueueScripts();
+        self::addScriptTags();
+        self::addCss();
+        self::injectData();
+        self::addContainer();
+    }
 }
-

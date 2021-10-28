@@ -14,5 +14,9 @@ export function getQuery(obj) {
     },
   ];
 
+  if (obj.type === 'post') {
+    stateInternal.entriesPostCurrentPath = obj.path;
+  }
+
   // console.log(stateInternal[`entries${capitalizeFirstLetter(obj.type)}`]);
 }

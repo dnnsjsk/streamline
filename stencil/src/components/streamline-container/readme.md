@@ -47,6 +47,7 @@ graph TD;
   streamline-box --> streamline-search
   streamline-box --> streamline-entries
   streamline-sidebar --> streamline-button
+  streamline-search --> streamline-button
   streamline-entries --> streamline-button
   streamline-entries --> streamline-post
   style streamline-container fill:#f9f,stroke:#333,stroke-width:4px

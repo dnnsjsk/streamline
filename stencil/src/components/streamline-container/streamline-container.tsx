@@ -19,36 +19,49 @@ export class StreamlineContainer {
 
   connectedCallback() {
     stateInternal.visible = this.visible || false;
+    stateInternal.entriesSettingsActive = stateInternal.entriesSettings;
+    stateInternal.entriesSettings[0].children.forEach((item) => {
+      item.children.forEach((itemInner) => {
+        stateInternal.entriesSettingsLoad[itemInner.id] = {
+          default:
+            JSON.parse(stateInternal.data.settings)[itemInner.id]?.default ??
+            stateInternal.entriesSettingsLoad[itemInner.id].default,
+        };
+      });
+    });
+    stateInternal.entriesSettingsSave = stateInternal.entriesSettingsLoad;
 
     if (stateInternal.test) {
       setTestData();
     }
 
     document.addEventListener('keydown', (e) => {
-      const isGutenberg = document.body.classList.contains('block-editor-page');
-
-      if (e.key === 'k' && e.metaKey && !isGutenberg) {
-        e.preventDefault();
-        stateInternal.visible = !stateInternal.visible;
-      }
-
-      if (e.key === 'k' && e.metaKey && e.shiftKey && isGutenberg) {
+      if (e.key === 'k' && (e.metaKey || e.shiftKey)) {
         e.preventDefault();
         stateInternal.visible = !stateInternal.visible;
       }
 
       if (stateInternal.visible) {
-        if (e.key === 'Escape') {
+        if (
+          e.key === 'Escape' &&
+          stateInternal.entriesSettingsLoad.keyExit.default
+        ) {
           e.preventDefault();
           stateInternal.visible = false;
         }
 
-        if (e.key === 'ArrowUp') {
+        if (
+          e.key === 'ArrowUp' &&
+          stateInternal.entriesSettingsLoad.keyNavigation.default
+        ) {
           e.preventDefault();
           this.cycle('up');
         }
 
-        if (e.key === 'ArrowDown') {
+        if (
+          e.key === 'ArrowDown' &&
+          stateInternal.entriesSettingsLoad.keyNavigation.default
+        ) {
           e.preventDefault();
           this.cycle('down');
         }
@@ -98,7 +111,11 @@ export class StreamlineContainer {
           <div class="fixed top-0 left-0 w-full h-full z-[9999999999999999]">
             <div
               tabIndex={-1}
-              class="fixed top-0 left-0 w-full h-full bg-black/90 backdrop-blur-sm"
+              class={`fixed top-0 left-0 w-full h-full bg-black/90 ${
+                stateInternal.entriesSettingsLoad.appearanceBlur.default
+                  ? 'backdrop-blur-sm'
+                  : ''
+              }`}
               onClick={() => (stateInternal.visible = false)}
             />
             <streamline-box />

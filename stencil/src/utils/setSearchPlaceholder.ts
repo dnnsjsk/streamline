@@ -16,5 +16,7 @@ export function setSearchPlaceholder() {
             ? 'Search for a post or filter entries'
             : 'Search for a post'
         }${commands}`
+      : stateLocal.active === 'settings'
+      ? 'Search settings'
       : `Search entries${commands}`;
 }

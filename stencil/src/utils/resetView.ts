@@ -7,7 +7,9 @@ export function resetView() {
   stateInternal.isLoading = false;
   stateInternal.isSlash = false;
   stateInternal.isEnter = false;
-  stateInternal.searchValue = '';
+  if (stateInternal.entriesSettingsLoad.searchResetInput.default) {
+    stateInternal.searchValue = '';
+  }
   setEntries();
   focusSearch();
 }

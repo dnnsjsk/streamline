@@ -1,4 +1,5 @@
 import { createStore } from '@stencil/store';
+import equal from 'fast-deep-equal/es6';
 
 const isTest = document
   .querySelector('streamline-container')
@@ -10,7 +11,7 @@ const { state, dispose, onChange } = createStore({
   class: {
     tag: 'px-2.5 py-1.5 bg-blue-gray-200 text-blue-gray-500 inline-block h-[max-content] leading-1',
   },
-  menus: ['fav', 'menu', 'post'],
+  menus: ['fav', 'menu', 'post', 'settings'],
   menu: {
     fav: {
       name: 'fav',
@@ -22,10 +23,9 @@ const { state, dispose, onChange } = createStore({
     post: {
       name: 'post',
     },
-  },
-  settings: {
-    key: 'k',
-    toggleArrows: true,
+    settings: {
+      name: 'settings',
+    },
   },
   commands: {
     local: {
@@ -34,7 +34,7 @@ const { state, dispose, onChange } = createStore({
         condition: window.streamlineData.network && !isTest,
         name: '/site [name]',
         description: `Display entries from a different site in the network.`,
-        callback: 'get_sites',
+        callback: 'sites',
       },
       network: {
         // @ts-ignore
@@ -56,18 +56,91 @@ const { state, dispose, onChange } = createStore({
   entriesNetworkActive: [],
   entriesPost: [],
   entriesPostActive: [],
+  entriesPostCurrentPath: '',
+  entriesSettings: [
+    {
+      children: [
+        {
+          children: [
+            {
+              id: 'keyNavigation',
+              name: 'Arrow key navigation',
+              nameParent: 'Key shortcuts',
+              label: 'Use up and down arrow keys to navigate between modes',
+            },
+            {
+              id: 'keyExit',
+              name: 'Close with escape',
+              nameParent: 'Key shortcuts',
+              label: 'Use escape key to close app',
+            },
+          ],
+          name: 'Key shortcuts',
+        },
+        {
+          children: [
+            {
+              id: 'searchResetInput',
+              name: 'Reset search',
+              nameParent: 'Searchbar',
+              label: 'Reset input value after switching modes',
+            },
+          ],
+          name: 'Searchbar',
+        },
+        {
+          children: [
+            {
+              id: 'appearanceBlur',
+              name: 'Enable background blur',
+              nameParent: 'Appearance',
+              label:
+                'Enabling the overlay blur can decrease performance on slower machines',
+            },
+          ],
+          name: 'Appearance',
+        },
+      ],
+      type: 'settings',
+    },
+  ],
+  entriesSettingsActive: [],
+  entriesSettingsLoad: {
+    keyNavigation: {
+      default: true,
+    },
+    keyExit: {
+      default: true,
+    },
+    searchResetInput: {
+      default: true,
+    },
+    appearanceBlur: {
+      default: false,
+    },
+  },
+  entriesSettingsSave: {},
+  entriesSettingsHaveChanged: false,
   entriesSite: [],
   isEnter: false,
   isLoading: false,
+  isProcessing: false,
   isSites: false,
   isSlash: false,
-  isProcessing: false,
   searchNoValue: 'No entries found',
   searchPlaceholder: '',
   searchValue: '',
   test: isTest,
   testFull: false,
   visible: false,
+});
+
+onChange('entriesSettingsSave', (value) => {
+  state.entriesSettingsHaveChanged = !equal(value, state.entriesSettingsLoad);
+});
+
+onChange('entriesSettingsLoad', (value) => {
+  state.entriesSettingsHaveChanged = !equal(value, state.entriesSettingsSave);
 });
 
 export {

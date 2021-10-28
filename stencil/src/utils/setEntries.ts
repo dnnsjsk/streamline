@@ -29,7 +29,10 @@ export function setEntries() {
             title: stateInternal.searchNoValue,
             children: [],
             isMultisite: stateInternal.data.network,
-            path: stateInternal.entriesMenuCurrentPath,
+            path:
+              stateLocal.active === 'menu'
+                ? stateInternal.entriesMenuCurrentPath
+                : stateInternal.entriesPostCurrentPath,
           },
         ];
 }

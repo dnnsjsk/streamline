@@ -15,17 +15,18 @@ export class StreamlineSidebar {
   render() {
     return (
       <nav
-        class={`bg-blue-gray-50 h-full w-[var(--sl-side-w)] grid-flow-row grid auto-rows-max border-r border-blue-gray-300`}
+        class={`bg-blue-gray-50 h-full w-[var(--sl-side-w)] flex flex-col border-r border-blue-gray-300 overflow-visible`}
       >
         <streamline-button
           type="primary"
           icon="wordpress"
           onClick={() => (stateInternal.visible = false)}
         />
-        <div class={`grid-flow-row grid auto-rows-max`}>
+        <div class={`flex flex-col h-full`}>
           {Object.values(stateInternal.menu).map((item) => {
             return (
               <streamline-button
+                class={`${item.name === 'settings' ? 'mt-auto' : ''}`}
                 type="sidebar"
                 text={capitalizeFirstLetter(item.name)}
                 icon={item.name}

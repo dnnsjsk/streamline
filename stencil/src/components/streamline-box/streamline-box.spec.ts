@@ -5,7 +5,8 @@ import { StreamlineEntries } from '../streamline-entries/streamline-entries';
 it('Render box', async () => {
   const page = await newSpecPage({
     components: [StreamlineBox, StreamlineEntries],
-    html: `<streamline-box></streamline-box>`,
+    html: `<div id="adminmenuwrap"></div>
+           <streamline-box></streamline-box>`,
   });
   expect(page.root).toEqualHtml(`
 <streamline-box>
@@ -17,10 +18,20 @@ it('Render box', async () => {
             <streamline-entries>
               <mock:shadow-root>
                 <div class="h-full relative">
-                  <div class="absolute backdrop-blur-sm bg-white/50 flex h-[calc(100%-var(--sl-side-w))] items-center justify-center left-0 top-0 w-full z-10">
-                    <svg aria-hidden="true" class="animate-spin h-10 w-10" data-icon="spinner-third" data-prefix="far" focusable="false" role="img" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M460.116 373.846l-20.823-12.022c-5.541-3.199-7.54-10.159-4.663-15.874 30.137-59.886 28.343-131.652-5.386-189.946-33.641-58.394-94.896-95.833-161.827-99.676C261.028 55.961 256 50.751 256 44.352V20.309c0-6.904 5.808-12.337 12.703-11.982 83.556 4.306 160.163 50.864 202.11 123.677 42.063 72.696 44.079 162.316 6.031 236.832-3.14 6.148-10.75 8.461-16.728 5.01z" fill="currentColor"></path>
-                    </svg>
+                  <div class="bg-white focus-none h-[calc(100%-var(--sl-side-w))] inner lg:px-8 overflow-x-hidden overflow-y-scroll pb-6 px-3 relative sm:px-6 w-full" tabindex="-1">
+                    <div>
+                      <div class="-top-2 bg-white border-b border-blue-gray-900 border-dotted flex flex-wrap items-center justify-between lg:-top-4 lg:pt-8 mb-4 pb-1 pt-5 sm:-top-2 sm:pb-2 sm:pt-6 sticky z-10">
+                        <h1 class="font-medium mr-6 sm:text-2xl text-blue-gray-900 text-xl">
+                          Admin menu
+                        </h1>
+                        <div class="divide-x flex flex-wrap space-x-4">
+                          <span class="font-medium text-gray-700 text-sm">
+                            Showing 0 results
+                          </span>
+                        </div>
+                      </div>
+                      <ul></ul>
+                    </div>
                   </div>
                 </div>
               </mock:shadow-root>

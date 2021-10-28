@@ -10,7 +10,7 @@ export function getMenu(obj = {} as any) {
   const isAdmin =
     document.querySelector('#adminmenuwrap') && !obj.adminUrl && !obj.network;
   const isNetwork = obj.network || stateInternal.data.isNetwork;
-  const isMultisite = stateInternal.data.network;
+  const isMultisite = !!stateInternal.data.network;
   const adminUrl =
     obj.adminUrl ||
     (isNetwork ? stateInternal.data.network : stateInternal.data.adminUrl);
@@ -82,7 +82,7 @@ export function getMenu(obj = {} as any) {
   } else {
     stateInternal.isLoading = true;
     fetch(adminUrl)
-      .then((response) => response.text())
+      .then((response) => response.text && response.text())
       .then((data) => {
         const parser = new DOMParser();
         const html = parser.parseFromString(data, 'text/html');
@@ -91,7 +91,8 @@ export function getMenu(obj = {} as any) {
         stateLocal.active = 'menu';
 
         // console.log(stateInternal.entriesMenu);
-      });
+      })
+      .catch((error) => console.log(error));
     // @ts-ignore
     // eslint-disable-next-line no-undef
     /*

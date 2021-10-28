@@ -5,6 +5,7 @@ import { getMenu } from '../../utils/getMenu';
 import { stateLocal } from '../../store/local';
 import { setEntries } from '../../utils/setEntries';
 import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
+import { Loader } from '../../elements/Loader';
 
 /**
  * Entries.
@@ -26,7 +27,7 @@ export class StreamlineEntries {
   @Element() el: HTMLStreamlineEntriesElement;
 
   connectedCallback() {
-    if (stateLocal.active !== 'fav' && stateLocal.active !== 'post') {
+    if (stateLocal.active === 'menu') {
       this[`g${stateLocal.active}`]();
     }
     setEntries();
@@ -112,12 +113,15 @@ export class StreamlineEntries {
                   .length === 0 &&
                 !item.queryValue
               ? 'No query, search for a post in the search bar'
+              : stateLocal.active === 'settings'
+              ? 'Settings'
               : 'No results'
           }`}
         />
         <div class={`flex flex-wrap space-x-4 divide-x`}>
           {Object.values([
             {
+              type: 'text',
               text: results,
               condition:
                 stateInternal.isSites ||
@@ -125,16 +129,32 @@ export class StreamlineEntries {
                 stateLocal.active === 'fav' ||
                 (stateLocal.active === 'menu' && !stateInternal.isSlash),
             },
+            {
+              type: 'button',
+              text: 'Save',
+              condition: stateLocal.active === 'settings',
+            },
           ]).map((itemInner, itemIndex) => {
-            return (
-              itemInner.condition && (
-                <span
-                  class={`text-sm font-medium text-gray-700 ${
-                    itemIndex === 0 ? '' : 'pl-4'
-                  }`}
-                >
-                  {itemInner.text}
-                </span>
+            return itemInner.condition && itemInner.type === 'text' ? (
+              <span
+                class={`text-sm font-medium text-gray-700 ${
+                  itemIndex === 0 ? '' : 'pl-4'
+                }`}
+              >
+                {itemInner.text}
+              </span>
+            ) : (
+              itemInner.condition && itemInner.type === 'button' && (
+                <streamline-button
+                  class={
+                    stateInternal.entriesSettingsHaveChanged
+                      ? ''
+                      : 'opacity-25 pointer-events-none'
+                  }
+                  type="saveSettings"
+                  styling="primary"
+                  text={itemInner.text}
+                />
               )
             );
           })}
@@ -211,7 +231,7 @@ export class StreamlineEntries {
                           getMenu(obj);
                         }
                       }}
-                      class={`${this.tag} focus-gray hover:text-blue-gray-50 hover:bg-blue-gray-900 hover:border-blue-gray-900`}
+                      class={`${this.tag} focus-white-out hover:text-blue-gray-50 hover:bg-blue-gray-900 hover:border-blue-gray-900`}
                     >
                       {itemInner.domain}
                     </div>
@@ -272,7 +292,7 @@ export class StreamlineEntries {
                             return (
                               <li key={indexSub} class={`mt-4 mr-4`}>
                                 <streamline-button
-                                  type="main"
+                                  type="menu"
                                   adminUrl={item.adminUrl}
                                   href={itemSub.href}
                                   index={item.index}
@@ -327,6 +347,102 @@ export class StreamlineEntries {
     });
   };
 
+  private settingsOnChange = (id, type, value) => {
+    stateInternal.entriesSettingsSave = {
+      ...stateInternal.entriesSettingsSave,
+      ...{
+        [id]: {
+          ...stateInternal.entriesSettingsSave[id],
+          ...{
+            [type]: value,
+          },
+        },
+      },
+    };
+  };
+
+  // @ts-ignore
+  private settings = () => {
+    return Object.values(stateInternal.entriesSettingsActive).map((item) => {
+      return (
+        <div>
+          {StreamlineEntries.getHeader(item)}
+          <ul class={`space-y-4`}>
+            {Object.values(item.children as unknown).map(
+              (itemInner, indexInner) => {
+                return (
+                  <li
+                    key={indexInner}
+                    class={`${
+                      indexInner === 0 ? this.border : ''
+                    } flex flex-col`}
+                  >
+                    <h2
+                      class={`${this.h2} !text-lg mt-4 space-y-2 mb-6 inline-block leading-1 pb-2 border-b border-blue-gray-200`}
+                    >
+                      {itemInner.name}
+                    </h2>
+                    {itemInner.children && (
+                      <ul class={`flex flex-col space-y-5`}>
+                        {Object.values(itemInner.children as unknown).map(
+                          (itemSub, indexSub) => {
+                            return (
+                              <li
+                                key={indexSub}
+                                class={`flex items-center mr-4`}
+                              >
+                                <label
+                                  htmlFor={`setting-${itemSub.id}`}
+                                  class={`grid grid-cols-[75px,1fr] gap-6 select-none group ${
+                                    itemSub.choices ? '' : 'cursor-pointer'
+                                  }`}
+                                >
+                                  <div class="relative mt-0.5 inline-block h-[max-content] w-[max-content] focus-in-white-out">
+                                    <input
+                                      type="checkbox"
+                                      id={`setting-${itemSub.id}`}
+                                      class="sr-only peer"
+                                      checked={
+                                        stateInternal.entriesSettingsLoad[
+                                          itemSub.id
+                                        ].default
+                                      }
+                                      onInput={(e) =>
+                                        this.settingsOnChange(
+                                          itemSub.id,
+                                          'default',
+                                          (e.target as HTMLInputElement).checked
+                                        )
+                                      }
+                                    />
+                                    <div class="block bg-blue-gray-300 w-14 h-5 transition ease-in-out duration-200 group-hover:bg-blue-gray-400 peer-checked:bg-blue-500" />
+                                    <div class="dot absolute left-1 top-1 bg-white w-3 h-3 transition ease-in-out duration-200" />
+                                  </div>
+                                  <div>
+                                    <div class="text-base text-blue-gray-900 font-medium">
+                                      {itemSub.name}
+                                    </div>
+                                    <div class="mt-0.5 text-xs text-blue-gray-500">
+                                      {itemSub.label}
+                                    </div>
+                                  </div>
+                                </label>
+                              </li>
+                            );
+                          }
+                        )}
+                      </ul>
+                    )}
+                  </li>
+                );
+              }
+            )}
+          </ul>
+        </div>
+      );
+    });
+  };
+
   render() {
     return (
       <div class={`h-full relative`}>
@@ -334,26 +450,12 @@ export class StreamlineEntries {
           <div
             class={`w-full h-[calc(100%-var(--sl-side-w))] flex items-center justify-center bg-white/50 absolute top-0 left-0 backdrop-blur-sm z-10`}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-              focusable="false"
-              data-prefix="far"
-              data-icon="spinner-third"
-              class={`w-10 h-10 animate-spin`}
-              role="img"
-              viewBox="0 0 512 512"
-            >
-              <path
-                fill="currentColor"
-                d="M460.116 373.846l-20.823-12.022c-5.541-3.199-7.54-10.159-4.663-15.874 30.137-59.886 28.343-131.652-5.386-189.946-33.641-58.394-94.896-95.833-161.827-99.676C261.028 55.961 256 50.751 256 44.352V20.309c0-6.904 5.808-12.337 12.703-11.982 83.556 4.306 160.163 50.864 202.11 123.677 42.063 72.696 44.079 162.316 6.031 236.832-3.14 6.148-10.75 8.461-16.728 5.01z"
-              />
-            </svg>
+            <Loader sm={false} />
           </div>
         ) : (
           <div
             tabindex={-1}
-            class={`focus-none inner pb-3 sm:pb-6 relative px-3 h-[calc(100%-var(--sl-side-w))] overflow-y-scroll overflow-x-hidden w-full bg-white sm:px-6 lg:px-8 ${
+            class={`focus-none inner pb-6 relative px-3 h-[calc(100%-var(--sl-side-w))] overflow-y-scroll overflow-x-hidden w-full bg-white sm:px-6 lg:px-8 ${
               stateInternal.isProcessing ? 'pointer-events-none opacity-50' : ''
             }`}
           >

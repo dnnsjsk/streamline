@@ -4,6 +4,7 @@ import { setEntries } from './setEntries';
 import { merge, unset, get, compact } from 'lodash-es';
 import { hideAll } from 'tippy.js';
 import { capitalizeFirstLetter } from './capitalizeFirstLetter';
+import { fetchAjax } from './fetchAjax';
 
 export function setFavourite(obj) {
   const arr = [...stateInternal.entriesFav];
@@ -82,25 +83,10 @@ export function setFavourite(obj) {
   // console.log(stateInternal.entriesFav);
 
   if (!stateInternal.test) {
-    stateInternal.isProcessing = true;
-
-    // @ts-ignore
-    // eslint-disable-next-line no-undef
-    const streamline = window.streamline || false;
-    fetch(streamline.ajax, {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: new Headers({
-        'Content-Type': 'application/x-www-form-urlencoded',
-      }),
-      body: `action=streamlineQuery&callback=fav&query=${JSON.stringify(
-        stateInternal.entriesFav
-        // @ts-ignore
-        // eslint-disable-next-line no-undef
-      )}&nonce=${streamline.nonce}&userId=${String(stateInternal.data.userId)}`,
-    })
-      .then((response) => response.json())
-      .then(() => (stateInternal.isProcessing = false));
+    fetchAjax({
+      type: 'favourites',
+      query: stateInternal.entriesFav,
+    });
   }
 
   obj.callback && obj.callback();

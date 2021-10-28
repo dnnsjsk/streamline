@@ -75,7 +75,6 @@ export class StreamlinePost {
           <div class={`flex flex-wrap items-center`}>
             <a
               href={stateInternal.test ? '#' : this.hrefView}
-              target="_blank"
               class={`focus-white inline-flex max-w-max font-semibold flex-col px-2.5 text-base py-2 text-blue-600 hover:underline`}
             >
               {this.postTitle}

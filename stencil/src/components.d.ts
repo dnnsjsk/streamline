@@ -19,6 +19,7 @@ export namespace Components {
         "indexSub": number;
         "path": string;
         "siteId": number;
+        "styling": string;
         "text": string;
         "type": string;
         "typeSub": string;
@@ -112,6 +113,7 @@ declare namespace LocalJSX {
         "indexSub"?: number;
         "path"?: string;
         "siteId"?: number;
+        "styling"?: string;
         "text"?: string;
         "type"?: string;
         "typeSub"?: string;
