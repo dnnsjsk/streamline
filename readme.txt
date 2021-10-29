@@ -15,6 +15,9 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.15 =
+* Fix: bundle assets correctly
+
 = 1.0.14 =
 * Fix: posts not being added to favourites when post_content contains certain characters
 
