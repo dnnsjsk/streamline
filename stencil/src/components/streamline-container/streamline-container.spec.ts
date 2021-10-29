@@ -46,24 +46,20 @@ describe('Key press should', function () {
     stateInternal.visible = true;
     const page = await newSpecPage({
       components: [StreamlineContainer],
-      html: `<streamline-container></streamline-container>`,
+      html: `<streamline-container mac="true"></streamline-container>`,
     });
     const event = new KeyboardEvent('keydown', { metaKey: true, key: 'k' });
     page.doc.dispatchEvent(event);
     await page.waitForChanges();
     expect(stateInternal.visible).toBe(true);
   });
-  it('open app (cmd + shift + k)', async () => {
+  it('open app (ctrl + k)', async () => {
     stateInternal.visible = true;
     const page = await newSpecPage({
       components: [StreamlineContainer],
       html: `<streamline-container></streamline-container>`,
     });
-    const event = new KeyboardEvent('keydown', {
-      metaKey: true,
-      shiftKey: true,
-      key: 'k',
-    });
+    const event = new KeyboardEvent('keydown', { ctrlKey: true, key: 'k' });
     page.doc.dispatchEvent(event);
     await page.waitForChanges();
     expect(stateInternal.visible).toBe(true);

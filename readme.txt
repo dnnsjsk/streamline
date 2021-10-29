@@ -15,6 +15,9 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.16 =
+* Fix: use 'CTRL' + 'K' to open app on Windows
+
 = 1.0.15 =
 * Fix: bundle assets correctly
 

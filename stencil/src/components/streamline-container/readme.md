@@ -7,6 +7,7 @@
 
 | Property  | Attribute | Description | Type      | Default     |
 | --------- | --------- | ----------- | --------- | ----------- |
+| `mac`     | `mac`     |             | `boolean` | `false`     |
 | `visible` | `visible` |             | `boolean` | `undefined` |
 
 

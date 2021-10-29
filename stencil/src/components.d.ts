@@ -25,6 +25,7 @@ export namespace Components {
         "typeSub": string;
     }
     interface StreamlineContainer {
+        "mac": boolean;
         "toggle": () => Promise<void>;
         "toggleTest": () => Promise<void>;
         "visible": boolean;
@@ -119,6 +120,7 @@ declare namespace LocalJSX {
         "typeSub"?: string;
     }
     interface StreamlineContainer {
+        "mac"?: boolean;
         "visible"?: boolean;
     }
     interface StreamlineEntries {

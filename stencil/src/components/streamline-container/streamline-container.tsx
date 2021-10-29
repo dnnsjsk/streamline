@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import { Component, h, Prop, Method, Host } from '@stencil/core';
+import { Component, h, Prop, Method, Host, Element } from '@stencil/core';
 import { stateInternal } from '../../store/internal';
 import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
 import { setTestData } from '../../utils/setTestData';
@@ -14,10 +14,16 @@ import { stateLocal } from '../../store/local';
   styleUrl: 'streamline-container.scss',
 })
 export class StreamlineContainer {
+  // eslint-disable-next-line no-undef
+  @Element() el: HTMLStreamlineContainerElement;
+
+  @Prop({ mutable: true }) mac = false;
   // eslint-disable-next-line @stencil/strict-mutable
   @Prop({ reflect: true, mutable: true }) visible: boolean;
 
   connectedCallback() {
+    this.mac = this.mac || navigator.userAgent.indexOf('Mac OS X') !== -1;
+
     stateInternal.visible = this.visible || false;
     stateInternal.entriesSettingsActive = stateInternal.entriesSettings;
     stateInternal.entriesSettings[0].children.forEach((item) => {
@@ -36,7 +42,7 @@ export class StreamlineContainer {
     }
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'k' && (e.metaKey || e.shiftKey)) {
+      if (e.key === 'k' && (this.mac ? e.metaKey : e.ctrlKey)) {
         e.preventDefault();
         stateInternal.visible = !stateInternal.visible;
       }
