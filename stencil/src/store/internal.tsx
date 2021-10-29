@@ -66,7 +66,7 @@ const { state, dispose, onChange } = createStore({
               id: 'keyNavigation',
               name: 'Arrow key navigation',
               nameParent: 'Key shortcuts',
-              label: 'Use up and down arrow keys to navigate between modes',
+              label: 'Use up and down arrow keys to navigate between tabs',
             },
             {
               id: 'keyExit',
@@ -83,7 +83,7 @@ const { state, dispose, onChange } = createStore({
               id: 'searchResetInput',
               name: 'Reset search',
               nameParent: 'Searchbar',
-              label: 'Reset input value after switching modes',
+              label: 'Resets search value after switching tabs',
             },
           ],
           name: 'Searchbar',
