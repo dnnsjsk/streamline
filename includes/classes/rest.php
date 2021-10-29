@@ -100,6 +100,7 @@ class Rest
             $arr[$index]->name = $post->post_title;
             $arr[$index]->siteId = get_current_blog_id();
             $arr[$index]->sitePath = $path;
+            unset($arr[$index]->post_content);
         }
 
         $newArr = [];

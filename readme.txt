@@ -15,6 +15,9 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.14 =
+* Fix: posts not being added to favourites when post_content contains certain characters
+
 = 1.0.13 =
 * Enhancement: adjust focus styles
 * Enhancement: make backdrop not blurry by default

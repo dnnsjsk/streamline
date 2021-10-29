@@ -1,1 +1,17 @@
-:root{--sl-focus-color:#2563eb;--sl-border-radius:0.25rem;--sl-side-w:48px}@media (min-width: 640px){:root{--sl-side-w:64px}}streamline-container{position:absolute;pointer-events:none;top:0;left:0}
+:root {
+  --sl-focus-color: #2563eb;
+  --sl-border-radius: 0.25rem;
+  --sl-side-w: 48px;
+}
+@media (min-width: 640px) {
+  :root {
+    --sl-side-w: 64px;
+  }
+}
+
+streamline-container {
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+}
