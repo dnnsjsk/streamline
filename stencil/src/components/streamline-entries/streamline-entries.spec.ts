@@ -111,7 +111,7 @@ describe('Render entries with', function () {
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
       const lengthLi = el.querySelectorAll('li').length;
-      const results = el.querySelector('h1 + div span').innerHTML.trim();
+      const results = el.querySelector('.results-amount').innerHTML.trim();
       expect(lengthLi).toBe(49);
       expect(results).toBe('Showing 38 results');
     });
@@ -124,7 +124,7 @@ describe('Render entries with', function () {
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
       const lengthLi = el.querySelectorAll('li').length;
-      const results = el.querySelector('h1 + div span').innerHTML.trim();
+      const results = el.querySelector('.results-amount').innerHTML.trim();
       expect(lengthLi).toBe(5);
       expect(results).toBe('Showing 3 results');
     });
@@ -137,7 +137,7 @@ describe('Render entries with', function () {
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
       const lengthLi = el.querySelectorAll('li').length;
-      const results = el.querySelector('h1 + div span').innerHTML.trim();
+      const results = el.querySelector('.results-amount').innerHTML.trim();
       expect(lengthLi).toBe(2);
       expect(results).toBe('Showing 1 result');
     });
@@ -150,7 +150,7 @@ describe('Render entries with', function () {
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
       const lengthLi = el.querySelectorAll('li').length;
-      const results = el.querySelector('h1 + div span').innerHTML.trim();
+      const results = el.querySelector('.results-amount').innerHTML.trim();
       expect(lengthLi).toBe(0);
       expect(results).toBe('Showing 0 results');
     });
@@ -194,7 +194,7 @@ describe('Render entries with', function () {
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
       const lengthLi = el.querySelectorAll('li').length;
-      const results = el.querySelector('h1 + div span').innerHTML.trim();
+      const results = el.querySelector('.results-amount').innerHTML.trim();
       expect(lengthLi).toBe(2);
       expect(results).toBe('Showing 2 results');
     });
@@ -207,7 +207,7 @@ describe('Render entries with', function () {
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
       const lengthLi = el.querySelectorAll('li').length;
-      const results = el.querySelector('h1 + div span').innerHTML.trim();
+      const results = el.querySelector('.results-amount').innerHTML.trim();
       expect(lengthLi).toBe(1);
       expect(results).toBe('Showing 1 result');
     });
@@ -220,7 +220,7 @@ describe('Render entries with', function () {
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
       const lengthLi = el.querySelectorAll('li').length;
-      const results = el.querySelector('h1 + div span').innerHTML.trim();
+      const results = el.querySelector('.results-amount').innerHTML.trim();
       expect(lengthLi).toBe(0);
       expect(results).toBe('Showing 0 results');
     });

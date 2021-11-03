@@ -51,6 +51,8 @@ graph TD;
   streamline-search --> streamline-button
   streamline-entries --> streamline-button
   streamline-entries --> streamline-post
+  streamline-post --> streamline-input
+  streamline-post --> streamline-button
   style streamline-container fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

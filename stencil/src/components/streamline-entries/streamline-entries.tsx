@@ -6,6 +6,8 @@ import { stateLocal } from '../../store/local';
 import { setEntries } from '../../utils/setEntries';
 import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
 import { Loader } from '../../elements/Loader';
+import { IconMenu, IconPost } from '../../icons';
+import { fetchAjax } from '../../utils/fetchAjax';
 
 /**
  * Entries.
@@ -73,51 +75,68 @@ export class StreamlineEntries {
 
     return (
       <div
-        class={`pt-5 flex flex-wrap mb-4 pb-1 flex justify-between items-center sticky -top-2 bg-white z-10 border-b border-dotted border-blue-gray-900 sm:pt-6 sm:pb-2 sm:-top-2 lg:pt-8 lg:-top-4`}
+        class={`${
+          stateLocal.active === 'settings'
+            ? 'flex-row justify-between'
+            : 'flex-col sm:justify-between'
+        } min-h-[60px] pt-5 flex items-start flex-wrap mb-1 pb-1.5 flex sticky -top-2 bg-white z-10 border-b border-dotted border-blue-gray-900 sm:min-h-[75px] sm:mb-4 sm:flex-row sm:items-center sm:pt-6 sm:pb-2 sm:-top-2 lg:pt-8 lg:-top-4`}
       >
-        <h1
-          class={`text-blue-gray-900 font-medium text-xl mr-6 sm:text-2xl`}
-          innerHTML={`${
-            stateInternal.isSlash && !stateInternal.isSites
-              ? item.title
-              : item.type === 'networkMenu' ||
-                (stateInternal.entriesMenuIsNetwork &&
-                  stateLocal.active === 'menu' &&
-                  !stateInternal.isSites)
-              ? 'Network admin'
-              : (stateLocal.active === 'menu' && !stateInternal.isSlash) ||
-                item.type === 'menu' ||
-                item.type === 'networkMenu'
-              ? 'Admin menu' + path
-              : (stateLocal.active === 'post' || item.type === 'site') &&
-                stateLocal.active !== 'fav' &&
-                stateInternal[
-                  `entries${stateLocal.active === 'post' ? 'Post' : 'Site'}`
-                ][0]?.queryValue
-              ? `${
-                  stateInternal.isSites
-                    ? 'Site'
-                    : capitalizeFirstLetter(stateLocal.active)
-                }s for: ` +
-                `<span class="text-gray-400 italic">${
+        <div class={`flex items-center flex-row`}>
+          {stateLocal.active === 'fav' &&
+            stateInternal.entriesFavActive[0].children.length !== 0 && (
+              <div
+                class={`scale-90 rounded-full flex-shrink-0 bg-blue-gray-100 text-gray-500 border border-blue-gray-200 w-8 h-8 flex items-center justify-center p-2 mr-3`}
+              >
+                {(item.type === 'menu' || item.type === 'networkMenu') && (
+                  <IconMenu />
+                )}
+                {item.type === 'post' && <IconPost />}
+              </div>
+            )}
+          <h1
+            class={`text-blue-gray-900 font-medium text-xl mr-6`}
+            innerHTML={`${
+              stateInternal.isSlash && !stateInternal.isSites
+                ? item.title
+                : item.type === 'networkMenu' ||
+                  (stateInternal.entriesMenuIsNetwork &&
+                    stateLocal.active === 'menu' &&
+                    !stateInternal.isSites)
+                ? 'Network admin'
+                : (stateLocal.active === 'menu' && !stateInternal.isSlash) ||
+                  item.type === 'menu' ||
+                  item.type === 'networkMenu'
+                ? 'Admin menu' + path
+                : (stateLocal.active === 'post' || item.type === 'site') &&
+                  stateLocal.active !== 'fav' &&
                   stateInternal[
                     `entries${stateLocal.active === 'post' ? 'Post' : 'Site'}`
                   ][0]?.queryValue
-                }</span>` +
-                path
-              : (item.type === 'post' || item.type === 'site') &&
-                stateLocal.active === 'fav'
-              ? `${capitalizeFirstLetter(item.type)}s` + path
-              : stateLocal.active === 'post' &&
-                Object.values(stateInternal.entriesPostActive[0].children)
-                  .length === 0 &&
-                !item.queryValue
-              ? 'No query, search for a post in the search bar'
-              : stateLocal.active === 'settings'
-              ? 'Settings'
-              : 'No results'
-          }`}
-        />
+                ? `${
+                    stateInternal.isSites
+                      ? 'Site'
+                      : capitalizeFirstLetter(stateLocal.active)
+                  }s for: ` +
+                  `<span class="text-gray-400 italic">${
+                    stateInternal[
+                      `entries${stateLocal.active === 'post' ? 'Post' : 'Site'}`
+                    ][0]?.queryValue
+                  }</span>` +
+                  path
+                : (item.type === 'post' || item.type === 'site') &&
+                  stateLocal.active === 'fav'
+                ? `${capitalizeFirstLetter(item.type)}s` + path
+                : stateLocal.active === 'post' &&
+                  Object.values(stateInternal.entriesPostActive[0].children)
+                    .length === 0 &&
+                  !item.queryValue
+                ? 'No query, search for a post in the search bar'
+                : stateLocal.active === 'settings'
+                ? 'Settings'
+                : 'No results'
+            }`}
+          />
+        </div>
         <div class={`flex flex-wrap space-x-4 divide-x`}>
           {Object.values([
             {
@@ -133,11 +152,28 @@ export class StreamlineEntries {
               type: 'button',
               text: 'Save',
               condition: stateLocal.active === 'settings',
+              onClick: () => {
+                if (!stateInternal.test) {
+                  fetchAjax({
+                    type: 'settings',
+                    query: stateInternal.entriesSettingsSave,
+                    callback: () => {
+                      // @ts-ignore
+                      stateInternal.entriesSettingsLoad =
+                        stateInternal.entriesSettingsSave;
+                    },
+                  });
+                } else {
+                  // @ts-ignore
+                  stateInternal.entriesSettingsLoad =
+                    stateInternal.entriesSettingsSave;
+                }
+              },
             },
           ]).map((itemInner, itemIndex) => {
             return itemInner.condition && itemInner.type === 'text' ? (
               <span
-                class={`text-sm font-medium text-gray-700 ${
+                class={`results-amount text-xs mt-1.5 sm:my-1.5 font-medium text-gray-700 sm:text-sm ${
                   itemIndex === 0 ? '' : 'pl-4'
                 }`}
               >
@@ -146,11 +182,9 @@ export class StreamlineEntries {
             ) : (
               itemInner.condition && itemInner.type === 'button' && (
                 <streamline-button
-                  class={
-                    stateInternal.entriesSettingsHaveChanged
-                      ? ''
-                      : 'opacity-25 pointer-events-none'
-                  }
+                  onClick={itemInner.onClick}
+                  tabindex={stateInternal.entriesSettingsHaveChanged ? 0 : -1}
+                  invalid={!stateInternal.entriesSettingsHaveChanged}
                   type="saveSettings"
                   styling="primary"
                   text={itemInner.text}
@@ -328,7 +362,7 @@ export class StreamlineEntries {
           <ul>
             {Object.values(item.children as unknown).map((itemInner) => {
               return (
-                <li class={`${this.border} flex flex-col pt-4 pb-3`}>
+                <li class={`${this.border} flex flex-col py-3`}>
                   <streamline-post
                     href-edit={itemInner.hrefEdit}
                     href-view={itemInner.guid}

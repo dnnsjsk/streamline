@@ -8,6 +8,10 @@ global.atob = jest.fn(() => {
   return '';
 }) as jest.Mock;
 
+global.fetchAjax = jest.fn(() => {
+  return '';
+}) as jest.Mock;
+
 global.DOMParser = jest.fn(() => {
   return '';
 }) as jest.Mock;

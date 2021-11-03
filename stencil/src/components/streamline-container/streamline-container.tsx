@@ -18,6 +18,7 @@ export class StreamlineContainer {
   @Element() el: HTMLStreamlineContainerElement;
 
   @Prop({ mutable: true }) mac = false;
+
   // eslint-disable-next-line @stencil/strict-mutable
   @Prop({ reflect: true, mutable: true }) visible: boolean;
 

@@ -15,6 +15,13 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.17 =
+* Enhancement: add icons to headers in favourite mode
+* Enhancement: always keep favourites up to date
+* Enhancement: make header text smaller
+* Enhancement: minor spacing fixes
+* New: post quick edit
+
 = 1.0.16 =
 * Fix: use 'CTRL' + 'K' to open app on Windows
 

@@ -153,10 +153,14 @@ class Init
                     if (is_multisite() && function_exists("switch_to_blog")) {
                         switch_to_blog($post->siteId);
                     }
-                    $post->guid = get_the_guid($post->ID);
+                    $freshPost = get_post($post->ID);
+                    foreach ($freshPost as $k => $v) {
+                        $post->$k = $v;
+                    }
                     $post->hrefEdit = base64_encode(
                         get_edit_post_link($post->ID)
                     );
+                    $post->name = $post->post_title;
                     if (
                         is_multisite() &&
                         function_exists("restore_current_blog")

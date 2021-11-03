@@ -2,6 +2,8 @@
 import { Component, h } from '@stencil/core';
 import { stateInternal } from '../../store/internal';
 import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
+import { stateLocal } from '../../store/local';
+import { getMenu } from '../../utils/getMenu';
 
 /**
  * Sidebar.
@@ -12,6 +14,17 @@ import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
   styleUrl: 'streamline-sidebar.scss',
 })
 export class StreamlineSidebar {
+  private handleClick = (name) => {
+    stateLocal.active = name;
+
+    if (
+      stateLocal.active === 'menu' &&
+      stateInternal.entriesMenu.length === 0
+    ) {
+      getMenu();
+    }
+  };
+
   render() {
     return (
       <nav
@@ -26,6 +39,7 @@ export class StreamlineSidebar {
           {Object.values(stateInternal.menu).map((item) => {
             return (
               <streamline-button
+                onClick={() => this.handleClick(item.name)}
                 class={`${item.name === 'settings' ? 'mt-auto' : ''}`}
                 type="sidebar"
                 text={capitalizeFirstLetter(item.name)}

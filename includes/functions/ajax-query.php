@@ -12,12 +12,24 @@ function streamlineQuery()
         $type = $_POST["type"];
         $query = $_POST["query"];
         $userId = intval($_POST["userId"]);
-
         $arr = json_decode(stripslashes(html_entity_decode($query)));
 
-        delete_user_meta($userId, "streamline_" . $type);
-        update_user_meta($userId, "streamline_" . $type, $arr);
-
+        if ($type !== "post") {
+            delete_user_meta($userId, "streamline_" . $type);
+            update_user_meta($userId, "streamline_" . $type, $arr);
+        } else {
+            if (is_multisite() && function_exists("switch_to_blog")) {
+                switch_to_blog($arr->siteId);
+            }
+            wp_update_post([
+                "ID" => $arr->postId,
+                "post_title" => $arr->values->post_title,
+                "post_name" => $arr->values->post_name,
+            ]);
+            if (is_multisite() && function_exists("restore_current_blog")) {
+                restore_current_blog();
+            }
+        }
         wp_send_json_success("success");
     }
     die();

@@ -6,7 +6,7 @@
     "build": "stencil build --docs",
     "start:stencil": "stencil build --dev --watch --serve",
     "start:bs": "browser-sync start --proxy 'https://fabrikat.local/harmoni/wp-admin/options-reading.php' --files './../assets/components/build/*.js' -w",
-    "test:unit": "stencil test --spec",
+    "test:unit": "stencil test --spec --unhandled-rejection=strict",
     "test:screen": "stencil test --e2e --screenshot"
   },
   "devDependencies": {

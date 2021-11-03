@@ -17,9 +17,12 @@ export function fetchAjax(obj) {
       // eslint-disable-next-line no-undef
     )}&nonce=${streamline.nonce}&userId=${String(stateInternal.data.userId)}`,
   })
-    .then((response) => response.json())
+    .then((response) => response && response.json())
     .then(() => {
       stateInternal.isProcessing = false;
       obj.callback && obj.callback();
+    })
+    .catch(() => {
+      console.log();
     });
 }

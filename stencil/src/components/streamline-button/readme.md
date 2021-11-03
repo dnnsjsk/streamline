@@ -15,6 +15,7 @@
 | `index`      | `index`       |             | `number`  | `undefined` |
 | `indexInner` | `index-inner` |             | `number`  | `undefined` |
 | `indexSub`   | `index-sub`   |             | `number`  | `undefined` |
+| `invalid`    | `invalid`     |             | `boolean` | `undefined` |
 | `path`       | `path`        |             | `string`  | `undefined` |
 | `siteId`     | `site-id`     |             | `number`  | `undefined` |
 | `styling`    | `styling`     |             | `string`  | `undefined` |
@@ -28,6 +29,7 @@
 ### Used by
 
  - [streamline-entries](../streamline-entries)
+ - [streamline-post](../streamline-post)
  - [streamline-search](../streamline-search)
  - [streamline-sidebar](../streamline-sidebar)
 
@@ -35,6 +37,7 @@
 ```mermaid
 graph TD;
   streamline-entries --> streamline-button
+  streamline-post --> streamline-button
   streamline-search --> streamline-button
   streamline-sidebar --> streamline-button
   style streamline-button fill:#f9f,stroke:#333,stroke-width:4px

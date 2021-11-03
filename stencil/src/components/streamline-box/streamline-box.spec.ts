@@ -20,12 +20,14 @@ it('Render box', async () => {
                 <div class="h-full relative">
                   <div class="bg-white focus-none h-[calc(100%-var(--sl-side-w))] inner lg:px-8 overflow-x-hidden overflow-y-scroll pb-6 px-3 relative sm:px-6 w-full" tabindex="-1">
                     <div>
-                      <div class="-top-2 bg-white border-b border-blue-gray-900 border-dotted flex flex-wrap items-center justify-between lg:-top-4 lg:pt-8 mb-4 pb-1 pt-5 sm:-top-2 sm:pb-2 sm:pt-6 sticky z-10">
-                        <h1 class="font-medium mr-6 sm:text-2xl text-blue-gray-900 text-xl">
-                          Admin menu
-                        </h1>
+                      <div class="-top-2 bg-white border-b border-blue-gray-900 border-dotted flex flex-col flex-wrap items-start lg:-top-4 lg:pt-8 mb-1 min-h-[60px] pb-1.5 pt-5 sm:-top-2 sm:flex-row sm:items-center sm:justify-between sm:mb-4 sm:min-h-[75px] sm:pb-2 sm:pt-6 sticky z-10">
+                        <div class="flex flex-row items-center">
+                          <h1 class="font-medium mr-6 text-blue-gray-900 text-xl">
+                            Admin menu
+                          </h1>
+                        </div>
                         <div class="divide-x flex flex-wrap space-x-4">
-                          <span class="font-medium text-gray-700 text-sm">
+                          <span class="font-medium mt-1.5 results-amount sm:my-1.5 sm:text-sm text-gray-700 text-xs">
                             Showing 0 results
                           </span>
                         </div>
