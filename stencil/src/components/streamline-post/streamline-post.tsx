@@ -92,18 +92,23 @@ export class StreamlinePost {
               childrenPath: ['children'],
             }
           );
-          const currentPath = path.context['_item'].strPath;
-          set(newFavs, `${currentPath}.post_title`, obj.values['post_title']);
-          set(newFavs, `${currentPath}.post_name`, obj.values['post_name']);
+          if (path) {
+            const currentPath = path.context['_item'].strPath;
+            set(newFavs, `${currentPath}.name`, obj.values['post_title']);
+            set(newFavs, `${currentPath}.post_title`, obj.values['post_title']);
+            set(newFavs, `${currentPath}.post_name`, obj.values['post_name']);
 
-          stateInternal[item] = newFavs;
+            stateInternal[item] = newFavs;
+          }
         });
       });
 
-      fetchAjax({
-        type: 'post',
-        query: obj,
-      });
+      if (!stateInternal.test) {
+        fetchAjax({
+          type: 'post',
+          query: obj,
+        });
+      }
     }
   };
 
