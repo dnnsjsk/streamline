@@ -85,6 +85,12 @@ const { state, dispose, onChange } = createStore({
               nameParent: 'Searchbar',
               label: 'Resets search value after switching tabs',
             },
+            {
+              id: 'searchFocus',
+              name: 'Always focus',
+              nameParent: 'Searchbar',
+              label: 'Focus searchbar after switching tabs',
+            },
           ],
           name: 'Searchbar',
         },
@@ -113,6 +119,9 @@ const { state, dispose, onChange } = createStore({
       default: true,
     },
     searchResetInput: {
+      default: true,
+    },
+    searchFocus: {
       default: true,
     },
     appearanceBlur: {

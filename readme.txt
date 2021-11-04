@@ -15,6 +15,11 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.18 =
+* Fix: always load menu if in admin but in a different mode
+* New: add admin bar icon
+* New: setting to turn off automatic focussing of search bar
+
 = 1.0.17 =
 * Enhancement: add icons to headers in favourite mode
 * Enhancement: always keep favourites up to date

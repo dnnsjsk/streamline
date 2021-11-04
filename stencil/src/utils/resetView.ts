@@ -11,5 +11,7 @@ export function resetView() {
     stateInternal.searchValue = '';
   }
   setEntries();
-  focusSearch();
+  if (stateInternal.entriesSettingsLoad.searchFocus.default) {
+    focusSearch();
+  }
 }

@@ -167,7 +167,7 @@ export class StreamlinePost {
               {this.edit ? <IconTimes /> : <IconPen />}
             </button>
             <span
-              class={`post-title focus-white inline-flex max-w-max font-bold flex-col px-2.5 text-base py-2`}
+              class={`post-title focus-white inline-flex max-w-max font-semibold flex-col px-2.5 text-base py-2`}
             >
               {this.postTitle}
             </span>

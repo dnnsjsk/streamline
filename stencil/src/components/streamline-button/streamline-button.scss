@@ -1,8 +1,9 @@
 @import 'node_modules/tippy.js/dist/tippy';
 
 :host {
-  display: inline-block;
   @include focus;
+  @include host;
+  display: inline-block;
 }
 
 .tippy-content {

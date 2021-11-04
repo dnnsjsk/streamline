@@ -29,18 +29,14 @@ export class StreamlineEntries {
   @Element() el: HTMLStreamlineEntriesElement;
 
   connectedCallback() {
-    if (stateLocal.active === 'menu') {
-      this[`g${stateLocal.active}`]();
+    if (
+      (stateInternal.data.isAdmin || stateLocal.active === 'menu') &&
+      stateInternal.entriesMenu.length === 0
+    ) {
+      getMenu({});
     }
     setEntries();
   }
-
-  // @ts-ignore
-  private gmenu = () => {
-    if (stateInternal.entriesMenu.length === 0) {
-      getMenu({});
-    }
-  };
 
   private static getHeader(item) {
     let menuNumber = 0;

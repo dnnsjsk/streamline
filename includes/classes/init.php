@@ -178,6 +178,7 @@ class Init
             "favourites" => json_encode($favs),
             "network" => !is_multisite() ? false : network_admin_url(),
             "isNetwork" => is_network_admin(),
+            "isAdmin" => is_admin(),
             "path" => is_multisite() ? $currentSite[0]->path : "/",
             "settings" => json_encode($settings),
             "siteId" => get_current_blog_id(),
@@ -223,6 +224,84 @@ class Init
     }
 
     /**
+     * Add admin bar icon.
+     *
+     * @date    04/11/2021
+     * @since   1.0.18
+     */
+    private function adminBar()
+    {
+        add_action("admin_head", function () {
+            $url = plugin_dir_url(STREAMLINE) . "assets/iconfonts/"; ?>
+			<style>
+                @font-face {
+                    font-family: 'Streamline';
+                    src: url('<?php echo $url . "streamline.eot"; ?>');
+                    src: url('<?php echo $url .
+                        "streamline.eot?#iefix"; ?>') format('embedded-opentype'),
+                    url('<?php echo $url .
+                        "streamline.woff"; ?>') format('woff'),
+                    url('<?php echo $url .
+                        "streamline.ttf"; ?>') format('truetype'),
+                    url('<?php echo $url .
+                        "streamline.svg#Streamline"; ?>') format('svg');
+                    font-weight: normal;
+                    font-style: normal;
+                }
+
+                #wp-admin-bar-streamline {
+	                  display: block !important;
+                    cursor: pointer !important;
+                }
+
+                #wp-admin-bar-streamline * {
+                    cursor: pointer !important;
+                }
+
+                .streamline-icon:before {
+                    display: inline-block;
+                    font-family: 'Streamline' !important;
+                    font-style: normal;
+                    font-weight: normal;
+                    line-height: 1;
+                    -webkit-font-smoothing: antialiased;
+                    -moz-osx-font-smoothing: grayscale;
+                    content: '\0041' !important;
+                    position: relative;
+                    top: 2px;
+                }
+
+                @media screen and (max-width: 782px) {
+                    #wp-admin-bar-streamline {
+                      display: flex !important;
+	                    align-items: center !important;
+	                    justify-content: center !important;
+                    }
+
+                    #wp-admin-bar-streamline .streamline-icon:before {
+	                    font-size: 32px !important;
+	                    top: -1px !important;
+                    }
+                }
+			</style>
+			<?php
+        });
+
+        add_action("admin_bar_menu", function (\WP_Admin_Bar $bar) {
+            $bar->add_menu([
+                "id" => "streamline",
+                "parent" => "top-secondary",
+                "title" =>
+                    "<span class='ab-icon streamline-icon'></span><span class='ab-label'>Streamline</span>",
+                "meta" => [
+                    "onclick" =>
+                        'document.querySelector("streamline-container").toggle();',
+                ],
+            ]);
+        });
+    }
+
+    /**
      * Construct.
      *
      * @date    03/05/2021
@@ -235,5 +314,6 @@ class Init
         self::addCss();
         self::injectData();
         self::addContainer();
+        self::adminBar();
     }
 }

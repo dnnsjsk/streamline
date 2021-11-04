@@ -9,6 +9,10 @@
   }
 }
 
+:host {
+  @include host;
+}
+
 .inner {
   opacity: 0;
 }
