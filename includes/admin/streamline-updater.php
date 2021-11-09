@@ -1,6 +1,9 @@
 <?php
+/**
+ * 1.0
+ */
 
-class FabrikatPlugin
+class StreamlinePlugin
 {
     static $prefix = "";
     static $name = "";
@@ -24,7 +27,13 @@ class FabrikatPlugin
         self::$license_page = $license_page;
         self::$file = $file;
 
-        add_action("admin_enqueue_scripts", [__CLASS__, "assets"]);
+        $admin = admin_url("admin.php?page=" . $_GET["page"]);
+
+        if (
+            substr_compare($admin, $license_page, -strlen($license_page)) === 0
+        ) {
+            add_action("admin_enqueue_scripts", [__CLASS__, "assets"]);
+        }
         add_action("admin_init", [__CLASS__, "updater"], 0);
         add_action("admin_init", [__CLASS__, "option"]);
         add_action("admin_menu", [__CLASS__, "menu"], 11);
@@ -48,6 +57,8 @@ class FabrikatPlugin
      */
     static function assets()
     {
+        $url = str_replace("_", "", self::$prefix);
+
         $localizeArray = [
             "ajax" => admin_url("admin-ajax.php"),
             "nonce" => wp_create_nonce("ajax-nonce"),
@@ -55,7 +66,7 @@ class FabrikatPlugin
 
         wp_enqueue_script(
             "fabrikat-admin",
-            plugins_url("/", __FILE__) . "assets/fabrikat-admin.js",
+            plugins_url("/", __FILE__) . "assets/${url}-admin.js",
             ["wp-api", "wp-i18n", "wp-components", "wp-element"],
             get_plugin_data(self::$file)["Version"],
             true

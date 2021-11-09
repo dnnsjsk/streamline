@@ -44,7 +44,7 @@ if (!class_exists("EDD_SL_Plugin_Updater")) {
     include plugin_dir_path(__FILE__) . "includes/admin/edd-sl-updater.php";
 }
 
-require_once plugin_dir_path(__FILE__) . "includes/admin/fabrikat-updater.php";
+require_once plugin_dir_path(__FILE__) . "includes/admin/streamline-updater.php";
 
 /**
  * Init plugin.
@@ -52,7 +52,7 @@ require_once plugin_dir_path(__FILE__) . "includes/admin/fabrikat-updater.php";
  * @date    19/10/2021
  * @since   1.0.0
  */
-FabrikatPlugin::init(
+StreamlinePlugin::init(
     "streamline_",
     STREAMLINE_ITEM_NAME,
     STREAMLINE_STORE_URL,
