@@ -29,6 +29,8 @@ class StreamlinePlugin
 
         $admin = admin_url("admin.php?page=" . $_GET["page"]);
 
+        $name = str_replace("_", "", $prefix);
+
         if (
             substr_compare($admin, $license_page, -strlen($license_page)) === 0
         ) {
@@ -37,13 +39,12 @@ class StreamlinePlugin
         add_action("admin_init", [__CLASS__, "updater"], 0);
         add_action("admin_init", [__CLASS__, "option"]);
         add_action("admin_menu", [__CLASS__, "menu"], 11);
-
-        add_action("plugins_loaded", function () {
-            add_action("wp_ajax_fabrikatLicenseQuery", [
+        add_action("plugins_loaded", function () use (&$name) {
+            add_action("wp_ajax_${name}LicenseQuery", [
                 __CLASS__,
                 "fabrikatLicenseQuery",
             ]);
-            add_action("wp_ajax_fabrikatSettingsQuery", [
+            add_action("wp_ajax_${name}SettingsQuery", [
                 __CLASS__,
                 "fabrikatSettingsQuery",
             ]);
@@ -128,6 +129,7 @@ class StreamlinePlugin
         ?>
       <script>
         var fabrikatPlugin = {
+          name: '<?php echo str_replace("_", "", self::$prefix); ?>',
           pluginUrl: '<?php echo plugins_url("/", self::$file); ?>',
           shopUrl: '<?php echo self::$store_url; ?>',
           productId: '<?php echo self::$item_id; ?>',
@@ -181,7 +183,7 @@ class StreamlinePlugin
      *
      * @since 1.0
      */
-    static function fabrikatLicenseQuery()
+    function fabrikatLicenseQuery()
     {
         if (wp_verify_nonce($_POST["nonce"], "ajax-nonce")) {
             $license = $_POST["license"]
