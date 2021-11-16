@@ -133,17 +133,17 @@ export class StreamlineButton {
       this.type === 'menu'
         ? `text-sm px-3 py-2.5 leading-none border border-blue-gray-200 bg-blue-gray-50 text-blue-600 hover:border-blue-600`
         : this.type === 'sidebar' || this.type === 'primary'
-        ? `h-[calc(var(--sl-side-w))] w-[calc(var(--sl-side-w)-1px)] flex flex-col items-center justify-center p-0 text-blue-gray-900 bg-transparent border-b border-blue-gray-300 ${
+        ? `h-[calc(var(--sl-side-w))] w-[calc(var(--sl-side-w))] flex flex-col items-center justify-center p-0 text-white bg-transparent lg:h-[64px] ${
             this.type === 'primary'
-              ? `bg-blue-gray-900 border-none text-white fill-current h-[var(--sl-side-w)] w-[calc(var(--sl-side-w)+1px)] hover:bg-[#0e1114]`
+              ? `focus-darker bg-[#020204] text-white fill-current h-[var(--sl-side-w)] hover:bg-[#080d17]`
               : this.type === 'sidebar' &&
-                `!grid ${
+                `!grid focus-dark ${
                   this.icon !== 'settings'
-                    ? 'sm:!grid-rows-[20px,20px]'
-                    : 'border-t border-blue-gray-300'
-                } !justify-items-center !content-center text-blue-gray-500 border-b border-blue-gray-300 hover:bg-blue-gray-100 hover:text-blue-gray-900 ${
+                    ? 'sm:!grid-rows-[20px,20px] lg:!grid-rows-1 lg:grid-cols-[30px,1fr] lg:h-[48px] lg:p-4'
+                    : ''
+                } !justify-items-center !content-center text-blue-gray-200 hover:bg-blue-gray-800 lg:!justify-items-start ${
                   stateLocal.active === this.icon
-                    ? 'text-blue-700 pointer-events-none'
+                    ? 'bg-blue-gray-800 pointer-events-none'
                     : ''
                 }`
           }`
@@ -152,7 +152,7 @@ export class StreamlineButton {
 
     const classNameText = `${
       this.type === 'sidebar'
-        ? 'hidden sm:inline-block text-xs font-bold leading-1 uppercase mt-1.5'
+        ? 'hidden sm:inline-block text-xs font-semibold leading-1 mt-1.5 lg:mt-0 lg:text-sm'
         : ''
     }`;
 
@@ -194,15 +194,7 @@ export class StreamlineButton {
         ) : this.type === 'sidebar' || this.type === 'primary' ? (
           <button
             tabIndex={stateLocal.active === this.icon ? -1 : 0}
-            style={{
-              borderBottom:
-                this.type === 'primary'
-                  ? ''
-                  : '1px solid rgba(209,213,219,var(--tw-border-opacity))',
-            }}
-            class={
-              className + ` ${this.type === 'primary' ? 'focus-dark' : 'focus'}`
-            }
+            class={className}
           >
             {this.type === 'primary' ? (
               stateInternal.isProcessing ? (

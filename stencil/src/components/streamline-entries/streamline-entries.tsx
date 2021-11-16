@@ -475,7 +475,7 @@ export class StreamlineEntries {
 
   render() {
     return (
-      <div class={`h-full relative`}>
+      <div class={`h-full relative lg:h-[calc(100%+64px)]`}>
         {stateInternal.isLoading ? (
           <div
             class={`w-full h-[calc(100%-var(--sl-side-w))] flex items-center justify-center bg-white/50 absolute top-0 left-0 backdrop-blur-sm z-10`}
@@ -485,7 +485,7 @@ export class StreamlineEntries {
         ) : (
           <div
             tabindex={-1}
-            class={`focus-none inner pb-6 relative px-3 h-[calc(100%-var(--sl-side-w))] overflow-y-scroll overflow-x-hidden w-full bg-white sm:px-6 lg:px-8 ${
+            class={`focus-none inner pb-6 relative px-3 h-[calc(100%-var(--sl-side-w))] overflow-y-scroll overflow-x-hidden w-full bg-white sm:px-6 lg:px-8 lg:pb-10 ${
               stateInternal.isProcessing ? 'pointer-events-none opacity-50' : ''
             }`}
           >

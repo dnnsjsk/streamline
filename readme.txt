@@ -15,6 +15,13 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.19 =
+* Enhancement: remove entrance animation
+* Enhancement: preload app
+* Fix: automatically disable autofocus on touch devices to prevent keyboard popping up after switching modes
+* Fix: minor UI bugs on mobile
+* New: simplified and enhanced sidebar design
+
 = 1.0.18 =
 * Fix: always load menu if in admin but in a different mode
 * New: add admin bar icon

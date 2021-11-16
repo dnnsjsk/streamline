@@ -142,10 +142,10 @@ export class StreamlineSearch {
 
   render() {
     return (
-      <div class={`relative h-[var(--sl-side-w)] w-full`}>
+      <div class={`relative h-[var(--sl-side-w)] w-full lg:h-[64px]`}>
         <input
           part="search"
-          class="peer w-full h-[var(--sl-side-w)] focus bg-blue-gray-50 px-3 text-[1.15rem] h-full w-full m-0 p-0 border-b border-blue-gray-300 font-medium placeholder-blue-gray-500 sm:px-8"
+          class="peer w-full h-[var(--sl-side-w)] focus bg-blue-gray-100 px-3 text-[1.15rem] h-full w-full m-0 p-0 font-normal placeholder-blue-gray-600 text-blue-gray-900 sm:px-8 lg:h-[64px]"
           type="text"
           placeholder={stateInternal.searchPlaceholder}
           value={stateInternal.searchValue}

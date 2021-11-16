@@ -19,7 +19,12 @@ describe('Render container', function () {
     });
     expect(page.root).toEqualHtml(`
 <streamline-container>
-      <mock:shadow-root></mock:shadow-root>
+      <mock:shadow-root>
+        <div class="fixed h-full hidden left-0 pointer-events-none top-0 w-full z-[9999999999999999]">
+          <div class="bg-black/90 fixed h-full left-0 top-0 w-full" tabindex="-1"></div>
+          <streamline-box></streamline-box>
+        </div>
+      </mock:shadow-root>
     </streamline-container>
   `);
   });
@@ -31,7 +36,7 @@ describe('Render container', function () {
     expect(page.root).toEqualHtml(`
 <streamline-container visible="">
       <mock:shadow-root>
-        <div class="fixed h-full left-0 top-0 w-full z-[9999999999999999]">
+        <div class="block fixed h-full left-0 pointer-events-auto top-0 w-full z-[9999999999999999]">
           <div class="bg-black/90 fixed h-full left-0 top-0 w-full" tabindex="-1"></div>
           <streamline-box></streamline-box>
         </div>

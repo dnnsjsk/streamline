@@ -1,5 +1,6 @@
 import { createStore } from '@stencil/store';
 import equal from 'fast-deep-equal/es6';
+import { focusSearch } from '../utils/focusSearch';
 
 const isTest = document
   .querySelector('streamline-container')
@@ -142,6 +143,14 @@ const { state, dispose, onChange } = createStore({
   test: isTest,
   testFull: false,
   visible: false,
+});
+
+onChange('visible', (value) => {
+  if (value === true) {
+    setTimeout(() => {
+      focusSearch();
+    }, 20);
+  }
 });
 
 onChange('entriesSettingsSave', (value) => {

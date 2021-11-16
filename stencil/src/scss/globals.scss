@@ -7,6 +7,10 @@
   @media (min-width: 640px) {
     --sl-side-w: 64px;
   }
+
+  @media (min-width: 1024px) {
+    --sl-side-w: 128px;
+  }
 }
 
 streamline-container {

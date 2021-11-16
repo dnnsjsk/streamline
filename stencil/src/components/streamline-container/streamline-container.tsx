@@ -114,20 +114,24 @@ export class StreamlineContainer {
   render() {
     return (
       <Host>
-        {stateInternal.visible && (
-          <div class="fixed top-0 left-0 w-full h-full z-[9999999999999999]">
-            <div
-              tabIndex={-1}
-              class={`fixed top-0 left-0 w-full h-full bg-black/90 ${
-                stateInternal.entriesSettingsLoad.appearanceBlur.default
-                  ? 'backdrop-blur-sm'
-                  : ''
-              }`}
-              onClick={() => (stateInternal.visible = false)}
-            />
-            <streamline-box />
-          </div>
-        )}
+        <div
+          class={`fixed top-0 left-0 w-full h-full z-[9999999999999999] ${
+            stateInternal.visible
+              ? 'block pointer-events-auto'
+              : 'hidden pointer-events-none'
+          }`}
+        >
+          <div
+            tabIndex={-1}
+            class={`fixed top-0 left-0 w-full h-full bg-black/90 ${
+              stateInternal.entriesSettingsLoad.appearanceBlur.default
+                ? 'backdrop-blur-sm'
+                : ''
+            }`}
+            onClick={() => (stateInternal.visible = false)}
+          />
+          <streamline-box />
+        </div>
       </Host>
     );
   }

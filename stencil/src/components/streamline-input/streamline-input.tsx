@@ -39,7 +39,7 @@ export class StreamlineInput {
     const parent = (this.el.getRootNode() as ShadowRoot).host;
 
     setTimeout(() => {
-      if (parent.tagName === 'STREAMLINE-POST') {
+      if (parent?.tagName === 'STREAMLINE-POST') {
         const invalid = parent.shadowRoot.querySelectorAll(
           'streamline-input[invalid]'
         );

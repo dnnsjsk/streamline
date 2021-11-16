@@ -2,7 +2,7 @@
 import { Component, Element, h } from '@stencil/core';
 import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import { setEntries } from '../../utils/setEntries';
-import { focusSearch } from '../../utils/focusSearch';
+import { onChangeInternal } from '../../store/internal';
 
 /**
  * Box.
@@ -21,29 +21,25 @@ export class StreamlineBox {
   }
 
   componentDidLoad() {
-    disableBodyScroll(
-      this.el.shadowRoot
-        .querySelector('streamline-entries')
-        .shadowRoot.querySelector('div > div'),
-      {
-        reserveScrollBarGap: true,
+    onChangeInternal('visible', (value) => {
+      if (value === true) {
+        disableBodyScroll(
+          this.el.shadowRoot
+            .querySelector('streamline-entries')
+            .shadowRoot.querySelector('div > div'),
+          {
+            reserveScrollBarGap: true,
+          }
+        );
+      } else {
+        clearAllBodyScrollLocks();
       }
-    );
-
-    this.el.shadowRoot.querySelector('.inner').classList.add('animate');
-
-    setTimeout(() => {
-      focusSearch();
-    }, 50);
-  }
-
-  disconnectedCallback() {
-    clearAllBodyScrollLocks();
+    });
   }
 
   render() {
     return (
-      <div class="inner w-full h-full absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[900px] max-h-[700px] bg-white overflow-hidden grid">
+      <div class="inner w-full h-full absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[1000px] max-h-[700px] bg-white overflow-hidden grid">
         <streamline-sidebar />
         <div class="wrap h-full absolute left-[var(--sl-side-w)] w-[calc(100%-var(--sl-side-w))]">
           <streamline-search class="h-[var(--sl-side-w)] w-full" />

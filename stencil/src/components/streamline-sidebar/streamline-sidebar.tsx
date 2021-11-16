@@ -28,7 +28,7 @@ export class StreamlineSidebar {
   render() {
     return (
       <nav
-        class={`bg-blue-gray-50 h-full w-[var(--sl-side-w)] flex flex-col border-r border-blue-gray-300 overflow-visible`}
+        class={`bg-blue-gray-900 h-full w-[var(--sl-side-w)] flex flex-col overflow-visible`}
       >
         <streamline-button
           type="primary"
@@ -42,7 +42,9 @@ export class StreamlineSidebar {
                 onClick={() => this.handleClick(item.name)}
                 class={`${item.name === 'settings' ? 'mt-auto' : ''}`}
                 type="sidebar"
-                text={capitalizeFirstLetter(item.name)}
+                text={capitalizeFirstLetter(
+                  item.name === 'fav' ? 'faves' : item.name
+                )}
                 icon={item.name}
               />
             );
