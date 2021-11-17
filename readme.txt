@@ -15,6 +15,10 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.20 =
+* Enhancement: sidebar spacing
+* Fix: menu not being loaded when using keyboard navigation on frontends
+
 = 1.0.19 =
 * Enhancement: remove entrance animation
 * Enhancement: preload app

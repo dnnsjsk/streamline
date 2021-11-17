@@ -4,6 +4,7 @@ import { stateInternal } from '../../store/internal';
 import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
 import { setTestData } from '../../utils/setTestData';
 import { stateLocal } from '../../store/local';
+import { getMenu } from '../../utils/getMenu';
 
 /**
  * Container.
@@ -98,6 +99,13 @@ export class StreamlineContainer {
       } else {
         stateLocal.active = stateInternal.menus[index + 1];
       }
+    }
+
+    if (
+      stateLocal.active === 'menu' &&
+      stateInternal.entriesMenu.length === 0
+    ) {
+      getMenu();
     }
   };
 

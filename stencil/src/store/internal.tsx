@@ -24,6 +24,11 @@ const { state, dispose, onChange } = createStore({
     post: {
       name: 'post',
     },
+    /*
+    custom: {
+      name: 'custom',
+    },
+     */
     settings: {
       name: 'settings',
     },

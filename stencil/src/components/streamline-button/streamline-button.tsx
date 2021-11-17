@@ -9,6 +9,7 @@ import { Fav } from '../../elements/Fav';
 import { Heart } from '../../elements/Heart';
 import { Loader } from '../../elements/Loader';
 import {
+  IconCustom,
   IconFlow,
   IconMenu,
   IconPost,
@@ -137,9 +138,9 @@ export class StreamlineButton {
             this.type === 'primary'
               ? `focus-darker bg-[#020204] text-white fill-current h-[var(--sl-side-w)] hover:bg-[#080d17]`
               : this.type === 'sidebar' &&
-                `!grid focus-dark ${
+                `!grid focus-dark lg:h-[48px] ${
                   this.icon !== 'settings'
-                    ? 'sm:!grid-rows-[20px,20px] lg:!grid-rows-1 lg:grid-cols-[30px,1fr] lg:h-[48px] lg:p-4'
+                    ? 'sm:!grid-rows-[20px,20px] lg:!grid-rows-1 lg:grid-cols-[32px,1fr] lg:px-5'
                     : ''
                 } !justify-items-center !content-center text-blue-gray-200 hover:bg-blue-gray-800 lg:!justify-items-start ${
                   stateLocal.active === this.icon
@@ -165,6 +166,8 @@ export class StreamlineButton {
         <IconPost />
       ) : this.icon === 'flow' ? (
         <IconFlow />
+      ) : this.icon === 'custom' ? (
+        <IconCustom />
       ) : this.icon === 'settings' ? (
         <IconSettings />
       ) : (
