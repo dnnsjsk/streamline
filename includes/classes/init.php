@@ -10,6 +10,28 @@ namespace Streamline;
  */
 class Init
 {
+    /**
+     * Construct.
+     *
+     * @date    03/05/2021
+     * @since   1.0.0
+     */
+    function __construct()
+    {
+        self::enqueueScripts();
+        self::addScriptTags();
+        self::addCss();
+        self::injectData();
+        self::addContainer();
+        self::adminBar();
+    }
+
+    /**
+     * Get JS.
+     *
+     * @date    03/05/2021
+     * @since   1.0.0
+     */
     function getScript()
     {
         $localizeArray = [
@@ -35,6 +57,12 @@ class Init
         wp_localize_script("streamline", "streamline", $localizeArray);
     }
 
+    /**
+     * Get allowed user role.
+     *
+     * @date    03/05/2021
+     * @since   1.0.0
+     */
     public static function isAllowed(): bool
     {
         return current_user_can(
@@ -179,13 +207,14 @@ class Init
             "network" => !is_multisite() ? false : network_admin_url(),
             "isNetwork" => is_network_admin(),
             "isAdmin" => is_admin(),
-            "path" => is_multisite() ? $currentSite[0]->path : "/",
             "settings" => json_encode($settings),
             "siteId" => get_current_blog_id(),
+            "sitePath" => is_multisite() ? $currentSite[0]->path : "/",
+            "siteUrl" => get_site_url(),
             "userId" => get_current_user_id(),
         ]);
         echo ";";
-        //echo "console.log(JSON.parse(streamlineData.favourites));";
+        // echo "console.log(JSON.parse(streamlineData.favourites));";
         echo "</script>";
     }
 
@@ -299,21 +328,5 @@ class Init
                 ],
             ]);
         });
-    }
-
-    /**
-     * Construct.
-     *
-     * @date    03/05/2021
-     * @since   1.0.0
-     */
-    function __construct()
-    {
-        self::enqueueScripts();
-        self::addScriptTags();
-        self::addCss();
-        self::injectData();
-        self::addContainer();
-        self::adminBar();
     }
 }

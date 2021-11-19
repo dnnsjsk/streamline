@@ -1,3 +1,4 @@
+// import { isLocalCommands } from '../../utils/isLocalCommands';
 // eslint-disable-next-line no-unused-vars
 import { Component, Element, h } from '@stencil/core';
 import { stateInternal } from '../../store/internal';
@@ -7,8 +8,6 @@ import { getQuery } from '../../utils/getQuery';
 import { stateLocal } from '../../store/local';
 import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
 import { resetView } from '../../utils/resetView';
-import { isLocalCommands } from '../../utils/isLocalCommands';
-import { getMenu } from '../../utils/getMenu';
 
 /**
  * Search.
@@ -38,23 +37,23 @@ export class StreamlineSearch {
   private handleChange = (e) => {
     stateInternal.searchValue = e.target.value;
     if (!e.target.value.startsWith('/')) {
-      stateInternal.isSites = false;
       stateInternal.isLoading = false;
       stateInternal.isSlash = false;
       stateInternal.isEnter = false;
       setEntries();
 
       if (
+        (stateLocal.active === 'post' || stateLocal.active === 'site') &&
         stateInternal.searchValue.length >= 1 &&
-        stateLocal.active === 'post' &&
         !stateInternal.test
       ) {
         stateInternal.isEnter = true;
-        this.command = 'post';
+        this.command = stateLocal.active;
       }
     } else if (
-      (e.target.value.startsWith('/') && isLocalCommands()) ||
-      (e.target.value.startsWith('/') && stateInternal.testFull)
+      // (e.target.value.startsWith('/') && isLocalCommands()) ||
+      e.target.value.startsWith('/') &&
+      stateInternal.testFull
     ) {
       stateInternal.isSlash = true;
       if (
@@ -66,7 +65,6 @@ export class StreamlineSearch {
         stateInternal.isEnter = true;
         this.command = stateInternal.searchValue.split(' ')[0].slice(1);
       } else {
-        stateInternal.isSites = false;
         stateInternal.isLoading = false;
         stateInternal.isEnter = false;
       }
@@ -83,7 +81,11 @@ export class StreamlineSearch {
     this.callback =
       stateInternal.commands.local[this.command]?.callback || false;
 
-    if (this.callback || stateLocal.active === 'post') {
+    if (
+      this.callback ||
+      stateLocal.active === 'post' ||
+      stateLocal.active === 'site'
+    ) {
       if (
         checkIfStringStartsWith(stateInternal.searchValue, this.commands) &&
         this.callback
@@ -91,49 +93,44 @@ export class StreamlineSearch {
         this.value = stateInternal.searchValue
           .replace(`/${this.command}`, '')
           .trim();
-      } else if (stateLocal.active === 'post') {
+      } else if (stateLocal.active === 'post' || stateLocal.active === 'site') {
         this.value = stateInternal.searchValue;
-        this.callback = 'posts';
+        this.callback = `${stateLocal.active}s`;
       }
 
       this.query();
-    } else if (this.command === 'network') {
-      getMenu({
-        network: true,
-      });
     }
   };
 
   private query = () => {
     stateInternal.isLoading = true;
-    // @ts-ignore
-    // eslint-disable-next-line no-undef
-    fetch(`${streamline.rest}streamline/v1/${this.callback}/${this.value}`, {
-      method: 'GET',
-      credentials: 'same-origin',
-      headers: {
-        // @ts-ignore
-        // eslint-disable-next-line no-undef
-        'X-WP-Nonce': streamline.nonceRest,
-        'Content-Type': 'application/json',
-      },
-    })
+    fetch(
+      // @ts-ignore
+      // eslint-disable-next-line no-undef
+      `${streamline.rest}streamline/v1/${this.callback}?siteId=${stateInternal.currentSite.id}&value=${this.value}`,
+      {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: {
+          // @ts-ignore
+          // eslint-disable-next-line no-undef
+          'X-WP-Nonce': streamline.nonceRest,
+          'Content-Type': 'application/json',
+        },
+      }
+    )
       .then((response) => response.json())
       .then((data) => {
-        // console.log(data);
-
         getQuery({
           children: data.children,
           isMultisite: data.isMultisite,
-          path: data.path,
+          path: stateInternal.currentSite.path,
           search: this.value,
           type: this.command,
           queryValue: this.value,
         });
         setSearchPlaceholder();
-        if (this.callback === 'sites') {
-          stateInternal.isSites = true;
-        } else if (this.callback === 'posts') {
+        if (this.callback === 'posts' || this.callback === 'sites') {
           resetView();
         }
         stateInternal.isLoading = false;

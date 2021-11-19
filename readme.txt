@@ -15,6 +15,13 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.21 =
+* Enhancement: remove previous implementation of network menu
+* Fix: scrollbar being too short
+* New: add 'Network' tab for network admin menu
+* New: add 'Site' tab to find sites in multisite network
+* New: add site information when multisite is active
+
 = 1.0.20 =
 * Enhancement: sidebar spacing
 * Fix: menu not being loaded when using keyboard navigation on frontends

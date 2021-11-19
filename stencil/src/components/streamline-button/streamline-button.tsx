@@ -12,8 +12,10 @@ import {
   IconCustom,
   IconFlow,
   IconMenu,
+  IconNetwork,
   IconPost,
   IconSettings,
+  IconSites,
   IconWordPress,
 } from '../../icons';
 
@@ -106,7 +108,7 @@ export class StreamlineButton {
     setFavourite({
       favourite: this.favourite,
       callback: this.checkIfFav,
-      type: 'menu',
+      type: stateLocal.active,
       filter: (o) => {
         return o.href === this.href && o.adminUrl === this.adminUrl;
       },
@@ -160,8 +162,12 @@ export class StreamlineButton {
     const icon =
       this.icon === 'wordpress' ? (
         <IconWordPress />
+      ) : this.icon === 'site' ? (
+        <IconSites />
       ) : this.icon === 'menu' ? (
         <IconMenu />
+      ) : this.icon === 'network' ? (
+        <IconNetwork />
       ) : this.icon === 'post' ? (
         <IconPost />
       ) : this.icon === 'flow' ? (

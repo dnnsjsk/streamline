@@ -1,8 +1,5 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, Element, h } from '@stencil/core';
-import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
-import { setEntries } from '../../utils/setEntries';
-import { onChangeInternal } from '../../store/internal';
 
 /**
  * Box.
@@ -15,27 +12,6 @@ import { onChangeInternal } from '../../store/internal';
 export class StreamlineBox {
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineBoxElement;
-
-  connectedCallback() {
-    setEntries();
-  }
-
-  componentDidLoad() {
-    onChangeInternal('visible', (value) => {
-      if (value === true) {
-        disableBodyScroll(
-          this.el.shadowRoot
-            .querySelector('streamline-entries')
-            .shadowRoot.querySelector('div > div'),
-          {
-            reserveScrollBarGap: true,
-          }
-        );
-      } else {
-        clearAllBodyScrollLocks();
-      }
-    });
-  }
 
   render() {
     return (

@@ -11,6 +11,17 @@ namespace Streamline;
 class Rest
 {
     /**
+     * Construct.
+     *
+     * @date    26/10/2021
+     * @since   1.0.12
+     */
+    function __construct()
+    {
+        self::registerEndpoints();
+    }
+
+    /**
      * Add REST endpoints.
      *
      * @date    26/10/2021
@@ -18,29 +29,37 @@ class Rest
      */
     function registerEndpoints()
     {
-        add_action("rest_api_init", function () {
-            register_rest_route(
-                "streamline/v1",
-                "/sites/(?P<search>[a-zA-Z0-9-]+)",
-                [
-                    "methods" => "GET",
-                    "callback" => [$this, "sites"],
-                    "permission_callback" => function () {
-                        return Init::isAllowed();
+        $args = [
+            "args" => [
+                "siteId" => [
+                    "validate_callback" => function ($param, $request, $key) {
+                        return is_numeric($param);
                     },
-                ]
-            );
-            register_rest_route(
-                "streamline/v1",
-                "/posts/(?P<search>[a-zA-Z0-9-]+)",
-                [
-                    "methods" => "GET",
-                    "callback" => [$this, "posts"],
-                    "permission_callback" => function () {
-                        return Init::isAllowed();
+                ],
+                "value" => [
+                    "validate_callback" => function ($param, $request, $key) {
+                        return $param;
                     },
-                ]
-            );
+                ],
+            ],
+        ];
+        add_action("rest_api_init", function () use ($args) {
+            register_rest_route("streamline/v1", "/sites", [
+                "methods" => "GET",
+                "callback" => [$this, "sites"],
+                "permission_callback" => function () {
+                    return Init::isAllowed();
+                },
+                "args" => $args,
+            ]);
+            register_rest_route("streamline/v1", "/posts", [
+                "methods" => "GET",
+                "callback" => [$this, "posts"],
+                "permission_callback" => function () {
+                    return Init::isAllowed();
+                },
+                "args" => $args,
+            ]);
         });
     }
 
@@ -53,7 +72,7 @@ class Rest
     function sites($data): array
     {
         $arr = get_sites([
-            "search" => $data["search"],
+            "search" => $data["value"],
         ]);
 
         $index = -1;
@@ -61,6 +80,7 @@ class Rest
             $id = $site->blog_id;
             $index++;
             switch_to_blog($id);
+            $arr[$index]->name = get_bloginfo("name");
             $arr[$index]->siteId = $id;
             $arr[$index]->adminUrl = get_admin_url();
             $arr[$index]->path = get_site($id)->path;
@@ -80,15 +100,19 @@ class Rest
      */
     function posts($data): array
     {
-        $arr = get_posts([
-            "s" => $data["search"],
+	    $args = [
+            "s" => $data["value"],
             "post_type" => "any",
-        ]);
+        ];
 
         if (is_multisite() && function_exists("get_site")) {
+            switch_to_blog($data["siteId"]);
             $path = get_site(get_current_blog_id())->path;
+            $arr = get_posts($args);
+            restore_current_blog();
         } else {
             $path = "/";
+            $arr = get_posts($args);
         }
 
         $index = -1;
@@ -113,16 +137,5 @@ class Rest
         $get["isMultisite"] = is_multisite();
 
         return $get;
-    }
-
-    /**
-     * Construct.
-     *
-     * @date    26/10/2021
-     * @since   1.0.12
-     */
-    function __construct()
-    {
-        self::registerEndpoints();
     }
 }

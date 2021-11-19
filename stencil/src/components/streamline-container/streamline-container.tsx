@@ -2,9 +2,10 @@
 import { Component, h, Prop, Method, Host, Element } from '@stencil/core';
 import { stateInternal } from '../../store/internal';
 import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
-import { setTestData } from '../../utils/setTestData';
 import { stateLocal } from '../../store/local';
-import { getMenu } from '../../utils/getMenu';
+import { getMenus } from '../../utils/getMenus';
+import { setTestData } from '../../utils/setTestData';
+import { setEntries } from '../../utils/setEntries';
 
 /**
  * Container.
@@ -24,9 +25,14 @@ export class StreamlineContainer {
   @Prop({ reflect: true, mutable: true }) visible: boolean;
 
   connectedCallback() {
+    if (stateInternal.test) {
+      setTestData();
+    }
+
+    setEntries();
+
     this.mac = this.mac || navigator.userAgent.indexOf('Mac OS X') !== -1;
 
-    stateInternal.visible = this.visible || false;
     stateInternal.entriesSettingsActive = stateInternal.entriesSettings;
     stateInternal.entriesSettings[0].children.forEach((item) => {
       item.children.forEach((itemInner) => {
@@ -38,10 +44,6 @@ export class StreamlineContainer {
       });
     });
     stateInternal.entriesSettingsSave = stateInternal.entriesSettingsLoad;
-
-    if (stateInternal.test) {
-      setTestData();
-    }
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'k' && (this.mac ? e.metaKey : e.ctrlKey)) {
@@ -79,6 +81,8 @@ export class StreamlineContainer {
 
   componentDidLoad() {
     setSearchPlaceholder();
+
+    stateInternal.visible = this.visible || false;
   }
 
   private cycle = (mode) => {
@@ -101,12 +105,7 @@ export class StreamlineContainer {
       }
     }
 
-    if (
-      stateLocal.active === 'menu' &&
-      stateInternal.entriesMenu.length === 0
-    ) {
-      getMenu();
-    }
+    getMenus();
   };
 
   @Method()

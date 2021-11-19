@@ -24,6 +24,14 @@ global.parser.parseFromString = jest.fn(() => {
   return '';
 }) as jest.Mock;
 
+global.disableBodyScroll = jest.fn(() => {
+  return '';
+}) as jest.Mock;
+
+global.clearAllBodyScrollLocks = jest.fn(() => {
+  return '';
+}) as jest.Mock;
+
 // @ts-ignore
 window.streamlineData = {
   isMultisite: true,

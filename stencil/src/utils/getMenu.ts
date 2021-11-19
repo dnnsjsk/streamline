@@ -1,15 +1,18 @@
 import { stateInternal } from '../store/internal';
 import { setEntries } from './setEntries';
 import { resetView } from './resetView';
-import { stateLocal } from '../store/local';
 
 export function getMenu(obj = {} as any) {
   let data = [];
   const menu = {};
 
   const isAdmin =
-    document.querySelector('#adminmenuwrap') && !obj.adminUrl && !obj.network;
-  const isNetwork = obj.network || stateInternal.data.isNetwork;
+    document.querySelector('#adminmenuwrap') &&
+    ((obj.network && stateInternal.data.isNetwork) ||
+      (!obj.network &&
+        stateInternal.data.isAdmin &&
+        !stateInternal.data.isNetwork));
+  const isNetwork = obj.network;
   const isMultisite = !!stateInternal.data.network;
   const adminUrl =
     obj.adminUrl ||
@@ -63,21 +66,26 @@ export function getMenu(obj = {} as any) {
         adminUrl,
         children: menu,
         isMultisite: isMultisite,
-        path: obj.path || stateInternal.data.path,
+        path: obj.path || stateInternal.currentSite.path,
         siteId: Number(siteId),
         type: type,
       },
     ];
 
-    stateInternal.entriesMenu = data;
-    stateInternal.entriesMenuActive = data;
-    stateInternal.entriesMenuCurrentPath = obj.path || stateInternal.data.path;
-    stateInternal.entriesMenuIsNetwork = obj.network;
+    if (isNetwork) {
+      stateInternal.entriesNetwork = data;
+      stateInternal.entriesNetworkActive = data;
+    } else {
+      stateInternal.entriesMenu = data;
+      stateInternal.entriesMenuActive = data;
+      stateInternal.entriesMenuCurrentPath =
+        obj.path || stateInternal.currentSite.path;
+    }
 
     setEntries();
   }
 
-  if (isAdmin) {
+  if (isAdmin && !obj.fetch) {
     get(document);
   } else {
     stateInternal.isLoading = true;
@@ -88,11 +96,10 @@ export function getMenu(obj = {} as any) {
         const html = parser.parseFromString(data, 'text/html');
         get(html);
         resetView();
-        stateLocal.active = 'menu';
 
         // console.log(stateInternal.entriesMenu);
       })
-      .catch((error) => console.log(error));
+      .catch(() => {});
     // @ts-ignore
     // eslint-disable-next-line no-undef
     /*

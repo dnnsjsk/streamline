@@ -1,5 +1,282 @@
-import { getRenderingRef, forceUpdate, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
+import { h, getRenderingRef, forceUpdate, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
+
+const streamlineBoxCss = ":host{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box}";
+
+let StreamlineBox$1 = class extends HTMLElement {
+    constructor() {
+        super();
+        this.__registerHost();
+        this.__attachShadow();
+    }
+    render() {
+        return (h("div", { class: "inner w-full h-full absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[1000px] max-h-[700px] bg-white overflow-hidden grid" }, h("streamline-sidebar", null), h("div", { class: "wrap h-full absolute left-[var(--sl-side-w)] w-[calc(100%-var(--sl-side-w))]" }, h("streamline-search", { class: "h-[var(--sl-side-w)] w-full" }), h("streamline-entries", null))));
+    }
+    get el() { return this; }
+    static get style() { return streamlineBoxCss + '/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-transform:translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;border:0 solid;box-sizing:border-box}.absolute{position:absolute}.left-1\\/2{left:50%}.top-1\\/2{top:50%}.left-\\[var\\(--sl-side-w\\)\\]{left:var(--sl-side-w)}.grid{display:grid}.h-full{height:100%}.h-\\[var\\(--sl-side-w\\)\\]{height:var(--sl-side-w)}.max-h-\\[700px\\]{max-height:700px}.w-full{width:100%}.w-\\[calc\\(100\\%-var\\(--sl-side-w\\)\\)\\]{width:calc(100% - var(--sl-side-w))}.max-w-\\[1000px\\]{max-width:1000px}.-translate-x-1\\/2{--tw-translate-x:-50%;transform:var(--tw-transform)}.-translate-y-1\\/2{--tw-translate-y:-50%;transform:var(--tw-transform)}.overflow-hidden{overflow:hidden}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px 0 rgba(0,0,0,.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}'; }
+};
+
+const appendToMap = (map, propName, value) => {
+    const items = map.get(propName);
+    if (!items) {
+        map.set(propName, [value]);
+    }
+    else if (!items.includes(value)) {
+        items.push(value);
+    }
+};
+const debounce$2 = (fn, ms) => {
+    let timeoutId;
+    return (...args) => {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+        timeoutId = setTimeout(() => {
+            timeoutId = 0;
+            fn(...args);
+        }, ms);
+    };
+};
+
+/**
+ * Check if a possible element isConnected.
+ * The property might not be there, so we check for it.
+ *
+ * We want it to return true if isConnected is not a property,
+ * otherwise we would remove these elements and would not update.
+ *
+ * Better leak in Edge than to be useless.
+ */
+const isConnected = (maybeElement) => !('isConnected' in maybeElement) || maybeElement.isConnected;
+const cleanupElements = debounce$2((map) => {
+    for (let key of map.keys()) {
+        map.set(key, map.get(key).filter(isConnected));
+    }
+}, 2000);
+const stencilSubscription = () => {
+    if (typeof getRenderingRef !== 'function') {
+        // If we are not in a stencil project, we do nothing.
+        // This function is not really exported by @stencil/core.
+        return {};
+    }
+    const elmsToUpdate = new Map();
+    return {
+        dispose: () => elmsToUpdate.clear(),
+        get: (propName) => {
+            const elm = getRenderingRef();
+            if (elm) {
+                appendToMap(elmsToUpdate, propName, elm);
+            }
+        },
+        set: (propName) => {
+            const elements = elmsToUpdate.get(propName);
+            if (elements) {
+                elmsToUpdate.set(propName, elements.filter(forceUpdate));
+            }
+            cleanupElements(elmsToUpdate);
+        },
+        reset: () => {
+            elmsToUpdate.forEach((elms) => elms.forEach(forceUpdate));
+            cleanupElements(elmsToUpdate);
+        },
+    };
+};
+
+const createObservableMap = (defaultState, shouldUpdate = (a, b) => a !== b) => {
+    let states = new Map(Object.entries(defaultState !== null && defaultState !== void 0 ? defaultState : {}));
+    const handlers = {
+        dispose: [],
+        get: [],
+        set: [],
+        reset: [],
+    };
+    const reset = () => {
+        states = new Map(Object.entries(defaultState !== null && defaultState !== void 0 ? defaultState : {}));
+        handlers.reset.forEach((cb) => cb());
+    };
+    const dispose = () => {
+        // Call first dispose as resetting the state would
+        // cause less updates ;)
+        handlers.dispose.forEach((cb) => cb());
+        reset();
+    };
+    const get = (propName) => {
+        handlers.get.forEach((cb) => cb(propName));
+        return states.get(propName);
+    };
+    const set = (propName, value) => {
+        const oldValue = states.get(propName);
+        if (shouldUpdate(value, oldValue, propName)) {
+            states.set(propName, value);
+            handlers.set.forEach((cb) => cb(propName, value, oldValue));
+        }
+    };
+    const state = (typeof Proxy === 'undefined'
+        ? {}
+        : new Proxy(defaultState, {
+            get(_, propName) {
+                return get(propName);
+            },
+            ownKeys(_) {
+                return Array.from(states.keys());
+            },
+            getOwnPropertyDescriptor() {
+                return {
+                    enumerable: true,
+                    configurable: true,
+                };
+            },
+            has(_, propName) {
+                return states.has(propName);
+            },
+            set(_, propName, value) {
+                set(propName, value);
+                return true;
+            },
+        }));
+    const on = (eventName, callback) => {
+        handlers[eventName].push(callback);
+        return () => {
+            removeFromArray(handlers[eventName], callback);
+        };
+    };
+    const onChange = (propName, cb) => {
+        const unSet = on('set', (key, newValue) => {
+            if (key === propName) {
+                cb(newValue);
+            }
+        });
+        const unReset = on('reset', () => cb(defaultState[propName]));
+        return () => {
+            unSet();
+            unReset();
+        };
+    };
+    const use = (...subscriptions) => {
+        const unsubs = subscriptions.reduce((unsubs, subscription) => {
+            if (subscription.set) {
+                unsubs.push(on('set', subscription.set));
+            }
+            if (subscription.get) {
+                unsubs.push(on('get', subscription.get));
+            }
+            if (subscription.reset) {
+                unsubs.push(on('reset', subscription.reset));
+            }
+            if (subscription.dispose) {
+                unsubs.push(on('dispose', subscription.dispose));
+            }
+            return unsubs;
+        }, []);
+        return () => unsubs.forEach((unsub) => unsub());
+    };
+    const forceUpdate = (key) => {
+        const oldValue = states.get(key);
+        handlers.set.forEach((cb) => cb(key, oldValue, oldValue));
+    };
+    return {
+        state,
+        get,
+        set,
+        on,
+        onChange,
+        use,
+        dispose,
+        reset,
+        forceUpdate,
+    };
+};
+const removeFromArray = (array, item) => {
+    const index = array.indexOf(item);
+    if (index >= 0) {
+        array[index] = array[array.length - 1];
+        array.length--;
+    }
+};
+
+const createStore = (defaultState, shouldUpdate) => {
+    const map = createObservableMap(defaultState, shouldUpdate);
+    map.use(stencilSubscription());
+    return map;
+};
+
+const e=(t,e)=>{try{return JSON.parse(t.getItem(e))}catch(t){return null}},r=(r,s,n,o=!1)=>{var i;const l=createStore(null!=(i=e(r,s))?i:n),a=(t=>{let e=!1;return ()=>{e||(e=!0,setTimeout(()=>{t(),e=!1;},0));}})(()=>r.setItem(s,JSON.stringify(l.state)));return a(),o&&window.addEventListener("storage",()=>{const t=e(r,s);if(null!==t)for(const e in t)l.set(e,t[e]);}),l.use({set:a,reset:a}),l},s=(t,e,s=!1)=>r(localStorage,t,e,s);
+
+var es6 = function equal(a, b) {
+  if (a === b) return true;
+
+  if (a && b && typeof a == 'object' && typeof b == 'object') {
+    if (a.constructor !== b.constructor) return false;
+
+    var length, i, keys;
+    if (Array.isArray(a)) {
+      length = a.length;
+      if (length != b.length) return false;
+      for (i = length; i-- !== 0;)
+        if (!equal(a[i], b[i])) return false;
+      return true;
+    }
+
+
+    if ((a instanceof Map) && (b instanceof Map)) {
+      if (a.size !== b.size) return false;
+      for (i of a.entries())
+        if (!b.has(i[0])) return false;
+      for (i of a.entries())
+        if (!equal(i[1], b.get(i[0]))) return false;
+      return true;
+    }
+
+    if ((a instanceof Set) && (b instanceof Set)) {
+      if (a.size !== b.size) return false;
+      for (i of a.entries())
+        if (!b.has(i[0])) return false;
+      return true;
+    }
+
+    if (ArrayBuffer.isView(a) && ArrayBuffer.isView(b)) {
+      length = a.length;
+      if (length != b.length) return false;
+      for (i = length; i-- !== 0;)
+        if (a[i] !== b[i]) return false;
+      return true;
+    }
+
+
+    if (a.constructor === RegExp) return a.source === b.source && a.flags === b.flags;
+    if (a.valueOf !== Object.prototype.valueOf) return a.valueOf() === b.valueOf();
+    if (a.toString !== Object.prototype.toString) return a.toString() === b.toString();
+
+    keys = Object.keys(a);
+    length = keys.length;
+    if (length !== Object.keys(b).length) return false;
+
+    for (i = length; i-- !== 0;)
+      if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
+
+    for (i = length; i-- !== 0;) {
+      var key = keys[i];
+
+      if (!equal(a[key], b[key])) return false;
+    }
+
+    return true;
+  }
+
+  // true if both NaN, false otherwise
+  return a!==a && b!==b;
+};
+
+function isMobile() {
+  return /Android|webOS|iPhone|iPad|iPod|Opera Mini/i.test(navigator.userAgent);
+}
+
+function focusSearch() {
+  var _a, _b, _c, _d, _e, _f;
+  if (!isMobile()) {
+    (_f = (_e = (_d = (_c = (_b = (_a = document === null || document === void 0 ? void 0 : document.querySelector('streamline-container')) === null || _a === void 0 ? void 0 : _a.shadowRoot) === null || _b === void 0 ? void 0 : _b.querySelector('streamline-box')) === null || _c === void 0 ? void 0 : _c.shadowRoot) === null || _d === void 0 ? void 0 : _d.querySelector('streamline-search')) === null || _e === void 0 ? void 0 : _e.shadowRoot) === null || _f === void 0 ? void 0 : _f.querySelector('input').focus();
+  }
+}
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -189,313 +466,34 @@ var clearAllBodyScrollLocks = function clearAllBodyScrollLocks() {
   locks = [];
 };
 
-const appendToMap = (map, propName, value) => {
-    const items = map.get(propName);
-    if (!items) {
-        map.set(propName, [value]);
-    }
-    else if (!items.includes(value)) {
-        items.push(value);
-    }
-};
-const debounce$2 = (fn, ms) => {
-    let timeoutId;
-    return (...args) => {
-        if (timeoutId) {
-            clearTimeout(timeoutId);
-        }
-        timeoutId = setTimeout(() => {
-            timeoutId = 0;
-            fn(...args);
-        }, ms);
-    };
-};
-
-/**
- * Check if a possible element isConnected.
- * The property might not be there, so we check for it.
- *
- * We want it to return true if isConnected is not a property,
- * otherwise we would remove these elements and would not update.
- *
- * Better leak in Edge than to be useless.
- */
-const isConnected = (maybeElement) => !('isConnected' in maybeElement) || maybeElement.isConnected;
-const cleanupElements = debounce$2((map) => {
-    for (let key of map.keys()) {
-        map.set(key, map.get(key).filter(isConnected));
-    }
-}, 2000);
-const stencilSubscription = () => {
-    if (typeof getRenderingRef !== 'function') {
-        // If we are not in a stencil project, we do nothing.
-        // This function is not really exported by @stencil/core.
-        return {};
-    }
-    const elmsToUpdate = new Map();
-    return {
-        dispose: () => elmsToUpdate.clear(),
-        get: (propName) => {
-            const elm = getRenderingRef();
-            if (elm) {
-                appendToMap(elmsToUpdate, propName, elm);
-            }
-        },
-        set: (propName) => {
-            const elements = elmsToUpdate.get(propName);
-            if (elements) {
-                elmsToUpdate.set(propName, elements.filter(forceUpdate));
-            }
-            cleanupElements(elmsToUpdate);
-        },
-        reset: () => {
-            elmsToUpdate.forEach((elms) => elms.forEach(forceUpdate));
-            cleanupElements(elmsToUpdate);
-        },
-    };
-};
-
-const createObservableMap = (defaultState, shouldUpdate = (a, b) => a !== b) => {
-    let states = new Map(Object.entries(defaultState !== null && defaultState !== void 0 ? defaultState : {}));
-    const handlers = {
-        dispose: [],
-        get: [],
-        set: [],
-        reset: [],
-    };
-    const reset = () => {
-        states = new Map(Object.entries(defaultState !== null && defaultState !== void 0 ? defaultState : {}));
-        handlers.reset.forEach((cb) => cb());
-    };
-    const dispose = () => {
-        // Call first dispose as resetting the state would
-        // cause less updates ;)
-        handlers.dispose.forEach((cb) => cb());
-        reset();
-    };
-    const get = (propName) => {
-        handlers.get.forEach((cb) => cb(propName));
-        return states.get(propName);
-    };
-    const set = (propName, value) => {
-        const oldValue = states.get(propName);
-        if (shouldUpdate(value, oldValue, propName)) {
-            states.set(propName, value);
-            handlers.set.forEach((cb) => cb(propName, value, oldValue));
-        }
-    };
-    const state = (typeof Proxy === 'undefined'
-        ? {}
-        : new Proxy(defaultState, {
-            get(_, propName) {
-                return get(propName);
-            },
-            ownKeys(_) {
-                return Array.from(states.keys());
-            },
-            getOwnPropertyDescriptor() {
-                return {
-                    enumerable: true,
-                    configurable: true,
-                };
-            },
-            has(_, propName) {
-                return states.has(propName);
-            },
-            set(_, propName, value) {
-                set(propName, value);
-                return true;
-            },
-        }));
-    const on = (eventName, callback) => {
-        handlers[eventName].push(callback);
-        return () => {
-            removeFromArray(handlers[eventName], callback);
-        };
-    };
-    const onChange = (propName, cb) => {
-        const unSet = on('set', (key, newValue) => {
-            if (key === propName) {
-                cb(newValue);
-            }
-        });
-        const unReset = on('reset', () => cb(defaultState[propName]));
-        return () => {
-            unSet();
-            unReset();
-        };
-    };
-    const use = (...subscriptions) => {
-        const unsubs = subscriptions.reduce((unsubs, subscription) => {
-            if (subscription.set) {
-                unsubs.push(on('set', subscription.set));
-            }
-            if (subscription.get) {
-                unsubs.push(on('get', subscription.get));
-            }
-            if (subscription.reset) {
-                unsubs.push(on('reset', subscription.reset));
-            }
-            if (subscription.dispose) {
-                unsubs.push(on('dispose', subscription.dispose));
-            }
-            return unsubs;
-        }, []);
-        return () => unsubs.forEach((unsub) => unsub());
-    };
-    const forceUpdate = (key) => {
-        const oldValue = states.get(key);
-        handlers.set.forEach((cb) => cb(key, oldValue, oldValue));
-    };
-    return {
-        state,
-        get,
-        set,
-        on,
-        onChange,
-        use,
-        dispose,
-        reset,
-        forceUpdate,
-    };
-};
-const removeFromArray = (array, item) => {
-    const index = array.indexOf(item);
-    if (index >= 0) {
-        array[index] = array[array.length - 1];
-        array.length--;
-    }
-};
-
-const createStore = (defaultState, shouldUpdate) => {
-    const map = createObservableMap(defaultState, shouldUpdate);
-    map.use(stencilSubscription());
-    return map;
-};
-
-var es6 = function equal(a, b) {
-  if (a === b) return true;
-
-  if (a && b && typeof a == 'object' && typeof b == 'object') {
-    if (a.constructor !== b.constructor) return false;
-
-    var length, i, keys;
-    if (Array.isArray(a)) {
-      length = a.length;
-      if (length != b.length) return false;
-      for (i = length; i-- !== 0;)
-        if (!equal(a[i], b[i])) return false;
-      return true;
-    }
-
-
-    if ((a instanceof Map) && (b instanceof Map)) {
-      if (a.size !== b.size) return false;
-      for (i of a.entries())
-        if (!b.has(i[0])) return false;
-      for (i of a.entries())
-        if (!equal(i[1], b.get(i[0]))) return false;
-      return true;
-    }
-
-    if ((a instanceof Set) && (b instanceof Set)) {
-      if (a.size !== b.size) return false;
-      for (i of a.entries())
-        if (!b.has(i[0])) return false;
-      return true;
-    }
-
-    if (ArrayBuffer.isView(a) && ArrayBuffer.isView(b)) {
-      length = a.length;
-      if (length != b.length) return false;
-      for (i = length; i-- !== 0;)
-        if (a[i] !== b[i]) return false;
-      return true;
-    }
-
-
-    if (a.constructor === RegExp) return a.source === b.source && a.flags === b.flags;
-    if (a.valueOf !== Object.prototype.valueOf) return a.valueOf() === b.valueOf();
-    if (a.toString !== Object.prototype.toString) return a.toString() === b.toString();
-
-    keys = Object.keys(a);
-    length = keys.length;
-    if (length !== Object.keys(b).length) return false;
-
-    for (i = length; i-- !== 0;)
-      if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
-
-    for (i = length; i-- !== 0;) {
-      var key = keys[i];
-
-      if (!equal(a[key], b[key])) return false;
-    }
-
-    return true;
-  }
-
-  // true if both NaN, false otherwise
-  return a!==a && b!==b;
-};
-
-function isMobile() {
-  return /Android|webOS|iPhone|iPad|iPod|Opera Mini/i.test(navigator.userAgent);
-}
-
-function focusSearch() {
-  var _a, _b, _c, _d, _e, _f;
-  if (!isMobile()) {
-    (_f = (_e = (_d = (_c = (_b = (_a = document === null || document === void 0 ? void 0 : document.querySelector('streamline-container')) === null || _a === void 0 ? void 0 : _a.shadowRoot) === null || _b === void 0 ? void 0 : _b.querySelector('streamline-box')) === null || _c === void 0 ? void 0 : _c.shadowRoot) === null || _d === void 0 ? void 0 : _d.querySelector('streamline-search')) === null || _e === void 0 ? void 0 : _e.shadowRoot) === null || _f === void 0 ? void 0 : _f.querySelector('input').focus();
-  }
-}
-
 var _a;
 const isTest = (_a = document
     .querySelector("streamline-container")) === null || _a === void 0 ? void 0 : _a.hasAttribute("test");
 const { state: state$1, dispose: dispose$1, onChange: onChange$1 } = createStore({
-    // @ts-ignore
-    data: window.streamlineData,
     class: {
         tag: "px-2.5 py-1.5 bg-blue-gray-200 text-blue-gray-500 inline-block h-[max-content] leading-1",
     },
-    menus: ["fav", "menu", "post", "settings"],
-    menu: {
-        fav: {
-            name: "fav",
-        },
-        menu: {
-            name: "menu",
-            commands: ["/site ", "/network"],
-        },
-        post: {
-            name: "post",
-        },
-        /*
-        custom: {
-          name: 'custom',
-        },
-         */
-        settings: {
-            name: "settings",
-        },
-    },
     commands: {
         local: {
-            site: {
-                // @ts-ignore
-                condition: window.streamlineData.network && !isTest,
-                name: "/site [name]",
-                description: `Display entries from a different site in the network.`,
-                callback: "sites",
-            },
-            network: {
-                // @ts-ignore
-                condition: window.streamlineData.network && !isTest,
-                name: "/network",
-                description: `Display entries from a from network dashboard.`,
-            },
+        /*
+        site: {
+          // @ts-ignore
+          condition: window.streamlineData.network && !isTest,
+          name: '/site [name]',
+          description: `Display entries from a different site in the network.`,
+          callback: 'sites',
+        },
+        */
         },
     },
+    currentSite: {
+        // @ts-ignore
+        id: window.streamlineData.siteId,
+        // @ts-ignore
+        path: window.streamlineData.sitePath,
+    },
+    // @ts-ignore
+    data: window.streamlineData,
     // @ts-ignore
     entriesFav: JSON.parse(window.streamlineData.favourites),
     // @ts-ignore
@@ -503,7 +501,6 @@ const { state: state$1, dispose: dispose$1, onChange: onChange$1 } = createStore
     entriesMenu: [],
     entriesMenuActive: [],
     entriesMenuCurrentPath: "",
-    entriesMenuIsNetwork: false,
     entriesNetwork: [],
     entriesNetworkActive: [],
     entriesPost: [],
@@ -582,11 +579,45 @@ const { state: state$1, dispose: dispose$1, onChange: onChange$1 } = createStore
     entriesSettingsSave: {},
     entriesSettingsHaveChanged: false,
     entriesSite: [],
+    entriesSiteActive: [],
     isEnter: false,
     isLoading: false,
     isProcessing: false,
-    isSites: false,
     isSlash: false,
+    menus: ["site", "network", "fav", "menu", "post", "settings"],
+    menu: {
+        site: {
+            name: "site",
+            // @ts-ignore
+            condition: window.streamlineData.network && !isTest,
+        },
+        network: {
+            name: "network",
+            // @ts-ignore
+            condition: window.streamlineData.network && !isTest,
+        },
+        fav: {
+            name: "fav",
+            condition: true,
+        },
+        menu: {
+            name: "menu",
+            condition: true,
+        },
+        post: {
+            name: "post",
+            condition: true,
+        },
+        /*
+        custom: {
+          name: 'custom',
+        },
+         */
+        settings: {
+            name: "settings",
+            condition: true,
+        },
+    },
     searchNoValue: "No entries found",
     searchPlaceholder: "",
     searchValue: "",
@@ -607,57 +638,44 @@ onChange$1("entriesSettingsSave", (value) => {
 onChange$1("entriesSettingsLoad", (value) => {
     state$1.entriesSettingsHaveChanged = !es6(value, state$1.entriesSettingsSave);
 });
-
-const e=(t,e)=>{try{return JSON.parse(t.getItem(e))}catch(t){return null}},r=(r,s,n,o=!1)=>{var i;const l=createStore(null!=(i=e(r,s))?i:n),a=(t=>{let e=!1;return ()=>{e||(e=!0,setTimeout(()=>{t(),e=!1;},0));}})(()=>r.setItem(s,JSON.stringify(l.state)));return a(),o&&window.addEventListener("storage",()=>{const t=e(r,s);if(null!==t)for(const e in t)l.set(e,t[e]);}),l.use({set:a,reset:a}),l},s=(t,e,s=!1)=>r(localStorage,t,e,s);
-
-function isLocalCommands() {
-  var _a;
-  let index = 0;
-  Object.values(state$1.commands.local).forEach((item) => {
-    if (item.condition !== false) {
-      index++;
+onChange$1("visible", (value) => {
+    var _a, _b, _c, _d, _e, _f;
+    const el = (_f = (_e = (_d = (_c = (_b = (_a = document === null || document === void 0 ? void 0 : document.querySelector("streamline-container")) === null || _a === void 0 ? void 0 : _a.shadowRoot) === null || _b === void 0 ? void 0 : _b.querySelector("streamline-box")) === null || _c === void 0 ? void 0 : _c.shadowRoot) === null || _d === void 0 ? void 0 : _d.querySelector("streamline-entries")) === null || _e === void 0 ? void 0 : _e.shadowRoot) === null || _f === void 0 ? void 0 : _f.querySelector("div > div");
+    if (el) {
+        if (value === true) {
+            disableBodyScroll(el, {
+                reserveScrollBarGap: true,
+            });
+        }
+        else {
+            clearAllBodyScrollLocks();
+        }
     }
-  });
-  return (((_a = state$1.menu[state.active].commands) === null || _a === void 0 ? void 0 : _a.length) >= 1 && index >= 1);
+});
+
+function capitalizeFirstLetter(string) {
+  return string[0].toUpperCase() + string.slice(1);
 }
 
+// import { isLocalCommands } from './isLocalCommands';
 function setSearchPlaceholder() {
+  /*
   const commands = isLocalCommands()
     ? " or type '/' for available commands"
     : '';
+   */
+  const commands = '';
   state$1.searchPlaceholder =
-    state.active === 'post'
+    state.active === 'post' || state.active === 'site'
       ? `${state$1.test
         ? 'Filter entries'
-        : Object.values(state$1.entriesPost).length >= 1
-          ? 'Search for a post or filter entries'
-          : 'Search for a post'}${commands}`
+        : Object.values(state$1[`entries${capitalizeFirstLetter(state.active)}`]).length >= 1
+          ? `Search for a ${state.active} or filter entries`
+          : `Search for a ${state.active}`}${commands}`
       : state.active === 'settings'
         ? 'Search settings'
         : `Search entries${commands}`;
 }
-
-function resetView() {
-  state$1.isSites = false;
-  state$1.isLoading = false;
-  state$1.isSlash = false;
-  state$1.isEnter = false;
-  if (state$1.entriesSettingsLoad.searchResetInput.default) {
-    state$1.searchValue = '';
-  }
-  setEntries();
-  if (state$1.entriesSettingsLoad.searchFocus.default) {
-    focusSearch();
-  }
-}
-
-const { state, dispose, onChange } = s("streamline", {
-    active: "menu",
-});
-onChange("active", () => {
-    resetView();
-    setSearchPlaceholder();
-});
 
 var deps$9 = {};
 
@@ -6441,10 +6459,6 @@ function getSomeDeep(_) {
 /* build/tpl */
 const someDeep = getSomeDeep(deps$3);
 
-function capitalizeFirstLetter(string) {
-  return string[0].toUpperCase() + string.slice(1);
-}
-
 function setEntries() {
   const result = filterDeep(state$1[`entries${capitalizeFirstLetter(state.active)}`], (o) => {
     return ((o.name &&
@@ -6471,37 +6485,26 @@ function setEntries() {
       ];
 }
 
-const streamlineBoxCss = ":host{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;box-sizing:border-box}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.blur{--tw-blur:blur(8px);filter:var(--tw-filter)}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
+function resetView() {
+  state$1.isLoading = false;
+  state$1.isSlash = false;
+  state$1.isEnter = false;
+  if (state$1.entriesSettingsLoad.searchResetInput.default) {
+    state$1.searchValue = '';
+  }
+  setEntries();
+  if (state$1.entriesSettingsLoad.searchFocus.default) {
+    focusSearch();
+  }
+}
 
-let StreamlineBox$1 = class extends HTMLElement {
-    constructor() {
-        super();
-        this.__registerHost();
-        this.__attachShadow();
-    }
-    connectedCallback() {
-        setEntries();
-    }
-    componentDidLoad() {
-        onChange$1("visible", (value) => {
-            if (value === true) {
-                disableBodyScroll(this.el.shadowRoot
-                    .querySelector("streamline-entries")
-                    .shadowRoot.querySelector("div > div"), {
-                    reserveScrollBarGap: true,
-                });
-            }
-            else {
-                clearAllBodyScrollLocks();
-            }
-        });
-    }
-    render() {
-        return (h("div", { class: "inner w-full h-full absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[1000px] max-h-[700px] bg-white overflow-hidden grid" }, h("streamline-sidebar", null), h("div", { class: "wrap h-full absolute left-[var(--sl-side-w)] w-[calc(100%-var(--sl-side-w))]" }, h("streamline-search", { class: "h-[var(--sl-side-w)] w-full" }), h("streamline-entries", null))));
-    }
-    get el() { return this; }
-    static get style() { return streamlineBoxCss + '/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-transform:translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;border:0 solid;box-sizing:border-box}.visible{visibility:visible}.absolute{position:absolute}.left-1\\/2{left:50%}.top-1\\/2{top:50%}.left-\\[var\\(--sl-side-w\\)\\]{left:var(--sl-side-w)}.grid{display:grid}.h-full{height:100%}.h-\\[var\\(--sl-side-w\\)\\]{height:var(--sl-side-w)}.max-h-\\[700px\\]{max-height:700px}.w-full{width:100%}.w-\\[calc\\(100\\%-var\\(--sl-side-w\\)\\)\\]{width:calc(100% - var(--sl-side-w))}.max-w-\\[1000px\\]{max-width:1000px}.-translate-x-1\\/2{--tw-translate-x:-50%;transform:var(--tw-transform)}.-translate-y-1\\/2{--tw-translate-y:-50%;transform:var(--tw-transform)}.overflow-hidden{overflow:hidden}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px 0 rgba(0,0,0,.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}'; }
-};
+const { state, dispose, onChange } = s("streamline", {
+    active: "menu",
+});
+onChange("active", () => {
+    resetView();
+    setSearchPlaceholder();
+});
 
 var top = 'top';
 var bottom = 'bottom';
@@ -9934,10 +9937,19 @@ function IconTimes() {
     return (h("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 320 512" }, h("path", { fill: "currentColor", d: "M193.94 256L296.5 153.44l21.15-21.15c3.12-3.12 3.12-8.19 0-11.31l-22.63-22.63c-3.12-3.12-8.19-3.12-11.31 0L160 222.06 36.29 98.34c-3.12-3.12-8.19-3.12-11.31 0L2.34 120.97c-3.12 3.12-3.12 8.19 0 11.31L126.06 256 2.34 379.71c-3.12 3.12-3.12 8.19 0 11.31l22.63 22.63c3.12 3.12 8.19 3.12 11.31 0L160 289.94 262.56 392.5l21.15 21.15c3.12 3.12 8.19 3.12 11.31 0l22.63-22.63c3.12-3.12 3.12-8.19 0-11.31L193.94 256z" })));
 }
 function IconCustom() {
-    return (h("svg", { class: `w-4 h-4`, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 512 512" }, h("path", { fill: "currentColor", d: "M324.42 103.15L384 128l24.84 59.58a8 8 0 0 0 14.32 0L448 128l59.58-24.85a8 8 0 0 0 0-14.31L448 64 423.16 4.42a8 8 0 0 0-14.32 0L384 64l-59.58 24.84a8 8 0 0 0 0 14.31zm183.16 305.69L448 384l-24.84-59.58a8 8 0 0 0-14.32 0L384 384l-59.58 24.84a8 8 0 0 0 0 14.32L384 448l24.84 59.58a8 8 0 0 0 14.32 0L448 448l59.58-24.84a8 8 0 0 0 0-14.32zM384 255.64a16.06 16.06 0 0 0-8.84-14.33l-112.57-56.39-56.28-112.77c-5.44-10.87-23.19-10.87-28.62 0l-56.28 112.77L8.84 241.31a16 16 0 0 0 0 28.67l112.57 56.39 56.28 112.77a16 16 0 0 0 28.62 0l56.28-112.77L375.16 270a16.07 16.07 0 0 0 8.84-14.36z" })));
+    return (h("svg", { class: `w-4`, xmlns: "http://www.w3.org/2000/svg" }, h("path", { fill: "currentColor", d: "M128 352H32c-17.67 0-32 14.33-32 32v96c0 17.67 14.33 32 32 32h96c17.67 0 32-14.33 32-32v-96c0-17.67-14.33-32-32-32zm-24-80h192v48h48v-48h192v48h48v-57.59c0-21.17-17.23-38.41-38.41-38.41H344v-64h40c17.67 0 32-14.33 32-32V32c0-17.67-14.33-32-32-32H256c-17.67 0-32 14.33-32 32v96c0 17.67 14.33 32 32 32h40v64H94.41C73.23 224 56 241.23 56 262.41V320h48v-48zm264 80h-96c-17.67 0-32 14.33-32 32v96c0 17.67 14.33 32 32 32h96c17.67 0 32-14.33 32-32v-96c0-17.67-14.33-32-32-32zm240 0h-96c-17.67 0-32 14.33-32 32v96c0 17.67 14.33 32 32 32h96c17.67 0 32-14.33 32-32v-96c0-17.67-14.33-32-32-32z" })));
+}
+function IconSites() {
+    return (h("svg", { class: `w-4`, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 640 512" }, h("path", { fill: "currentColor", d: "M128 352H32c-17.67 0-32 14.33-32 32v96c0 17.67 14.33 32 32 32h96c17.67 0 32-14.33 32-32v-96c0-17.67-14.33-32-32-32zm-24-80h192v48h48v-48h192v48h48v-57.59c0-21.17-17.23-38.41-38.41-38.41H344v-64h40c17.67 0 32-14.33 32-32V32c0-17.67-14.33-32-32-32H256c-17.67 0-32 14.33-32 32v96c0 17.67 14.33 32 32 32h40v64H94.41C73.23 224 56 241.23 56 262.41V320h48v-48zm264 80h-96c-17.67 0-32 14.33-32 32v96c0 17.67 14.33 32 32 32h96c17.67 0 32-14.33 32-32v-96c0-17.67-14.33-32-32-32zm240 0h-96c-17.67 0-32 14.33-32 32v96c0 17.67 14.33 32 32 32h96c17.67 0 32-14.33 32-32v-96c0-17.67-14.33-32-32-32z" })));
+}
+function IconNetwork() {
+    return (h("svg", { class: `w-4`, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 640 512" }, h("path", { fill: "currentColor", d: "M576 192c35.3 0 64-28.7 64-64s-28.7-64-64-64-64 28.7-64 64 28.7 64 64 64zM64 240c-35.3 0-64 28.7-64 64s28.7 64 64 64 64-28.7 64-64-28.7-64-64-64zm449.6-37.2l-19.2-25.6-48 36 19.2 25.6 48-36zM576 384c-14.4 0-27.6 5-38.3 13l-96-57.6c3.8-11.2 6.3-23 6.3-35.5 0-61.9-50.1-112-112-112-8.4 0-16.6 1.1-24.4 2.9l-40.8-87.4C281.4 96 288 80.8 288 64c0-35.3-28.7-64-64-64s-64 28.7-64 64 28.7 64 64 64c1.1 0 2.1-.3 3.2-.3l41 87.8C241.5 235.9 224 267.8 224 304c0 61.9 50.1 112 112 112 32.1 0 60.8-13.7 81.2-35.3l95.8 57.5c-.5 3.2-1 6.5-1 9.8 0 35.3 28.7 64 64 64s64-28.7 64-64-28.7-64-64-64zm-240-32c-26.5 0-48-21.5-48-48s21.5-48 48-48 48 21.5 48 48-21.5 48-48 48zm-184-32h48v-32h-48v32z" })));
+}
+function IconCheck() {
+    return (h("svg", { class: `w-3 lg:w-4`, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 512 512" }, h("path", { fill: "currentColor", d: "M435.848 83.466L172.804 346.51l-96.652-96.652c-4.686-4.686-12.284-4.686-16.971 0l-28.284 28.284c-4.686 4.686-4.686 12.284 0 16.971l133.421 133.421c4.686 4.686 12.284 4.686 16.971 0l299.813-299.813c4.686-4.686 4.686-12.284 0-16.971l-28.284-28.284c-4.686-4.686-12.284-4.686-16.97 0z" })));
 }
 
-const streamlineButtonCss = ".tippy-box[data-animation=fade][data-state=hidden]{opacity:0}[data-tippy-root]{max-width:calc(100vw - 10px)}.tippy-box{background-color:#333;background:#0f172a;border-radius:4px;border-radius:0!important;color:#fff;font-size:14px;line-height:1.4;outline:0;position:relative;transition-property:transform,visibility,opacity;white-space:normal}.tippy-box[data-placement^=top]>.tippy-arrow{bottom:0}.tippy-box[data-placement^=top]>.tippy-arrow:before{border-top-color:initial;border-width:8px 8px 0;bottom:-7px;left:0;transform-origin:center top}.tippy-box[data-placement^=bottom]>.tippy-arrow{top:0}.tippy-box[data-placement^=bottom]>.tippy-arrow:before{border-bottom-color:initial;border-width:0 8px 8px;left:0;top:-7px;transform-origin:center bottom}.tippy-box[data-placement^=left]>.tippy-arrow{right:0}.tippy-box[data-placement^=left]>.tippy-arrow:before{border-left-color:initial;border-width:8px 0 8px 8px;right:-7px;transform-origin:center left}.tippy-box[data-placement^=right]>.tippy-arrow{left:0}.tippy-box[data-placement^=right]>.tippy-arrow:before{border-right-color:initial;border-width:8px 8px 8px 0;left:-7px;transform-origin:center right}.tippy-box[data-inertia][data-state=visible]{transition-timing-function:cubic-bezier(.54,1.5,.38,1.11)}.tippy-arrow{color:#333;height:16px;width:16px}.tippy-arrow:before{border-color:transparent;border-style:solid;content:\"\";position:absolute}.tippy-content{padding:0;position:relative;z-index:1}:host{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;display:inline-block}:host .focus:focus{box-shadow:inset 0 0 0 4px #f8fafc,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-border:focus{border-color:var(--sl-focus-color);box-shadow:0 0 0 1px var(--sl-focus-color);outline:none!important}:host .focus-out:focus{box-shadow:0 0 0 2px #f8fafc,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-dark:focus{box-shadow:inset 0 0 0 4px #0f172a,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-darker:focus{box-shadow:inset 0 0 0 4px #020204,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-white:focus{box-shadow:inset 0 0 0 4px #fff,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-white-out:focus{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-in-white-out:focus-within{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-none:focus{box-shadow:none!important;outline:none!important}:host .border-invalid{border-color:var(--sl-focus-color-invalid);box-shadow:0 0 0 1px var(--sl-focus-color-invalid);outline:none!important}.tippy-box .tippy-arrow{color:#0f172a}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);--tw-border-opacity:1;border:0 solid;box-sizing:border-box}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */.pointer-events-none{pointer-events:none}.flex{display:flex}.h-4{height:1rem}.h-full{height:100%}.w-4{width:1rem}.w-full{width:100%}.items-center{align-items:center}.justify-center{justify-content:center}.rounded-full{border-radius:9999px}.border{border-width:1px}.border-blue-gray-200{--tw-border-opacity:1;border-color:rgba(226,232,240,var(--tw-border-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.text-red-500{--tw-text-opacity:1;color:rgba(239,68,68,var(--tw-text-opacity))}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */[type=search]{-webkit-appearance:textfield;outline-offset:-2px}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.blur{--tw-blur:blur(8px);filter:var(--tw-filter)}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */img{border-style:solid;height:auto;max-width:100%}img,svg{display:block;vertical-align:middle}.h-6{height:1.5rem}.h-10{height:2.5rem}.w-6{width:1.5rem}.w-10{width:2.5rem}.animate-spin{-webkit-animation:spin 1s linear infinite;animation:spin 1s linear infinite}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */svg{display:block;vertical-align:middle}.relative{position:relative}.-mr-px{margin-right:-1px}.h-\\[14px\\]{height:14px}.fill-current{fill:currentColor}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */@media (min-width:640px){.sm\\:h-7{height:1.75rem}.sm\\:w-7{width:1.75rem}}";
+const streamlineButtonCss = ".tippy-box[data-animation=fade][data-state=hidden]{opacity:0}[data-tippy-root]{max-width:calc(100vw - 10px)}.tippy-box{background-color:#333;background:#0f172a;border-radius:4px;border-radius:0!important;color:#fff;font-size:14px;line-height:1.4;outline:0;position:relative;transition-property:transform,visibility,opacity;white-space:normal}.tippy-box[data-placement^=top]>.tippy-arrow{bottom:0}.tippy-box[data-placement^=top]>.tippy-arrow:before{border-top-color:initial;border-width:8px 8px 0;bottom:-7px;left:0;transform-origin:center top}.tippy-box[data-placement^=bottom]>.tippy-arrow{top:0}.tippy-box[data-placement^=bottom]>.tippy-arrow:before{border-bottom-color:initial;border-width:0 8px 8px;left:0;top:-7px;transform-origin:center bottom}.tippy-box[data-placement^=left]>.tippy-arrow{right:0}.tippy-box[data-placement^=left]>.tippy-arrow:before{border-left-color:initial;border-width:8px 0 8px 8px;right:-7px;transform-origin:center left}.tippy-box[data-placement^=right]>.tippy-arrow{left:0}.tippy-box[data-placement^=right]>.tippy-arrow:before{border-right-color:initial;border-width:8px 8px 8px 0;left:-7px;transform-origin:center right}.tippy-box[data-inertia][data-state=visible]{transition-timing-function:cubic-bezier(.54,1.5,.38,1.11)}.tippy-arrow{color:#333;height:16px;width:16px}.tippy-arrow:before{border-color:transparent;border-style:solid;content:\"\";position:absolute}.tippy-content{padding:0;position:relative;z-index:1}:host{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;display:inline-block}:host .focus:focus{box-shadow:inset 0 0 0 4px #f8fafc,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-border:focus{border-color:var(--sl-focus-color);box-shadow:0 0 0 1px var(--sl-focus-color);outline:none!important}:host .focus-out:focus{box-shadow:0 0 0 2px #f8fafc,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-dark:focus{box-shadow:inset 0 0 0 4px #0f172a,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-darker:focus{box-shadow:inset 0 0 0 4px #020204,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-white:focus{box-shadow:inset 0 0 0 4px #fff,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-white-out:focus{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-in-white-out:focus-within{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-none:focus{box-shadow:none!important;outline:none!important}:host .border-invalid{border-color:var(--sl-focus-color-invalid);box-shadow:0 0 0 1px var(--sl-focus-color-invalid);outline:none!important}.tippy-box .tippy-arrow{color:#0f172a}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);--tw-border-opacity:1;border:0 solid;box-sizing:border-box}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.blur{--tw-blur:blur(8px);filter:var(--tw-filter)}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */img{border-style:solid;height:auto;max-width:100%}img,svg{display:block;vertical-align:middle}.h-6{height:1.5rem}.h-10{height:2.5rem}.w-6{width:1.5rem}.w-10{width:2.5rem}.animate-spin{-webkit-animation:spin 1s linear infinite;animation:spin 1s linear infinite}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */.pointer-events-none{pointer-events:none}.flex{display:flex}.h-4{height:1rem}.h-full{height:100%}.w-4{width:1rem}.w-full{width:100%}.items-center{align-items:center}.justify-center{justify-content:center}.rounded-full{border-radius:9999px}.border{border-width:1px}.border-blue-gray-200{--tw-border-opacity:1;border-color:rgba(226,232,240,var(--tw-border-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.text-red-500{--tw-text-opacity:1;color:rgba(239,68,68,var(--tw-text-opacity))}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */svg{display:block;vertical-align:middle}.relative{position:relative}.-mr-px{margin-right:-1px}.h-\\[14px\\]{height:14px}.fill-current{fill:currentColor}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */@media (min-width:640px){.sm\\:h-7{height:1.75rem}.sm\\:w-7{width:1.75rem}}";
 
 let StreamlineButton$1 = class extends HTMLElement {
     constructor() {
@@ -9952,7 +9964,7 @@ let StreamlineButton$1 = class extends HTMLElement {
             setFavourite({
                 favourite: this.favourite,
                 callback: this.checkIfFav,
-                type: "menu",
+                type: state.active,
                 filter: (o) => {
                     return o.href === this.href && o.adminUrl === this.adminUrl;
                 },
@@ -10020,7 +10032,7 @@ let StreamlineButton$1 = class extends HTMLElement {
         const classNameText = `${this.type === "sidebar"
             ? "hidden sm:inline-block text-xs font-semibold leading-1 mt-1.5 lg:mt-0 lg:text-sm"
             : ""}`;
-        const icon = this.icon === "wordpress" ? (h(IconWordPress, null)) : this.icon === "menu" ? (h(IconMenu, null)) : this.icon === "post" ? (h(IconPost, null)) : this.icon === "flow" ? (h(IconFlow, null)) : this.icon === "custom" ? (h(IconCustom, null)) : this.icon === "settings" ? (h(IconSettings, null)) : (this.icon === "fav" && h(Heart, { type: this.type }));
+        const icon = this.icon === "wordpress" ? (h(IconWordPress, null)) : this.icon === "site" ? (h(IconSites, null)) : this.icon === "menu" ? (h(IconMenu, null)) : this.icon === "network" ? (h(IconNetwork, null)) : this.icon === "post" ? (h(IconPost, null)) : this.icon === "flow" ? (h(IconFlow, null)) : this.icon === "custom" ? (h(IconCustom, null)) : this.icon === "settings" ? (h(IconSettings, null)) : (this.icon === "fav" && h(Heart, { type: this.type }));
         const text = this.text && h("span", { class: classNameText }, this.text);
         return (h("div", { class: `relative flex ${this.type === "primary" ? "w-[calc(var(--sl-side-w)+1px)]" : "w-full"} ${this.invalid ? "opacity-25 pointer-events-none" : ""}` }, this.type === "menu" && this.href ? (h("a", { ref: (el) => (this.link = el), href: !state$1.test ? this.href : "#", class: className + ` focus-out` }, icon, text, this.favourite && state.active !== "fav" && (h(Fav, { class: `absolute -top-1.5 -right-2` })))) : this.type === "sidebar" || this.type === "primary" ? (h("button", { tabIndex: state.active === this.icon ? -1 : 0, class: className }, this.type === "primary" ? (state$1.isProcessing ? (h(Loader, { sm: true })) : (icon)) : (icon), this.icon === "settings" ? "" : text)) : (h("button", { class: `select-none focus-out inline-flex items-center uppercase font-semibold text-xs ${this.styling === "primary"
                 ? "px-2.5 py-2 bg-blue-500 border-blue-500 text-white hover:bg-blue-600 hover:border-blue-600 sm:px-3.5"
@@ -10035,6 +10047,126 @@ let StreamlineButton$1 = class extends HTMLElement {
     }
     static get style() { return streamlineButtonCss + '/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-transform:translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));--tw-border-opacity:1;--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;border-color:rgba(228,228,231,var(--tw-border-opacity));box-sizing:border-box}button{background-color:transparent;background-image:none;color:inherit;cursor:pointer;font-family:inherit;font-size:100%;line-height:1.15;line-height:inherit;margin:0;padding:0;text-transform:none}[type=button],button{-webkit-appearance:button}a{color:inherit;text-decoration:inherit}svg{display:block;vertical-align:middle}[hidden]{display:none}.pointer-events-none{pointer-events:none}.absolute{position:absolute}.relative{position:relative}.-top-1\\.5{top:-.375rem}.-right-2{right:-.5rem}.-top-1{top:-.25rem}.mt-1\\.5{margin-top:.375rem}.mt-1{margin-top:.25rem}.ml-1{margin-left:.25rem}.mr-2{margin-right:.5rem}.block{display:block}.flex{display:flex}.inline-flex{display:inline-flex}.\\!grid{display:grid!important}.hidden{display:none}.h-\\[16px\\]{height:16px}.h-\\[14px\\]{height:14px}.h-8{height:2rem}.h-\\[calc\\(var\\(--sl-side-w\\)\\)\\]{height:calc(var(--sl-side-w))}.h-\\[var\\(--sl-side-w\\)\\]{height:var(--sl-side-w)}.w-8{width:2rem}.w-\\[max-content\\]{width:-webkit-max-content;width:-moz-max-content;width:max-content}.w-\\[calc\\(var\\(--sl-side-w\\)\\)\\]{width:calc(var(--sl-side-w))}.w-\\[calc\\(var\\(--sl-side-w\\)\\+1px\\)\\]{width:calc(var(--sl-side-w) + 1px)}.w-full{width:100%}.w-2{width:.5rem}.rotate-90{--tw-rotate:90deg;transform:var(--tw-transform)}@-webkit-keyframes spin{to{transform:rotate(1turn)}}@keyframes spin{to{transform:rotate(1turn)}}.animate-spin{-webkit-animation:spin 1s linear infinite;animation:spin 1s linear infinite}.cursor-pointer{cursor:pointer}.select-none{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.auto-cols-max{grid-auto-columns:-webkit-max-content;grid-auto-columns:max-content}.grid-flow-col{grid-auto-flow:column}.flex-col{flex-direction:column}.\\!content-center{align-content:center!important}.items-center{align-items:center}.justify-center{justify-content:center}.\\!justify-items-center{justify-items:center!important}.divide-x>:not([hidden])~:not([hidden]){--tw-divide-x-reverse:0;border-left-width:calc(1px*(1 - var(--tw-divide-x-reverse)));border-right-width:calc(1px*var(--tw-divide-x-reverse))}.divide-blue-gray-200>:not([hidden])~:not([hidden]){--tw-divide-opacity:1;border-color:rgba(226,232,240,var(--tw-divide-opacity))}.break-words{overflow-wrap:break-word}.border{border-width:1px}.border-none{border-style:none}.border-blue-gray-200{--tw-border-opacity:1;border-color:rgba(226,232,240,var(--tw-border-opacity))}.border-blue-500{--tw-border-opacity:1;border-color:rgba(59,130,246,var(--tw-border-opacity))}.bg-blue-gray-50{--tw-bg-opacity:1;background-color:rgba(248,250,252,var(--tw-bg-opacity))}.bg-transparent{background-color:transparent}.bg-\\[\\#020204\\]{--tw-bg-opacity:1;background-color:rgba(2,2,4,var(--tw-bg-opacity))}.bg-blue-gray-800{--tw-bg-opacity:1;background-color:rgba(30,41,59,var(--tw-bg-opacity))}.bg-blue-500{--tw-bg-opacity:1;background-color:rgba(59,130,246,var(--tw-bg-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.fill-current{fill:currentColor}.p-0{padding:0}.px-3{padding-left:.75rem;padding-right:.75rem}.py-2\\.5{padding-bottom:.625rem;padding-top:.625rem}.py-2{padding-bottom:.5rem;padding-top:.5rem}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-center{text-align:center}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xs{font-size:.75rem;line-height:1rem}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-none{line-height:1}.text-blue-600{--tw-text-opacity:1;color:rgba(37,99,235,var(--tw-text-opacity))}.text-white{--tw-text-opacity:1;color:rgba(255,255,255,var(--tw-text-opacity))}.text-blue-gray-200{--tw-text-opacity:1;color:rgba(226,232,240,var(--tw-text-opacity))}.text-blue-gray-600{--tw-text-opacity:1;color:rgba(71,85,105,var(--tw-text-opacity))}.text-red-500{--tw-text-opacity:1;color:rgba(239,68,68,var(--tw-text-opacity))}.opacity-25{opacity:.25}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px 0 rgba(0,0,0,.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.filter{filter:var(--tw-filter)}.hover\\:border-blue-600:hover{--tw-border-opacity:1;border-color:rgba(37,99,235,var(--tw-border-opacity))}.hover\\:border-blue-gray-900:hover{--tw-border-opacity:1;border-color:rgba(15,23,42,var(--tw-border-opacity))}.hover\\:bg-\\[\\#080d17\\]:hover{--tw-bg-opacity:1;background-color:rgba(8,13,23,var(--tw-bg-opacity))}.hover\\:bg-blue-gray-800:hover{--tw-bg-opacity:1;background-color:rgba(30,41,59,var(--tw-bg-opacity))}.hover\\:bg-blue-600:hover{--tw-bg-opacity:1;background-color:rgba(37,99,235,var(--tw-bg-opacity))}.hover\\:bg-blue-gray-900:hover{--tw-bg-opacity:1;background-color:rgba(15,23,42,var(--tw-bg-opacity))}.hover\\:text-blue-gray-50:hover{--tw-text-opacity:1;color:rgba(248,250,252,var(--tw-text-opacity))}@media (min-width:640px){.sm\\:inline-block{display:inline-block}.sm\\:h-10{height:2.5rem}.sm\\:w-10{width:2.5rem}.sm\\:\\!grid-rows-\\[20px\\2c 20px\\]{grid-template-rows:20px 20px!important}.sm\\:px-3\\.5{padding-left:.875rem;padding-right:.875rem}.sm\\:px-3{padding-left:.75rem;padding-right:.75rem}.sm\\:py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.sm\\:py-1{padding-bottom:.25rem;padding-top:.25rem}}@media (min-width:1024px){.lg\\:mt-0{margin-top:0}.lg\\:h-\\[64px\\]{height:64px}.lg\\:h-\\[48px\\]{height:48px}.lg\\:grid-cols-\\[32px\\2c 1fr\\]{grid-template-columns:32px 1fr}.lg\\:\\!grid-rows-1{grid-template-rows:repeat(1,minmax(0,1fr))!important}.lg\\:\\!justify-items-start{justify-items:start!important}.lg\\:px-5{padding-left:1.25rem;padding-right:1.25rem}.lg\\:text-sm{font-size:.875rem;line-height:1.25rem}}'; }
 };
+
+function getMenu(obj = {}) {
+  let data = [];
+  const menu = {};
+  const isAdmin = document.querySelector('#adminmenuwrap') &&
+    ((obj.network && state$1.data.isNetwork) ||
+      (!obj.network &&
+        state$1.data.isAdmin &&
+        !state$1.data.isNetwork));
+  const isNetwork = obj.network;
+  const isMultisite = !!state$1.data.network;
+  const adminUrl = obj.adminUrl ||
+    (isNetwork ? state$1.data.network : state$1.data.adminUrl);
+  const siteId = obj.siteId || (isNetwork ? 0 : state$1.data.siteId);
+  const type = !obj.path && isNetwork ? 'networkMenu' : 'menu';
+  function get(doc) {
+    doc.querySelectorAll('.menu-top > a').forEach((item, index) => {
+      const name = item.innerText.replace(/(\r\n|\n|\r)/gm, '');
+      const subMenu = item.closest('li.menu-top');
+      const subArr = {};
+      if (subMenu) {
+        const subSubMenu = subMenu.querySelectorAll('a');
+        subSubMenu.forEach((itemSub, indexSub) => {
+          if ((indexSub !== 0 && subSubMenu.length >= 2) ||
+            (indexSub === 0 && subSubMenu.length === 1)) {
+            const nameSub = itemSub.innerText.replace(/(\r\n|\n|\r)/gm, '');
+            const hrefSub = itemSub.getAttribute('href');
+            subArr[hrefSub] = {
+              adminUrl,
+              href: adminUrl + hrefSub,
+              index: subSubMenu.length === 1 ? indexSub : indexSub - 1,
+              name: nameSub,
+              nameParent: name,
+              path: hrefSub,
+              siteId: Number(siteId),
+              type: type,
+            };
+          }
+        });
+      }
+      menu[name] = {
+        index,
+        name,
+        children: subArr,
+      };
+    });
+    data = [
+      {
+        adminUrl,
+        children: menu,
+        isMultisite: isMultisite,
+        path: obj.path || state$1.currentSite.path,
+        siteId: Number(siteId),
+        type: type,
+      },
+    ];
+    if (isNetwork) {
+      state$1.entriesNetwork = data;
+      state$1.entriesNetworkActive = data;
+    }
+    else {
+      state$1.entriesMenu = data;
+      state$1.entriesMenuActive = data;
+      state$1.entriesMenuCurrentPath =
+        obj.path || state$1.currentSite.path;
+    }
+    setEntries();
+  }
+  if (isAdmin && !obj.fetch) {
+    get(document);
+  }
+  else {
+    state$1.isLoading = true;
+    fetch(adminUrl)
+      .then((response) => response.text && response.text())
+      .then((data) => {
+      const parser = new DOMParser();
+      const html = parser.parseFromString(data, 'text/html');
+      get(html);
+      resetView();
+      // console.log(stateInternal.entriesMenu);
+    })
+      .catch(() => { });
+    // @ts-ignore
+    // eslint-disable-next-line no-undef
+    /*
+    fetch(streamline.ajax, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/x-www-form-urlencoded',
+      }),
+      body: `action=streamlineMenu&url=${
+        obj.adminUrl || stateInternal.data.adminUrl
+        // @ts-ignore
+        // eslint-disable-next-line no-undef
+      }&nonce=${streamline.nonce}`,
+    })
+      .then((response) => response.text())
+      .then((data) => {
+        const parser = new DOMParser();
+        const html = parser.parseFromString(data, 'text/html');
+        console.log(html);
+        get(html);
+        resetView();
+        stateLocal.active = 'menu';
+      });
+     */
+  }
+}
+
+function getMenus() {
+  if (state.active === 'menu' && state$1.entriesMenu.length === 0) {
+    getMenu({ network: false, adminUrl: state$1.data.adminUrl });
+  }
+  if (state.active === 'network' &&
+    state$1.entriesNetwork.length === 0) {
+    getMenu({ network: true });
+  }
+}
 
 function setTestData() {
   const menu = [
@@ -11047,108 +11179,7 @@ function setTestData() {
   state$1.entriesPostActive = post;
 }
 
-function getMenu(obj = {}) {
-  let data = [];
-  const menu = {};
-  const isAdmin = document.querySelector('#adminmenuwrap') && !obj.adminUrl && !obj.network;
-  const isNetwork = obj.network || state$1.data.isNetwork;
-  const isMultisite = !!state$1.data.network;
-  const adminUrl = obj.adminUrl ||
-    (isNetwork ? state$1.data.network : state$1.data.adminUrl);
-  const siteId = obj.siteId || (isNetwork ? 0 : state$1.data.siteId);
-  const type = !obj.path && isNetwork ? 'networkMenu' : 'menu';
-  function get(doc) {
-    doc.querySelectorAll('.menu-top > a').forEach((item, index) => {
-      const name = item.innerText.replace(/(\r\n|\n|\r)/gm, '');
-      const subMenu = item.closest('li.menu-top');
-      const subArr = {};
-      if (subMenu) {
-        const subSubMenu = subMenu.querySelectorAll('a');
-        subSubMenu.forEach((itemSub, indexSub) => {
-          if ((indexSub !== 0 && subSubMenu.length >= 2) ||
-            (indexSub === 0 && subSubMenu.length === 1)) {
-            const nameSub = itemSub.innerText.replace(/(\r\n|\n|\r)/gm, '');
-            const hrefSub = itemSub.getAttribute('href');
-            subArr[hrefSub] = {
-              adminUrl,
-              href: adminUrl + hrefSub,
-              index: subSubMenu.length === 1 ? indexSub : indexSub - 1,
-              name: nameSub,
-              nameParent: name,
-              path: hrefSub,
-              siteId: Number(siteId),
-              type: type,
-            };
-          }
-        });
-      }
-      menu[name] = {
-        index,
-        name,
-        children: subArr,
-      };
-    });
-    data = [
-      {
-        adminUrl,
-        children: menu,
-        isMultisite: isMultisite,
-        path: obj.path || state$1.data.path,
-        siteId: Number(siteId),
-        type: type,
-      },
-    ];
-    state$1.entriesMenu = data;
-    state$1.entriesMenuActive = data;
-    state$1.entriesMenuCurrentPath = obj.path || state$1.data.path;
-    state$1.entriesMenuIsNetwork = obj.network;
-    setEntries();
-  }
-  if (isAdmin) {
-    get(document);
-  }
-  else {
-    state$1.isLoading = true;
-    fetch(adminUrl)
-      .then((response) => response.text && response.text())
-      .then((data) => {
-      const parser = new DOMParser();
-      const html = parser.parseFromString(data, 'text/html');
-      get(html);
-      resetView();
-      state.active = 'menu';
-      // console.log(stateInternal.entriesMenu);
-    })
-      .catch((error) => console.log(error));
-    // @ts-ignore
-    // eslint-disable-next-line no-undef
-    /*
-    fetch(streamline.ajax, {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: new Headers({
-        'Content-Type': 'application/x-www-form-urlencoded',
-      }),
-      body: `action=streamlineMenu&url=${
-        obj.adminUrl || stateInternal.data.adminUrl
-        // @ts-ignore
-        // eslint-disable-next-line no-undef
-      }&nonce=${streamline.nonce}`,
-    })
-      .then((response) => response.text())
-      .then((data) => {
-        const parser = new DOMParser();
-        const html = parser.parseFromString(data, 'text/html');
-        console.log(html);
-        get(html);
-        resetView();
-        stateLocal.active = 'menu';
-      });
-     */
-  }
-}
-
-const streamlineContainerCss = ":host{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;display:block;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif}:host *{pointer-events:auto}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;box-sizing:border-box}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */[type=search]{-webkit-appearance:textfield;outline-offset:-2px}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.blur{--tw-blur:blur(8px);filter:var(--tw-filter)}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
+const streamlineContainerCss = ":host{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box;display:block;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif}:host *{pointer-events:auto}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;box-sizing:border-box}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.blur{--tw-blur:blur(8px);filter:var(--tw-filter)}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
 
 let StreamlineContainer$1 = class extends HTMLElement {
     constructor() {
@@ -11175,15 +11206,15 @@ let StreamlineContainer$1 = class extends HTMLElement {
                     state.active = state$1.menus[index + 1];
                 }
             }
-            if (state.active === "menu" &&
-                state$1.entriesMenu.length === 0) {
-                getMenu();
-            }
+            getMenus();
         };
     }
     connectedCallback() {
+        if (state$1.test) {
+            setTestData();
+        }
+        setEntries();
         this.mac = this.mac || navigator.userAgent.indexOf("Mac OS X") !== -1;
-        state$1.visible = this.visible || false;
         state$1.entriesSettingsActive = state$1.entriesSettings;
         state$1.entriesSettings[0].children.forEach((item) => {
             item.children.forEach((itemInner) => {
@@ -11194,9 +11225,6 @@ let StreamlineContainer$1 = class extends HTMLElement {
             });
         });
         state$1.entriesSettingsSave = state$1.entriesSettingsLoad;
-        if (state$1.test) {
-            setTestData();
-        }
         document.addEventListener("keydown", (e) => {
             if (e.key === "k" && (this.mac ? e.metaKey : e.ctrlKey)) {
                 e.preventDefault();
@@ -11223,6 +11251,7 @@ let StreamlineContainer$1 = class extends HTMLElement {
     }
     componentDidLoad() {
         setSearchPlaceholder();
+        state$1.visible = this.visible || false;
     }
     async toggle() {
         state$1.visible = !state$1.visible;
@@ -11241,18 +11270,19 @@ let StreamlineContainer$1 = class extends HTMLElement {
     static get style() { return streamlineContainerCss + '/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-backdrop-blur:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-invert:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-opacity:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);border:0 solid;box-sizing:border-box}[hidden]{display:none}.pointer-events-none{pointer-events:none}.pointer-events-auto{pointer-events:auto}.visible{visibility:visible}.fixed{position:fixed}.top-0{top:0}.left-0{left:0}.z-\\[9999999999999999\\]{z-index:10000000000000000}.block{display:block}.hidden{display:none}.h-full{height:100%}.w-full{width:100%}.bg-black\\/90{background-color:rgba(0,0,0,.9)}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px 0 rgba(0,0,0,.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-filter);backdrop-filter:var(--tw-backdrop-filter)}'; }
 };
 
-const streamlineEntriesCss = ":host{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box}:host .focus:focus{box-shadow:inset 0 0 0 4px #f8fafc,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-border:focus{border-color:var(--sl-focus-color);box-shadow:0 0 0 1px var(--sl-focus-color);outline:none!important}:host .focus-out:focus{box-shadow:0 0 0 2px #f8fafc,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-dark:focus{box-shadow:inset 0 0 0 4px #0f172a,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-darker:focus{box-shadow:inset 0 0 0 4px #020204,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-white:focus{box-shadow:inset 0 0 0 4px #fff,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-white-out:focus{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-in-white-out:focus-within{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-none:focus{box-shadow:none!important;outline:none!important}:host .border-invalid{border-color:var(--sl-focus-color-invalid);box-shadow:0 0 0 1px var(--sl-focus-color-invalid);outline:none!important}.inner::-webkit-scrollbar{width:10px}.inner::-webkit-scrollbar-track{background:#fff}.inner::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:0}streamline-button{display:block;height:100%;width:100%}input:checked~.dot{background-color:#fff;transform:translateX(36px)}select{-moz-appearance:none;appearance:none;-webkit-appearance:none;background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E\");background-position:right .25rem center;background-repeat:no-repeat;background-size:1.25em 1.25em;border:1px solid #e2e8f0;color:#0f172a;font-family:inter,sans-serif;font-size:.875rem;font-weight:600;height:34px;padding:0 .75rem!important;width:100%}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;box-sizing:border-box}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */[type=search]{-webkit-appearance:textfield;outline-offset:-2px}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.blur{--tw-blur:blur(8px);filter:var(--tw-filter)}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */img{border-style:solid;height:auto;max-width:100%}img,svg{display:block;vertical-align:middle}.h-6{height:1.5rem}.h-10{height:2.5rem}.w-6{width:1.5rem}.w-10{width:2.5rem}.animate-spin{-webkit-animation:spin 1s linear infinite;animation:spin 1s linear infinite}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */@media (min-width:640px){.sm\\:h-7{height:1.75rem}.sm\\:w-7{width:1.75rem}}";
+const streamlineEntriesCss = ":host{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box}:host .focus:focus{box-shadow:inset 0 0 0 4px #f8fafc,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-border:focus{border-color:var(--sl-focus-color);box-shadow:0 0 0 1px var(--sl-focus-color);outline:none!important}:host .focus-out:focus{box-shadow:0 0 0 2px #f8fafc,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-dark:focus{box-shadow:inset 0 0 0 4px #0f172a,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-darker:focus{box-shadow:inset 0 0 0 4px #020204,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-white:focus{box-shadow:inset 0 0 0 4px #fff,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-white-out:focus{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-in-white-out:focus-within{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-none:focus{box-shadow:none!important;outline:none!important}:host .border-invalid{border-color:var(--sl-focus-color-invalid);box-shadow:0 0 0 1px var(--sl-focus-color-invalid);outline:none!important}.inner::-webkit-scrollbar{width:10px}.inner::-webkit-scrollbar-track{background:#fff}.inner::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:0}streamline-button{display:block;height:100%;width:100%}input:checked~.dot{background-color:#fff;transform:translateX(36px)}select{-moz-appearance:none;appearance:none;-webkit-appearance:none;background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E\");background-position:right .25rem center;background-repeat:no-repeat;background-size:1.25em 1.25em;border:1px solid #e2e8f0;color:#0f172a;font-family:inter,sans-serif;font-size:.875rem;font-weight:600;height:34px;padding:0 .75rem!important;width:100%}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;box-sizing:border-box}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.blur{--tw-blur:blur(8px);filter:var(--tw-filter)}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */img{border-style:solid;height:auto;max-width:100%}img,svg{display:block;vertical-align:middle}.h-6{height:1.5rem}.h-10{height:2.5rem}.w-6{width:1.5rem}.w-10{width:2.5rem}.animate-spin{-webkit-animation:spin 1s linear infinite;animation:spin 1s linear infinite}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */@media (min-width:640px){.sm\\:h-7{height:1.75rem}.sm\\:w-7{width:1.75rem}}";
 
 let StreamlineEntries$1 = class extends HTMLElement {
     constructor() {
         super();
         this.__registerHost();
         this.__attachShadow();
+        this.px = "px-6 lg:px-8";
         this.h2 = "text-base text-blue-gray-900 font-medium";
         this.p = "text-blue-gray-600 text-base font-normal";
         this.tag = "px-2.5 py-1.5 bg-blue-gray-200 text-blue-gray-500 inline-block h-[max-content] leading-1";
         this.border = "border-t border-blue-gray-100 first-of-type:border-none";
-        this.getArr = (arr, type) => {
+        this.getArr = (arr = [], type) => {
             var _a;
             return ((arr.length >= 1 && arr) ||
                 (((_a = state$1[`entries${capitalizeFirstLetter(type)}Active`]) === null || _a === void 0 ? void 0 : _a.length) >=
@@ -11261,26 +11291,68 @@ let StreamlineEntries$1 = class extends HTMLElement {
                         state$1[`entries${capitalizeFirstLetter(type)}`])));
         };
         this.slash = () => {
-            return (h("div", null, StreamlineEntries$1.getHeader({
-                title: "Available commands for current mode",
-            }), h("ul", null, Object.values(state$1.commands.local).map((item) => {
-                const isEntry = item.name.includes("[");
-                const type = item.name.substring(item.name.indexOf("[") - 1);
-                const cmd = isEntry ? item.name.replace(type, "") : item.name;
-                return (h("li", { class: `flex flex-col py-3` }, h("h2", { class: `${this.h2} mb-2` }, h("span", null, cmd, isEntry && (h("span", { class: `${this.tag} ml-2` }, type.trim())))), h("p", { class: `${this.p}` }, item.description)));
-            }))));
+            /*
+            return (
+              <div>
+                {StreamlineEntries.getHeader({
+                  title: 'Available commands for current mode',
+                })}
+                <ul>
+                  {Object.values(stateInternal.commands.local).map((item) => {
+                    const isEntry = item.name.includes('[');
+                    const type = item.name.substring(item.name.indexOf('[') - 1);
+                    const cmd = isEntry ? item.name.replace(type, '') : item.name;
+        
+                    return (
+                      stateInternal.menu[stateLocal.active].commands.includes(
+                        item.name
+                      ) && (
+                        <li class={`flex flex-col py-3`}>
+                          <h2 class={`${this.h2} mb-2`}>
+                            <span>
+                              {cmd}
+                              {isEntry && (
+                                <span class={`${this.tag} ml-2`}>{type.trim()}</span>
+                              )}
+                            </span>
+                          </h2>
+                          <p class={`${this.p}`}>{item.description}</p>
+                        </li>
+                      )
+                    );
+                  })}
+                </ul>
+              </div>
+            );
+             */
         };
-        this.site = () => {
-            return Object.values(state$1.entriesSite).map((item) => {
+        // @ts-ignore
+        this.site = (arr = []) => {
+            function selectSite(obj) {
+                state$1.currentSite = {
+                    path: obj.path,
+                    id: obj.siteId,
+                };
+                state$1.entriesPost = [];
+                state$1.entriesPostActive = [];
+                getMenu({
+                    adminUrl: obj.adminUrl,
+                    fetch: true,
+                    siteId: obj.siteId,
+                    path: obj.path,
+                });
+            }
+            return Object.values(this.getArr(arr, "site")).map((item) => {
                 return (h("div", null, StreamlineEntries$1.getHeader(item), h("ul", null, Object.values(item.children).map((itemInner) => {
                     const obj = {
                         siteId: itemInner.siteId,
                         adminUrl: itemInner.adminUrl,
                         path: itemInner.path,
                     };
-                    return (h("li", { class: `flex flex-col` }, h("div", { class: `${this.h2} inline-grid grid-flow-col auto-cols-max py-3 items-center` }, h("div", { role: "button", tabIndex: 0, onClick: () => getMenu(obj), onKeyPress: (e) => {
+                    return (h("li", { class: `flex flex-col` }, h("div", { class: `${this.h2} relative flex flex-wrap py-3 items-center` }, parseInt(itemInner.siteId) ===
+                        parseInt(state$1.currentSite.id) && (h("span", { class: `text-green-600 w-3 inline-block mr-4 absolute left-[-1.125rem] lg:w-4 lg:-left-6` }, h(IconCheck, null))), h("div", { role: "button", tabIndex: 0, onClick: () => selectSite(obj), onKeyPress: (e) => {
                             if (e.key === "Enter") {
-                                getMenu(obj);
+                                selectSite(obj);
                             }
                         }, class: `${this.tag} focus-white-out hover:text-blue-gray-50 hover:bg-blue-gray-900 hover:border-blue-gray-900` }, itemInner.domain), h("p", { class: `${this.p} ml-2` }, h("span", { class: `font-semibold` }, "Path: "), itemInner.path, h("span", { class: `font-semibold` }, " ID: "), itemInner.blog_id))));
                 }))));
@@ -11299,7 +11371,7 @@ let StreamlineEntries$1 = class extends HTMLElement {
         };
         // @ts-ignore
         this.menu = (arr = []) => {
-            return Object.values(this.getArr(arr, "menu")).map((item) => {
+            return Object.values(this.getArr(arr, state.active)).map((item) => {
                 return (h("div", null, StreamlineEntries$1.getHeader(item), h("ul", null, Object.values(item.children).map((itemInner, indexInner) => {
                     return (h("li", { key: indexInner, class: `${this.border} flex flex-col pb-4 sm:flex-row` }, h("h2", { class: `${this.h2} mt-4 mr-4 leading-1 inline-block break-words sm:min-w-[120px] md:min-w-[200px]` }, itemInner.name), itemInner.children && (h("ul", { class: `flex flex-wrap` }, Object.values(itemInner.children).map((itemSub, indexSub) => {
                         return (h("li", { key: indexSub, class: `mt-4 mr-4` }, h("streamline-button", { type: "menu", adminUrl: item.adminUrl, href: itemSub.href, index: item.index, indexInner: itemInner.index, indexSub: itemSub.index, path: itemSub.path, siteId: itemSub.siteId, text: itemSub.name, typeSub: itemSub.type })));
@@ -11334,76 +11406,58 @@ let StreamlineEntries$1 = class extends HTMLElement {
         };
     }
     connectedCallback() {
-        if ((state$1.data.isAdmin || state.active === "menu") &&
-            state$1.entriesMenu.length === 0) {
-            getMenu({});
-        }
+        getMenus();
         setEntries();
     }
     static getHeader(item) {
         var _a, _b;
+        const isQuery = item.type === "post" || item.type === "site";
+        const isMenu = item.type === "menu" || item.type === "networkMenu";
         let menuNumber = 0;
-        if (item.type === "menu" || item.type === "networkMenu") {
+        if (isMenu) {
             Object.values(item.children).forEach((itemNested) => {
                 Object.values(itemNested.children).forEach(() => {
                     menuNumber++;
                 });
             });
         }
-        const results = `Showing ${item.type === "post"
-            ? Object.values(item.children).length
-            : state$1.isSites
-                ? Object.values(item.children).length
-                : item.type === "menu" || item.type === "networkMenu"
-                    ? menuNumber
-                    : "0"} ${(item.type === "post" && Object.values(item.children).length === 1) ||
-            (state$1.isSites && Object.values(item.children).length === 1) ||
-            ((item.type === "menu" || item.type === "networkMenu") &&
-                menuNumber === 1)
+        const results = `Showing ${isQuery ? Object.values(item.children).length : isMenu ? menuNumber : "0"} ${(isQuery && Object.values(item.children).length === 1) ||
+            (isMenu && menuNumber === 1)
             ? `result`
             : `results`}
     `;
-        const path = item.isMultisite && !state$1.test ? ` (subsite: ${item.path})` : "";
+        const path = item.isMultisite && !state$1.test && state.active !== "site"
+            ? ` (subsite: ${item.path})`
+            : "";
         return (h("div", { class: `${state.active === "settings"
                 ? "flex-row justify-between"
                 : "flex-col sm:justify-between"} min-h-[60px] pt-5 flex items-start flex-wrap mb-1 pb-1.5 flex sticky -top-2 bg-white z-10 border-b border-dotted border-blue-gray-900 sm:min-h-[75px] sm:mb-4 sm:flex-row sm:items-center sm:pt-6 sm:pb-2 sm:-top-2 lg:pt-8 lg:-top-4` }, h("div", { class: `flex items-center flex-row` }, state.active === "fav" &&
-            state$1.entriesFavActive[0].children.length !== 0 && (h("div", { class: `scale-90 rounded-full flex-shrink-0 bg-blue-gray-100 text-gray-500 border border-blue-gray-200 w-8 h-8 flex items-center justify-center p-2 mr-3` }, (item.type === "menu" || item.type === "networkMenu") && (h(IconMenu, null)), item.type === "post" && h(IconPost, null))), h("h1", { class: `text-blue-gray-900 font-medium text-xl mr-6`, innerHTML: `${state$1.isSlash && !state$1.isSites
+            state$1.entriesFavActive[0].children.length !== 0 && (h("div", { class: `scale-90 rounded-full flex-shrink-0 bg-blue-gray-100 text-gray-500 border border-blue-gray-200 w-8 h-8 flex items-center justify-center p-2 mr-3` }, item.type === "menu" && h(IconMenu, null), item.type === "networkMenu" && h(IconNetwork, null), item.type === "post" && h(IconPost, null))), h("h1", { class: `text-blue-gray-900 font-medium text-xl mr-6`, innerHTML: `${state$1.isSlash
                 ? item.title
-                : item.type === "networkMenu" ||
-                    (state$1.entriesMenuIsNetwork &&
-                        state.active === "menu" &&
-                        !state$1.isSites)
+                : item.type === "networkMenu"
                     ? "Network admin"
-                    : (state.active === "menu" && !state$1.isSlash) ||
-                        item.type === "menu" ||
-                        item.type === "networkMenu"
+                    : isMenu
                         ? "Admin menu" + path
-                        : (state.active === "post" || item.type === "site") &&
-                            state.active !== "fav" &&
+                        : (state.active === "post" ||
+                            state.active === "site") &&
                             ((_a = state$1[`entries${state.active === "post" ? "Post" : "Site"}`][0]) === null || _a === void 0 ? void 0 : _a.queryValue)
-                            ? `${state$1.isSites
-                                ? "Site"
-                                : capitalizeFirstLetter(state.active)}s for: ` +
+                            ? `${capitalizeFirstLetter(state.active)}s for: ` +
                                 `<span class="text-gray-400 italic">${(_b = state$1[`entries${state.active === "post" ? "Post" : "Site"}`][0]) === null || _b === void 0 ? void 0 : _b.queryValue}</span>` +
                                 path
-                            : (item.type === "post" || item.type === "site") &&
-                                state.active === "fav"
+                            : isQuery && state.active === "fav"
                                 ? `${capitalizeFirstLetter(item.type)}s` + path
-                                : state.active === "post" &&
-                                    Object.values(state$1.entriesPostActive[0].children)
-                                        .length === 0 &&
+                                : (state.active === "post" ||
+                                    state.active === "site") &&
+                                    Object.values(state$1[`entries${capitalizeFirstLetter(state.active)}Active`][0].children).length === 0 &&
                                     !item.queryValue
-                                    ? "No query, search for a post in the search bar"
+                                    ? `No query, search for a ${state.active} in the search bar`
                                     : state.active === "settings"
                                         ? "Settings"
                                         : "No results"}` })), h("div", { class: `flex flex-wrap space-x-4 divide-x` }, Object.values([
             {
                 type: "text",
                 text: results,
-                condition: state$1.isSites ||
-                    state.active === "post" ||
-                    state.active === "fav" ||
-                    (state.active === "menu" && !state$1.isSlash),
+                condition: state.active !== "settings",
             },
             {
                 type: "button",
@@ -11433,14 +11487,14 @@ let StreamlineEntries$1 = class extends HTMLElement {
         }))));
     }
     render() {
-        return (h("div", { class: `h-full relative lg:h-[calc(100%+64px)]` }, state$1.isLoading ? (h("div", { class: `w-full h-[calc(100%-var(--sl-side-w))] flex items-center justify-center bg-white/50 absolute top-0 left-0 backdrop-blur-sm z-10` }, h(Loader, { sm: false }))) : (h("div", { tabindex: -1, class: `focus-none inner pb-6 relative px-3 h-[calc(100%-var(--sl-side-w))] overflow-y-scroll overflow-x-hidden w-full bg-white sm:px-6 lg:px-8 lg:pb-10 ${state$1.isProcessing ? "pointer-events-none opacity-50" : ""}` }, state$1.isSlash && !state$1.isSites
+        return (h("div", { class: `h-[calc(100%-24px)] relative lg:h-[calc(100%+56px)]` }, state$1.isLoading ? (h("div", { class: `w-full h-[calc(100%-var(--sl-side-w))] flex items-center justify-center bg-white/50 absolute top-0 left-0 backdrop-blur-sm z-10` }, h(Loader, { sm: false }))) : (h("div", { tabindex: -1, class: `${this.px} focus-none inner pb-6 relative h-[calc(100%-var(--sl-side-w))] overflow-y-scroll overflow-x-hidden w-full bg-white lg:pb-10 ${state$1.isProcessing ? "pointer-events-none opacity-50" : ""}` }, state$1.isSlash
             ? this.slash()
-            : state$1.isSites
-                ? this.site()
-                : this[`${state.active}`]()))));
+            : state.active === "network"
+                ? this.menu()
+                : this[`${state.active}`]())), state$1.data.network && !state$1.isLoading && (h("div", { class: `mt-auto px-3 h-6 bg-blue-gray-50 border-t border-blue-gray-100 flex items-center text-blue-gray-900` }, h("span", { class: `flex whitespace-no-wrap` }, h("span", { class: `text-[0.675rem]` }, h("span", { class: `font-semibold` }, "Current site:"), " ", state$1.currentSite.path, " \u2219", " ", h("span", { class: `font-semibold` }, "ID:"), state$1.currentSite.id))))));
     }
     get el() { return this; }
-    static get style() { return streamlineEntriesCss + '/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-transform:translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));--tw-border-opacity:1;--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-backdrop-blur:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-invert:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-opacity:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);border:0 solid;border-color:rgba(228,228,231,var(--tw-border-opacity));box-sizing:border-box}button,input{color:inherit;font-family:inherit;font-size:100%;line-height:1.15;line-height:inherit;margin:0;padding:0}button{background-color:transparent;background-image:none;text-transform:none}[type=button],button{-webkit-appearance:button}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}h1,h2,p,ul{margin:0}ul{list-style:none;padding:0}input::-moz-placeholder{color:#a1a1aa;opacity:1}input:-ms-input-placeholder{color:#a1a1aa;opacity:1}input::placeholder{color:#a1a1aa;opacity:1}[role=button],button{cursor:pointer}h1,h2{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}.sr-only{clip:rect(0,0,0,0);border-width:0;height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;white-space:nowrap;width:1px}.pointer-events-none{pointer-events:none}.static{position:static}.absolute{position:absolute}.relative{position:relative}.sticky{position:-webkit-sticky;position:sticky}.-top-2{top:-.5rem}.left-1{left:.25rem}.top-1{top:.25rem}.top-0{top:0}.left-0{left:0}.z-10{z-index:10}.mb-1{margin-bottom:.25rem}.mr-3{margin-right:.75rem}.mr-6{margin-right:1.5rem}.mt-1\\.5{margin-top:.375rem}.mt-1{margin-top:.25rem}.mb-2{margin-bottom:.5rem}.ml-2{margin-left:.5rem}.mt-4{margin-top:1rem}.mr-4{margin-right:1rem}.mb-6{margin-bottom:1.5rem}.mt-0\\.5{margin-top:.125rem}.mt-0{margin-top:0}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.grid{display:grid}.inline-grid{display:inline-grid}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.h-8{height:2rem}.h-5{height:1.25rem}.h-3{height:.75rem}.h-full{height:100%}.h-\\[calc\\(100\\%-var\\(--sl-side-w\\)\\)\\]{height:calc(100% - var(--sl-side-w))}.min-h-\\[60px\\]{min-height:60px}.w-8{width:2rem}.w-\\[max-content\\]{width:-webkit-max-content;width:-moz-max-content;width:max-content}.w-14{width:3.5rem}.w-3{width:.75rem}.w-full{width:100%}.flex-shrink-0{flex-shrink:0}.scale-90{--tw-scale-x:.9;--tw-scale-y:.9;transform:var(--tw-transform)}.cursor-pointer{cursor:pointer}.select-none{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.auto-cols-max{grid-auto-columns:-webkit-max-content;grid-auto-columns:max-content}.grid-flow-col{grid-auto-flow:column}.grid-cols-\\[75px\\2c 1fr\\]{grid-template-columns:75px 1fr}.flex-row{flex-direction:row}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-6{gap:1.5rem}.space-x-4>:not([hidden])~:not([hidden]){--tw-space-x-reverse:0;margin-left:calc(1rem*(1 - var(--tw-space-x-reverse)));margin-right:calc(1rem*var(--tw-space-x-reverse))}.space-y-4>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-bottom:calc(1rem*var(--tw-space-y-reverse));margin-top:calc(1rem*(1 - var(--tw-space-y-reverse)))}.space-y-2>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-bottom:calc(.5rem*var(--tw-space-y-reverse));margin-top:calc(.5rem*(1 - var(--tw-space-y-reverse)))}.space-y-5>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-bottom:calc(1.25rem*var(--tw-space-y-reverse));margin-top:calc(1.25rem*(1 - var(--tw-space-y-reverse)))}.divide-x>:not([hidden])~:not([hidden]){--tw-divide-x-reverse:0;border-left-width:calc(1px*(1 - var(--tw-divide-x-reverse)));border-right-width:calc(1px*var(--tw-divide-x-reverse))}.overflow-x-hidden{overflow-x:hidden}.overflow-y-scroll{overflow-y:scroll}.break-words{overflow-wrap:break-word}.rounded-full{border-radius:9999px}.border{border-width:1px}.border-t{border-top-width:1px}.border-b{border-bottom-width:1px}.border-dotted{border-style:dotted}.border-blue-gray-100{--tw-border-opacity:1;border-color:rgba(241,245,249,var(--tw-border-opacity))}.border-blue-gray-900{--tw-border-opacity:1;border-color:rgba(15,23,42,var(--tw-border-opacity))}.border-blue-gray-200{--tw-border-opacity:1;border-color:rgba(226,232,240,var(--tw-border-opacity))}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.bg-blue-gray-100{--tw-bg-opacity:1;background-color:rgba(241,245,249,var(--tw-bg-opacity))}.bg-blue-gray-300{--tw-bg-opacity:1;background-color:rgba(203,213,225,var(--tw-bg-opacity))}.bg-white\\/50{background-color:hsla(0,0%,100%,.5)}.p-2{padding:.5rem}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.py-3{padding-bottom:.75rem;padding-top:.75rem}.px-3{padding-left:.75rem;padding-right:.75rem}.pt-5{padding-top:1.25rem}.pb-1\\.5{padding-bottom:.375rem}.pb-1{padding-bottom:.25rem}.pl-4{padding-left:1rem}.pb-4{padding-bottom:1rem}.pb-2{padding-bottom:.5rem}.pb-6{padding-bottom:1.5rem}.text-base{font-size:1rem;line-height:1.5rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:.75rem;line-height:1rem}.\\!text-lg{font-size:1.125rem!important;line-height:1.75rem!important}.font-medium{font-weight:500}.font-normal{font-weight:400}.font-semibold{font-weight:600}.italic{font-style:italic}.text-blue-gray-900{--tw-text-opacity:1;color:rgba(15,23,42,var(--tw-text-opacity))}.text-blue-gray-600{--tw-text-opacity:1;color:rgba(71,85,105,var(--tw-text-opacity))}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.text-gray-500{--tw-text-opacity:1;color:rgba(113,113,122,var(--tw-text-opacity))}.text-gray-400{--tw-text-opacity:1;color:rgba(161,161,170,var(--tw-text-opacity))}.text-gray-700{--tw-text-opacity:1;color:rgba(63,63,70,var(--tw-text-opacity))}.opacity-50{opacity:.5}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px 0 rgba(0,0,0,.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-filter);backdrop-filter:var(--tw-backdrop-filter)}.transition{transition-duration:.15s;transition-property:background-color,border-color,color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter;transition-property:background-color,border-color,color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-property:background-color,border-color,color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1)}.duration-200{transition-duration:.2s}.ease-in-out{transition-timing-function:cubic-bezier(.4,0,.2,1)}.first-of-type\\:border-none:first-of-type{border-style:none}.hover\\:border-blue-gray-900:hover{--tw-border-opacity:1;border-color:rgba(15,23,42,var(--tw-border-opacity))}.hover\\:bg-blue-gray-900:hover{--tw-bg-opacity:1;background-color:rgba(15,23,42,var(--tw-bg-opacity))}.hover\\:text-blue-gray-50:hover{--tw-text-opacity:1;color:rgba(248,250,252,var(--tw-text-opacity))}.group:hover .group-hover\\:bg-blue-gray-400{--tw-bg-opacity:1;background-color:rgba(148,163,184,var(--tw-bg-opacity))}.peer:checked~.peer-checked\\:bg-blue-500{--tw-bg-opacity:1;background-color:rgba(59,130,246,var(--tw-bg-opacity))}@media (min-width:640px){.sm\\:-top-2{top:-.5rem}.sm\\:my-1\\.5{margin-bottom:.375rem;margin-top:.375rem}.sm\\:my-1{margin-bottom:.25rem;margin-top:.25rem}.sm\\:mb-4{margin-bottom:1rem}.sm\\:min-h-\\[75px\\]{min-height:75px}.sm\\:min-w-\\[120px\\]{min-width:120px}.sm\\:flex-row{flex-direction:row}.sm\\:items-center{align-items:center}.sm\\:justify-between{justify-content:space-between}.sm\\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\\:pt-6{padding-top:1.5rem}.sm\\:pb-2{padding-bottom:.5rem}.sm\\:text-sm{font-size:.875rem;line-height:1.25rem}}@media (min-width:768px){.md\\:min-w-\\[200px\\]{min-width:200px}}@media (min-width:1024px){.lg\\:-top-4{top:-1rem}.lg\\:h-\\[calc\\(100\\%\\+64px\\)\\]{height:calc(100% + 64px)}.lg\\:px-8{padding-left:2rem;padding-right:2rem}.lg\\:pt-8{padding-top:2rem}.lg\\:pb-10{padding-bottom:2.5rem}}'; }
+    static get style() { return streamlineEntriesCss + '/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-transform:translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));--tw-border-opacity:1;--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-backdrop-blur:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-invert:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-opacity:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);border:0 solid;border-color:rgba(228,228,231,var(--tw-border-opacity));box-sizing:border-box}button,input{color:inherit;font-family:inherit;font-size:100%;line-height:1.15;line-height:inherit;margin:0;padding:0}button{background-color:transparent;background-image:none;text-transform:none}[type=button],button{-webkit-appearance:button}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}h1,h2,p,ul{margin:0}ul{list-style:none;padding:0}input::-moz-placeholder{color:#a1a1aa;opacity:1}input:-ms-input-placeholder{color:#a1a1aa;opacity:1}input::placeholder{color:#a1a1aa;opacity:1}[role=button],button{cursor:pointer}h1,h2{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}.sr-only{clip:rect(0,0,0,0);border-width:0;height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;white-space:nowrap;width:1px}.pointer-events-none{pointer-events:none}.static{position:static}.absolute{position:absolute}.relative{position:relative}.sticky{position:-webkit-sticky;position:sticky}.-top-2{top:-.5rem}.left-\\[-1\\.125rem\\]{left:-1.125rem}.left-1{left:.25rem}.top-1{top:.25rem}.top-0{top:0}.left-0{left:0}.z-10{z-index:10}.mb-1{margin-bottom:.25rem}.mr-3{margin-right:.75rem}.mr-6{margin-right:1.5rem}.mt-1\\.5{margin-top:.375rem}.mt-1{margin-top:.25rem}.mb-2{margin-bottom:.5rem}.ml-2{margin-left:.5rem}.mr-4{margin-right:1rem}.mt-4{margin-top:1rem}.mb-6{margin-bottom:1.5rem}.mt-0\\.5{margin-top:.125rem}.mt-0{margin-top:0}.mt-auto{margin-top:auto}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.grid{display:grid}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.h-8{height:2rem}.h-5{height:1.25rem}.h-3{height:.75rem}.h-\\[calc\\(100\\%-24px\\)\\]{height:calc(100% - 24px)}.h-\\[calc\\(100\\%-var\\(--sl-side-w\\)\\)\\]{height:calc(100% - var(--sl-side-w))}.h-6{height:1.5rem}.min-h-\\[60px\\]{min-height:60px}.w-8{width:2rem}.w-3{width:.75rem}.w-\\[max-content\\]{width:-webkit-max-content;width:-moz-max-content;width:max-content}.w-14{width:3.5rem}.w-full{width:100%}.flex-shrink-0{flex-shrink:0}.scale-90{--tw-scale-x:.9;--tw-scale-y:.9;transform:var(--tw-transform)}.cursor-pointer{cursor:pointer}.select-none{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.grid-cols-\\[75px\\2c 1fr\\]{grid-template-columns:75px 1fr}.flex-row{flex-direction:row}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-6{gap:1.5rem}.space-x-4>:not([hidden])~:not([hidden]){--tw-space-x-reverse:0;margin-left:calc(1rem*(1 - var(--tw-space-x-reverse)));margin-right:calc(1rem*var(--tw-space-x-reverse))}.space-y-4>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-bottom:calc(1rem*var(--tw-space-y-reverse));margin-top:calc(1rem*(1 - var(--tw-space-y-reverse)))}.space-y-2>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-bottom:calc(.5rem*var(--tw-space-y-reverse));margin-top:calc(.5rem*(1 - var(--tw-space-y-reverse)))}.space-y-5>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-bottom:calc(1.25rem*var(--tw-space-y-reverse));margin-top:calc(1.25rem*(1 - var(--tw-space-y-reverse)))}.divide-x>:not([hidden])~:not([hidden]){--tw-divide-x-reverse:0;border-left-width:calc(1px*(1 - var(--tw-divide-x-reverse)));border-right-width:calc(1px*var(--tw-divide-x-reverse))}.overflow-x-hidden{overflow-x:hidden}.overflow-y-scroll{overflow-y:scroll}.break-words{overflow-wrap:break-word}.rounded-full{border-radius:9999px}.border{border-width:1px}.border-t{border-top-width:1px}.border-b{border-bottom-width:1px}.border-dotted{border-style:dotted}.border-blue-gray-100{--tw-border-opacity:1;border-color:rgba(241,245,249,var(--tw-border-opacity))}.border-blue-gray-900{--tw-border-opacity:1;border-color:rgba(15,23,42,var(--tw-border-opacity))}.border-blue-gray-200{--tw-border-opacity:1;border-color:rgba(226,232,240,var(--tw-border-opacity))}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.bg-blue-gray-100{--tw-bg-opacity:1;background-color:rgba(241,245,249,var(--tw-bg-opacity))}.bg-blue-gray-300{--tw-bg-opacity:1;background-color:rgba(203,213,225,var(--tw-bg-opacity))}.bg-white\\/50{background-color:hsla(0,0%,100%,.5)}.bg-blue-gray-50{--tw-bg-opacity:1;background-color:rgba(248,250,252,var(--tw-bg-opacity))}.p-2{padding:.5rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.py-3{padding-bottom:.75rem;padding-top:.75rem}.px-3{padding-left:.75rem;padding-right:.75rem}.pt-5{padding-top:1.25rem}.pb-1\\.5{padding-bottom:.375rem}.pb-1{padding-bottom:.25rem}.pl-4{padding-left:1rem}.pb-4{padding-bottom:1rem}.pb-2{padding-bottom:.5rem}.pb-6{padding-bottom:1.5rem}.text-base{font-size:1rem;line-height:1.5rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:.75rem;line-height:1rem}.\\!text-lg{font-size:1.125rem!important;line-height:1.75rem!important}.text-\\[0\\.675rem\\]{font-size:.675rem}.font-medium{font-weight:500}.font-normal{font-weight:400}.font-semibold{font-weight:600}.italic{font-style:italic}.text-blue-gray-900{--tw-text-opacity:1;color:rgba(15,23,42,var(--tw-text-opacity))}.text-blue-gray-600{--tw-text-opacity:1;color:rgba(71,85,105,var(--tw-text-opacity))}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.text-gray-500{--tw-text-opacity:1;color:rgba(113,113,122,var(--tw-text-opacity))}.text-gray-400{--tw-text-opacity:1;color:rgba(161,161,170,var(--tw-text-opacity))}.text-gray-700{--tw-text-opacity:1;color:rgba(63,63,70,var(--tw-text-opacity))}.text-green-600{--tw-text-opacity:1;color:rgba(22,163,74,var(--tw-text-opacity))}.opacity-50{opacity:.5}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px 0 rgba(0,0,0,.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-filter);backdrop-filter:var(--tw-backdrop-filter)}.transition{transition-duration:.15s;transition-property:background-color,border-color,color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter;transition-property:background-color,border-color,color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-property:background-color,border-color,color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1)}.duration-200{transition-duration:.2s}.ease-in-out{transition-timing-function:cubic-bezier(.4,0,.2,1)}.first-of-type\\:border-none:first-of-type{border-style:none}.hover\\:border-blue-gray-900:hover{--tw-border-opacity:1;border-color:rgba(15,23,42,var(--tw-border-opacity))}.hover\\:bg-blue-gray-900:hover{--tw-bg-opacity:1;background-color:rgba(15,23,42,var(--tw-bg-opacity))}.hover\\:text-blue-gray-50:hover{--tw-text-opacity:1;color:rgba(248,250,252,var(--tw-text-opacity))}.group:hover .group-hover\\:bg-blue-gray-400{--tw-bg-opacity:1;background-color:rgba(148,163,184,var(--tw-bg-opacity))}.peer:checked~.peer-checked\\:bg-blue-500{--tw-bg-opacity:1;background-color:rgba(59,130,246,var(--tw-bg-opacity))}@media (min-width:640px){.sm\\:-top-2{top:-.5rem}.sm\\:my-1\\.5{margin-bottom:.375rem;margin-top:.375rem}.sm\\:my-1{margin-bottom:.25rem;margin-top:.25rem}.sm\\:mb-4{margin-bottom:1rem}.sm\\:min-h-\\[75px\\]{min-height:75px}.sm\\:min-w-\\[120px\\]{min-width:120px}.sm\\:flex-row{flex-direction:row}.sm\\:items-center{align-items:center}.sm\\:justify-between{justify-content:space-between}.sm\\:pt-6{padding-top:1.5rem}.sm\\:pb-2{padding-bottom:.5rem}.sm\\:text-sm{font-size:.875rem;line-height:1.25rem}}@media (min-width:768px){.md\\:min-w-\\[200px\\]{min-width:200px}}@media (min-width:1024px){.lg\\:-top-4{top:-1rem}.lg\\:-left-6{left:-1.5rem}.lg\\:h-\\[calc\\(100\\%\\+56px\\)\\]{height:calc(100% + 56px)}.lg\\:w-4{width:1rem}.lg\\:px-8{padding-left:2rem;padding-right:2rem}.lg\\:pt-8{padding-top:2rem}.lg\\:pb-10{padding-bottom:2.5rem}}'; }
 };
 
 const streamlineInputCss = ":host{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box}:host .focus:focus{box-shadow:inset 0 0 0 4px #f8fafc,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-border:focus{border-color:var(--sl-focus-color);box-shadow:0 0 0 1px var(--sl-focus-color);outline:none!important}:host .focus-out:focus{box-shadow:0 0 0 2px #f8fafc,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-dark:focus{box-shadow:inset 0 0 0 4px #0f172a,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-darker:focus{box-shadow:inset 0 0 0 4px #020204,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-white:focus{box-shadow:inset 0 0 0 4px #fff,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-white-out:focus{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-in-white-out:focus-within{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-none:focus{box-shadow:none!important;outline:none!important}:host .border-invalid{border-color:var(--sl-focus-color-invalid);box-shadow:0 0 0 1px var(--sl-focus-color-invalid);outline:none!important}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;box-sizing:border-box}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.blur{--tw-blur:blur(8px);filter:var(--tw-filter)}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
@@ -11482,7 +11536,7 @@ let StreamlineInput$1 = class extends HTMLElement {
     static get style() { return streamlineInputCss + '/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-transform:translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));--tw-border-opacity:1;--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;border-color:rgba(228,228,231,var(--tw-border-opacity));box-sizing:border-box}input{color:inherit;font-family:inherit;font-size:100%;line-height:1.15;line-height:inherit;margin:0;padding:0}input::-moz-placeholder{color:#a1a1aa;opacity:1}input:-ms-input-placeholder{color:#a1a1aa;opacity:1}input::placeholder{color:#a1a1aa;opacity:1}.pointer-events-none{pointer-events:none}.absolute{position:absolute}.relative{position:relative}.left-1{left:.25rem}.-top-3{top:-.75rem}.mt-1{margin-top:.25rem}.h-10{height:2.5rem}.w-full{width:100%}.border{border-width:1px}.border-blue-gray-300{--tw-border-opacity:1;border-color:rgba(203,213,225,var(--tw-border-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.px-3{padding-left:.75rem;padding-right:.75rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xs{font-size:.75rem;line-height:1rem}.font-medium{font-weight:500}.text-blue-gray-900{--tw-text-opacity:1;color:rgba(15,23,42,var(--tw-text-opacity))}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.placeholder-transparent::-moz-placeholder{color:transparent}.placeholder-transparent:-ms-input-placeholder{color:transparent}.placeholder-transparent::placeholder{color:transparent}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px 0 rgba(0,0,0,.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.blur{--tw-blur:blur(8px);filter:var(--tw-filter)}.transition-all{transition-duration:.15s;transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1)}.focus\\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.peer:-moz-placeholder-shown~.peer-placeholder-shown\\:top-1\\/2{top:50%}.peer:-ms-input-placeholder~.peer-placeholder-shown\\:top-1\\/2{top:50%}.peer:placeholder-shown~.peer-placeholder-shown\\:top-1\\/2{top:50%}.peer:-moz-placeholder-shown~.peer-placeholder-shown\\:-translate-y-1\\/2{--tw-translate-y:-50%;transform:var(--tw-transform)}.peer:-ms-input-placeholder~.peer-placeholder-shown\\:-translate-y-1\\/2{--tw-translate-y:-50%;transform:var(--tw-transform)}.peer:placeholder-shown~.peer-placeholder-shown\\:-translate-y-1\\/2{--tw-translate-y:-50%;transform:var(--tw-transform)}.peer:-moz-placeholder-shown~.peer-placeholder-shown\\:text-base{font-size:1rem;line-height:1.5rem}.peer:-ms-input-placeholder~.peer-placeholder-shown\\:text-base{font-size:1rem;line-height:1.5rem}.peer:placeholder-shown~.peer-placeholder-shown\\:text-base{font-size:1rem;line-height:1.5rem}.peer:-moz-placeholder-shown~.peer-placeholder-shown\\:text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.peer:-ms-input-placeholder~.peer-placeholder-shown\\:text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.peer:placeholder-shown~.peer-placeholder-shown\\:text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.peer:focus~.peer-focus\\:-top-3{top:-.75rem}.peer:focus~.peer-focus\\:translate-y-0{--tw-translate-y:0px;transform:var(--tw-transform)}.peer:focus~.peer-focus\\:text-xs{font-size:.75rem;line-height:1rem}.peer:focus~.peer-focus\\:text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}'; }
 };
 
-const streamlinePostCss = ":host{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box}:host .focus:focus{box-shadow:inset 0 0 0 4px #f8fafc,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-border:focus{border-color:var(--sl-focus-color);box-shadow:0 0 0 1px var(--sl-focus-color);outline:none!important}:host .focus-out:focus{box-shadow:0 0 0 2px #f8fafc,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-dark:focus{box-shadow:inset 0 0 0 4px #0f172a,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-darker:focus{box-shadow:inset 0 0 0 4px #020204,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-white:focus{box-shadow:inset 0 0 0 4px #fff,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-white-out:focus{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-in-white-out:focus-within{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-none:focus{box-shadow:none!important;outline:none!important}:host .border-invalid{border-color:var(--sl-focus-color-invalid);box-shadow:0 0 0 1px var(--sl-focus-color-invalid);outline:none!important}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);--tw-border-opacity:1;border:0 solid;border:0 solid rgba(228,228,231,var(--tw-border-opacity));box-sizing:border-box}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */.pointer-events-none{pointer-events:none}.flex{display:flex}.h-4{height:1rem}.h-full{height:100%}.w-4{width:1rem}.w-full{width:100%}.items-center{align-items:center}.justify-center{justify-content:center}.rounded-full{border-radius:9999px}.border{border-width:1px}.border-blue-gray-200{--tw-border-opacity:1;border-color:rgba(226,232,240,var(--tw-border-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.text-red-500{--tw-text-opacity:1;color:rgba(239,68,68,var(--tw-text-opacity))}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */[type=search]{-webkit-appearance:textfield;outline-offset:-2px}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.blur{--tw-blur:blur(8px);filter:var(--tw-filter)}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
+const streamlinePostCss = ":host{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box}:host .focus:focus{box-shadow:inset 0 0 0 4px #f8fafc,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-border:focus{border-color:var(--sl-focus-color);box-shadow:0 0 0 1px var(--sl-focus-color);outline:none!important}:host .focus-out:focus{box-shadow:0 0 0 2px #f8fafc,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-dark:focus{box-shadow:inset 0 0 0 4px #0f172a,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-darker:focus{box-shadow:inset 0 0 0 4px #020204,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-white:focus{box-shadow:inset 0 0 0 4px #fff,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-white-out:focus{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-in-white-out:focus-within{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-none:focus{box-shadow:none!important;outline:none!important}:host .border-invalid{border-color:var(--sl-focus-color-invalid);box-shadow:0 0 0 1px var(--sl-focus-color-invalid);outline:none!important}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);--tw-border-opacity:1;border:0 solid;border:0 solid rgba(228,228,231,var(--tw-border-opacity));box-sizing:border-box}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.blur{--tw-blur:blur(8px);filter:var(--tw-filter)}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */.pointer-events-none{pointer-events:none}.flex{display:flex}.h-4{height:1rem}.h-full{height:100%}.w-4{width:1rem}.w-full{width:100%}.items-center{align-items:center}.justify-center{justify-content:center}.rounded-full{border-radius:9999px}.border{border-width:1px}.border-blue-gray-200{--tw-border-opacity:1;border-color:rgba(226,232,240,var(--tw-border-opacity))}.bg-white{--tw-bg-opacity:1;background-color:rgba(255,255,255,var(--tw-bg-opacity))}.text-red-500{--tw-text-opacity:1;color:rgba(239,68,68,var(--tw-text-opacity))}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
 
 let StreamlinePost$1 = class extends HTMLElement {
     constructor() {
@@ -11623,7 +11677,7 @@ function getQuery(obj) {
   // console.log(stateInternal[`entries${capitalizeFirstLetter(obj.type)}`]);
 }
 
-const streamlineSearchCss = ":host{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box}:host .focus:focus{box-shadow:inset 0 0 0 4px #f8fafc,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-border:focus{border-color:var(--sl-focus-color);box-shadow:0 0 0 1px var(--sl-focus-color);outline:none!important}:host .focus-out:focus{box-shadow:0 0 0 2px #f8fafc,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-dark:focus{box-shadow:inset 0 0 0 4px #0f172a,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-darker:focus{box-shadow:inset 0 0 0 4px #020204,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-white:focus{box-shadow:inset 0 0 0 4px #fff,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-white-out:focus{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-in-white-out:focus-within{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-none:focus{box-shadow:none!important;outline:none!important}:host .border-invalid{border-color:var(--sl-focus-color-invalid);box-shadow:0 0 0 1px var(--sl-focus-color-invalid);outline:none!important}input{-webkit-appearance:none;border-radius:0}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;box-sizing:border-box}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */[type=search]{-webkit-appearance:textfield;outline-offset:-2px}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.blur{--tw-blur:blur(8px);filter:var(--tw-filter)}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
+const streamlineSearchCss = ":host{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box}:host .focus:focus{box-shadow:inset 0 0 0 4px #f8fafc,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-border:focus{border-color:var(--sl-focus-color);box-shadow:0 0 0 1px var(--sl-focus-color);outline:none!important}:host .focus-out:focus{box-shadow:0 0 0 2px #f8fafc,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-dark:focus{box-shadow:inset 0 0 0 4px #0f172a,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-darker:focus{box-shadow:inset 0 0 0 4px #020204,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-white:focus{box-shadow:inset 0 0 0 4px #fff,inset 0 0 0 6px var(--sl-focus-color);outline:none!important}:host .focus-white-out:focus{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-in-white-out:focus-within{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--sl-focus-color);outline:none!important}:host .focus-none:focus{box-shadow:none!important;outline:none!important}:host .border-invalid{border-color:var(--sl-focus-color-invalid);box-shadow:0 0 0 1px var(--sl-focus-color-invalid);outline:none!important}input{-webkit-appearance:none;border-radius:0}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;box-sizing:border-box}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.blur{--tw-blur:blur(8px);filter:var(--tw-filter)}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
 
 let StreamlineSearch$1 = class extends HTMLElement {
     constructor() {
@@ -11633,27 +11687,27 @@ let StreamlineSearch$1 = class extends HTMLElement {
         this.handleChange = (e) => {
             state$1.searchValue = e.target.value;
             if (!e.target.value.startsWith("/")) {
-                state$1.isSites = false;
                 state$1.isLoading = false;
                 state$1.isSlash = false;
                 state$1.isEnter = false;
                 setEntries();
-                if (state$1.searchValue.length >= 1 &&
-                    state.active === "post" &&
+                if ((state.active === "post" || state.active === "site") &&
+                    state$1.searchValue.length >= 1 &&
                     !state$1.test) {
                     state$1.isEnter = true;
-                    this.command = "post";
+                    this.command = state.active;
                 }
             }
-            else if ((e.target.value.startsWith("/") && isLocalCommands()) ||
-                (e.target.value.startsWith("/") && state$1.testFull)) {
+            else if (
+            // (e.target.value.startsWith('/') && isLocalCommands()) ||
+            e.target.value.startsWith("/") &&
+                state$1.testFull) {
                 state$1.isSlash = true;
                 if (checkIfStringStartsWith(state$1.searchValue, state$1.menu[state.active].commands)) {
                     state$1.isEnter = true;
                     this.command = state$1.searchValue.split(" ")[0].slice(1);
                 }
                 else {
-                    state$1.isSites = false;
                     state$1.isLoading = false;
                     state$1.isEnter = false;
                 }
@@ -11668,30 +11722,28 @@ let StreamlineSearch$1 = class extends HTMLElement {
             var _a;
             this.callback =
                 ((_a = state$1.commands.local[this.command]) === null || _a === void 0 ? void 0 : _a.callback) || false;
-            if (this.callback || state.active === "post") {
+            if (this.callback ||
+                state.active === "post" ||
+                state.active === "site") {
                 if (checkIfStringStartsWith(state$1.searchValue, this.commands) &&
                     this.callback) {
                     this.value = state$1.searchValue
                         .replace(`/${this.command}`, "")
                         .trim();
                 }
-                else if (state.active === "post") {
+                else if (state.active === "post" || state.active === "site") {
                     this.value = state$1.searchValue;
-                    this.callback = "posts";
+                    this.callback = `${state.active}s`;
                 }
                 this.query();
-            }
-            else if (this.command === "network") {
-                getMenu({
-                    network: true,
-                });
             }
         };
         this.query = () => {
             state$1.isLoading = true;
+            fetch(
             // @ts-ignore
             // eslint-disable-next-line no-undef
-            fetch(`${streamline.rest}streamline/v1/${this.callback}/${this.value}`, {
+            `${streamline.rest}streamline/v1/${this.callback}?siteId=${state$1.currentSite.id}&value=${this.value}`, {
                 method: "GET",
                 credentials: "same-origin",
                 headers: {
@@ -11703,20 +11755,16 @@ let StreamlineSearch$1 = class extends HTMLElement {
             })
                 .then((response) => response.json())
                 .then((data) => {
-                // console.log(data);
                 getQuery({
                     children: data.children,
                     isMultisite: data.isMultisite,
-                    path: data.path,
+                    path: state$1.currentSite.path,
                     search: this.value,
                     type: this.command,
                     queryValue: this.value,
                 });
                 setSearchPlaceholder();
-                if (this.callback === "sites") {
-                    state$1.isSites = true;
-                }
-                else if (this.callback === "posts") {
+                if (this.callback === "posts" || this.callback === "sites") {
                     resetView();
                 }
                 state$1.isLoading = false;
@@ -11737,7 +11785,7 @@ let StreamlineSearch$1 = class extends HTMLElement {
     static get style() { return streamlineSearchCss + '/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-transform:translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;border:0 solid;box-sizing:border-box}input{color:inherit;font-family:inherit;font-size:100%;line-height:1.15;line-height:inherit;margin:0;padding:0}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}input::-moz-placeholder{color:#a1a1aa;opacity:1}input:-ms-input-placeholder{color:#a1a1aa;opacity:1}input::placeholder{color:#a1a1aa;opacity:1}svg{display:block;vertical-align:middle}[hidden]{display:none}.absolute{position:absolute}.relative{position:relative}.top-1\\/2{top:50%}.left-3{left:.75rem}.right-3{right:.75rem}.m-0{margin:0}.hidden{display:none}.h-\\[var\\(--sl-side-w\\)\\]{height:var(--sl-side-w)}.h-full{height:100%}.h-3\\.5{height:.875rem}.h-3{height:.75rem}.w-full{width:100%}.-translate-y-1\\/2{--tw-translate-y:-50%;transform:var(--tw-transform)}.bg-blue-gray-100{--tw-bg-opacity:1;background-color:rgba(241,245,249,var(--tw-bg-opacity))}.p-0{padding:0}.px-3{padding-left:.75rem;padding-right:.75rem}.text-\\[1\\.15rem\\]{font-size:1.15rem}.font-normal{font-weight:400}.text-blue-gray-900{--tw-text-opacity:1;color:rgba(15,23,42,var(--tw-text-opacity))}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.placeholder-blue-gray-600::-moz-placeholder{--tw-placeholder-opacity:1;color:rgba(71,85,105,var(--tw-placeholder-opacity))}.placeholder-blue-gray-600:-ms-input-placeholder{--tw-placeholder-opacity:1;color:rgba(71,85,105,var(--tw-placeholder-opacity))}.placeholder-blue-gray-600::placeholder{--tw-placeholder-opacity:1;color:rgba(71,85,105,var(--tw-placeholder-opacity))}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px 0 rgba(0,0,0,.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.peer:focus~.peer-focus\\:text-blue-600{--tw-text-opacity:1;color:rgba(37,99,235,var(--tw-text-opacity))}@media (min-width:640px){.sm\\:right-4{right:1rem}.sm\\:block{display:block}.sm\\:px-8{padding-left:2rem;padding-right:2rem}}@media (min-width:1024px){.lg\\:h-\\[64px\\]{height:64px}}'; }
 };
 
-const streamlineSidebarCss = ":host{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;box-sizing:border-box}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */[type=search]{-webkit-appearance:textfield;outline-offset:-2px}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.blur{--tw-blur:blur(8px);filter:var(--tw-filter)}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
+const streamlineSidebarCss = ":host{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-blur:var(--tw-empty,/*!*/ /*!*/);--tw-brightness:var(--tw-empty,/*!*/ /*!*/);--tw-contrast:var(--tw-empty,/*!*/ /*!*/);--tw-grayscale:var(--tw-empty,/*!*/ /*!*/);--tw-hue-rotate:var(--tw-empty,/*!*/ /*!*/);--tw-invert:var(--tw-empty,/*!*/ /*!*/);--tw-saturate:var(--tw-empty,/*!*/ /*!*/);--tw-sepia:var(--tw-empty,/*!*/ /*!*/);--tw-drop-shadow:var(--tw-empty,/*!*/ /*!*/);--tw-filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);border:0 solid;box-sizing:border-box}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}a{color:inherit;text-decoration:inherit}.visible{visibility:visible}.inline-block{display:inline-block}.h-\\[max-content\\]{height:-webkit-max-content;height:-moz-max-content;height:max-content}.bg-blue-gray-200{--tw-bg-opacity:1;background-color:rgba(226,232,240,var(--tw-bg-opacity))}.px-2\\.5{padding-left:.625rem;padding-right:.625rem}.py-1\\.5{padding-bottom:.375rem;padding-top:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.py-1{padding-bottom:.25rem;padding-top:.25rem}.text-blue-gray-500{--tw-text-opacity:1;color:rgba(100,116,139,var(--tw-text-opacity))}.blur{--tw-blur:blur(8px);filter:var(--tw-filter)}/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize *//*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */";
 
 let StreamlineSidebar$1 = class extends HTMLElement {
     constructor() {
@@ -11746,18 +11794,19 @@ let StreamlineSidebar$1 = class extends HTMLElement {
         this.__attachShadow();
         this.handleClick = (name) => {
             state.active = name;
-            if (state.active === "menu" &&
-                state$1.entriesMenu.length === 0) {
-                getMenu();
-            }
+            getMenus();
         };
     }
     render() {
         return (h("nav", { class: `bg-blue-gray-900 h-full w-[var(--sl-side-w)] flex flex-col overflow-visible` }, h("streamline-button", { type: "primary", icon: "wordpress", onClick: () => (state$1.visible = false) }), h("div", { class: `flex flex-col h-full` }, Object.values(state$1.menu).map((item) => {
-            return (h("streamline-button", { onClick: () => this.handleClick(item.name), class: `${item.name === "settings" ? "mt-auto" : ""}`, type: "sidebar", text: capitalizeFirstLetter(item.name === "fav" ? "faves" : item.name), icon: item.name }));
+            return (item["condition"] && (h("streamline-button", { onClick: () => this.handleClick(item.name), class: `${item.name === "settings"
+                    ? "mt-auto"
+                    : item.name === "network"
+                        ? "mb-4"
+                        : ""}`, type: "sidebar", text: capitalizeFirstLetter(item.name === "fav" ? "faves" : item.name), icon: item.name })));
         }))));
     }
-    static get style() { return streamlineSidebarCss + '/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;border:0 solid;box-sizing:border-box}.visible{visibility:visible}.mt-auto{margin-top:auto}.flex{display:flex}.h-full{height:100%}.w-\\[var\\(--sl-side-w\\)\\]{width:var(--sl-side-w)}.flex-col{flex-direction:column}.overflow-visible{overflow:visible}.bg-blue-gray-900{--tw-bg-opacity:1;background-color:rgba(15,23,42,var(--tw-bg-opacity))}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px 0 rgba(0,0,0,.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}'; }
+    static get style() { return streamlineSidebarCss + '/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com*//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */*,:after,:before{--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;border:0 solid;box-sizing:border-box}.visible{visibility:visible}.mt-auto{margin-top:auto}.mb-4{margin-bottom:1rem}.flex{display:flex}.h-full{height:100%}.w-\\[var\\(--sl-side-w\\)\\]{width:var(--sl-side-w)}.flex-col{flex-direction:column}.overflow-visible{overflow:visible}.bg-blue-gray-900{--tw-bg-opacity:1;background-color:rgba(15,23,42,var(--tw-bg-opacity))}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px 0 rgba(0,0,0,.06);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}'; }
 };
 
 const StreamlineBox = /*@__PURE__*/proxyCustomElement(StreamlineBox$1, [1,"streamline-box"]);

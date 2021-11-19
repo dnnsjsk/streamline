@@ -1,20 +1,28 @@
 import { stateInternal } from '../store/internal';
 import { stateLocal } from '../store/local';
-import { isLocalCommands } from './isLocalCommands';
+import { capitalizeFirstLetter } from './capitalizeFirstLetter';
+// import { isLocalCommands } from './isLocalCommands';
 
 export function setSearchPlaceholder() {
+  /*
   const commands = isLocalCommands()
     ? " or type '/' for available commands"
     : '';
+   */
+  const commands = '';
 
   stateInternal.searchPlaceholder =
-    stateLocal.active === 'post'
+    stateLocal.active === 'post' || stateLocal.active === 'site'
       ? `${
           stateInternal.test
             ? 'Filter entries'
-            : Object.values(stateInternal.entriesPost).length >= 1
-            ? 'Search for a post or filter entries'
-            : 'Search for a post'
+            : Object.values(
+                stateInternal[
+                  `entries${capitalizeFirstLetter(stateLocal.active)}`
+                ]
+              ).length >= 1
+            ? `Search for a ${stateLocal.active} or filter entries`
+            : `Search for a ${stateLocal.active}`
         }${commands}`
       : stateLocal.active === 'settings'
       ? 'Search settings'

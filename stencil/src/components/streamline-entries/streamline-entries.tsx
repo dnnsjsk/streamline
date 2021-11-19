@@ -1,13 +1,14 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, h, Element } from '@stencil/core';
 import { stateInternal } from '../../store/internal';
-import { getMenu } from '../../utils/getMenu';
 import { stateLocal } from '../../store/local';
 import { setEntries } from '../../utils/setEntries';
 import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
 import { Loader } from '../../elements/Loader';
-import { IconMenu, IconPost } from '../../icons';
+import { IconCheck, IconMenu, IconNetwork, IconPost } from '../../icons';
 import { fetchAjax } from '../../utils/fetchAjax';
+import { getMenus } from '../../utils/getMenus';
+import { getMenu } from '../../utils/getMenu';
 
 /**
  * Entries.
@@ -18,6 +19,7 @@ import { fetchAjax } from '../../utils/fetchAjax';
   styleUrl: 'streamline-entries.scss',
 })
 export class StreamlineEntries {
+  private px = 'px-6 lg:px-8';
   private h2 = 'text-base text-blue-gray-900 font-medium';
   private p = 'text-blue-gray-600 text-base font-normal';
   private tag =
@@ -29,18 +31,16 @@ export class StreamlineEntries {
   @Element() el: HTMLStreamlineEntriesElement;
 
   connectedCallback() {
-    if (
-      (stateInternal.data.isAdmin || stateLocal.active === 'menu') &&
-      stateInternal.entriesMenu.length === 0
-    ) {
-      getMenu({});
-    }
+    getMenus();
     setEntries();
   }
 
   private static getHeader(item) {
+    const isQuery = item.type === 'post' || item.type === 'site';
+    const isMenu = item.type === 'menu' || item.type === 'networkMenu';
+
     let menuNumber = 0;
-    if (item.type === 'menu' || item.type === 'networkMenu') {
+    if (isMenu) {
       Object.values(item.children as unknown).forEach((itemNested) => {
         Object.values(itemNested.children as unknown).forEach(() => {
           menuNumber++;
@@ -49,25 +49,19 @@ export class StreamlineEntries {
     }
 
     const results = `Showing ${
-      item.type === 'post'
-        ? Object.values(item.children).length
-        : stateInternal.isSites
-        ? Object.values(item.children).length
-        : item.type === 'menu' || item.type === 'networkMenu'
-        ? menuNumber
-        : '0'
+      isQuery ? Object.values(item.children).length : isMenu ? menuNumber : '0'
     } ${
-      (item.type === 'post' && Object.values(item.children).length === 1) ||
-      (stateInternal.isSites && Object.values(item.children).length === 1) ||
-      ((item.type === 'menu' || item.type === 'networkMenu') &&
-        menuNumber === 1)
+      (isQuery && Object.values(item.children).length === 1) ||
+      (isMenu && menuNumber === 1)
         ? `result`
         : `results`
     }
     `;
 
     const path =
-      item.isMultisite && !stateInternal.test ? ` (subsite: ${item.path})` : '';
+      item.isMultisite && !stateInternal.test && stateLocal.active !== 'site'
+        ? ` (subsite: ${item.path})`
+        : '';
 
     return (
       <div
@@ -83,50 +77,43 @@ export class StreamlineEntries {
               <div
                 class={`scale-90 rounded-full flex-shrink-0 bg-blue-gray-100 text-gray-500 border border-blue-gray-200 w-8 h-8 flex items-center justify-center p-2 mr-3`}
               >
-                {(item.type === 'menu' || item.type === 'networkMenu') && (
-                  <IconMenu />
-                )}
+                {item.type === 'menu' && <IconMenu />}
+                {item.type === 'networkMenu' && <IconNetwork />}
                 {item.type === 'post' && <IconPost />}
               </div>
             )}
           <h1
             class={`text-blue-gray-900 font-medium text-xl mr-6`}
             innerHTML={`${
-              stateInternal.isSlash && !stateInternal.isSites
+              stateInternal.isSlash
                 ? item.title
-                : item.type === 'networkMenu' ||
-                  (stateInternal.entriesMenuIsNetwork &&
-                    stateLocal.active === 'menu' &&
-                    !stateInternal.isSites)
+                : item.type === 'networkMenu'
                 ? 'Network admin'
-                : (stateLocal.active === 'menu' && !stateInternal.isSlash) ||
-                  item.type === 'menu' ||
-                  item.type === 'networkMenu'
+                : isMenu
                 ? 'Admin menu' + path
-                : (stateLocal.active === 'post' || item.type === 'site') &&
-                  stateLocal.active !== 'fav' &&
+                : (stateLocal.active === 'post' ||
+                    stateLocal.active === 'site') &&
                   stateInternal[
                     `entries${stateLocal.active === 'post' ? 'Post' : 'Site'}`
                   ][0]?.queryValue
-                ? `${
-                    stateInternal.isSites
-                      ? 'Site'
-                      : capitalizeFirstLetter(stateLocal.active)
-                  }s for: ` +
+                ? `${capitalizeFirstLetter(stateLocal.active)}s for: ` +
                   `<span class="text-gray-400 italic">${
                     stateInternal[
                       `entries${stateLocal.active === 'post' ? 'Post' : 'Site'}`
                     ][0]?.queryValue
                   }</span>` +
                   path
-                : (item.type === 'post' || item.type === 'site') &&
-                  stateLocal.active === 'fav'
+                : isQuery && stateLocal.active === 'fav'
                 ? `${capitalizeFirstLetter(item.type)}s` + path
-                : stateLocal.active === 'post' &&
-                  Object.values(stateInternal.entriesPostActive[0].children)
-                    .length === 0 &&
+                : (stateLocal.active === 'post' ||
+                    stateLocal.active === 'site') &&
+                  Object.values(
+                    stateInternal[
+                      `entries${capitalizeFirstLetter(stateLocal.active)}Active`
+                    ][0].children
+                  ).length === 0 &&
                   !item.queryValue
-                ? 'No query, search for a post in the search bar'
+                ? `No query, search for a ${stateLocal.active} in the search bar`
                 : stateLocal.active === 'settings'
                 ? 'Settings'
                 : 'No results'
@@ -138,11 +125,7 @@ export class StreamlineEntries {
             {
               type: 'text',
               text: results,
-              condition:
-                stateInternal.isSites ||
-                stateLocal.active === 'post' ||
-                stateLocal.active === 'fav' ||
-                (stateLocal.active === 'menu' && !stateInternal.isSlash),
+              condition: stateLocal.active !== 'settings',
             },
             {
               type: 'button',
@@ -193,7 +176,7 @@ export class StreamlineEntries {
     );
   }
 
-  private getArr = (arr, type) => {
+  private getArr = (arr = [], type) => {
     return (
       (arr.length >= 1 && arr) ||
       (stateInternal[`entries${capitalizeFirstLetter(type)}Active`]?.length >=
@@ -204,6 +187,7 @@ export class StreamlineEntries {
   };
 
   private slash = () => {
+    /*
     return (
       <div>
         {StreamlineEntries.getHeader({
@@ -216,26 +200,49 @@ export class StreamlineEntries {
             const cmd = isEntry ? item.name.replace(type, '') : item.name;
 
             return (
-              <li class={`flex flex-col py-3`}>
-                <h2 class={`${this.h2} mb-2`}>
-                  <span>
-                    {cmd}
-                    {isEntry && (
-                      <span class={`${this.tag} ml-2`}>{type.trim()}</span>
-                    )}
-                  </span>
-                </h2>
-                <p class={`${this.p}`}>{item.description}</p>
-              </li>
+              stateInternal.menu[stateLocal.active].commands.includes(
+                item.name
+              ) && (
+                <li class={`flex flex-col py-3`}>
+                  <h2 class={`${this.h2} mb-2`}>
+                    <span>
+                      {cmd}
+                      {isEntry && (
+                        <span class={`${this.tag} ml-2`}>{type.trim()}</span>
+                      )}
+                    </span>
+                  </h2>
+                  <p class={`${this.p}`}>{item.description}</p>
+                </li>
+              )
             );
           })}
         </ul>
       </div>
     );
+     */
   };
 
-  private site = () => {
-    return Object.values(stateInternal.entriesSite).map((item) => {
+  // @ts-ignore
+  private site = (arr = []) => {
+    function selectSite(obj) {
+      stateInternal.currentSite = {
+        path: obj.path,
+        id: obj.siteId,
+      };
+
+      stateInternal.entriesPost = [];
+      stateInternal.entriesPostActive = [];
+
+      getMenu({
+        adminUrl: obj.adminUrl,
+        fetch: true,
+        siteId: obj.siteId,
+        path: obj.path,
+      });
+    }
+
+    return Object.values(this.getArr(arr, 'site') as unknown).map((item) => {
       return (
         <div>
           {StreamlineEntries.getHeader(item)}
@@ -250,15 +257,23 @@ export class StreamlineEntries {
               return (
                 <li class={`flex flex-col`}>
                   <div
-                    class={`${this.h2} inline-grid grid-flow-col auto-cols-max py-3 items-center`}
+                    class={`${this.h2} relative flex flex-wrap py-3 items-center`}
                   >
+                    {parseInt(itemInner.siteId) ===
+                      parseInt(stateInternal.currentSite.id) && (
+                      <span
+                        class={`text-green-600 w-3 inline-block mr-4 absolute left-[-1.125rem] lg:w-4 lg:-left-6`}
+                      >
+                        <IconCheck />
+                      </span>
+                    )}
                     <div
                       role="button"
                       tabIndex={0}
-                      onClick={() => getMenu(obj)}
+                      onClick={() => selectSite(obj)}
                       onKeyPress={(e) => {
                         if (e.key === 'Enter') {
-                          getMenu(obj);
+                          selectSite(obj);
                         }
                       }}
                       class={`${this.tag} focus-white-out hover:text-blue-gray-50 hover:bg-blue-gray-900 hover:border-blue-gray-900`}
@@ -298,55 +313,57 @@ export class StreamlineEntries {
 
   // @ts-ignore
   private menu = (arr = []) => {
-    return Object.values(this.getArr(arr, 'menu') as unknown).map((item) => {
-      return (
-        <div>
-          {StreamlineEntries.getHeader(item)}
-          <ul>
-            {Object.values(item.children as unknown).map(
-              (itemInner, indexInner) => {
-                return (
-                  <li
-                    key={indexInner}
-                    class={`${this.border} flex flex-col pb-4 sm:flex-row`}
-                  >
-                    <h2
-                      class={`${this.h2} mt-4 mr-4 leading-1 inline-block break-words sm:min-w-[120px] md:min-w-[200px]`}
+    return Object.values(this.getArr(arr, stateLocal.active) as unknown).map(
+      (item) => {
+        return (
+          <div>
+            {StreamlineEntries.getHeader(item)}
+            <ul>
+              {Object.values(item.children as unknown).map(
+                (itemInner, indexInner) => {
+                  return (
+                    <li
+                      key={indexInner}
+                      class={`${this.border} flex flex-col pb-4 sm:flex-row`}
                     >
-                      {itemInner.name}
-                    </h2>
-                    {itemInner.children && (
-                      <ul class={`flex flex-wrap`}>
-                        {Object.values(itemInner.children as unknown).map(
-                          (itemSub, indexSub) => {
-                            return (
-                              <li key={indexSub} class={`mt-4 mr-4`}>
-                                <streamline-button
-                                  type="menu"
-                                  adminUrl={item.adminUrl}
-                                  href={itemSub.href}
-                                  index={item.index}
-                                  indexInner={itemInner.index}
-                                  indexSub={itemSub.index}
-                                  path={itemSub.path}
-                                  siteId={itemSub.siteId}
-                                  text={itemSub.name}
-                                  typeSub={itemSub.type}
-                                />
-                              </li>
-                            );
-                          }
-                        )}
-                      </ul>
-                    )}
-                  </li>
-                );
-              }
-            )}
-          </ul>
-        </div>
-      );
-    });
+                      <h2
+                        class={`${this.h2} mt-4 mr-4 leading-1 inline-block break-words sm:min-w-[120px] md:min-w-[200px]`}
+                      >
+                        {itemInner.name}
+                      </h2>
+                      {itemInner.children && (
+                        <ul class={`flex flex-wrap`}>
+                          {Object.values(itemInner.children as unknown).map(
+                            (itemSub, indexSub) => {
+                              return (
+                                <li key={indexSub} class={`mt-4 mr-4`}>
+                                  <streamline-button
+                                    type="menu"
+                                    adminUrl={item.adminUrl}
+                                    href={itemSub.href}
+                                    index={item.index}
+                                    indexInner={itemInner.index}
+                                    indexSub={itemSub.index}
+                                    path={itemSub.path}
+                                    siteId={itemSub.siteId}
+                                    text={itemSub.name}
+                                    typeSub={itemSub.type}
+                                  />
+                                </li>
+                              );
+                            }
+                          )}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                }
+              )}
+            </ul>
+          </div>
+        );
+      }
+    );
   };
 
   // @ts-ignore
@@ -475,7 +492,7 @@ export class StreamlineEntries {
 
   render() {
     return (
-      <div class={`h-full relative lg:h-[calc(100%+64px)]`}>
+      <div class={`h-[calc(100%-24px)] relative lg:h-[calc(100%+56px)]`}>
         {stateInternal.isLoading ? (
           <div
             class={`w-full h-[calc(100%-var(--sl-side-w))] flex items-center justify-center bg-white/50 absolute top-0 left-0 backdrop-blur-sm z-10`}
@@ -485,15 +502,31 @@ export class StreamlineEntries {
         ) : (
           <div
             tabindex={-1}
-            class={`focus-none inner pb-6 relative px-3 h-[calc(100%-var(--sl-side-w))] overflow-y-scroll overflow-x-hidden w-full bg-white sm:px-6 lg:px-8 lg:pb-10 ${
+            class={`${
+              this.px
+            } focus-none inner pb-6 relative h-[calc(100%-var(--sl-side-w))] overflow-y-scroll overflow-x-hidden w-full bg-white lg:pb-10 ${
               stateInternal.isProcessing ? 'pointer-events-none opacity-50' : ''
             }`}
           >
-            {stateInternal.isSlash && !stateInternal.isSites
+            {stateInternal.isSlash
               ? this.slash()
-              : stateInternal.isSites
-              ? this.site()
+              : stateLocal.active === 'network'
+              ? this.menu()
               : this[`${stateLocal.active}`]()}
+          </div>
+        )}
+        {stateInternal.data.network && !stateInternal.isLoading && (
+          <div
+            class={`mt-auto px-3 h-6 bg-blue-gray-50 border-t border-blue-gray-100 flex items-center text-blue-gray-900`}
+          >
+            <span class={`flex whitespace-no-wrap`}>
+              <span class={`text-[0.675rem]`}>
+                <span class={`font-semibold`}>Current site:</span>{' '}
+                {stateInternal.currentSite.path} ∙{' '}
+                <span class={`font-semibold`}>ID:</span>
+                {stateInternal.currentSite.id}
+              </span>
+            </span>
           </div>
         )}
       </div>

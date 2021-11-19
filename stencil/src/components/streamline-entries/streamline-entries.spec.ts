@@ -13,6 +13,8 @@ beforeEach(async () => {
 });
 
 describe('Render entries with', function () {
+  // eslint-disable-next-line jest/no-commented-out-tests
+  /*
   it("mode set to 'slash'", async () => {
     stateInternal.isSlash = true;
     stateLocal.active = 'menu';
@@ -24,18 +26,7 @@ describe('Render entries with', function () {
     const length = el.querySelectorAll('li').length;
     expect(length).toBe(2);
   });
-  it("mode set to 'sites'", async () => {
-    stateInternal.isSites = true;
-    stateLocal.active = 'menu';
-    const page = await newSpecPage({
-      components: [StreamlineEntries],
-      html: `<streamline-entries></streamline-entries>`,
-    });
-    const el = page.doc.querySelector('streamline-entries').shadowRoot;
-    const length = el.querySelectorAll('li').length;
-    expect(length).toBe(7);
-  });
-
+   */
   describe("mode set to 'favourites'", function () {
     it('and all elements shown', async () => {
       stateLocal.active = 'fav';

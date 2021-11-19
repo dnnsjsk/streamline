@@ -1,40 +1,19 @@
 import { createStore } from '@stencil/store';
 import equal from 'fast-deep-equal/es6';
 import { focusSearch } from '../utils/focusSearch';
+import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 
 const isTest = document
   .querySelector('streamline-container')
   ?.hasAttribute('test');
 
 const { state, dispose, onChange } = createStore({
-  // @ts-ignore
-  data: window.streamlineData,
   class: {
     tag: 'px-2.5 py-1.5 bg-blue-gray-200 text-blue-gray-500 inline-block h-[max-content] leading-1',
   },
-  menus: ['fav', 'menu', 'post', 'settings'],
-  menu: {
-    fav: {
-      name: 'fav',
-    },
-    menu: {
-      name: 'menu',
-      commands: ['/site ', '/network'],
-    },
-    post: {
-      name: 'post',
-    },
-    /*
-    custom: {
-      name: 'custom',
-    },
-     */
-    settings: {
-      name: 'settings',
-    },
-  },
   commands: {
     local: {
+      /*
       site: {
         // @ts-ignore
         condition: window.streamlineData.network && !isTest,
@@ -42,14 +21,17 @@ const { state, dispose, onChange } = createStore({
         description: `Display entries from a different site in the network.`,
         callback: 'sites',
       },
-      network: {
-        // @ts-ignore
-        condition: window.streamlineData.network && !isTest,
-        name: '/network',
-        description: `Display entries from a from network dashboard.`,
-      },
+      */
     },
   },
+  currentSite: {
+    // @ts-ignore
+    id: window.streamlineData.siteId,
+    // @ts-ignore
+    path: window.streamlineData.sitePath,
+  },
+  // @ts-ignore
+  data: window.streamlineData,
   // @ts-ignore
   entriesFav: JSON.parse(window.streamlineData.favourites),
   // @ts-ignore
@@ -57,7 +39,6 @@ const { state, dispose, onChange } = createStore({
   entriesMenu: [],
   entriesMenuActive: [],
   entriesMenuCurrentPath: '',
-  entriesMenuIsNetwork: false,
   entriesNetwork: [],
   entriesNetworkActive: [],
   entriesPost: [],
@@ -137,11 +118,45 @@ const { state, dispose, onChange } = createStore({
   entriesSettingsSave: {},
   entriesSettingsHaveChanged: false,
   entriesSite: [],
+  entriesSiteActive: [],
   isEnter: false,
   isLoading: false,
   isProcessing: false,
-  isSites: false,
   isSlash: false,
+  menus: ['site', 'network', 'fav', 'menu', 'post', 'settings'],
+  menu: {
+    site: {
+      name: 'site',
+      // @ts-ignore
+      condition: window.streamlineData.network && !isTest,
+    },
+    network: {
+      name: 'network',
+      // @ts-ignore
+      condition: window.streamlineData.network && !isTest,
+    },
+    fav: {
+      name: 'fav',
+      condition: true,
+    },
+    menu: {
+      name: 'menu',
+      condition: true,
+    },
+    post: {
+      name: 'post',
+      condition: true,
+    },
+    /*
+    custom: {
+      name: 'custom',
+    },
+     */
+    settings: {
+      name: 'settings',
+      condition: true,
+    },
+  },
   searchNoValue: 'No entries found',
   searchPlaceholder: '',
   searchValue: '',
@@ -164,6 +179,24 @@ onChange('entriesSettingsSave', (value) => {
 
 onChange('entriesSettingsLoad', (value) => {
   state.entriesSettingsHaveChanged = !equal(value, state.entriesSettingsSave);
+});
+
+onChange('visible', (value) => {
+  const el = document
+    ?.querySelector('streamline-container')
+    ?.shadowRoot?.querySelector('streamline-box')
+    ?.shadowRoot?.querySelector('streamline-entries')
+    ?.shadowRoot?.querySelector('div > div');
+
+  if (el) {
+    if (value === true) {
+      disableBodyScroll(el, {
+        reserveScrollBarGap: true,
+      });
+    } else {
+      clearAllBodyScrollLocks();
+    }
+  }
 });
 
 export {

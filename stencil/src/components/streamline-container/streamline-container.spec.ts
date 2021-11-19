@@ -2,7 +2,6 @@ import { newSpecPage } from '@stencil/core/testing';
 import { StreamlineContainer } from './streamline-container';
 import { stateInternal, disposeInternal } from '../../store/internal';
 import { StreamlineSearch } from '../streamline-search/streamline-search';
-import { setTestMode } from '../../test/setTestMode';
 import { stateLocal, disposeLocal } from '../../store/local';
 
 beforeEach(async () => {
@@ -117,7 +116,13 @@ describe('Key press should', function () {
     expect(stateLocal.active).toBe('fav');
     page.doc.dispatchEvent(eventUp);
     await page.waitForChanges();
-    expect(stateLocal.active).toBe('settings');
+    expect(stateLocal.active).toBe('network');
+    page.doc.dispatchEvent(eventUp);
+    await page.waitForChanges();
+    expect(stateLocal.active).toBe('site');
+    page.doc.dispatchEvent(eventDown);
+    await page.waitForChanges();
+    expect(stateLocal.active).toBe('network');
     page.doc.dispatchEvent(eventDown);
     await page.waitForChanges();
     expect(stateLocal.active).toBe('fav');
@@ -127,6 +132,12 @@ describe('Key press should', function () {
     page.doc.dispatchEvent(eventDown);
     await page.waitForChanges();
     expect(stateLocal.active).toBe('post');
+    page.doc.dispatchEvent(eventDown);
+    await page.waitForChanges();
+    expect(stateLocal.active).toBe('settings');
+    page.doc.dispatchEvent(eventDown);
+    await page.waitForChanges();
+    expect(stateLocal.active).toBe('site');
   });
   it('not cycle through modes (arrow keys)', async () => {
     stateLocal.active = 'menu';
@@ -154,7 +165,6 @@ describe('Key press should', function () {
 
 describe('In test mode', function () {
   it('render search with correct placeholder', async () => {
-    setTestMode();
     stateInternal.test = true;
     const page = await newSpecPage({
       components: [StreamlineContainer, StreamlineSearch],
