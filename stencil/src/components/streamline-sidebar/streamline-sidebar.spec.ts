@@ -1,24 +1,43 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { StreamlineSidebar } from './streamline-sidebar';
+import { disposeInternal, stateInternal } from '../../store/internal';
+import { disposeLocal } from '../../store/local';
+import { setData } from '../../test/setData';
 
-it('Render sidebar', async () => {
-  const page = await newSpecPage({
-    components: [StreamlineSidebar],
-    html: `<streamline-sidebar></streamline-sidebar>`,
+beforeEach(async () => {
+  disposeInternal();
+  disposeLocal();
+});
+
+describe('Render sidebar', function () {
+  it('as single site', async () => {
+    const page = await newSpecPage({
+      components: [StreamlineSidebar],
+      html: `<streamline-sidebar></streamline-sidebar>`,
+    });
+    const el = page.doc.querySelector('streamline-sidebar').shadowRoot;
+    expect(el.querySelectorAll('streamline-button').length).toBe(5);
   });
-  expect(page.root).toEqualHtml(`
-<streamline-sidebar>
-      <mock:shadow-root>
-        <nav class="bg-blue-gray-900 flex flex-col h-full overflow-visible w-[var(--sl-side-w)]">
-          <streamline-button icon="wordpress" type="primary"></streamline-button>
-          <div class="flex flex-col h-full">
-            <streamline-button icon="fav" text="Faves" type="sidebar"></streamline-button>
-            <streamline-button icon="menu" text="Menu" type="sidebar"></streamline-button>
-            <streamline-button icon="post" text="Post" type="sidebar"></streamline-button>
-            <streamline-button class="mt-auto" icon="settings" text="Settings" type="sidebar"></streamline-button>
-          </div>
-        </nav>
-      </mock:shadow-root>
-    </streamline-sidebar>
-  `);
+  it('as multisite', async () => {
+    setData();
+    stateInternal.menu = {
+      ...stateInternal.menu,
+      ...{
+        site: {
+          name: 'site',
+          condition: true,
+        },
+        network: {
+          name: 'network',
+          condition: true,
+        },
+      },
+    };
+    const page = await newSpecPage({
+      components: [StreamlineSidebar],
+      html: `<streamline-sidebar></streamline-sidebar>`,
+    });
+    const el = page.doc.querySelector('streamline-sidebar').shadowRoot;
+    expect(el.querySelectorAll('streamline-button').length).toBe(7);
+  });
 });

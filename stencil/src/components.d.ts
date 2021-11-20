@@ -28,7 +28,7 @@ export namespace Components {
     interface StreamlineContainer {
         "mac": boolean;
         "toggle": () => Promise<void>;
-        "toggleTest": () => Promise<void>;
+        "toggleTestFull": (type: any) => Promise<void>;
         "visible": boolean;
     }
     interface StreamlineEntries {

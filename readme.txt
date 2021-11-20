@@ -20,7 +20,7 @@ Do things faster.
 * Fix: scrollbar being too short
 * New: add 'Network' tab for network admin menu
 * New: add 'Site' tab to find sites in multisite network
-* New: add site information when multisite is active
+* New: add site information footer when multisite is active
 
 = 1.0.20 =
 * Enhancement: sidebar spacing

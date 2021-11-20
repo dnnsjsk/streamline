@@ -491,8 +491,20 @@ export class StreamlineEntries {
   };
 
   render() {
+    const isMultisite =
+      (stateInternal.data.network &&
+        !stateInternal.test &&
+        !stateInternal.isLoading) ||
+      stateInternal.testFull;
+
     return (
-      <div class={`h-[calc(100%-24px)] relative lg:h-[calc(100%+56px)]`}>
+      <div
+        class={`${
+          isMultisite
+            ? 'h-[calc(100%-24px)] lg:h-[calc(100%+56px)]'
+            : 'h-full lg:h-[calc(100%+80px)]'
+        } relative`}
+      >
         {stateInternal.isLoading ? (
           <div
             class={`w-full h-[calc(100%-var(--sl-side-w))] flex items-center justify-center bg-white/50 absolute top-0 left-0 backdrop-blur-sm z-10`}
@@ -515,7 +527,7 @@ export class StreamlineEntries {
               : this[`${stateLocal.active}`]()}
           </div>
         )}
-        {stateInternal.data.network && !stateInternal.isLoading && (
+        {isMultisite && (
           <div
             class={`mt-auto px-3 h-6 bg-blue-gray-50 border-t border-blue-gray-100 flex items-center text-blue-gray-900`}
           >

@@ -23,7 +23,7 @@ Type: `Promise<void>`
 
 
 
-### `toggleTest() => Promise<void>`
+### `toggleTestFull(type: any) => Promise<void>`
 
 
 

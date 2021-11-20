@@ -114,8 +114,21 @@ export class StreamlineContainer {
   }
 
   @Method()
-  async toggleTest() {
-    stateInternal.testFull = !stateInternal.testFull;
+  async toggleTestFull(type) {
+    stateInternal.testFull = type;
+    stateInternal.menu = {
+      ...stateInternal.menu,
+      ...{
+        site: {
+          name: 'site',
+          condition: type,
+        },
+        network: {
+          name: 'network',
+          condition: type,
+        },
+      },
+    };
   }
 
   render() {

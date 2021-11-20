@@ -52,8 +52,7 @@ export class StreamlineSearch {
       }
     } else if (
       // (e.target.value.startsWith('/') && isLocalCommands()) ||
-      e.target.value.startsWith('/') &&
-      stateInternal.testFull
+      e.target.value.startsWith('/')
     ) {
       stateInternal.isSlash = true;
       if (
