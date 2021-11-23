@@ -31,7 +31,7 @@ describe('Render search', function () {
       .querySelector('streamline-search')
       .shadowRoot.querySelector('streamline-button');
     expect(el).toEqualHtml(`
-<streamline-button text="Search"/></streamline-button>
+<streamline-button text="Search" type="button"></streamline-button>
     `);
   });
 });

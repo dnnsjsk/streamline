@@ -5,7 +5,7 @@
  * Plugin URI: https://wpstreamline.com
  * Description: Use WordPress faster.
  * Author: Fabrikat
- * Version: 1.0.21
+ * Version: 1.0.22
  * License: GPL2+
  * License URI: https://www.gnu.org/licenses/gpl-2.0.txt
  */

@@ -98,6 +98,7 @@ export function getMenu(obj = {} as any) {
         resetView();
 
         // console.log(stateInternal.entriesMenu);
+        // console.log(stateInternal.entriesNetwork);
       })
       .catch(() => {});
     // @ts-ignore

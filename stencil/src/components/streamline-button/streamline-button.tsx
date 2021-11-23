@@ -10,6 +10,7 @@ import { Heart } from '../../elements/Heart';
 import { Loader } from '../../elements/Loader';
 import {
   IconCustom,
+  IconDots,
   IconFlow,
   IconMenu,
   IconNetwork,
@@ -30,15 +31,13 @@ import {
 export class StreamlineButton {
   // @ts-ignore
   private tw = 'animate-spin h-[16px] h-[14px] w-8 h-8 sm:w-10 sm:h-10';
-  private link: HTMLElement;
   private tooltip: HTMLElement;
+  private tooltipTrigger: HTMLElement;
 
   @Prop() adminUrl: string;
 
   // eslint-disable-next-line @stencil/strict-mutable
   @Prop({ mutable: true, reflect: true }) favourite: boolean = false;
-
-  @Prop() header: string;
 
   @Prop() href: string;
 
@@ -91,15 +90,24 @@ export class StreamlineButton {
       },
     };
 
-    if (this.type === 'menu' && this.link) {
+    if (
+      (this.type === 'menu' && this.tooltipTrigger) ||
+      this.typeSub === 'context'
+    ) {
       const template = this.tooltip;
       template.style.display = 'block';
 
-      tippy(this.link, {
+      tippy(this.tooltipTrigger, {
         content: template,
         interactive: true,
         plugins: [hideOnPopperBlur],
-        delay: [500, null],
+        delay: [this.typeSub === 'context' ? 0 : 500, null],
+        placement: this.typeSub === 'context' ? 'bottom-end' : 'top',
+        offset: [
+          this.typeSub === 'context' ? -9 : 0,
+          this.typeSub === 'context' ? -1 : 10,
+        ],
+        arrow: this.typeSub !== 'context',
       });
     }
   }
@@ -134,7 +142,7 @@ export class StreamlineButton {
   render() {
     const className = `select-none break-words w-[max-content] underline-none cursor-pointer text-center whitespace-no-wrap ${
       this.type === 'menu'
-        ? `text-sm px-3 py-2.5 leading-none border border-blue-gray-200 bg-blue-gray-50 text-blue-600 hover:border-blue-600`
+        ? `focus-out text-sm px-3 py-2.5 leading-none border border-blue-gray-200 bg-blue-gray-50 text-blue-600 hover:border-blue-600`
         : this.type === 'sidebar' || this.type === 'primary'
         ? `h-[calc(var(--sl-side-w))] w-[calc(var(--sl-side-w))] flex flex-col items-center justify-center p-0 text-white bg-transparent lg:h-[64px] ${
             this.type === 'primary'
@@ -144,11 +152,19 @@ export class StreamlineButton {
                   this.icon !== 'settings'
                     ? 'sm:!grid-rows-[20px,20px] lg:!grid-rows-1 lg:grid-cols-[32px,1fr] lg:px-5'
                     : ''
-                } !justify-items-center !content-center text-blue-gray-200 hover:bg-blue-gray-800 lg:!justify-items-start ${
+                } !justify-items-center !content-center text-blue-gray-200 hover:text-blue-400 lg:!justify-items-start ${
                   stateLocal.active === this.icon
                     ? 'bg-blue-gray-800 pointer-events-none'
                     : ''
                 }`
+          }`
+        : this.type === 'icon'
+        ? 'focus flex items-center justify-center w-full h-full text-blue-gray-900 border-b border-blue-gray-200'
+        : this.type === 'button'
+        ? `select-none focus-out inline-flex items-center font-semibold text-xs ${
+            this.styling === 'primary'
+              ? 'px-2.5 py-2 bg-blue-500 border-blue-500 text-white hover:bg-blue-600 hover:border-blue-600 sm:px-3.5'
+              : 'px-2 py-1 bg-white border border-blue-gray-200 text-blue-gray-600 hover:text-blue-gray-50 hover:bg-blue-gray-900 hover:border-blue-gray-900 sm:px-3 sm:py-1.5'
           }`
         : ''
     }`;
@@ -164,10 +180,10 @@ export class StreamlineButton {
         <IconWordPress />
       ) : this.icon === 'site' ? (
         <IconSites />
-      ) : this.icon === 'menu' ? (
-        <IconMenu />
       ) : this.icon === 'network' ? (
         <IconNetwork />
+      ) : this.icon === 'menu' ? (
+        <IconMenu />
       ) : this.icon === 'post' ? (
         <IconPost />
       ) : this.icon === 'flow' ? (
@@ -176,23 +192,34 @@ export class StreamlineButton {
         <IconCustom />
       ) : this.icon === 'settings' ? (
         <IconSettings />
+      ) : this.icon === 'dots' ? (
+        <IconDots />
       ) : (
         this.icon === 'fav' && <Heart type={this.type} />
       );
 
     const text = this.text && <span class={classNameText}>{this.text}</span>;
 
+    const dropdownButton = (obj) => (
+      <button
+        class={`focus px-4 py-2 whitespace-nowrap text-sm font-medium text-blue-gray-900 hover:text-blue-400`}
+        onClick={obj.onClick}
+      >
+        {obj.text}
+      </button>
+    );
+
     return (
       <div
-        class={`relative flex ${
-          this.type === 'primary' ? 'w-[calc(var(--sl-side-w)+1px)]' : 'w-full'
+        class={`relative flex w-full h-full ${
+          this.type === 'primary' ? 'w-[calc(var(--sl-side-w)+1px)]' : ''
         } ${this.invalid ? 'opacity-25 pointer-events-none' : ''}`}
       >
         {this.type === 'menu' && this.href ? (
           <a
-            ref={(el) => (this.link = el as HTMLElement)}
+            ref={(el) => (this.tooltipTrigger = el as HTMLElement)}
             href={!stateInternal.test ? this.href : '#'}
-            class={className + ` focus-out`}
+            class={className}
           >
             {icon}
             {text}
@@ -216,28 +243,50 @@ export class StreamlineButton {
             )}
             {this.icon === 'settings' ? '' : text}
           </button>
-        ) : (
+        ) : this.type === 'icon' ? (
           <button
-            class={`select-none focus-out inline-flex items-center uppercase font-semibold text-xs ${
-              this.styling === 'primary'
-                ? 'px-2.5 py-2 bg-blue-500 border-blue-500 text-white hover:bg-blue-600 hover:border-blue-600 sm:px-3.5'
-                : 'px-2 py-1 bg-white border border-blue-gray-200 text-blue-gray-600 hover:text-blue-gray-50 hover:bg-blue-gray-900 hover:border-blue-gray-900 sm:px-3 sm:py-1.5'
-            }`}
+            class={className}
+            ref={(el) => (this.tooltipTrigger = el as HTMLElement)}
           >
-            {this.text === 'Search' && (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class={`fill-current w-2 rotate-90 ml-1 mr-2 origin-right-center`}
-                viewBox="0 0 320 512"
+            {icon}
+            {this.typeSub === 'context' && (
+              <div
+                class={`border border-blue-gray-200`}
+                ref={(el) => (this.tooltip = el as HTMLElement)}
+                style={{
+                  display: 'block',
+                }}
               >
-                <path
-                  fill="currentColor"
-                  d="M296.64 412.326l-96.16 96.16c-4.686 4.687-12.285 4.686-16.97 0L87.354 412.33c-7.536-7.536-2.198-20.484 8.485-20.485l68.161-.002V56H64a11.996 11.996 0 0 1-8.485-3.515l-32-32C15.955 12.926 21.309 0 32 0h164c13.255 0 24 10.745 24 24v367.842l68.154-.001c10.626-.001 16.066 12.905 8.486 20.485z"
-                />
-              </svg>
+                {[
+                  {
+                    text: stateInternal.isHelp ? 'Close help' : 'Show help',
+                    onClick: () =>
+                      (stateInternal.isHelp = !stateInternal.isHelp),
+                  },
+                ].map((item) => {
+                  return dropdownButton(item);
+                })}
+              </div>
             )}
-            {this.text}
           </button>
+        ) : (
+          this.type === 'button' && (
+            <button class={className}>
+              {this.text === 'Search' && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class={`fill-current w-2 rotate-90 ml-1 mr-2 origin-right-center`}
+                  viewBox="0 0 320 512"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M296.64 412.326l-96.16 96.16c-4.686 4.687-12.285 4.686-16.97 0L87.354 412.33c-7.536-7.536-2.198-20.484 8.485-20.485l68.161-.002V56H64a11.996 11.996 0 0 1-8.485-3.515l-32-32C15.955 12.926 21.309 0 32 0h164c13.255 0 24 10.745 24 24v367.842l68.154-.001c10.626-.001 16.066 12.905 8.486 20.485z"
+                  />
+                </svg>
+              )}
+              {this.text}
+            </button>
+          )
         )}
         {this.type === 'menu' && (
           <div
@@ -252,9 +301,12 @@ export class StreamlineButton {
               },
             ].map((item) => {
               return (
-                <button class={`border-none focus-dark`} onClick={item.onClick}>
+                <button
+                  class={`border-none focus-dark group`}
+                  onClick={item.onClick}
+                >
                   <span
-                    class={`w-8 h-8 flex items-center justify-center ${
+                    class={`w-8 h-8 flex items-center justify-center group-hover:text-blue-400 ${
                       item.condition ? 'text-red-500' : ''
                     }`}
                   >

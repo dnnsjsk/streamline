@@ -6,13 +6,31 @@
   display: inline-block;
 }
 
+[data-tippy-root] {
+  max-width: none;
+
+  :host([type-sub='context']) & {
+    transform: translate(0, 47px) !important;
+
+    @media (min-width: 1024px) {
+      transform: translate(0, 63px) !important;
+    }
+  }
+}
+
 .tippy-content {
   padding: 0;
 }
 
 .tippy-box {
+  max-width: none !important;
   border-radius: 0 !important;
   background: #0f172a;
+
+  :host([type-sub='context']) & {
+    box-shadow: -2px 2px 3px 0 rgba(0, 0, 0, 0.05);
+    background: #fff;
+  }
 
   .tippy-arrow {
     color: #0f172a;

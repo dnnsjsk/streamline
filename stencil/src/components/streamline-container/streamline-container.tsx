@@ -120,11 +120,11 @@ export class StreamlineContainer {
       ...stateInternal.menu,
       ...{
         site: {
-          name: 'site',
+          ...stateInternal.menu.site,
           condition: type,
         },
         network: {
-          name: 'network',
+          ...stateInternal.menu.network,
           condition: type,
         },
       },

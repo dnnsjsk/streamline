@@ -24,11 +24,11 @@ describe('Render sidebar', function () {
       ...stateInternal.menu,
       ...{
         site: {
-          name: 'site',
+          ...stateInternal.menu.site,
           condition: true,
         },
         network: {
-          name: 'network',
+          ...stateInternal.menu.network,
           condition: true,
         },
       },

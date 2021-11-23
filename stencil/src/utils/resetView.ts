@@ -6,6 +6,7 @@ export function resetView() {
   stateInternal.isLoading = false;
   stateInternal.isSlash = false;
   stateInternal.isEnter = false;
+  stateInternal.isHelp = false;
   if (stateInternal.entriesSettingsLoad.searchResetInput.default) {
     stateInternal.searchValue = '';
   }

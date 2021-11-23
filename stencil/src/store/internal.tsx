@@ -123,29 +123,54 @@ const { state, dispose, onChange } = createStore({
   isLoading: false,
   isProcessing: false,
   isSlash: false,
+  isHelp: false,
   menus: ['site', 'network', 'fav', 'menu', 'post', 'settings'],
   menu: {
     site: {
       name: 'site',
       // @ts-ignore
       condition: window.streamlineData.network && !isTest,
+      text: 'Site',
+      help: `
+      <p>Streamline works with single sites and multisite networks. Since you are able to view this text, it means that you are currently on a multisite.</p>
+      <p>This tab can be used to search for a specific subsite in the network and use Streamline as the selected site.</p>
+      <p>After searching and selecting a site, the <strong>menu</strong> tab will show the admin menu of the chosen site, while the <strong>post</strong> tab makes it possible to search for posts of the respective subsite.</p>
+      `,
     },
     network: {
       name: 'network',
       // @ts-ignore
       condition: window.streamlineData.network && !isTest,
+      text: 'Network',
+      help: `
+      <p>Streamline works with single sites and multisite networks. Since you are able to view this text, it means that you are currently on a multisite.</p>
+      <p>The network tab shows you all the available menu items from the network admin screen. Clicking any of the links will redirect to the respective page.</p>
+      `,
     },
     fav: {
       name: 'fav',
       condition: true,
+      text: 'Faves',
+      help: `
+      <p>All individual menu items and posts can be favourited for easier access.</p>
+      <p>This mode lists all of your currently favourites in unified list.</p>
+      `,
     },
     menu: {
       name: 'menu',
       condition: true,
+      text: 'Menu',
+      help: `
+      <p>The menu tab shows you all the available menu items from the admin screen. Clicking any of the links will redirect to the respective page.</p>
+      `,
     },
     post: {
       name: 'post',
       condition: true,
+      text: 'Post',
+      help: `
+      <p>Posts are an essential part of WordPress and the posts tab allows you to search for any posts on your site.</p>
+      `,
     },
     /*
     custom: {
@@ -155,6 +180,10 @@ const { state, dispose, onChange } = createStore({
     settings: {
       name: 'settings',
       condition: true,
+      text: 'Settings',
+      help: `
+      <p>The settings tab allows you to make Streamline your own by customising certain nuances to your liking.</p>
+      `,
     },
   },
   searchNoValue: 'No entries found',

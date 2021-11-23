@@ -5,7 +5,7 @@
 
 .inner {
   &::-webkit-scrollbar {
-    width: 10px;
+    width: 8px;
   }
 
   &::-webkit-scrollbar-track {
@@ -14,7 +14,7 @@
 
   &::-webkit-scrollbar-thumb {
     background: #cbd5e1;
-    border-radius: 0;
+    border-radius: 0px;
   }
 }
 

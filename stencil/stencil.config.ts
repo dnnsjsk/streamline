@@ -54,6 +54,8 @@ export const config: Config = {
       type: 'dist-custom-elements-bundle',
       dir: '../assets/bundle',
       empty: true,
+      externalRuntime: false,
+      minify: true,
     },
   ],
   plugins: [

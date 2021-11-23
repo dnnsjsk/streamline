@@ -27,6 +27,19 @@ describe('Render entries with', function () {
     expect(length).toBe(2);
   });
    */
+  describe("mode set to 'help'", function () {
+    it("mode set to 'slash'", async () => {
+      stateInternal.isHelp = true;
+      stateLocal.active = 'menu';
+      const page = await newSpecPage({
+        components: [StreamlineEntries],
+        html: `<streamline-entries></streamline-entries>`,
+      });
+      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const length = el.querySelectorAll('p').length;
+      expect(length).toBe(1);
+    });
+  });
   describe("mode set to 'favourites'", function () {
     it('and all elements shown', async () => {
       stateLocal.active = 'fav';

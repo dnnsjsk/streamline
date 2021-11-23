@@ -15,6 +15,13 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.22 =
+* Enhancement: UI fixes
+* Enhancement: switch to :focus-visible for all focusing inside the app
+* Fix: don't make "Save" button clickable if settings haven't changed
+* Fix: save post button not showing
+* New: context menu
+
 = 1.0.21 =
 * Enhancement: remove previous implementation of network menu
 * Fix: scrollbar being too short

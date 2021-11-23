@@ -69,11 +69,12 @@ export class StreamlineEntries {
           stateLocal.active === 'settings'
             ? 'flex-row justify-between'
             : 'flex-col sm:justify-between'
-        } min-h-[60px] pt-5 flex items-start flex-wrap mb-1 pb-1.5 flex sticky -top-2 bg-white z-10 border-b border-dotted border-blue-gray-900 sm:min-h-[75px] sm:mb-4 sm:flex-row sm:items-center sm:pt-6 sm:pb-2 sm:-top-2 lg:pt-8 lg:-top-4`}
+        } min-h-[60px] pt-5 flex items-start flex-wrap mb-1 pb-1.5 flex sticky -top-2 bg-white z-10 border-b border-dotted border-blue-gray-800 sm:min-h-[75px] sm:mb-4 sm:flex-row sm:items-center sm:pt-6 sm:pb-2 sm:-top-2 lg:pt-7 lg:-top-3`}
       >
         <div class={`flex items-center flex-row`}>
           {stateLocal.active === 'fav' &&
-            stateInternal.entriesFavActive[0].children.length !== 0 && (
+            stateInternal.entriesFavActive[0].children.length !== 0 &&
+            !stateInternal.isHelp && (
               <div
                 class={`scale-90 rounded-full flex-shrink-0 bg-blue-gray-100 text-gray-500 border border-blue-gray-200 w-8 h-8 flex items-center justify-center p-2 mr-3`}
               >
@@ -85,7 +86,7 @@ export class StreamlineEntries {
           <h1
             class={`text-blue-gray-900 font-medium text-xl mr-6`}
             innerHTML={`${
-              stateInternal.isSlash
+              stateInternal.isSlash || stateInternal.isHelp
                 ? item.title
                 : item.type === 'networkMenu'
                 ? 'Network admin'
@@ -125,12 +126,14 @@ export class StreamlineEntries {
             {
               type: 'text',
               text: results,
-              condition: stateLocal.active !== 'settings',
+              condition:
+                stateLocal.active !== 'settings' && !stateInternal.isHelp,
             },
             {
               type: 'button',
               text: 'Save',
-              condition: stateLocal.active === 'settings',
+              condition:
+                stateLocal.active === 'settings' && !stateInternal.isHelp,
               onClick: () => {
                 if (!stateInternal.test) {
                   fetchAjax({
@@ -161,10 +164,13 @@ export class StreamlineEntries {
             ) : (
               itemInner.condition && itemInner.type === 'button' && (
                 <streamline-button
-                  onClick={itemInner.onClick}
+                  onClick={
+                    stateInternal.entriesSettingsHaveChanged &&
+                    itemInner.onClick
+                  }
                   tabindex={stateInternal.entriesSettingsHaveChanged ? 0 : -1}
                   invalid={!stateInternal.entriesSettingsHaveChanged}
-                  type="saveSettings"
+                  type="button"
                   styling="primary"
                   text={itemInner.text}
                 />
@@ -183,6 +189,20 @@ export class StreamlineEntries {
         1 &&
         (stateInternal[`entries${capitalizeFirstLetter(type)}Active`] ||
           stateInternal[`entries${capitalizeFirstLetter(type)}`]))
+    );
+  };
+
+  private help = () => {
+    return (
+      <div>
+        {StreamlineEntries.getHeader({
+          title: `${stateInternal.menu[stateLocal.active].text} mode help`,
+        })}
+        <div
+          class={`mt-6 text-base space-y-2 md:w-3/4`}
+          innerHTML={stateInternal.menu[stateLocal.active].help}
+        />
+      </div>
     );
   };
 
@@ -522,6 +542,8 @@ export class StreamlineEntries {
           >
             {stateInternal.isSlash
               ? this.slash()
+              : stateInternal.isHelp
+              ? this.help()
               : stateLocal.active === 'network'
               ? this.menu()
               : this[`${stateLocal.active}`]()}
@@ -529,7 +551,7 @@ export class StreamlineEntries {
         )}
         {isMultisite && (
           <div
-            class={`mt-auto px-3 h-6 bg-blue-gray-50 border-t border-blue-gray-100 flex items-center text-blue-gray-900`}
+            class={`mt-auto px-3 h-6 bg-blue-gray-50 border-t border-blue-gray-200 flex items-center text-blue-gray-900`}
           >
             <span class={`flex whitespace-no-wrap`}>
               <span class={`text-[0.675rem]`}>

@@ -11,7 +11,6 @@ export namespace Components {
     interface StreamlineButton {
         "adminUrl": string;
         "favourite": boolean;
-        "header": string;
         "href": string;
         "icon": string;
         "index": number;
@@ -121,7 +120,6 @@ declare namespace LocalJSX {
     interface StreamlineButton {
         "adminUrl"?: string;
         "favourite"?: boolean;
-        "header"?: string;
         "href"?: string;
         "icon"?: string;
         "index"?: number;

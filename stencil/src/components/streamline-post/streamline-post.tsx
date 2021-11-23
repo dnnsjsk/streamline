@@ -197,6 +197,7 @@ export class StreamlinePost {
               <streamline-button
                 invalid={this.invalid}
                 onClick={this.handleClickSave}
+                type="button"
                 styling="primary"
                 text="Save post"
               />

@@ -13,6 +13,7 @@
 
 - [streamline-sidebar](../streamline-sidebar)
 - [streamline-search](../streamline-search)
+- [streamline-button](../streamline-button)
 - [streamline-entries](../streamline-entries)
 
 ### Graph
@@ -20,6 +21,7 @@
 graph TD;
   streamline-box --> streamline-sidebar
   streamline-box --> streamline-search
+  streamline-box --> streamline-button
   streamline-box --> streamline-entries
   streamline-sidebar --> streamline-button
   streamline-search --> streamline-button

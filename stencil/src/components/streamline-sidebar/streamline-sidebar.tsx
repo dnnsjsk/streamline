@@ -43,9 +43,7 @@ export class StreamlineSidebar {
                       : ''
                   }`}
                   type="sidebar"
-                  text={capitalizeFirstLetter(
-                    item.name === 'fav' ? 'faves' : item.name
-                  )}
+                  text={capitalizeFirstLetter(item.text)}
                   icon={item.name}
                 />
               )

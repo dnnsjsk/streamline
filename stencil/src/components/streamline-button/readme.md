@@ -9,7 +9,6 @@
 | ------------ | ------------- | ----------- | --------- | ----------- |
 | `adminUrl`   | `admin-url`   |             | `string`  | `undefined` |
 | `favourite`  | `favourite`   |             | `boolean` | `false`     |
-| `header`     | `header`      |             | `string`  | `undefined` |
 | `href`       | `href`        |             | `string`  | `undefined` |
 | `icon`       | `icon`        |             | `string`  | `undefined` |
 | `index`      | `index`       |             | `number`  | `undefined` |
@@ -28,6 +27,7 @@
 
 ### Used by
 
+ - [streamline-box](../streamline-box)
  - [streamline-entries](../streamline-entries)
  - [streamline-post](../streamline-post)
  - [streamline-search](../streamline-search)
@@ -36,6 +36,7 @@
 ### Graph
 ```mermaid
 graph TD;
+  streamline-box --> streamline-button
   streamline-entries --> streamline-button
   streamline-post --> streamline-button
   streamline-search --> streamline-button
