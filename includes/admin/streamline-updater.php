@@ -27,33 +27,29 @@ class StreamlinePlugin
         self::$license_page = $license_page;
         self::$file = $file;
 
-        if (isset($_GET["page"])) {
-            $admin = admin_url("admin.php?page=" . $_GET["page"]);
-            $name = str_replace("_", "", $prefix);
+        $admin = array_key_exists("page", $_GET)
+            ? admin_url("admin.php?page=" . $_GET["page"])
+            : "";
+        $name = str_replace("_", "", $prefix);
 
-            if (
-                substr_compare(
-                    $admin,
-                    $license_page,
-                    -strlen($license_page)
-                ) === 0
-            ) {
-                add_action("admin_enqueue_scripts", [__CLASS__, "assets"]);
-            }
-            add_action("admin_init", [__CLASS__, "updater"], 0);
-            add_action("admin_init", [__CLASS__, "option"]);
-            add_action("admin_menu", [__CLASS__, "menu"], 11);
-            add_action("plugins_loaded", function () use (&$name) {
-                add_action("wp_ajax_${name}LicenseQuery", [
-                    __CLASS__,
-                    "fabrikatLicenseQuery",
-                ]);
-                add_action("wp_ajax_${name}SettingsQuery", [
-                    __CLASS__,
-                    "fabrikatSettingsQuery",
-                ]);
-            });
+        if (
+            substr_compare($admin, $license_page, -strlen($license_page)) === 0
+        ) {
+            add_action("admin_enqueue_scripts", [__CLASS__, "assets"]);
         }
+        add_action("admin_init", [__CLASS__, "updater"], 0);
+        add_action("admin_init", [__CLASS__, "option"]);
+        add_action("admin_menu", [__CLASS__, "menu"], 11);
+        add_action("plugins_loaded", function () use (&$name) {
+            add_action("wp_ajax_${name}LicenseQuery", [
+                __CLASS__,
+                "fabrikatLicenseQuery",
+            ]);
+            add_action("wp_ajax_${name}SettingsQuery", [
+                __CLASS__,
+                "fabrikatSettingsQuery",
+            ]);
+        });
     }
 
     /**
