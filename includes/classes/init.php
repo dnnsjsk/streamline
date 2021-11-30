@@ -66,7 +66,10 @@ class Init
     public static function isAllowed(): bool
     {
         return current_user_can(
-            get_option("streamline_settings")->capability ?: "activate_plugins"
+            get_option("streamline_settings") &&
+            get_option("streamline_settings")->capability
+                ? get_option("streamline_settings")->capability
+                : "activate_plugins"
         ) &&
             apply_filters("streamline/enable", true) &&
             !defined("OXYGEN_IFRAME");
@@ -144,13 +147,17 @@ class Init
             $currentSite = get_sites(["ID" => get_current_blog_id()]);
         }
 
-        $favs =
-            get_user_meta(get_current_user_id(), "streamline_favourites")[0] ?:
-            [];
+        $favsOption = get_user_meta(
+            get_current_user_id(),
+            "streamline_favourites"
+        );
+        $favs = $favsOption[0] ?? [];
 
-        $settings =
-            get_user_meta(get_current_user_id(), "streamline_settings")[0] ?:
-            [];
+        $settingsOption = get_user_meta(
+            get_current_user_id(),
+            "streamline_settings"
+        );
+        $settings = $settingsOption[0] ?? [];
 
         foreach ($favs as $fav) {
             if ($fav->type === "menu") {

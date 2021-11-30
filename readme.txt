@@ -15,6 +15,9 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.23 =
+* Fix: PHP 8 warnings
+
 = 1.0.22 =
 * Enhancement: UI fixes
 * Enhancement: switch to :focus-visible for all focusing inside the app
