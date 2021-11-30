@@ -1,7 +1,7 @@
 === spx ===
 Contributors: dnnsjsk
 Requires at least: 5.0
-Tested up to: 5.8.1
+Tested up to: 5.8.2
 Requires PHP: 7.0
 Stable tag: 2.0
 License: GPLv2 or later
