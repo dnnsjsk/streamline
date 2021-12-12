@@ -10,10 +10,10 @@
   max-width: none;
 
   :host([type-sub='context']) & {
-    transform: translate(0, 47px) !important;
+    transform: translate(0, 46px) !important;
 
     @media (min-width: 1024px) {
-      transform: translate(0, 63px) !important;
+      transform: translate(0, 62px) !important;
     }
   }
 }

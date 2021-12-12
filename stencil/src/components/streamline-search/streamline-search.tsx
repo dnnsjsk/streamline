@@ -139,7 +139,7 @@ export class StreamlineSearch {
   render() {
     return (
       <div
-        class={`border-b border-blue-gray-200 bg-blue-gray-50 relative h-[var(--sl-side-w)] w-full lg:h-[64px]`}
+        class={`bg-blue-gray-50 relative h-[var(--sl-side-w)] w-full lg:h-[64px]`}
       >
         {stateInternal.isSearch && [
           <input
@@ -150,6 +150,9 @@ export class StreamlineSearch {
             value={stateInternal.searchValue}
             onInput={this.handleChange}
             onKeyDown={this.handleKeydown}
+          />,
+          <div
+            class={`h-px w-screen left-0 absolute bottom-0 bg-blue-gray-200 z-50 peer-focus:h-[2px] peer-focus:bg-blue-600`}
           />,
           <svg
             xmlns="http://www.w3.org/2000/svg"

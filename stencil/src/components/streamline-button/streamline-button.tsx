@@ -32,7 +32,7 @@ export class StreamlineButton {
   private tooltip: HTMLElement;
   private tooltipTrigger: HTMLElement;
   // @ts-ignore
-  private tw = 'animate-spin h-[16px] h-[14px] w-8 h-8 sm:w-10 sm:h-10';
+  private tw = 'w-8 h-8 sm:w-10 sm:h-10';
 
   @Prop() adminUrl: string;
 
