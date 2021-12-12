@@ -8,7 +8,7 @@ beforeEach(async () => {
   disposeLocal();
 });
 
-describe('Render button with', function () {
+describe('Render button with', () => {
   it("'type' set to 'primary' (WordPress icon)", async () => {
     const page = await newSpecPage({
       components: [StreamlineButton],
@@ -22,7 +22,7 @@ describe('Render button with', function () {
       true
     );
   });
-  describe("'type' set to 'sidebar'", function () {
+  describe("'type' set to 'sidebar'", () => {
     it('and not active', async () => {
       stateLocal.active = 'fav';
       const page = await newSpecPage({
@@ -52,7 +52,7 @@ describe('Render button with', function () {
       ).toBe(true);
     });
   });
-  describe("'type' set to 'menu'", function () {
+  describe("'type' set to 'menu'", () => {
     it('and not a favourite', async () => {
       stateLocal.active = 'fav';
       stateInternal.entriesFav = [];
@@ -65,9 +65,7 @@ describe('Render button with', function () {
                </streamline-button>`,
       });
       const el = page.doc.querySelector('streamline-button').shadowRoot;
-      expect(el.querySelector('a').classList.contains('focus-out')).toBe(
-        true
-      );
+      expect(el.querySelector('a').classList.contains('focus-out')).toBe(true);
     });
     it('and a favourite', async () => {
       stateLocal.active = 'menu';

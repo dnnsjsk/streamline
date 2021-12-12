@@ -71,7 +71,7 @@ const { state, dispose, onChange } = createStore({
               nameParent: 'Key shortcuts',
               label: 'Focus the search bar',
               metaKey: true,
-              keys: ['k'],
+              keys: ['s'],
             },
             {
               id: 'keyExit',
@@ -151,6 +151,7 @@ const { state, dispose, onChange } = createStore({
   isMac: false,
   isProcessing: false,
   isSearch: true,
+  isSearchFocus: true,
   isSlash: false,
   focusIndex: -1,
   menus: ['site', 'network', 'fav', 'menu', 'post', 'settings'],

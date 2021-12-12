@@ -12,7 +12,7 @@ beforeEach(async () => {
   setData();
 });
 
-describe('Render posts', function () {
+describe('Render posts', () => {
   it('and check if the right amount of posts render', async () => {
     stateLocal.active = 'post';
     const page = await newSpecPage({
@@ -49,7 +49,7 @@ describe('Render posts', function () {
     expect(slugs[2]).toBe('home');
   });
 
-  describe('in edit mode', function () {
+  describe('in edit mode', () => {
     it('and render two inputs', async () => {
       stateLocal.active = 'post';
       const page = await newSpecPage({

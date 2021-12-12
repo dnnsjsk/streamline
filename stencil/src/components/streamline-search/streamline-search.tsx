@@ -76,6 +76,10 @@ export class StreamlineSearch {
     }
   };
 
+  private handleBlur = () => {
+    stateInternal.isSearchFocus = false;
+  };
+
   private startQuery = () => {
     this.callback =
       stateInternal.commands.local[this.command]?.callback || false;
@@ -150,6 +154,7 @@ export class StreamlineSearch {
             value={stateInternal.searchValue}
             onInput={this.handleChange}
             onKeyDown={this.handleKeydown}
+            onBlur={this.handleBlur}
           />,
           <div
             class={`h-px w-screen left-0 absolute bottom-0 bg-blue-gray-200 z-50 peer-focus:h-[2px] peer-focus:bg-blue-600`}

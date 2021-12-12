@@ -85,12 +85,14 @@ export class StreamlineEntries {
       stateLocal.active === 'menu' ||
       stateLocal.active === 'network'
     ) {
-      focusEls[stateInternal.focusIndex]?.shadowRoot.querySelector('a').focus();
+      focusEls[stateInternal.focusIndex]?.shadowRoot
+        ?.querySelector('a')
+        ?.focus();
     }
 
     if (stateLocal.active === 'post') {
       (
-        focusEls[stateInternal.focusIndex]?.shadowRoot.querySelector(
+        focusEls[stateInternal.focusIndex]?.shadowRoot?.querySelector(
           'a[data-type="view"]'
         ) as HTMLElement
       )?.focus();
@@ -500,7 +502,7 @@ export class StreamlineEntries {
     const Key = (props) => (
       <div
         style={{ boxShadow: '0 3px 0 0 #E2E8F0' }}
-        class={`px-2 leading-0 py-0.5 text-xs uppercase font-medium text-blue-gray-800 border bg-blue-gray-50 border-blue-gray-200`}
+        class={`px-2 leading-0 py-0.5 text-[11px] uppercase font-medium text-blue-gray-800 border bg-blue-gray-50 border-blue-gray-200`}
       >
         {props.key}
       </div>

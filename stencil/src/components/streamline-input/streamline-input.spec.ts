@@ -1,7 +1,7 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { StreamlineInput } from './streamline-input';
 
-describe('Render input', function () {
+describe('Render input', () => {
   it('as invalid', async () => {
     const page = await newSpecPage({
       components: [StreamlineInput],

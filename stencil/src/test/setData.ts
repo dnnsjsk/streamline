@@ -1,7 +1,7 @@
 import { stateInternal } from '../store/internal';
 
 export function setData() {
-  stateInternal.entriesSite = [
+  const sites = [
     {
       index: 0,
       children: [
@@ -121,6 +121,8 @@ export function setData() {
       type: 'site',
     },
   ];
+  stateInternal.entriesSite = sites;
+  stateInternal.entriesSiteActive = sites;
 
   const fav = [
     {

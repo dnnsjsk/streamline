@@ -9,7 +9,7 @@ beforeEach(async () => {
   disposeLocal();
 });
 
-describe('Render sidebar', function () {
+describe('Render sidebar', () => {
   it('as single site', async () => {
     const page = await newSpecPage({
       components: [StreamlineSidebar],

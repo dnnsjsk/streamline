@@ -8,7 +8,7 @@ beforeEach(async () => {
   disposeLocal();
 });
 
-describe('Render search', function () {
+describe('Render search', () => {
   it('without enter button', async () => {
     const page = await newSpecPage({
       components: [StreamlineSearch],
@@ -53,7 +53,7 @@ it("Activate 'slash' mode after typing '/'", async () => {
 });
  */
 
-describe('Search value between different modes should', function () {
+describe('Search value between different modes should', () => {
   it("persist'", async () => {
     stateInternal.searchValue = 'test';
     stateInternal.entriesSettingsLoad = {

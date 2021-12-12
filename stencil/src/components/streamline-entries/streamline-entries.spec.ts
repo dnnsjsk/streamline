@@ -12,7 +12,7 @@ beforeEach(async () => {
   setData();
 });
 
-describe('Render entries with', function () {
+describe('Render entries with', () => {
   // eslint-disable-next-line jest/no-commented-out-tests
   /*
   it("mode set to 'slash'", async () => {
@@ -27,8 +27,8 @@ describe('Render entries with', function () {
     expect(length).toBe(2);
   });
    */
-  describe("mode set to 'help'", function () {
-    it("mode set to 'slash'", async () => {
+  describe('dot menu', () => {
+    it("mode set to 'help'", async () => {
       stateInternal.isHelp = true;
       stateLocal.active = 'menu';
       const page = await newSpecPage({
@@ -40,7 +40,7 @@ describe('Render entries with', function () {
       expect(length).toBe(1);
     });
   });
-  describe("mode set to 'favourites'", function () {
+  describe("mode set to 'favourites'", () => {
     it('and all elements shown', async () => {
       stateLocal.active = 'fav';
       const page = await newSpecPage({
@@ -106,7 +106,7 @@ describe('Render entries with', function () {
     });
   });
 
-  describe("mode set to 'menu'", function () {
+  describe("mode set to 'menu'", () => {
     it('and all elements shown', async () => {
       stateLocal.active = 'menu';
       const page = await newSpecPage({
@@ -178,7 +178,7 @@ describe('Render entries with', function () {
     });
   });
 
-  describe("mode set to 'post'", function () {
+  describe("mode set to 'post'", () => {
     it('and all elements shown', async () => {
       stateLocal.active = 'post';
       const page = await newSpecPage({
@@ -245,5 +245,57 @@ describe('Render entries with', function () {
       }
       expect(favs).toBe(3);
     });
+  });
+});
+
+describe('Cycling with up and down arrow keys', () => {
+  it('should work', async () => {
+    stateInternal.visible = true;
+    const page = await newSpecPage({
+      components: [StreamlineEntries],
+      html: `<streamline-entries></streamline-entries>`,
+    });
+    const eventUp = new KeyboardEvent('keydown', {
+      key: 'ArrowUp',
+    });
+    const eventDown = new KeyboardEvent('keydown', {
+      key: 'ArrowDown',
+    });
+    page.doc.dispatchEvent(eventUp);
+    await page.waitForChanges();
+    expect(stateInternal.focusIndex).toBe(37);
+    page.doc.dispatchEvent(eventUp);
+    await page.waitForChanges();
+    expect(stateInternal.focusIndex).toBe(36);
+    page.doc.dispatchEvent(eventDown);
+    await page.waitForChanges();
+    expect(stateInternal.focusIndex).toBe(37);
+    page.doc.dispatchEvent(eventDown);
+    await page.waitForChanges();
+    expect(stateInternal.focusIndex).toBe(0);
+    page.doc.dispatchEvent(eventDown);
+    await page.waitForChanges();
+    expect(stateInternal.focusIndex).toBe(1);
+  });
+  it('should not work', async () => {
+    stateInternal.visible = true;
+    const page = await newSpecPage({
+      components: [StreamlineEntries],
+      html: `<streamline-entries></streamline-entries>`,
+    });
+    stateInternal.entriesSettingsLoad = {
+      ...stateInternal.entriesSettingsLoad,
+      ...{
+        keyNavigation: {
+          default: false,
+        },
+      },
+    };
+    const eventDown = new KeyboardEvent('keydown', {
+      key: 'ArrowDown',
+    });
+    page.doc.dispatchEvent(eventDown);
+    await page.waitForChanges();
+    expect(stateInternal.focusIndex).toBe(-1);
   });
 });

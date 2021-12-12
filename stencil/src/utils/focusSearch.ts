@@ -9,6 +9,7 @@ export function focusSearch() {
       ?.shadowRoot?.querySelector('streamline-search')
       ?.shadowRoot?.querySelector('input')
       ?.focus();
+    stateInternal.isSearchFocus = true;
     stateInternal.focusIndex = -1;
   }
 }
