@@ -171,7 +171,7 @@ export class StreamlinePost {
             >
               {this.postTitle}
             </span>
-            <span class={`text-sm inline-block ml-2 text-gray-600`}>
+            <span class={`text-sm inline-block ml-2 text-blue-gray-600`}>
               (<strong>slug:</strong> {this.postSlug})
             </span>
           </div>
@@ -221,7 +221,11 @@ export class StreamlinePost {
                 },
               ].map((item) => {
                 return item.href ? (
-                  <a href={item.href} class={className + ` focus-white`}>
+                  <a
+                    data-type={item.text.toLowerCase()}
+                    href={item.href}
+                    class={className + ` focus-white`}
+                  >
                     {item.text}
                   </a>
                 ) : (

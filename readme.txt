@@ -15,6 +15,18 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.24 =
+* Enhancement: show plugin updates count in network and menu tab in brackets
+* Enhancement: show shortcut keys in settings
+* Enhancement: swap out menu icon
+* Enhancement: use meta key + arrow keys to cycle through menu items
+* Fix: cross browser styling inconsistencies
+* Fix: normalize focus behaviour across browsers
+* Fix: revert from :focus-visible to :focus for Safari support
+* Fix: some icons not showing on Safari
+* Fix: switch to pixel based sizing to prevent changes in root font-size obscuring the UI
+* New: use arrow keys to cycle through entries
+
 = 1.0.23 =
 * Fix: PHP 8 warnings
 

@@ -1,4 +1,5 @@
 import { isMobile } from './isMobile';
+import { stateInternal } from '../store/internal';
 
 export function focusSearch() {
   if (!isMobile()) {
@@ -8,5 +9,6 @@ export function focusSearch() {
       ?.shadowRoot?.querySelector('streamline-search')
       ?.shadowRoot?.querySelector('input')
       ?.focus();
+    stateInternal.focusIndex = -1;
   }
 }

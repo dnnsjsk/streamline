@@ -51,15 +51,35 @@ const { state, dispose, onChange } = createStore({
           children: [
             {
               id: 'keyNavigation',
-              name: 'Arrow key navigation',
+              name: 'Entry navigation',
               nameParent: 'Key shortcuts',
-              label: 'Use up and down arrow keys to navigate between tabs',
+              label: 'Navigate between entry items',
+              metaKey: false,
+              keys: ['↑', '↓'],
+            },
+            {
+              id: 'keyNavigationTabs',
+              name: 'Tab navigation',
+              nameParent: 'Key shortcuts',
+              label: 'Navigate between top-level tab items',
+              metaKey: true,
+              keys: ['↑', '↓'],
+            },
+            {
+              id: 'keySearch',
+              name: 'Focus search',
+              nameParent: 'Key shortcuts',
+              label: 'Focus the search bar',
+              metaKey: true,
+              keys: ['k'],
             },
             {
               id: 'keyExit',
-              name: 'Close with escape',
+              name: 'Close',
               nameParent: 'Key shortcuts',
-              label: 'Use escape key to close app',
+              label: 'Exit the app',
+              metaKey: false,
+              keys: ['esc'],
             },
           ],
           name: 'Key shortcuts',
@@ -102,6 +122,12 @@ const { state, dispose, onChange } = createStore({
     keyNavigation: {
       default: true,
     },
+    keyNavigationTabs: {
+      default: true,
+    },
+    keySearch: {
+      default: true,
+    },
     keyExit: {
       default: true,
     },
@@ -120,10 +146,13 @@ const { state, dispose, onChange } = createStore({
   entriesSite: [],
   entriesSiteActive: [],
   isEnter: false,
-  isLoading: false,
-  isProcessing: false,
-  isSlash: false,
   isHelp: false,
+  isLoading: false,
+  isMac: false,
+  isProcessing: false,
+  isSearch: true,
+  isSlash: false,
+  focusIndex: -1,
   menus: ['site', 'network', 'fav', 'menu', 'post', 'settings'],
   menu: {
     site: {
@@ -194,20 +223,18 @@ const { state, dispose, onChange } = createStore({
   visible: false,
 });
 
-onChange('visible', (value) => {
-  if (value === true) {
-    setTimeout(() => {
-      focusSearch();
-    }, 20);
-  }
-});
-
 onChange('entriesSettingsSave', (value) => {
   state.entriesSettingsHaveChanged = !equal(value, state.entriesSettingsLoad);
 });
 
 onChange('entriesSettingsLoad', (value) => {
   state.entriesSettingsHaveChanged = !equal(value, state.entriesSettingsSave);
+});
+
+onChange('searchValue', (value) => {
+  if (value === '') {
+    state.focusIndex = -1;
+  }
 });
 
 onChange('visible', (value) => {
@@ -225,6 +252,12 @@ onChange('visible', (value) => {
     } else {
       clearAllBodyScrollLocks();
     }
+  }
+
+  if (value === true) {
+    setTimeout(() => {
+      focusSearch();
+    }, 20);
   }
 });
 

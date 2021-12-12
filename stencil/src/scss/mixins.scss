@@ -1,37 +1,37 @@
 @mixin focus {
   .focus {
-    &:focus-visible {
+    &:focus {
       outline: none !important;
       box-shadow: inset 0 0 0 4px #F1F5F9, inset 0 0 0 6px var(--sl-focus-color);
     }
 
-    &-border:focus-visible {
+    &-border:focus {
       outline: none !important;
       box-shadow: 0 0 0 1px var(--sl-focus-color);
       border-color: var(--sl-focus-color);
     }
 
-    &-out:focus-visible {
+    &-out:focus {
       outline: none !important;
       box-shadow: 0 0 0 2px #f8fafc, 0 0 0 4px var(--sl-focus-color);
     }
 
-    &-dark:focus-visible {
+    &-dark:focus {
       outline: none !important;
       box-shadow: inset 0 0 0 4px #0F172A, inset 0 0 0 6px var(--sl-focus-color);
     }
 
-    &-darker:focus-visible {
+    &-darker:focus {
       outline: none !important;
       box-shadow: inset 0 0 0 4px #020204, inset 0 0 0 6px var(--sl-focus-color);
     }
 
-    &-white:focus-visible {
+    &-white:focus {
       outline: none !important;
       box-shadow: inset 0 0 0 4px #ffffff, inset 0 0 0 6px var(--sl-focus-color);
     }
 
-    &-white-out:focus-visible {
+    &-white-out:focus {
       outline: none !important;
       box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px var(--sl-focus-color);
     }
@@ -41,7 +41,7 @@
       box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px var(--sl-focus-color);
     }
 
-    &-none:focus-visible {
+    &-none:focus {
       outline: none !important;
       box-shadow: none !important;
     }
@@ -58,4 +58,8 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   box-sizing: border-box;
+
+  * {
+    user-select: none;
+  }
 }

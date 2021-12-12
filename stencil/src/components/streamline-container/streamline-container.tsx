@@ -4,8 +4,10 @@ import { stateInternal } from '../../store/internal';
 import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
 import { stateLocal } from '../../store/local';
 import { getMenus } from '../../utils/getMenus';
+import { getMetaKey } from '../../utils/getMetaKey';
 import { setTestData } from '../../utils/setTestData';
 import { setEntries } from '../../utils/setEntries';
+import { focusSearch } from '../../utils/focusSearch';
 
 /**
  * Container.
@@ -31,7 +33,8 @@ export class StreamlineContainer {
 
     setEntries();
 
-    this.mac = this.mac || navigator.userAgent.indexOf('Mac OS X') !== -1;
+    stateInternal.isMac =
+      this.mac || navigator.userAgent.indexOf('Mac OS X') !== -1;
 
     stateInternal.entriesSettingsActive = stateInternal.entriesSettings;
     stateInternal.entriesSettings[0].children.forEach((item) => {
@@ -46,12 +49,30 @@ export class StreamlineContainer {
     stateInternal.entriesSettingsSave = stateInternal.entriesSettingsLoad;
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'k' && (this.mac ? e.metaKey : e.ctrlKey)) {
+      if (e.key === 'k' && getMetaKey(e)) {
         e.preventDefault();
         stateInternal.visible = !stateInternal.visible;
       }
 
       if (stateInternal.visible) {
+        if (
+          e.key === 'ArrowUp' &&
+          getMetaKey(e) &&
+          stateInternal.entriesSettingsLoad.keyNavigationTabs.default
+        ) {
+          e.preventDefault();
+          this.cycleTabs('up');
+        }
+
+        if (
+          e.key === 'ArrowDown' &&
+          getMetaKey(e) &&
+          stateInternal.entriesSettingsLoad.keyNavigationTabs.default
+        ) {
+          e.preventDefault();
+          this.cycleTabs('down');
+        }
+
         if (
           e.key === 'Escape' &&
           stateInternal.entriesSettingsLoad.keyExit.default
@@ -61,19 +82,12 @@ export class StreamlineContainer {
         }
 
         if (
-          e.key === 'ArrowUp' &&
-          stateInternal.entriesSettingsLoad.keyNavigation.default
+          e.key === 's' &&
+          getMetaKey(e) &&
+          stateInternal.entriesSettingsLoad.keySearch.default
         ) {
           e.preventDefault();
-          this.cycle('up');
-        }
-
-        if (
-          e.key === 'ArrowDown' &&
-          stateInternal.entriesSettingsLoad.keyNavigation.default
-        ) {
-          e.preventDefault();
-          this.cycle('down');
+          focusSearch();
         }
       }
     });
@@ -85,7 +99,7 @@ export class StreamlineContainer {
     stateInternal.visible = this.visible || false;
   }
 
-  private cycle = (mode) => {
+  private cycleTabs = (mode) => {
     const index = stateInternal.menus.indexOf(stateLocal.active);
     const length = stateInternal.menus.length;
 

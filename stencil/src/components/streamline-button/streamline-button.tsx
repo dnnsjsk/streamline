@@ -29,10 +29,10 @@ import {
   styleUrl: 'streamline-button.scss',
 })
 export class StreamlineButton {
-  // @ts-ignore
-  private tw = 'animate-spin h-[16px] h-[14px] w-8 h-8 sm:w-10 sm:h-10';
   private tooltip: HTMLElement;
   private tooltipTrigger: HTMLElement;
+  // @ts-ignore
+  private tw = 'animate-spin h-[16px] h-[14px] w-8 h-8 sm:w-10 sm:h-10';
 
   @Prop() adminUrl: string;
 
@@ -111,6 +111,10 @@ export class StreamlineButton {
       });
     }
   }
+
+  private preventClickFocus = (e) => {
+    e.preventDefault();
+  };
 
   private handleClickFav = () => {
     setFavourite({
@@ -202,8 +206,12 @@ export class StreamlineButton {
 
     const dropdownButton = (obj) => (
       <button
+        onMouseDown={(e) => e.preventDefault()}
         class={`focus px-4 py-2 whitespace-nowrap text-sm font-medium text-blue-gray-900 hover:text-blue-400`}
-        onClick={obj.onClick}
+        onClick={() => {
+          obj.onClick();
+          stateInternal.isSearch = !stateInternal.isHelp;
+        }}
       >
         {obj.text}
       </button>
@@ -211,12 +219,13 @@ export class StreamlineButton {
 
     return (
       <div
-        class={`relative flex w-full h-full ${
+        class={`relative flex flex-col w-full h-full ${
           this.type === 'primary' ? 'w-[calc(var(--sl-side-w)+1px)]' : ''
         } ${this.invalid ? 'opacity-25 pointer-events-none' : ''}`}
       >
         {this.type === 'menu' && this.href ? (
           <a
+            onMouseDown={this.preventClickFocus}
             ref={(el) => (this.tooltipTrigger = el as HTMLElement)}
             href={!stateInternal.test ? this.href : '#'}
             class={className}
@@ -229,6 +238,7 @@ export class StreamlineButton {
           </a>
         ) : this.type === 'sidebar' || this.type === 'primary' ? (
           <button
+            onMouseDown={this.preventClickFocus}
             tabIndex={stateLocal.active === this.icon ? -1 : 0}
             class={className}
           >
@@ -245,6 +255,7 @@ export class StreamlineButton {
           </button>
         ) : this.type === 'icon' ? (
           <button
+            onMouseDown={this.preventClickFocus}
             class={className}
             ref={(el) => (this.tooltipTrigger = el as HTMLElement)}
           >
@@ -260,8 +271,9 @@ export class StreamlineButton {
                 {[
                   {
                     text: stateInternal.isHelp ? 'Close help' : 'Show help',
-                    onClick: () =>
-                      (stateInternal.isHelp = !stateInternal.isHelp),
+                    onClick: () => {
+                      stateInternal.isHelp = !stateInternal.isHelp;
+                    },
                   },
                 ].map((item) => {
                   return dropdownButton(item);
@@ -271,7 +283,7 @@ export class StreamlineButton {
           </button>
         ) : (
           this.type === 'button' && (
-            <button class={className}>
+            <button onMouseDown={this.preventClickFocus} class={className}>
               {this.text === 'Search' && (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -290,6 +302,7 @@ export class StreamlineButton {
         )}
         {this.type === 'menu' && (
           <div
+            onMouseDown={this.preventClickFocus}
             class={`!grid divide-x divide-blue-gray-200 auto-cols-max grid-flow-col`}
             ref={(el) => (this.tooltip = el as HTMLElement)}
             style={{ display: 'block' }}
@@ -302,6 +315,7 @@ export class StreamlineButton {
             ].map((item) => {
               return (
                 <button
+                  onMouseDown={this.preventClickFocus}
                   class={`border-none focus-dark group`}
                   onClick={item.onClick}
                 >

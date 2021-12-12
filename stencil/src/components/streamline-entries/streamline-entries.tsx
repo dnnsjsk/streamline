@@ -9,6 +9,7 @@ import { IconCheck, IconMenu, IconNetwork, IconPost } from '../../icons';
 import { fetchAjax } from '../../utils/fetchAjax';
 import { getMenus } from '../../utils/getMenus';
 import { getMenu } from '../../utils/getMenu';
+import { getMetaKey } from '../../utils/getMetaKey';
 
 /**
  * Entries.
@@ -19,13 +20,15 @@ import { getMenu } from '../../utils/getMenu';
   styleUrl: 'streamline-entries.scss',
 })
 export class StreamlineEntries {
-  private px = 'px-6 lg:px-8';
+  private border = 'border-t border-blue-gray-100 first-of-type:border-none';
   private h2 = 'text-base text-blue-gray-900 font-medium';
   private p = 'text-blue-gray-600 text-base font-normal';
+  private px = 'px-6 lg:px-8';
   private tag =
     'px-2.5 py-1.5 bg-blue-gray-200 text-blue-gray-500 inline-block h-[max-content] leading-1';
 
-  private border = 'border-t border-blue-gray-100 first-of-type:border-none';
+  // @ts-ignore
+  private tw = 'h-[16px]';
 
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineEntriesElement;
@@ -33,11 +36,72 @@ export class StreamlineEntries {
   connectedCallback() {
     getMenus();
     setEntries();
+
+    document.addEventListener('keydown', (e) => {
+      if (stateInternal.visible) {
+        if (
+          e.key === 'ArrowDown' &&
+          !getMetaKey(e) &&
+          stateInternal.entriesSettingsLoad.keyNavigation.default
+        ) {
+          e.preventDefault();
+          this.cycleEntries('down');
+        }
+        if (
+          e.key === 'ArrowUp' &&
+          !getMetaKey(e) &&
+          stateInternal.entriesSettingsLoad.keyNavigation.default
+        ) {
+          e.preventDefault();
+          this.cycleEntries('up');
+        }
+      }
+    });
   }
+
+  private cycleEntries = (mode) => {
+    const focusEls = this.el.shadowRoot.querySelectorAll('[data-focus]');
+    const focusElsLength = focusEls.length;
+
+    if (mode === 'down') {
+      stateInternal.focusIndex++;
+      if (stateInternal.focusIndex === focusElsLength) {
+        stateInternal.focusIndex = 0;
+      }
+    } else {
+      if (stateInternal.focusIndex === 0 || stateInternal.focusIndex === -1) {
+        stateInternal.focusIndex = focusElsLength - 1;
+      } else {
+        stateInternal.focusIndex--;
+      }
+    }
+
+    if (stateLocal.active === 'site' || stateLocal.active === 'settings') {
+      (focusEls[stateInternal.focusIndex] as HTMLElement)?.focus();
+    }
+
+    if (
+      stateLocal.active === 'fav' ||
+      stateLocal.active === 'menu' ||
+      stateLocal.active === 'network'
+    ) {
+      focusEls[stateInternal.focusIndex]?.shadowRoot.querySelector('a').focus();
+    }
+
+    if (stateLocal.active === 'post') {
+      (
+        focusEls[stateInternal.focusIndex]?.shadowRoot.querySelector(
+          'a[data-type="view"]'
+        ) as HTMLElement
+      )?.focus();
+    }
+  };
 
   private static getHeader(item) {
     const isQuery = item.type === 'post' || item.type === 'site';
     const isMenu = item.type === 'menu' || item.type === 'networkMenu';
+    const isDotMenu = stateInternal.isHelp;
+    const isNotDotMenu = !stateInternal.isHelp;
 
     let menuNumber = 0;
     if (isMenu) {
@@ -55,8 +119,7 @@ export class StreamlineEntries {
       (isMenu && menuNumber === 1)
         ? `result`
         : `results`
-    }
-    `;
+    }`;
 
     const path =
       item.isMultisite && !stateInternal.test && stateLocal.active !== 'site'
@@ -67,16 +130,19 @@ export class StreamlineEntries {
       <div
         class={`${
           stateLocal.active === 'settings'
-            ? 'flex-row justify-between'
-            : 'flex-col sm:justify-between'
-        } min-h-[60px] pt-5 flex items-start flex-wrap mb-1 pb-1.5 flex sticky -top-2 bg-white z-10 border-b border-dotted border-blue-gray-800 sm:min-h-[75px] sm:mb-4 sm:flex-row sm:items-center sm:pt-6 sm:pb-2 sm:-top-2 lg:pt-7 lg:-top-3`}
+            ? 'flex-row items-center justify-between'
+            : 'flex-col items-start sm:justify-between'
+        } relative min-h-[60px] pt-5 flex flex-wrap mb-1 pb-1.5 flex sticky -top-2 bg-white z-10 border-b border-blue-gray-300 sm:min-h-[75px] sm:mb-4 sm:flex-row sm:items-center sm:pt-6 sm:pb-2 sm:-top-2 lg:pt-7 lg:-top-3`}
       >
+        <div
+          class={`absolute -left-full top-0 w-[9999px] h-full bg-white z-[-1]`}
+        />
         <div class={`flex items-center flex-row`}>
           {stateLocal.active === 'fav' &&
             stateInternal.entriesFavActive[0].children.length !== 0 &&
             !stateInternal.isHelp && (
               <div
-                class={`scale-90 rounded-full flex-shrink-0 bg-blue-gray-100 text-gray-500 border border-blue-gray-200 w-8 h-8 flex items-center justify-center p-2 mr-3`}
+                class={`flex-shrink-0 text-blue-gray-400 flex items-center justify-center mr-3`}
               >
                 {item.type === 'menu' && <IconMenu />}
                 {item.type === 'networkMenu' && <IconNetwork />}
@@ -86,7 +152,7 @@ export class StreamlineEntries {
           <h1
             class={`text-blue-gray-900 font-medium text-xl mr-6`}
             innerHTML={`${
-              stateInternal.isSlash || stateInternal.isHelp
+              stateInternal.isSlash || isDotMenu
                 ? item.title
                 : item.type === 'networkMenu'
                 ? 'Network admin'
@@ -98,7 +164,7 @@ export class StreamlineEntries {
                     `entries${stateLocal.active === 'post' ? 'Post' : 'Site'}`
                   ][0]?.queryValue
                 ? `${capitalizeFirstLetter(stateLocal.active)}s for: ` +
-                  `<span class="text-gray-400 italic">${
+                  `<span class="text-blue-gray-400 italic">${
                     stateInternal[
                       `entries${stateLocal.active === 'post' ? 'Post' : 'Site'}`
                     ][0]?.queryValue
@@ -126,14 +192,12 @@ export class StreamlineEntries {
             {
               type: 'text',
               text: results,
-              condition:
-                stateLocal.active !== 'settings' && !stateInternal.isHelp,
+              condition: stateLocal.active !== 'settings' && isNotDotMenu,
             },
             {
               type: 'button',
               text: 'Save',
-              condition:
-                stateLocal.active === 'settings' && !stateInternal.isHelp,
+              condition: stateLocal.active === 'settings' && isNotDotMenu,
               onClick: () => {
                 if (!stateInternal.test) {
                   fetchAjax({
@@ -155,7 +219,7 @@ export class StreamlineEntries {
           ]).map((itemInner, itemIndex) => {
             return itemInner.condition && itemInner.type === 'text' ? (
               <span
-                class={`results-amount text-xs mt-1.5 sm:my-1.5 font-medium text-gray-700 sm:text-sm ${
+                class={`results-amount text-xs mt-1.5 sm:my-1.5 font-medium text-blue-gray-700 sm:text-sm ${
                   itemIndex === 0 ? '' : 'pl-4'
                 }`}
               >
@@ -199,7 +263,7 @@ export class StreamlineEntries {
           title: `${stateInternal.menu[stateLocal.active].text} mode help`,
         })}
         <div
-          class={`mt-6 text-base space-y-2 md:w-3/4`}
+          class={`mt-6 text-base space-y-2 leading-relaxed md:w-3/4`}
           innerHTML={stateInternal.menu[stateLocal.active].help}
         />
       </div>
@@ -282,12 +346,13 @@ export class StreamlineEntries {
                     {parseInt(itemInner.siteId) ===
                       parseInt(stateInternal.currentSite.id) && (
                       <span
-                        class={`text-green-600 w-3 inline-block mr-4 absolute left-[-1.125rem] lg:w-4 lg:-left-6`}
+                        class={`text-green-600 w-3 inline-block mr-4 absolute left-[-18px] lg:w-4 lg:-left-6`}
                       >
                         <IconCheck />
                       </span>
                     )}
                     <div
+                      data-focus={true}
                       role="button"
                       tabIndex={0}
                       onClick={() => selectSite(obj)}
@@ -338,7 +403,7 @@ export class StreamlineEntries {
         return (
           <div>
             {StreamlineEntries.getHeader(item)}
-            <ul>
+            <ul data-focus-parent={true}>
               {Object.values(item.children as unknown).map(
                 (itemInner, indexInner) => {
                   return (
@@ -358,6 +423,7 @@ export class StreamlineEntries {
                               return (
                                 <li key={indexSub} class={`mt-4 mr-4`}>
                                   <streamline-button
+                                    data-focus={true}
                                     type="menu"
                                     adminUrl={item.adminUrl}
                                     href={itemSub.href}
@@ -397,6 +463,7 @@ export class StreamlineEntries {
               return (
                 <li class={`${this.border} flex flex-col py-3`}>
                   <streamline-post
+                    data-focus={true}
                     href-edit={itemInner.hrefEdit}
                     href-view={itemInner.guid}
                     post-id={itemInner.ID}
@@ -430,6 +497,15 @@ export class StreamlineEntries {
 
   // @ts-ignore
   private settings = () => {
+    const Key = (props) => (
+      <div
+        style={{ boxShadow: '0 3px 0 0 #E2E8F0' }}
+        class={`px-2 leading-0 py-0.5 text-xs uppercase font-medium text-blue-gray-800 border bg-blue-gray-50 border-blue-gray-200`}
+      >
+        {props.key}
+      </div>
+    );
+
     return Object.values(stateInternal.entriesSettingsActive).map((item) => {
       return (
         <div>
@@ -460,12 +536,15 @@ export class StreamlineEntries {
                               >
                                 <label
                                   htmlFor={`setting-${itemSub.id}`}
-                                  class={`grid grid-cols-[75px,1fr] gap-6 select-none group ${
+                                  class={`w-full grid grid-cols-[75px,1fr] gap-6 select-none group ${
                                     itemSub.choices ? '' : 'cursor-pointer'
                                   }`}
                                 >
-                                  <div class="relative mt-0.5 inline-block h-[max-content] w-[max-content] focus-in-white-out">
+                                  <div
+                                    class={`relative mt-0.5 inline-block h-[max-content] w-[max-content] focus-in-white-out`}
+                                  >
                                     <input
+                                      data-focus={true}
                                       type="checkbox"
                                       id={`setting-${itemSub.id}`}
                                       class="sr-only peer"
@@ -482,14 +561,46 @@ export class StreamlineEntries {
                                         )
                                       }
                                     />
-                                    <div class="block bg-blue-gray-300 w-14 h-5 transition ease-in-out duration-200 group-hover:bg-blue-gray-400 peer-checked:bg-blue-500" />
-                                    <div class="dot absolute left-1 top-1 bg-white w-3 h-3 transition ease-in-out duration-200" />
+                                    <div
+                                      class={`block bg-blue-gray-300 w-14 h-5 transition ease-in-out duration-200 group-hover:bg-blue-gray-400 peer-checked:bg-blue-500`}
+                                    />
+                                    <div
+                                      class={`dot absolute left-1 top-1 bg-white w-3 h-3 transition ease-in-out duration-200`}
+                                    />
                                   </div>
-                                  <div>
-                                    <div class="text-base text-blue-gray-900 font-medium">
+                                  <div class={`w-full`}>
+                                    <div
+                                      class={`text-base text-blue-gray-900 font-medium flex justify-between`}
+                                    >
                                       {itemSub.name}
+                                      {itemSub.keys && (
+                                        <div
+                                          class={`hidden space-x-2 mt-[-6px] md:flex ${
+                                            stateInternal.entriesSettingsLoad[
+                                              itemSub.id
+                                            ].default
+                                              ? ''
+                                              : 'opacity-50'
+                                          }`}
+                                        >
+                                          {itemSub.metaKey && (
+                                            <Key
+                                              key={
+                                                stateInternal.isMac
+                                                  ? 'cmd'
+                                                  : 'ctrl'
+                                              }
+                                            />
+                                          )}
+                                          {itemSub.keys.map((item) => {
+                                            return <Key key={item} />;
+                                          })}
+                                        </div>
+                                      )}
                                     </div>
-                                    <div class="mt-0.5 text-xs text-blue-gray-500">
+                                    <div
+                                      class={`mt-0.5 text-xs text-blue-gray-500`}
+                                    >
                                       {itemSub.label}
                                     </div>
                                   </div>
@@ -554,7 +665,7 @@ export class StreamlineEntries {
             class={`mt-auto px-3 h-6 bg-blue-gray-50 border-t border-blue-gray-200 flex items-center text-blue-gray-900`}
           >
             <span class={`flex whitespace-no-wrap`}>
-              <span class={`text-[0.675rem]`}>
+              <span class={`text-[11px]`}>
                 <span class={`font-semibold`}>Current site:</span>{' '}
                 {stateInternal.currentSite.path} ∙{' '}
                 <span class={`font-semibold`}>ID:</span>
