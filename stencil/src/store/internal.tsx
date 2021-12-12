@@ -259,6 +259,12 @@ onChange('visible', (value) => {
     setTimeout(() => {
       focusSearch();
     }, 20);
+    setTimeout(() => {
+      focusSearch();
+    }, 50);
+    setTimeout(() => {
+      focusSearch();
+    }, 100);
   }
 });
 

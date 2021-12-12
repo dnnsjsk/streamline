@@ -148,7 +148,7 @@ export class StreamlineSearch {
         {stateInternal.isSearch && [
           <input
             part="search"
-            class="peer bg-transparent focus:outline-none w-full h-[var(--sl-side-w)] px-3 text-[18px] h-full w-full m-0 p-0 font-normal placeholder-blue-gray-500 text-blue-gray-900 sm:px-8 lg:h-[64px]"
+            class="select peer bg-transparent focus:outline-none w-full h-[var(--sl-side-w)] px-3 text-[18px] h-full w-full m-0 p-0 font-normal placeholder-blue-gray-500 text-blue-gray-900 sm:px-8 lg:h-[64px]"
             type="text"
             placeholder={stateInternal.searchPlaceholder}
             value={stateInternal.searchValue}

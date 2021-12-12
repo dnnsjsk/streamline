@@ -1,6 +1,10 @@
 :host {
   @include focus;
   @include host;
+
+  * {
+    user-select: auto;
+  }
 }
 
 input {
