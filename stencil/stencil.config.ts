@@ -112,10 +112,6 @@ export const config: Config = {
   taskQueue: 'async',
   outputTargets: [
     {
-      type: 'dist',
-      esmLoaderPath: '../loader',
-    },
-    {
       type: 'www',
       serviceWorker: null,
       dir: '../assets/components',
