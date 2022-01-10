@@ -1,22 +1,22 @@
-import { stateInternal } from '../store/internal';
+import { state } from '../store/internal';
 import { capitalizeFirstLetter } from './capitalizeFirstLetter';
 
 export function getQuery(obj) {
-  stateInternal[`entries${capitalizeFirstLetter(obj.type)}`] = [
+  state[`entries${capitalizeFirstLetter(obj.type)}`] = [
     {
       children: obj.children,
       isMultisite: obj.isMultisite,
       path: obj.path,
       queryValue: obj.search,
-      siteId: stateInternal.data.siteId,
+      siteId: state.data.siteId,
       type: obj.type,
       network: obj.network,
     },
   ];
 
   if (obj.type === 'post') {
-    stateInternal.entriesPostCurrentPath = obj.path;
+    state.entriesPostCurrentPath = obj.path;
   }
 
-  // console.log(stateInternal[`entries${capitalizeFirstLetter(obj.type)}`]);
+  // console.log(state[`entries${capitalizeFirstLetter(obj.type)}`]);
 }

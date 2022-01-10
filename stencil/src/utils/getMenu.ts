@@ -1,4 +1,4 @@
-import { stateInternal } from '../store/internal';
+import { state } from '../store/internal';
 import { setEntries } from './setEntries';
 import { resetView } from './resetView';
 
@@ -8,16 +8,13 @@ export function getMenu(obj = {} as any) {
 
   const isAdmin =
     document.querySelector('#adminmenuwrap') &&
-    ((obj.network && stateInternal.data.isNetwork) ||
-      (!obj.network &&
-        stateInternal.data.isAdmin &&
-        !stateInternal.data.isNetwork));
+    ((obj.network && state.data.isNetwork) ||
+      (!obj.network && state.data.isAdmin && !state.data.isNetwork));
   const isNetwork = obj.network;
-  const isMultisite = !!stateInternal.data.network;
+  const isMultisite = !!state.data.network;
   const adminUrl =
-    obj.adminUrl ||
-    (isNetwork ? stateInternal.data.network : stateInternal.data.adminUrl);
-  const siteId = obj.siteId || (isNetwork ? 0 : stateInternal.data.siteId);
+    obj.adminUrl || (isNetwork ? state.data.network : state.data.adminUrl);
+  const siteId = obj.siteId || (isNetwork ? 0 : state.data.siteId);
   const type = !obj.path && isNetwork ? 'networkMenu' : 'menu';
 
   function get(doc) {
@@ -72,20 +69,19 @@ export function getMenu(obj = {} as any) {
         adminUrl,
         children: menu,
         isMultisite: isMultisite,
-        path: obj.path || stateInternal.currentSite.path,
+        path: obj.path || state.currentSite.path,
         siteId: Number(siteId),
         type: type,
       },
     ];
 
     if (isNetwork) {
-      stateInternal.entriesNetwork = data;
-      stateInternal.entriesNetworkActive = data;
+      state.entriesNetwork = data;
+      state.entriesNetworkActive = data;
     } else {
-      stateInternal.entriesMenu = data;
-      stateInternal.entriesMenuActive = data;
-      stateInternal.entriesMenuCurrentPath =
-        obj.path || stateInternal.currentSite.path;
+      state.entriesMenu = data;
+      state.entriesMenuActive = data;
+      state.entriesMenuCurrentPath = obj.path || state.currentSite.path;
     }
 
     setEntries();
@@ -94,7 +90,7 @@ export function getMenu(obj = {} as any) {
   if (isAdmin && !obj.fetch) {
     get(document);
   } else {
-    stateInternal.isLoading = true;
+    state.isLoading = true;
     fetch(adminUrl)
       .then((response) => response.text && response.text())
       .then((data) => {
@@ -103,8 +99,8 @@ export function getMenu(obj = {} as any) {
         get(html);
         resetView();
 
-        // console.log(stateInternal.entriesMenu);
-        // console.log(stateInternal.entriesNetwork);
+        // console.log(state.entriesMenu);
+        // console.log(state.entriesNetwork);
       })
       .catch(() => {});
     // @ts-ignore
@@ -117,7 +113,7 @@ export function getMenu(obj = {} as any) {
         'Content-Type': 'application/x-www-form-urlencoded',
       }),
       body: `action=streamlineMenu&url=${
-        obj.adminUrl || stateInternal.data.adminUrl
+        obj.adminUrl || state.data.adminUrl
         // @ts-ignore
         // eslint-disable-next-line no-undef
       }&nonce=${streamline.nonce}`,

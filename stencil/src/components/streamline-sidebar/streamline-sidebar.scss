@@ -1,3 +1,7 @@
 :host {
   @include host;
 }
+
+.inner {
+  @include scrollbar;
+}

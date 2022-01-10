@@ -1,13 +1,13 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { StreamlinePost } from './streamline-post';
 import { StreamlineEntries } from '../streamline-entries/streamline-entries';
-import { disposeInternal } from '../../store/internal';
+import { dispose } from '../../store/internal';
 import { disposeLocal, stateLocal } from '../../store/local';
 import { setData } from '../../test/setData';
 import { StreamlineInput } from '../streamline-input/streamline-input';
 
 beforeEach(async () => {
-  disposeInternal();
+  dispose();
   disposeLocal();
   setData();
 });

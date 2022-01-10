@@ -1,18 +1,23 @@
-import { stateInternal } from '../store/internal';
+import { state } from '../store/internal';
 import { focusSearch } from './focusSearch';
 import { setEntries } from './setEntries';
+import { stateLocal } from '../store/local';
 
 export function resetView() {
-  stateInternal.isLoading = false;
-  stateInternal.isSlash = false;
-  stateInternal.isEnter = false;
-  stateInternal.isHelp = false;
-  stateInternal.isSearch = true;
-  if (stateInternal.entriesSettingsLoad.searchResetInput.default) {
-    stateInternal.searchValue = '';
+  state.isLoading = false;
+  state.isSlash = false;
+  state.isHelp = false;
+  state.isSearch = true;
+  if (stateLocal.active === 'site' || stateLocal.active === 'post') {
+    state.isEnter = state.searchValue !== '';
+  } else {
+    state.isEnter = false;
+  }
+  if (state.entriesSettingsLoad.searchResetInput.default) {
+    state.searchValue = '';
   }
   setEntries();
-  if (stateInternal.entriesSettingsLoad.searchFocus.default) {
+  if (state.entriesSettingsLoad.searchFocus.default) {
     focusSearch();
   }
 }

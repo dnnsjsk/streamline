@@ -3,7 +3,7 @@ import { Component, Element, h, Prop, State, Listen } from '@stencil/core';
 import { setFavourite } from '../../utils/setFavourite';
 import { findDeep, someDeep } from 'deepdash-es/standalone';
 import { stateLocal } from '../../store/local';
-import { stateInternal } from '../../store/internal';
+import { state } from '../../store/internal';
 import { Fav } from '../../elements/Fav';
 import { IconPen, IconTimes } from '../../icons';
 import { set } from 'lodash-es';
@@ -81,8 +81,8 @@ export class StreamlinePost {
         'entriesPost',
         'entriesPostActive',
       ].forEach((item) => {
-        stateInternal[item].forEach(() => {
-          const newFavs = [...stateInternal[item]];
+        state[item].forEach(() => {
+          const newFavs = [...state[item]];
           const path = findDeep(
             newFavs,
             (o) => {
@@ -98,12 +98,12 @@ export class StreamlinePost {
             set(newFavs, `${currentPath}.post_title`, obj.values['post_title']);
             set(newFavs, `${currentPath}.post_name`, obj.values['post_name']);
 
-            stateInternal[item] = newFavs;
+            state[item] = newFavs;
           }
         });
       });
 
-      if (!stateInternal.test) {
+      if (!state.test) {
         fetchAjax({
           type: 'post',
           query: obj,
@@ -135,7 +135,7 @@ export class StreamlinePost {
 
   private checkIfFav = () => {
     this.favourite = someDeep(
-      stateInternal.entriesFav,
+      state.entriesFav,
       (o) => {
         return o?.ID === this.postId && o?.siteId === this.siteId;
       },
@@ -150,7 +150,7 @@ export class StreamlinePost {
     return (
       <div class={`flex flex-col sm:flex-row`}>
         <div
-          class={`w-[max-content] mb-3 px-2.5 py-1.5 bg-blue-gray-100 border border-blue-gray-200 text-blue-gray-500 inline-block h-[max-content] leading-1 mr-4 !text-xs relative top-1.5 font-semibold uppercase sm:mb-0`}
+          class={`w-[max-content] mb-3 px-2.5 py-1.5 bg-slate-100 border border-slate-200 text-slate-500 inline-block h-[max-content] leading-1 mr-4 !text-xs relative top-1.5 font-semibold uppercase sm:mb-0`}
         >
           {this.postType}
         </div>
@@ -171,7 +171,7 @@ export class StreamlinePost {
             >
               {this.postTitle}
             </span>
-            <span class={`text-sm inline-block ml-2 text-blue-gray-600`}>
+            <span class={`text-sm inline-block ml-2 text-slate-600`}>
               (<strong>slug:</strong> {this.postSlug})
             </span>
           </div>
@@ -211,11 +211,11 @@ export class StreamlinePost {
                 },
                 {
                   text: 'View',
-                  href: stateInternal.test ? '#' : this.hrefView,
+                  href: state.test ? '#' : this.hrefView,
                 },
                 {
                   text: 'Edit',
-                  href: stateInternal.test
+                  href: state.test
                     ? '#'
                     : atob(this.hrefEdit).replace('&amp;', '&'),
                 },

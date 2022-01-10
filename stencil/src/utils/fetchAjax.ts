@@ -1,7 +1,7 @@
-import { stateInternal } from '../store/internal';
+import { state } from '../store/internal';
 
 export function fetchAjax(obj) {
-  stateInternal.isProcessing = true;
+  state.isProcessing = true;
   // @ts-ignore
   // eslint-disable-next-line no-undef
   const streamline = window.streamline || false;
@@ -15,11 +15,11 @@ export function fetchAjax(obj) {
       obj.query
       // @ts-ignore
       // eslint-disable-next-line no-undef
-    )}&nonce=${streamline.nonce}&userId=${String(stateInternal.data.userId)}`,
+    )}&nonce=${streamline.nonce}&userId=${String(state.data.userId)}`,
   })
     .then((response) => response && response.json())
     .then(() => {
-      stateInternal.isProcessing = false;
+      state.isProcessing = false;
       obj.callback && obj.callback();
     })
     .catch(() => {

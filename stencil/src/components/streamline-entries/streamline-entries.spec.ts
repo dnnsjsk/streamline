@@ -2,12 +2,12 @@ import { newSpecPage } from '@stencil/core/testing';
 import { StreamlineEntries } from './streamline-entries';
 import { StreamlineButton } from '../streamline-button/streamline-button';
 import { StreamlinePost } from '../streamline-post/streamline-post';
-import { disposeInternal, stateInternal } from '../../store/internal';
+import { dispose, state } from '../../store/internal';
 import { disposeLocal, stateLocal } from '../../store/local';
 import { setData } from '../../test/setData';
 
 beforeEach(async () => {
-  disposeInternal();
+  dispose();
   disposeLocal();
   setData();
 });
@@ -16,7 +16,7 @@ describe('Render entries with', () => {
   // eslint-disable-next-line jest/no-commented-out-tests
   /*
   it("mode set to 'slash'", async () => {
-    stateInternal.isSlash = true;
+    state.isSlash = true;
     stateLocal.active = 'menu';
     const page = await newSpecPage({
       components: [StreamlineEntries],
@@ -29,7 +29,7 @@ describe('Render entries with', () => {
    */
   describe('dot menu', () => {
     it("mode set to 'help'", async () => {
-      stateInternal.isHelp = true;
+      state.isHelp = true;
       stateLocal.active = 'menu';
       const page = await newSpecPage({
         components: [StreamlineEntries],
@@ -53,7 +53,7 @@ describe('Render entries with', () => {
     });
     it("and search is 'me'", async () => {
       stateLocal.active = 'fav';
-      stateInternal.searchValue = 'me';
+      state.searchValue = 'me';
       const page = await newSpecPage({
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
@@ -78,27 +78,27 @@ describe('Render entries with', () => {
         const lengthLi = el.querySelectorAll('li').length;
         if (index === 0) {
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(stateInternal.entriesFav.length).toBe(4);
+          expect(state.entriesFav.length).toBe(4);
           // eslint-disable-next-line jest/no-conditional-expect
           expect(lengthLi).toBe(21);
         } else if (index === 2) {
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(stateInternal.entriesFav.length).toBe(3);
+          expect(state.entriesFav.length).toBe(3);
           // eslint-disable-next-line jest/no-conditional-expect
           expect(lengthLi).toBe(18);
         } else if (index === 8) {
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(stateInternal.entriesFav.length).toBe(2);
+          expect(state.entriesFav.length).toBe(2);
           // eslint-disable-next-line jest/no-conditional-expect
           expect(lengthLi).toBe(8);
         } else if (index === 11) {
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(stateInternal.entriesFav.length).toBe(1);
+          expect(state.entriesFav.length).toBe(1);
           // eslint-disable-next-line jest/no-conditional-expect
           expect(lengthLi).toBe(3);
         } else if (index === 14) {
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(stateInternal.entriesFav.length).toBe(0);
+          expect(state.entriesFav.length).toBe(0);
           // eslint-disable-next-line jest/no-conditional-expect
           expect(lengthLi).toBe(0);
         }
@@ -121,7 +121,7 @@ describe('Render entries with', () => {
     });
     it("and search is 'med'", async () => {
       stateLocal.active = 'menu';
-      stateInternal.searchValue = 'med';
+      state.searchValue = 'med';
       const page = await newSpecPage({
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
@@ -134,7 +134,7 @@ describe('Render entries with', () => {
     });
     it("and search is 'All pages'", async () => {
       stateLocal.active = 'menu';
-      stateInternal.searchValue = 'All pages';
+      state.searchValue = 'All pages';
       const page = await newSpecPage({
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
@@ -147,7 +147,7 @@ describe('Render entries with', () => {
     });
     it("and search is 'xlsbvhaysgf'", async () => {
       stateLocal.active = 'menu';
-      stateInternal.searchValue = 'xlsbvhaysgf';
+      state.searchValue = 'xlsbvhaysgf';
       const page = await newSpecPage({
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
@@ -191,7 +191,7 @@ describe('Render entries with', () => {
     });
     it("and search is 'me'", async () => {
       stateLocal.active = 'post';
-      stateInternal.searchValue = 'me';
+      state.searchValue = 'me';
       const page = await newSpecPage({
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
@@ -204,7 +204,7 @@ describe('Render entries with', () => {
     });
     it("and search is 'Hello world'", async () => {
       stateLocal.active = 'post';
-      stateInternal.searchValue = 'Hello world';
+      state.searchValue = 'Hello world';
       const page = await newSpecPage({
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
@@ -217,7 +217,7 @@ describe('Render entries with', () => {
     });
     it("and search is 'xlsbvhaysgf'", async () => {
       stateLocal.active = 'post';
-      stateInternal.searchValue = 'xlsbvhaysgf';
+      state.searchValue = 'xlsbvhaysgf';
       const page = await newSpecPage({
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
@@ -250,7 +250,7 @@ describe('Render entries with', () => {
 
 describe('Cycling with up and down arrow keys', () => {
   it('should work', async () => {
-    stateInternal.visible = true;
+    state.visible = true;
     const page = await newSpecPage({
       components: [StreamlineEntries],
       html: `<streamline-entries></streamline-entries>`,
@@ -263,28 +263,28 @@ describe('Cycling with up and down arrow keys', () => {
     });
     page.doc.dispatchEvent(eventUp);
     await page.waitForChanges();
-    expect(stateInternal.focusIndex).toBe(37);
+    expect(state.focusIndex).toBe(37);
     page.doc.dispatchEvent(eventUp);
     await page.waitForChanges();
-    expect(stateInternal.focusIndex).toBe(36);
+    expect(state.focusIndex).toBe(36);
     page.doc.dispatchEvent(eventDown);
     await page.waitForChanges();
-    expect(stateInternal.focusIndex).toBe(37);
+    expect(state.focusIndex).toBe(37);
     page.doc.dispatchEvent(eventDown);
     await page.waitForChanges();
-    expect(stateInternal.focusIndex).toBe(0);
+    expect(state.focusIndex).toBe(0);
     page.doc.dispatchEvent(eventDown);
     await page.waitForChanges();
-    expect(stateInternal.focusIndex).toBe(1);
+    expect(state.focusIndex).toBe(1);
   });
   it('should not work', async () => {
-    stateInternal.visible = true;
+    state.visible = true;
     const page = await newSpecPage({
       components: [StreamlineEntries],
       html: `<streamline-entries></streamline-entries>`,
     });
-    stateInternal.entriesSettingsLoad = {
-      ...stateInternal.entriesSettingsLoad,
+    state.entriesSettingsLoad = {
+      ...state.entriesSettingsLoad,
       ...{
         keyNavigation: {
           default: false,
@@ -296,6 +296,6 @@ describe('Cycling with up and down arrow keys', () => {
     });
     page.doc.dispatchEvent(eventDown);
     await page.waitForChanges();
-    expect(stateInternal.focusIndex).toBe(-1);
+    expect(state.focusIndex).toBe(-1);
   });
 });

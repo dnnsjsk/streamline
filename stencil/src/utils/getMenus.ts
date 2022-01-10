@@ -1,16 +1,13 @@
 import { stateLocal } from '../store/local';
-import { stateInternal } from '../store/internal';
+import { state } from '../store/internal';
 import { getMenu } from './getMenu';
 
 export function getMenus() {
-  if (stateLocal.active === 'menu' && stateInternal.entriesMenu.length === 0) {
-    getMenu({ network: false, adminUrl: stateInternal.data.adminUrl });
+  if (stateLocal.active === 'menu' && state.entriesMenu.length === 0) {
+    getMenu({ network: false, adminUrl: state.data.adminUrl });
   }
 
-  if (
-    stateLocal.active === 'network' &&
-    stateInternal.entriesNetwork.length === 0
-  ) {
+  if (stateLocal.active === 'network' && state.entriesNetwork.length === 0) {
     getMenu({ network: true });
   }
 }

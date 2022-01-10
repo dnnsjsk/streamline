@@ -1,0 +1,13 @@
+export declare function IconWordPress(): any;
+export declare function IconMenu(): any;
+export declare function IconPost(): any;
+export declare function IconSettings(): any;
+export declare function IconFlow(): any;
+export declare function IconPen(): any;
+export declare function IconTimes(): any;
+export declare function IconCustom(): any;
+export declare function IconSites(): any;
+export declare function IconNetwork(): any;
+export declare function IconCheck(): any;
+export declare function IconDots(): any;
+export declare function IconHeart(): any;

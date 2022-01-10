@@ -1,10 +1,10 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { StreamlineSearch } from './streamline-search';
-import { disposeInternal, stateInternal } from '../../store/internal';
+import { dispose, state } from '../../store/internal';
 import { disposeLocal, stateLocal } from '../../store/local';
 
 beforeEach(async () => {
-  disposeInternal();
+  dispose();
   disposeLocal();
 });
 
@@ -21,7 +21,7 @@ describe('Render search', () => {
     expect(el).toBe(null);
   });
   it('with enter button', async () => {
-    stateInternal.isEnter = true;
+    state.isEnter = true;
     const page = await newSpecPage({
       components: [StreamlineSearch],
       html: `<streamline-search></streamline-search>`,
@@ -39,7 +39,7 @@ describe('Render search', () => {
 // eslint-disable-next-line jest/no-commented-out-tests
 /*
 it("Activate 'slash' mode after typing '/'", async () => {
-  stateInternal.searchValue = '/';
+  state.searchValue = '/';
   const page = await newSpecPage({
     components: [StreamlineSearch],
     html: `<streamline-search></streamline-search>`,
@@ -49,15 +49,15 @@ it("Activate 'slash' mode after typing '/'", async () => {
     .shadowRoot.querySelector('input');
   input.value = '/';
   input.dispatchEvent(new Event('input'));
-  expect(stateInternal.isSlash).toBe(true);
+  expect(state.isSlash).toBe(true);
 });
  */
 
 describe('Search value between different modes should', () => {
   it("persist'", async () => {
-    stateInternal.searchValue = 'test';
-    stateInternal.entriesSettingsLoad = {
-      ...stateInternal.entriesSettingsLoad,
+    state.searchValue = 'test';
+    state.entriesSettingsLoad = {
+      ...state.entriesSettingsLoad,
       ...{
         searchResetInput: {
           default: false,
@@ -69,15 +69,15 @@ describe('Search value between different modes should', () => {
       html: `<streamline-search></streamline-search>`,
     });
     stateLocal.active = 'fav';
-    expect(stateInternal.searchValue).toBe('test');
+    expect(state.searchValue).toBe('test');
   });
   it("not persist'", async () => {
-    stateInternal.searchValue = 'test';
+    state.searchValue = 'test';
     await newSpecPage({
       components: [StreamlineSearch],
       html: `<streamline-search></streamline-search>`,
     });
     stateLocal.active = 'fav';
-    expect(stateInternal.searchValue).toBe('');
+    expect(state.searchValue).toBe('');
   });
 });

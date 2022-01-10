@@ -14,17 +14,12 @@
 
 ### Used by
 
- - [streamline-box](../streamline-box)
-
-### Depends on
-
-- [streamline-button](../streamline-button)
+ - [streamline-container](../streamline-container)
 
 ### Graph
 ```mermaid
 graph TD;
-  streamline-search --> streamline-button
-  streamline-box --> streamline-search
+  streamline-container --> streamline-search
   style streamline-search fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

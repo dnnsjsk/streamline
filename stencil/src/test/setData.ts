@@ -1,4 +1,4 @@
-import { stateInternal } from '../store/internal';
+import { state } from '../store/internal';
 
 export function setData() {
   const sites = [
@@ -121,8 +121,8 @@ export function setData() {
       type: 'site',
     },
   ];
-  stateInternal.entriesSite = sites;
-  stateInternal.entriesSiteActive = sites;
+  state.entriesSite = sites;
+  state.entriesSiteActive = sites;
 
   const fav = [
     {
@@ -419,8 +419,8 @@ export function setData() {
       siteId: 305,
     },
   ];
-  stateInternal.entriesFav = fav;
-  stateInternal.entriesFavActive = fav;
+  state.entriesFav = fav;
+  state.entriesFavActive = fav;
 
   const menu = [
     {
@@ -877,8 +877,8 @@ export function setData() {
       type: 'menu',
     },
   ];
-  stateInternal.entriesMenu = menu;
-  stateInternal.entriesMenuActive = menu;
+  state.entriesMenu = menu;
+  state.entriesMenuActive = menu;
 
   const post = [
     {
@@ -980,6 +980,6 @@ export function setData() {
       siteId: 305,
     },
   ];
-  stateInternal.entriesPost = post;
-  stateInternal.entriesPostActive = post;
+  state.entriesPost = post;
+  state.entriesPostActive = post;
 }

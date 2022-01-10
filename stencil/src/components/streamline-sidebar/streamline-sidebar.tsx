@@ -1,9 +1,22 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, h } from '@stencil/core';
-import { stateInternal } from '../../store/internal';
+import { state } from '../../store/internal';
 import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
 import { stateLocal } from '../../store/local';
+import { Loader } from '../../elements/Loader';
 import { getMenus } from '../../utils/getMenus';
+import {
+  IconCustom,
+  IconDots,
+  IconFlow,
+  IconHeart,
+  IconMenu,
+  IconNetwork,
+  IconPost,
+  IconSettings,
+  IconSites,
+  IconWordPress,
+} from '../../icons';
 
 /**
  * Sidebar.
@@ -14,40 +27,91 @@ import { getMenus } from '../../utils/getMenus';
   styleUrl: 'streamline-sidebar.scss',
 })
 export class StreamlineSidebar {
-  private handleClick = (name) => {
-    stateLocal.active = name;
-    getMenus();
+  // @ts-ignore
+  private tw = 'w-8 h-8 sm:w-10 sm:h-10';
+
+  private button = (type) => {
+    const icon =
+      type === 'wordpress' ? (
+        <IconWordPress />
+      ) : type === 'site' ? (
+        <IconSites />
+      ) : type === 'network' ? (
+        <IconNetwork />
+      ) : type === 'menu' ? (
+        <IconMenu />
+      ) : type === 'post' ? (
+        <IconPost />
+      ) : type === 'flow' ? (
+        <IconFlow />
+      ) : type === 'custom' ? (
+        <IconCustom />
+      ) : type === 'settings' ? (
+        <IconSettings />
+      ) : type === 'dots' ? (
+        <IconDots />
+      ) : (
+        type === 'fav' && <IconHeart />
+      );
+
+    const handleClick = () => {
+      if (type !== 'wordpress') {
+        stateLocal.active = type;
+        getMenus();
+      } else {
+        state.visible = false;
+      }
+    };
+
+    return (
+      <button
+        onClick={handleClick}
+        onMouseDown={(e) => e.preventDefault()}
+        tabIndex={stateLocal.active === type ? -1 : 0}
+        class={{
+          'text-left h-[var(--sl-side-w)] min-w-[var(--sl-side-w)] flex flex-col items-center justify-center p-0 text-white bg-transparent':
+            true,
+          'focus-darker mr-auto bg-[#020204] text-white fill-current h-[var(--sl-side-w)] w-[calc(var(--sl-side-w))] hover:bg-[#080d17] sm:mr-0 sm:h-[64px] sm:min-h-[64px]':
+            type === 'wordpress',
+          '!justify-items-center !content-center text-slate-200 hover:text-blue-400 lg:!justify-items-start !grid focus-dark w-full w-full sm:w-[var(--sl-side-w)] sm:h-[var(--sl-side-w)] sm:min-h-[var(--sl-side-w)] lg:h-[48px] lg:min-h-[48px]':
+            type !== 'wordpress',
+          'sm:!grid-rows-[20px,20px] lg:!grid-rows-1 lg:grid-cols-[32px,1fr] lg:px-5':
+            type !== 'settings' && type !== 'wordpress',
+          'sm:mt-auto': type === 'settings',
+          'bg-slate-800 pointer-events-none': type === stateLocal.active,
+        }}
+      >
+        {type === 'wordpress' ? (
+          state.isProcessing ? (
+            <Loader sm={true} />
+          ) : (
+            icon
+          )
+        ) : (
+          icon
+        )}
+        {type === 'settings' || type === 'wordpress' ? (
+          ''
+        ) : (
+          <span class="hidden sm:inline-block text-xs font-semibold leading-1 mt-1.5 lg:mt-0 lg:text-sm">
+            {capitalizeFirstLetter(state.menu[type].text)}
+          </span>
+        )}
+      </button>
+    );
   };
 
   render() {
     return (
       <nav
-        class={`bg-blue-gray-900 h-full w-[var(--sl-side-w)] flex flex-col overflow-visible`}
+        class={`bg-slate-900 h-full w-full flex absolute bottom-0 h-[var(--sl-side-w)] sm:top-0 sm:h-full sm:flex-col sm:w-[var(--sl-side-w)]`}
       >
-        <streamline-button
-          type="primary"
-          icon="wordpress"
-          onClick={() => (stateInternal.visible = false)}
-        />
-        <div class={`flex flex-col h-full`}>
-          {Object.values(stateInternal.menu).map((item) => {
-            return (
-              item['condition'] && (
-                <streamline-button
-                  onClick={() => this.handleClick(item.name)}
-                  class={`${
-                    item.name === 'settings'
-                      ? 'mt-auto'
-                      : item.name === 'network'
-                      ? 'mb-4'
-                      : ''
-                  }`}
-                  type="sidebar"
-                  text={capitalizeFirstLetter(item.text)}
-                  icon={item.name}
-                />
-              )
-            );
+        {this.button('wordpress')}
+        <div
+          class={`inner grid grid-flow-col h-full overflow-x-auto overflow-y-hidden w-[calc(100%-var(--sl-side-w))] sm:w-full sm:overflow-x-hidden sm:flex sm:flex-col sm:overflow-y-auto sm:h-[calc(100%-64px)]`}
+        >
+          {Object.values(state.menu).map((item) => {
+            return item['condition'] && this.button(item.name);
           })}
         </div>
       </nav>

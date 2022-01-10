@@ -15,6 +15,17 @@ Do things faster.
 
 == Changelog ==
 
+= 1.0.25 =
+* Enhancement: faster rendering performance by using less web components
+* Enhancement: remove <streamline-box> component wrapper
+* Enhancement: show sidebar at bottom on smaller screen sizes
+* Fix: 'Enter' button not showing after switching tabs (post/site)
+* Fix: correct context menu positioning on lower screen sizes
+* Fix: minor UI bugs
+* New: reset search query button for sites and posts
+* New: show history of searches for sites and posts
+* New: unified UI for all data types
+
 = 1.0.24 =
 * Enhancement: show plugin updates count in network and menu tab in brackets
 * Enhancement: show shortcut keys in settings

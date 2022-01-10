@@ -1,11 +1,11 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { StreamlineSidebar } from './streamline-sidebar';
-import { disposeInternal, stateInternal } from '../../store/internal';
+import { dispose, state } from '../../store/internal';
 import { disposeLocal } from '../../store/local';
 import { setData } from '../../test/setData';
 
 beforeEach(async () => {
-  disposeInternal();
+  dispose();
   disposeLocal();
 });
 
@@ -20,15 +20,15 @@ describe('Render sidebar', () => {
   });
   it('as multisite', async () => {
     setData();
-    stateInternal.menu = {
-      ...stateInternal.menu,
+    state.menu = {
+      ...state.menu,
       ...{
         site: {
-          ...stateInternal.menu.site,
+          ...state.menu.site,
           condition: true,
         },
         network: {
-          ...stateInternal.menu.network,
+          ...state.menu.network,
           condition: true,
         },
       },

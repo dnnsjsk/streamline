@@ -4,24 +4,7 @@
 }
 
 .inner {
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: #ffffff;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 0px;
-  }
-}
-
-streamline-button {
-  display: block;
-  height: 100%;
-  width: 100%;
+  @include scrollbar;
 }
 
 input:checked {

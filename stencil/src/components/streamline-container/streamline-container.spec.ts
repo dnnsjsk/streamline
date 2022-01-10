@@ -1,17 +1,17 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { StreamlineContainer } from './streamline-container';
-import { stateInternal, disposeInternal } from '../../store/internal';
+import { state, dispose } from '../../store/internal';
 import { StreamlineSearch } from '../streamline-search/streamline-search';
 import { stateLocal, disposeLocal } from '../../store/local';
 
 beforeEach(async () => {
-  disposeInternal();
+  dispose();
   disposeLocal();
 });
 
 describe('Render container', () => {
   it('closed', async () => {
-    stateInternal.visible = true;
+    state.visible = true;
     const page = await newSpecPage({
       components: [StreamlineContainer],
       html: `<streamline-container></streamline-container>`,
@@ -47,7 +47,7 @@ describe('Render container', () => {
 
 describe('Key press should', () => {
   it('open app on mac', async () => {
-    stateInternal.visible = true;
+    state.visible = true;
     const page = await newSpecPage({
       components: [StreamlineContainer],
       html: `<streamline-container mac="true"></streamline-container>`,
@@ -55,10 +55,10 @@ describe('Key press should', () => {
     const event = new KeyboardEvent('keydown', { metaKey: true, key: 'k' });
     page.doc.dispatchEvent(event);
     await page.waitForChanges();
-    expect(stateInternal.visible).toBe(true);
+    expect(state.visible).toBe(true);
   });
   it('open app on windows', async () => {
-    stateInternal.visible = true;
+    state.visible = true;
     const page = await newSpecPage({
       components: [StreamlineContainer],
       html: `<streamline-container></streamline-container>`,
@@ -66,10 +66,10 @@ describe('Key press should', () => {
     const event = new KeyboardEvent('keydown', { ctrlKey: true, key: 'k' });
     page.doc.dispatchEvent(event);
     await page.waitForChanges();
-    expect(stateInternal.visible).toBe(true);
+    expect(state.visible).toBe(true);
   });
   it('close app', async () => {
-    stateInternal.visible = true;
+    state.visible = true;
     const page = await newSpecPage({
       components: [StreamlineContainer],
       html: `<streamline-container></streamline-container>`,
@@ -77,29 +77,29 @@ describe('Key press should', () => {
     const event = new KeyboardEvent('keydown', { key: 'Escape' });
     page.doc.dispatchEvent(event);
     await page.waitForChanges();
-    expect(stateInternal.visible).toBe(false);
+    expect(state.visible).toBe(false);
   });
   it('not close app', async () => {
     const page = await newSpecPage({
       components: [StreamlineContainer],
       html: `<streamline-container></streamline-container>`,
     });
-    stateInternal.entriesSettingsLoad = {
-      ...stateInternal.entriesSettingsLoad,
+    state.entriesSettingsLoad = {
+      ...state.entriesSettingsLoad,
       ...{
         keyExit: {
           default: false,
         },
       },
     };
-    stateInternal.visible = true;
+    state.visible = true;
     const event = new KeyboardEvent('keydown', { key: 'Escape' });
     page.doc.dispatchEvent(event);
     await page.waitForChanges();
-    expect(stateInternal.visible).toBe(true);
+    expect(state.visible).toBe(true);
   });
   it('focus search on mac', async () => {
-    stateInternal.visible = true;
+    state.visible = true;
     const page = await newSpecPage({
       components: [StreamlineContainer],
       html: `<streamline-container mac="true"></streamline-container>`,
@@ -107,10 +107,10 @@ describe('Key press should', () => {
     const event = new KeyboardEvent('keydown', { metaKey: true, key: 's' });
     page.doc.dispatchEvent(event);
     await page.waitForChanges();
-    expect(stateInternal.isSearchFocus).toBe(true);
+    expect(state.isSearchFocus).toBe(true);
   });
   it('focus search on windows', async () => {
-    stateInternal.visible = true;
+    state.visible = true;
     const page = await newSpecPage({
       components: [StreamlineContainer],
       html: `<streamline-container></streamline-container>`,
@@ -118,16 +118,16 @@ describe('Key press should', () => {
     const event = new KeyboardEvent('keydown', { ctrlKey: true, key: 's' });
     page.doc.dispatchEvent(event);
     await page.waitForChanges();
-    expect(stateInternal.isSearchFocus).toBe(true);
+    expect(state.isSearchFocus).toBe(true);
   });
   it('not focus search', async () => {
-    stateInternal.isSearchFocus = false;
+    state.isSearchFocus = false;
     const page = await newSpecPage({
       components: [StreamlineContainer],
       html: `<streamline-container></streamline-container>`,
     });
-    stateInternal.entriesSettingsLoad = {
-      ...stateInternal.entriesSettingsLoad,
+    state.entriesSettingsLoad = {
+      ...state.entriesSettingsLoad,
       ...{
         keySearch: {
           default: false,
@@ -137,7 +137,7 @@ describe('Key press should', () => {
     const event = new KeyboardEvent('keydown', { ctrlKey: true, key: 's' });
     page.doc.dispatchEvent(event);
     await page.waitForChanges();
-    expect(stateInternal.isSearchFocus).toBe(false);
+    expect(state.isSearchFocus).toBe(false);
   });
   it('cycle through modes on mac', async () => {
     stateLocal.active = 'menu';
@@ -145,7 +145,7 @@ describe('Key press should', () => {
       components: [StreamlineContainer],
       html: `<streamline-container mac="true"></streamline-container>`,
     });
-    stateInternal.visible = true;
+    state.visible = true;
     const eventUp = new KeyboardEvent('keydown', {
       metaKey: true,
       key: 'ArrowUp',
@@ -188,7 +188,7 @@ describe('Key press should', () => {
       components: [StreamlineContainer],
       html: `<streamline-container></streamline-container>`,
     });
-    stateInternal.visible = true;
+    state.visible = true;
     const eventUp = new KeyboardEvent('keydown', {
       ctrlKey: true,
       key: 'ArrowUp',
@@ -231,15 +231,15 @@ describe('Key press should', () => {
       components: [StreamlineContainer],
       html: `<streamline-container></streamline-container>`,
     });
-    stateInternal.entriesSettingsLoad = {
-      ...stateInternal.entriesSettingsLoad,
+    state.entriesSettingsLoad = {
+      ...state.entriesSettingsLoad,
       ...{
         keyNavigationTabs: {
           default: false,
         },
       },
     };
-    stateInternal.visible = true;
+    state.visible = true;
     const eventUp = new KeyboardEvent('keydown', {
       key: 'ArrowUp',
     });
@@ -251,13 +251,13 @@ describe('Key press should', () => {
 
 describe('In test mode', () => {
   it('render search with correct placeholder', async () => {
-    stateInternal.test = true;
+    state.test = true;
     const page = await newSpecPage({
       components: [StreamlineContainer, StreamlineSearch],
       html: `<streamline-container></streamline-container>`,
     });
     await page.waitForChanges();
-    const placeholder = stateInternal.searchPlaceholder;
+    const placeholder = state.searchPlaceholder;
     expect(placeholder).toBe('Search entries');
   });
 });

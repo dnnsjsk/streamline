@@ -1,16 +1,15 @@
 import { filterDeep, findDeep } from 'deepdash-es/standalone';
-import { stateInternal } from '../store/internal';
+import { state } from '../store/internal';
 import { setEntries } from './setEntries';
 import { merge, unset, get, compact } from 'lodash-es';
-import { hideAll } from 'tippy.js';
 import { capitalizeFirstLetter } from './capitalizeFirstLetter';
 import { fetchAjax } from './fetchAjax';
 
 export function setFavourite(obj) {
-  const arr = [...stateInternal.entriesFav];
+  const arr = [...state.entriesFav];
 
   const filter = filterDeep(
-    stateInternal[`entries${capitalizeFirstLetter(obj.type)}`],
+    state[`entries${capitalizeFirstLetter(obj.type)}`],
     (o) => obj.filter(o),
     {
       childrenPath: ['children'],
@@ -18,19 +17,19 @@ export function setFavourite(obj) {
   );
 
   if (!obj.favourite) {
-    const path = findDeep(stateInternal.entriesFav, (o) => obj.path(o), {
+    const path = findDeep(state.entriesFav, (o) => obj.path(o), {
       childrenPath: ['children'],
     });
     const index = path?.key;
 
-    if (stateInternal.entriesFav.length === 0) {
-      const mergeArr = [...merge(stateInternal.entriesFav, filter)];
-      stateInternal.entriesFav = mergeArr;
-      stateInternal.entriesFavActive = mergeArr;
+    if (state.entriesFav.length === 0) {
+      const mergeArr = [...merge(state.entriesFav, filter)];
+      state.entriesFav = mergeArr;
+      state.entriesFavActive = mergeArr;
     } else if (!path) {
       const mergeArr = [...arr, filter[0]];
-      stateInternal.entriesFav = mergeArr;
-      stateInternal.entriesFavActive = mergeArr;
+      state.entriesFav = mergeArr;
+      state.entriesFavActive = mergeArr;
     } else {
       const mergeArr = merge(
         [
@@ -41,11 +40,11 @@ export function setFavourite(obj) {
         filter
       );
       arr[index] = mergeArr[0];
-      stateInternal.entriesFav = arr;
-      stateInternal.entriesFavActive = arr;
+      state.entriesFav = arr;
+      state.entriesFavActive = arr;
     }
   } else {
-    const path = findDeep(stateInternal.entriesFav, (o) => obj.pathFav(o), {
+    const path = findDeep(state.entriesFav, (o) => obj.pathFav(o), {
       childrenPath: ['children'],
     });
 
@@ -55,7 +54,7 @@ export function setFavourite(obj) {
 
     const parentPath = path.context['_item'].parent.path;
     const parentChildrenLength = Object.values(
-      get(stateInternal.entriesFav, `${parentPath}.children`)
+      get(state.entriesFav, `${parentPath}.children`)
     ).length;
 
     if (parentChildrenLength === 0) {
@@ -64,8 +63,7 @@ export function setFavourite(obj) {
 
     const topPath = path.context['_item'].parent.parent.path;
     const topChildrenLength = topPath
-      ? Object.values(get(stateInternal.entriesFav, `${topPath}.children`))
-          .length
+      ? Object.values(get(state.entriesFav, `${topPath}.children`)).length
       : false;
 
     if (topChildrenLength === 0) {
@@ -74,21 +72,20 @@ export function setFavourite(obj) {
 
     const removeArr =
       arr.length === 1 && arr[0] === undefined ? [] : [...compact(arr)];
-    stateInternal.entriesFav = removeArr;
-    stateInternal.entriesFavActive = removeArr;
+    state.entriesFav = removeArr;
+    state.entriesFavActive = removeArr;
 
     setEntries();
   }
 
-  // console.log(stateInternal.entriesFav);
+  // console.log(state.entriesFav);
 
-  if (!stateInternal.test) {
+  if (!state.test) {
     fetchAjax({
       type: 'favourites',
-      query: stateInternal.entriesFav,
+      query: state.entriesFav,
     });
   }
 
   obj.callback && obj.callback();
-  hideAll();
 }

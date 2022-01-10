@@ -7,21 +7,18 @@
 
 ### Used by
 
- - [streamline-box](../streamline-box)
+ - [streamline-container](../streamline-container)
 
 ### Depends on
 
-- [streamline-button](../streamline-button)
 - [streamline-post](../streamline-post)
 
 ### Graph
 ```mermaid
 graph TD;
-  streamline-entries --> streamline-button
   streamline-entries --> streamline-post
   streamline-post --> streamline-input
-  streamline-post --> streamline-button
-  streamline-box --> streamline-entries
+  streamline-container --> streamline-entries
   style streamline-entries fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

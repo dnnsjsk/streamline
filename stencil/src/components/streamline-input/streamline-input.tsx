@@ -64,13 +64,13 @@ export class StreamlineInput {
           value={this.value}
           placeholder={this.placeholder}
           onInput={this.onInput}
-          class={`peer px-3 h-10 w-full border border-blue-gray-300 font-medium text-sm text-blue-gray-900 placeholder-transparent bg-white focus:outline-none focus-border ${
+          class={`peer px-3 h-10 w-full border border-slate-300 font-medium text-sm text-slate-900 placeholder-transparent bg-white focus:outline-none focus-border ${
             this.invalid ? 'border-invalid' : ''
           }`}
         />
         <label
           htmlFor={this.ident}
-          class={`px-2 py-1 left-1 bg-white pointer-events-none absolute -top-3 text-blue-gray-500 text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-focus:-top-3 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-blue-gray-500`}
+          class={`px-2 py-1 left-1 bg-white pointer-events-none absolute -top-3 text-slate-500 text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-slate-500 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-focus:-top-3 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-slate-500`}
         >
           {this.placeholder}
         </label>

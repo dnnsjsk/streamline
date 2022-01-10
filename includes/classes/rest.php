@@ -36,6 +36,11 @@ class Rest
                         return is_numeric($param);
                     },
                 ],
+                "userId" => [
+	                "validate_callback" => function ( $param, $request, $key ) {
+		                return is_numeric( $param );
+	                },
+                ],
                 "value" => [
                     "validate_callback" => function ($param, $request, $key) {
                         return $param;
@@ -64,6 +69,21 @@ class Rest
     }
 
     /**
+     * Update latest searches.
+     *
+     * @date    04/01/2022
+     * @since   1.0.25
+     */
+    function updateSearches($userId, $type, $value)
+    {
+        $key = "streamline_search_history_" . $type;
+		$meta = get_user_meta($userId, $key,true) ?: [];
+        $meta[] = $value;
+		delete_user_meta($userId, $key);
+        update_user_meta($userId, $key, $meta);
+    }
+
+    /**
      * /sites Endpoint.
      *
      * @date    26/10/2021
@@ -89,6 +109,8 @@ class Rest
 
         $get["children"] = $arr;
 
+        self::updateSearches($data["userId"], "sites", $data["value"]);
+
         return $get;
     }
 
@@ -100,7 +122,7 @@ class Rest
      */
     function posts($data): array
     {
-	    $args = [
+        $args = [
             "s" => $data["value"],
             "post_type" => "any",
         ];
@@ -135,6 +157,8 @@ class Rest
         $get["children"] = $newArr;
         $get["path"] = $path;
         $get["isMultisite"] = is_multisite();
+
+        self::updateSearches($data["userId"], "posts", $data["value"]);
 
         return $get;
     }

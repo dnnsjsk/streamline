@@ -38,22 +38,18 @@ Type: `Promise<void>`
 
 ### Depends on
 
-- [streamline-box](../streamline-box)
+- [streamline-sidebar](../streamline-sidebar)
+- [streamline-search](../streamline-search)
+- [streamline-entries](../streamline-entries)
 
 ### Graph
 ```mermaid
 graph TD;
-  streamline-container --> streamline-box
-  streamline-box --> streamline-sidebar
-  streamline-box --> streamline-search
-  streamline-box --> streamline-button
-  streamline-box --> streamline-entries
-  streamline-sidebar --> streamline-button
-  streamline-search --> streamline-button
-  streamline-entries --> streamline-button
+  streamline-container --> streamline-sidebar
+  streamline-container --> streamline-search
+  streamline-container --> streamline-entries
   streamline-entries --> streamline-post
   streamline-post --> streamline-input
-  streamline-post --> streamline-button
   style streamline-container fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

@@ -5,7 +5,7 @@
  * Plugin URI: https://wpstreamline.com
  * Description: Use WordPress faster.
  * Author: Fabrikat
- * Version: 1.0.24
+ * Version: 1.0.25
  * License: GPL2+
  * License URI: https://www.gnu.org/licenses/gpl-2.0.txt
  */
@@ -44,7 +44,8 @@ if (!class_exists("EDD_SL_Plugin_Updater")) {
     include plugin_dir_path(__FILE__) . "includes/admin/edd-sl-updater.php";
 }
 
-require_once plugin_dir_path(__FILE__) . "includes/admin/streamline-updater.php";
+require_once plugin_dir_path(__FILE__) .
+    "includes/admin/streamline-updater.php";
 
 /**
  * Init plugin.

@@ -1,40 +1,45 @@
-// eslint-disable-next-line no-unused-vars
+// @ts-ignore
+import autoprefixer from 'autoprefixer';
 import { Config } from '@stencil/core';
 import { sass } from '@stencil/sass';
-import tailwind from 'stencil-tailwind-plugin';
+import purgecss from '@fullhuman/postcss-purgecss';
+import tailwind, { tailwindHMR } from 'stencil-tailwind-plugin';
+import tailwindcss from 'tailwindcss';
+import { defaultExtractor } from 'tailwindcss/lib/lib/defaultExtractor';
 
 const colors = require('tailwindcss/colors');
 
 const tailwindConfig = {
   mode: 'jit',
+  content: [],
   theme: {
     colors: {
       transparent: 'transparent',
       current: 'currentColor',
-      black: colors.black,
-      white: colors.white,
-      'blue-gray': colors.blueGray,
-      'cool-gray': colors.coolGray,
-      gray: colors.gray,
-      'true-gray': colors.trueGray,
-      'warm-gray': colors.warmGray,
-      red: colors.red,
-      orange: colors.orange,
       amber: colors.amber,
-      yellow: colors.yellow,
-      lime: colors.lime,
-      green: colors.green,
-      emerald: colors.emerald,
-      teal: colors.teal,
-      cyan: colors.cyan,
-      sky: colors.sky,
+      black: colors.black,
       blue: colors.blue,
-      indigo: colors.indigo,
-      violet: colors.violet,
-      purple: colors.purple,
+      cyan: colors.cyan,
+      emerald: colors.emerald,
       fuchsia: colors.fuchsia,
+      gray: colors.gray,
+      green: colors.green,
+      indigo: colors.indigo,
+      lime: colors.lime,
+      neutral: colors.neutral,
+      orange: colors.orange,
       pink: colors.pink,
+      purple: colors.purple,
+      red: colors.red,
       rose: colors.rose,
+      sky: colors.sky,
+      slate: colors.slate,
+      stone: colors.stone,
+      teal: colors.teal,
+      violet: colors.violet,
+      white: colors.white,
+      yellow: colors.yellow,
+      zinc: colors.zinc,
     },
     fontSize: {
       xs: '12px',
@@ -107,17 +112,14 @@ export const config: Config = {
   taskQueue: 'async',
   outputTargets: [
     {
+      type: 'dist',
+      esmLoaderPath: '../loader',
+    },
+    {
       type: 'www',
       serviceWorker: null,
       dir: '../assets/components',
       empty: true,
-    },
-    {
-      type: 'dist-custom-elements-bundle',
-      dir: '../assets/bundle',
-      empty: true,
-      externalRuntime: false,
-      minify: true,
     },
   ],
   plugins: [
@@ -127,7 +129,26 @@ export const config: Config = {
     tailwind({
       tailwindCssPath: './tailwind.css',
       tailwindConf: tailwindConfig,
+      postcss: {
+        plugins: [
+          tailwindcss(),
+          purgecss({
+            content: ['./**/*.tsx'],
+            safelist: [
+              ':root',
+              ':host',
+              ':shadow',
+              '/deep/',
+              '::part',
+              '::theme',
+            ],
+            defaultExtractor,
+          }),
+          autoprefixer(),
+        ],
+      },
     }),
+    tailwindHMR(),
   ],
   devServer: {
     openBrowser: false,

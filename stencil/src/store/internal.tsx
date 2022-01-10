@@ -9,7 +9,7 @@ const isTest = document
 
 const { state, dispose, onChange } = createStore({
   class: {
-    tag: 'px-2.5 py-1.5 bg-blue-gray-200 text-blue-gray-500 inline-block h-[max-content] leading-1',
+    tag: 'px-2.5 py-1.5 bg-slate-200 text-slate-500 inline-block h-[max-content] leading-1',
   },
   commands: {
     local: {
@@ -43,6 +43,7 @@ const { state, dispose, onChange } = createStore({
   entriesNetworkActive: [],
   entriesPost: [],
   entriesPostActive: [],
+  entriesPostIsQuery: false,
   entriesPostCurrentPath: '',
   entriesSettings: [
     {
@@ -145,6 +146,15 @@ const { state, dispose, onChange } = createStore({
   entriesSettingsHaveChanged: false,
   entriesSite: [],
   entriesSiteActive: [],
+  entriesSiteIsQuery: false,
+  historySearchesSite: JSON.parse(
+    // @ts-ignore
+    window.streamlineData.historySearchesSite
+  ).reverse(),
+  historySearchesPost: JSON.parse(
+    // @ts-ignore
+    window.streamlineData.historySearchesPost
+  ).reverse(),
   isEnter: false,
   isHelp: false,
   isLoading: false,
@@ -241,7 +251,6 @@ onChange('searchValue', (value) => {
 onChange('visible', (value) => {
   const el = document
     ?.querySelector('streamline-container')
-    ?.shadowRoot?.querySelector('streamline-box')
     ?.shadowRoot?.querySelector('streamline-entries')
     ?.shadowRoot?.querySelector('div > div');
 
@@ -268,8 +277,4 @@ onChange('visible', (value) => {
   }
 });
 
-export {
-  state as stateInternal,
-  dispose as disposeInternal,
-  onChange as onChangeInternal,
-};
+export { state, dispose, onChange as onChangeInternal };

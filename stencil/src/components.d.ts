@@ -6,24 +6,6 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
-    interface StreamlineBox {
-    }
-    interface StreamlineButton {
-        "adminUrl": string;
-        "favourite": boolean;
-        "href": string;
-        "icon": string;
-        "index": number;
-        "indexInner": number;
-        "indexSub": number;
-        "invalid": boolean;
-        "path": string;
-        "siteId": number;
-        "styling": string;
-        "text": string;
-        "type": string;
-        "typeSub": string;
-    }
     interface StreamlineContainer {
         "mac": boolean;
         "toggle": () => Promise<void>;
@@ -55,18 +37,6 @@ export namespace Components {
     }
 }
 declare global {
-    interface HTMLStreamlineBoxElement extends Components.StreamlineBox, HTMLStencilElement {
-    }
-    var HTMLStreamlineBoxElement: {
-        prototype: HTMLStreamlineBoxElement;
-        new (): HTMLStreamlineBoxElement;
-    };
-    interface HTMLStreamlineButtonElement extends Components.StreamlineButton, HTMLStencilElement {
-    }
-    var HTMLStreamlineButtonElement: {
-        prototype: HTMLStreamlineButtonElement;
-        new (): HTMLStreamlineButtonElement;
-    };
     interface HTMLStreamlineContainerElement extends Components.StreamlineContainer, HTMLStencilElement {
     }
     var HTMLStreamlineContainerElement: {
@@ -104,8 +74,6 @@ declare global {
         new (): HTMLStreamlineSidebarElement;
     };
     interface HTMLElementTagNameMap {
-        "streamline-box": HTMLStreamlineBoxElement;
-        "streamline-button": HTMLStreamlineButtonElement;
         "streamline-container": HTMLStreamlineContainerElement;
         "streamline-entries": HTMLStreamlineEntriesElement;
         "streamline-input": HTMLStreamlineInputElement;
@@ -115,24 +83,6 @@ declare global {
     }
 }
 declare namespace LocalJSX {
-    interface StreamlineBox {
-    }
-    interface StreamlineButton {
-        "adminUrl"?: string;
-        "favourite"?: boolean;
-        "href"?: string;
-        "icon"?: string;
-        "index"?: number;
-        "indexInner"?: number;
-        "indexSub"?: number;
-        "invalid"?: boolean;
-        "path"?: string;
-        "siteId"?: number;
-        "styling"?: string;
-        "text"?: string;
-        "type"?: string;
-        "typeSub"?: string;
-    }
     interface StreamlineContainer {
         "mac"?: boolean;
         "visible"?: boolean;
@@ -161,8 +111,6 @@ declare namespace LocalJSX {
     interface StreamlineSidebar {
     }
     interface IntrinsicElements {
-        "streamline-box": StreamlineBox;
-        "streamline-button": StreamlineButton;
         "streamline-container": StreamlineContainer;
         "streamline-entries": StreamlineEntries;
         "streamline-input": StreamlineInput;
@@ -175,8 +123,6 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "streamline-box": LocalJSX.StreamlineBox & JSXBase.HTMLAttributes<HTMLStreamlineBoxElement>;
-            "streamline-button": LocalJSX.StreamlineButton & JSXBase.HTMLAttributes<HTMLStreamlineButtonElement>;
             "streamline-container": LocalJSX.StreamlineContainer & JSXBase.HTMLAttributes<HTMLStreamlineContainerElement>;
             "streamline-entries": LocalJSX.StreamlineEntries & JSXBase.HTMLAttributes<HTMLStreamlineEntriesElement>;
             "streamline-input": LocalJSX.StreamlineInput & JSXBase.HTMLAttributes<HTMLStreamlineInputElement>;

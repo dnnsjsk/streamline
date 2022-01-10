@@ -1,4 +1,4 @@
-import { stateInternal } from '../store/internal';
+import { state } from '../store/internal';
 import { stateLocal } from '../store/local';
 
 export function setTestData() {
@@ -1485,14 +1485,14 @@ export function setTestData() {
   ];
 
   stateLocal.active = 'menu';
-  stateInternal.entriesSite = site;
-  stateInternal.entriesSiteActive = site;
-  stateInternal.entriesNetwork = network;
-  stateInternal.entriesNetworkActive = network;
-  stateInternal.entriesMenu = menu;
-  stateInternal.entriesMenuActive = menu;
-  stateInternal.entriesFav = fav;
-  stateInternal.entriesFavActive = fav;
-  stateInternal.entriesPost = post;
-  stateInternal.entriesPostActive = post;
+  state.entriesSite = site;
+  state.entriesSiteActive = site;
+  state.entriesNetwork = network;
+  state.entriesNetworkActive = network;
+  state.entriesMenu = menu;
+  state.entriesMenuActive = menu;
+  state.entriesFav = fav;
+  state.entriesFavActive = fav;
+  state.entriesPost = post;
+  state.entriesPostActive = post;
 }
