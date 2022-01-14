@@ -112,7 +112,7 @@ export class StreamlineSearch {
         {state.isSearch && [
           <input
             part="search"
-            class="select peer bg-transparent focus:outline-none w-full h-[var(--sl-side-w)] text-[18px] h-full w-full m-0 p-0 font-normal placeholder-slate-500 text-slate-900 px-8 lg:h-[64px]"
+            class="select peer bg-transparent focus:outline-none w-full h-[var(--sl-side-w)] text-[18px] h-full w-full m-0 p-0 font-normal placeholder-slate-500 text-slate-900 px-9 lg:h-[64px]"
             type="text"
             placeholder={state.searchPlaceholder}
             value={state.searchValue}
@@ -123,7 +123,7 @@ export class StreamlineSearch {
           <div class="h-px w-screen left-0 absolute bottom-0 bg-slate-200 z-50 peer-focus:h-[2px] peer-focus:-bottom-px peer-focus:bg-blue-600" />,
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="search absolute top-1/2 -translate-y-1/2 left-3 h-3.5 text-slate-500 peer-focus:text-blue-600"
+            class="search absolute top-1/2 -translate-y-1/2 left-4 h-3.5 text-slate-500 peer-focus:text-blue-600"
             viewBox="0 0 512 512"
           >
             <path

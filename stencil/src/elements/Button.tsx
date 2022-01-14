@@ -15,7 +15,7 @@ export function Button(props) {
           !props.primary,
         [props.classOuter]: props.classOuter,
         'opacity-50 pointer-events-none': props.invalid,
-        '!w-6 !h-6 !p-0 mr-2': props.back,
+        '!w-5 !h-5 absolute !p-0 mr-2': props.back,
       }}
       onMouseDown={(e) => e.preventDefault()}
     >

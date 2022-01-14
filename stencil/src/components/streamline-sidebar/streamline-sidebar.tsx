@@ -104,7 +104,7 @@ export class StreamlineSidebar {
   render() {
     return (
       <nav
-        class={`bg-slate-900 h-full w-full flex absolute bottom-0 h-[var(--sl-side-w)] sm:top-0 sm:h-full sm:flex-col sm:w-[var(--sl-side-w)]`}
+        class={`z-50 bg-slate-900 h-full w-full flex absolute bottom-0 h-[var(--sl-side-w)] sm:top-0 sm:h-full sm:flex-col sm:w-[var(--sl-side-w)]`}
       >
         {this.button('wordpress')}
         <div

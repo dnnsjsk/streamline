@@ -35,8 +35,8 @@ export class StreamlineEntries {
   private border = 'border-t border-slate-100 first-of-type:border-none';
   private borderB = 'border-b border-slate-200 border-dotted';
   private h2 = 'text-sm text-slate-900 font-medium sm:text-base';
-  private px = 'px-3 sm:px-6 lg:px-8';
-  private mx = 'mx-3 sm:mx-6 lg:mx-8';
+  private px = 'px-4 sm:px-8';
+  private mx = 'mx-4 sm:mx-8';
 
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineEntriesElement;
@@ -94,6 +94,12 @@ export class StreamlineEntries {
     const isMenu = item.type === 'menu' || item.type === 'networkMenu';
     const isDotMenu = state.isHelp;
     const isNotDotMenu = !state.isHelp;
+    const isQueryWithClose =
+      isQueryMode &&
+      state[`entries${capitalizeFirstLetter(stateLocal.active)}IsQuery`] &&
+      state[`historySearches${capitalizeFirstLetter(stateLocal.active)}`]
+        ?.length > 0 &&
+      !state.isHelp;
 
     let menuNumber = 0;
     if (isMenu) {
@@ -126,10 +132,10 @@ export class StreamlineEntries {
             : 'flex-col items-start sm:justify-between'
         } ${test ? '!mb-0' : ''} ${
           this.px
-        } relative min-h-[60px] pt-5 flex flex-wrap mb-1 pb-1.5 flex sticky -top-2 bg-white z-10 border-b border-slate-300 sm:min-h-[75px] sm:mb-4 sm:flex-row sm:items-center sm:pt-6 sm:pb-2 sm:-top-2`}
+        } relative min-h-[60px] pt-5 flex flex-wrap mb-1 pb-1.5 flex sticky -top-2 bg-white z-20 border-b border-slate-300 sm:min-h-[75px] sm:mb-4 sm:flex-row sm:items-center sm:pt-6 sm:pb-2 sm:-top-2`}
       >
         <div class={`absolute -left-full top-0 h-full bg-white z-[-1]`} />
-        <div class={`flex items-center flex-row`}>
+        <div class={`flex items-center flex-row max-w-full`}>
           {stateLocal.active === 'fav' &&
             state.entriesFavActive[0].children.length !== 0 &&
             !state.isHelp && (
@@ -141,30 +147,28 @@ export class StreamlineEntries {
                 {item.type === 'post' && <IconPost />}
               </div>
             )}
-          {isQueryMode &&
-            state[
-              `entries${capitalizeFirstLetter(stateLocal.active)}IsQuery`
-            ] &&
-            state[`historySearches${capitalizeFirstLetter(stateLocal.active)}`]
-              ?.length > 0 &&
-            !state.isHelp && (
-              <Button
-                back
-                onClick={() => {
-                  state[
-                    `entries${capitalizeFirstLetter(stateLocal.active)}IsQuery`
-                  ] = false;
-                  state[`entries${capitalizeFirstLetter(stateLocal.active)}`] =
-                    [];
-                  state[
-                    `entries${capitalizeFirstLetter(stateLocal.active)}Active`
-                  ] = [];
-                  setSearchPlaceholder();
-                }}
-              />
-            )}
+          {isQueryWithClose && (
+            <Button
+              back
+              onClick={() => {
+                state[
+                  `entries${capitalizeFirstLetter(stateLocal.active)}IsQuery`
+                ] = false;
+                state[`entries${capitalizeFirstLetter(stateLocal.active)}`] =
+                  [];
+                state[
+                  `entries${capitalizeFirstLetter(stateLocal.active)}Active`
+                ] = [];
+                setSearchPlaceholder();
+              }}
+            />
+          )}
           <h1
-            class={`text-slate-900 font-medium text-lg mr-6 whitespace-nowrap sm:text-xl`}
+            class={{
+              'text-slate-900 font-medium text-lg mr-6 whitespace-nowrap truncate leading-tight sm:text-xl':
+                true,
+              'ml-8': isQueryWithClose,
+            }}
             innerHTML={`${
               state.isSlash || isDotMenu
                 ? item.title
@@ -238,7 +242,7 @@ export class StreamlineEntries {
           ]).map((itemInner, itemIndex) => {
             return itemInner.condition && itemInner.type === 'text' ? (
               <span
-                class={`results-amount text-xs mt-1.5 sm:my-1.5 font-medium text-slate-700 sm:text-sm ${
+                class={`results-amount text-xs mt-1.5 sm:my-1.5 font-medium leading-tight text-slate-700 sm:text-sm ${
                   itemIndex === 0 ? '' : 'pl-4'
                 }`}
               >
@@ -276,11 +280,12 @@ export class StreamlineEntries {
     let isFav = false;
     const isDropdown = item.type !== 'history' && !item.blog_id;
     const isHistory = item.type === 'history';
-    const isSites = item.blog_id;
+    const isSite = item.blog_id;
+    const isPost = item.post_title;
     const isCurrentSite =
       parseInt(item.siteId) === parseInt(state.currentSite.id);
-    const isTable = isSites || item.type === 'post';
-    const table = isSites
+    const isTable = isSite || isPost;
+    const table = isSite
       ? [
           <span class="flex items-center">
             {isCurrentSite && (
@@ -293,6 +298,8 @@ export class StreamlineEntries {
           item.path,
           item.blog_id,
         ]
+      : isPost
+      ? [item.post_title, item.post_type, item.post_name]
       : [];
 
     const checkIfFavourite = () => {
@@ -352,7 +359,7 @@ export class StreamlineEntries {
     };
 
     const onClick = () =>
-      isHistory ? onClickHistory() : isSites ? onClickSites() : false;
+      isHistory ? onClickHistory() : isSite ? onClickSites() : false;
 
     return (
       <li class={`relative focus-within:bg-slate-50`}>
@@ -362,15 +369,17 @@ export class StreamlineEntries {
           href={item.href && item.href}
           class={{
             [this.px]: true,
-            'cursor-pointer focus-white flex items-center flex-wrap cursor-pointer w-full inline-block py-3 text-sm font-medium text-slate-600 peer hover:text-blue-500 hover:bg-slate-50':
+            'relative cursor-pointer focus-white flex items-center flex-wrap cursor-pointer w-full inline-block py-3 text-sm font-medium text-slate-600 peer hover:text-blue-500 hover:bg-slate-50':
               true,
-            'pointer-events-none': isCurrentSite && isSites,
+            'pointer-events-none': isCurrentSite && isSite,
           }}
           onClick={onClick}
           onMouseDown={(e) => e.preventDefault()}
         >
           {isFav && stateLocal.active !== 'fav' && (
-            <span class={`text-red-500 mr-2 inline-block`}>
+            <span
+              class={`text-red-500 mr-2 inline-block absolute left-px scale-50 sm:scale-75 sm:left-2`}
+            >
               <IconHeart />
             </span>
           )}
@@ -416,29 +425,33 @@ export class StreamlineEntries {
         ]
       : this.getArr(arr, stateLocal.active);
 
-    const table = stateLocal.active === 'site' ? ['Domain', 'Path', 'ID'] : [];
-
     return Object.values(array as unknown).map((item) => {
+      const table =
+        stateLocal.active === 'site'
+          ? ['Domain', 'Path', 'ID']
+          : item.type === 'post'
+          ? ['Title', 'Post type', 'Slug']
+          : [];
+
       return (
         <div>
           {this.getHeader(item, true)}
-          {item.type === 'post' ||
-            (item.type === 'site' && (
-              <div
-                class={`${this.px} ${this.borderB} grid grid-cols-[1fr_1fr_1fr] sticky top-[68px] gap-2 z-10 bg-white sm:top-[67px]`}
-              >
-                {table.map((item) => {
-                  return (
-                    <span
-                      key={item}
-                      class="py-1.5 text-xs uppercase font-semibold font-slate-500"
-                    >
-                      {item}
-                    </span>
-                  );
-                })}
-              </div>
-            ))}
+          {(item.type === 'post' || item.type === 'site') && (
+            <div
+              class={`${this.px} ${this.borderB} grid grid-cols-[1fr_1fr_1fr] sticky top-[63px] gap-2 z-10 bg-white sm:top-[67px]`}
+            >
+              {table.map((item) => {
+                return (
+                  <span
+                    key={item}
+                    class="py-1.5 text-xs uppercase font-semibold font-slate-500"
+                  >
+                    {item}
+                  </span>
+                );
+              })}
+            </div>
+          )}
           <ul data-focus-parent={true}>
             {Object.values(item.children as unknown).map(
               (itemInner, indexInner) => {
@@ -551,7 +564,7 @@ export class StreamlineEntries {
                     } flex flex-col`}
                   >
                     <h2
-                      class={`${this.h2} ${this.borderB} !text-lg mt-4 space-y-2 mb-6 inline-block leading-1 pb-2`}
+                      class={`${this.h2} ${this.borderB} !text-lg mt-4 space-y-2 mb-6 inline-block leading-none pb-2`}
                     >
                       {itemInner.name}
                     </h2>
@@ -680,7 +693,7 @@ export class StreamlineEntries {
         )}
         {isMultisite && (
           <div
-            class={`mt-auto px-3 h-6 bg-slate-50 border-t border-slate-200 flex items-center text-slate-900`}
+            class={`mt-auto px-4 h-6 bg-slate-50 border-t border-slate-200 flex items-center text-slate-900`}
           >
             <span class={`flex whitespace-no-wrap`}>
               <span class={`text-[11px]`}>
