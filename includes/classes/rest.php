@@ -37,9 +37,9 @@ class Rest
                     },
                 ],
                 "userId" => [
-	                "validate_callback" => function ( $param, $request, $key ) {
-		                return is_numeric( $param );
-	                },
+                    "validate_callback" => function ($param, $request, $key) {
+                        return is_numeric($param);
+                    },
                 ],
                 "value" => [
                     "validate_callback" => function ($param, $request, $key) {
@@ -77,9 +77,9 @@ class Rest
     function updateSearches($userId, $type, $value)
     {
         $key = "streamline_search_history_" . $type;
-		$meta = get_user_meta($userId, $key,true) ?: [];
+        $meta = get_user_meta($userId, $key, true) ?: [];
         $meta[] = $value;
-		delete_user_meta($userId, $key);
+        delete_user_meta($userId, $key);
         update_user_meta($userId, $key, $meta);
     }
 
@@ -146,6 +146,7 @@ class Rest
             $arr[$index]->name = $post->post_title;
             $arr[$index]->siteId = get_current_blog_id();
             $arr[$index]->sitePath = $path;
+            $arr[$index]->type = "post";
             unset($arr[$index]->post_content);
         }
 

@@ -21,6 +21,7 @@ Do things faster.
 * Enhancement: show sidebar at bottom on smaller screen sizes
 * Fix: 'Enter' button not showing after switching tabs (post/site)
 * Fix: correct context menu positioning on lower screen sizes
+* Fix: don't allow empty search queries
 * Fix: minor UI bugs
 * New: reset search query button for sites and posts
 * New: show history of searches for sites and posts

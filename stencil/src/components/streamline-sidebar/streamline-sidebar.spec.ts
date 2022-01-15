@@ -28,7 +28,7 @@ describe('Render sidebar', () => {
           condition: true,
         },
         network: {
-          ...state.menu.network,
+          ...state.menu.networkMenu,
           condition: true,
         },
       },

@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import { Component, h, Element } from '@stencil/core';
+import { Component, h, Element, State } from '@stencil/core';
 import { state } from '../../store/internal';
 import { stateLocal } from '../../store/local';
 import { setEntries } from '../../utils/setEntries';
@@ -35,11 +35,13 @@ export class StreamlineEntries {
   private border = 'border-t border-slate-100 first-of-type:border-none';
   private borderB = 'border-b border-slate-200 border-dotted';
   private h2 = 'text-sm text-slate-900 font-medium sm:text-base';
-  private px = 'px-4 sm:px-8';
-  private mx = 'mx-4 sm:mx-8';
+  private px = 'px-4 sm:px-8 lg:px-12';
+  private mx = 'mx-4 sm:mx-8 lg:mx-12';
 
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineEntriesElement;
+
+  @State() editing: object;
 
   connectedCallback() {
     getMenus();
@@ -178,9 +180,8 @@ export class StreamlineEntries {
                 ? 'Admin menu' + path
                 : (stateLocal.active === 'post' ||
                     stateLocal.active === 'site') &&
-                  state[
-                    `entries${stateLocal.active === 'post' ? 'Post' : 'Site'}`
-                  ][0]?.queryValue
+                  state[`entries${capitalizeFirstLetter(stateLocal.active)}`][0]
+                    ?.queryValue
                 ? `${capitalizeFirstLetter(stateLocal.active)}s for: ` +
                   `<span class="text-slate-400 italic">${
                     state[
@@ -278,28 +279,44 @@ export class StreamlineEntries {
 
   private row = (item) => {
     let isFav = false;
-    const isDropdown = item.type !== 'history' && !item.blog_id;
-    const isHistory = item.type === 'history';
+
+    const isEdit = this.editing?.[item.ID];
     const isSite = item.blog_id;
-    const isPost = item.post_title;
+    const isHistory = item.type === 'history';
+    const isPost = item.type === 'post';
+    const isMenu = item.type === 'menu' || item.type === 'networkMenu';
+    const isDropdown = isPost || isMenu;
     const isCurrentSite =
       parseInt(item.siteId) === parseInt(state.currentSite.id);
     const isTable = isSite || isPost;
+
     const table = isSite
       ? [
-          <span class="flex items-center">
-            {isCurrentSite && (
-              <span class={`text-green-500 mr-2`}>
-                <IconCheck />
+          {
+            text: (
+              <span class="flex items-center">
+                {isCurrentSite && (
+                  <span class={`text-green-500 mr-2`}>
+                    <IconCheck />
+                  </span>
+                )}
+                {item.domain}
               </span>
-            )}
-            {item.domain}
-          </span>,
-          item.path,
-          item.blog_id,
+            ),
+          },
+          {
+            text: item.path,
+          },
+          {
+            text: item.blog_id,
+          },
         ]
       : isPost
-      ? [item.post_title, item.post_type, item.post_name]
+      ? [
+          { text: item.post_title, id: 'post_title' },
+          { text: item.post_type },
+          { text: item.post_name, id: 'post_name' },
+        ]
       : [];
 
     const checkIfFavourite = () => {
@@ -309,7 +326,9 @@ export class StreamlineEntries {
           : someDeep(
               state.entriesFav,
               (o) => {
-                return o?.path === item.path && o?.siteId === item.siteId;
+                return isMenu
+                  ? o?.path === item.path && o?.siteId === item.siteId
+                  : o?.ID === item.ID && o?.siteId === item.siteId;
               },
               { childrenPath: ['children'] }
             );
@@ -321,15 +340,21 @@ export class StreamlineEntries {
       setFavourite({
         favourite: isFav,
         callback: checkIfFavourite,
-        type: stateLocal.active,
+        type: item.type,
         filter: (o) => {
-          return o.href === item.href && o.adminUrl === item.adminUrl;
+          return isMenu
+            ? o.href === item.href && o.adminUrl === item.adminUrl
+            : o.ID === item.ID && o.siteId === item.siteId;
         },
         path: (o) => {
           return o.type === item.type && o.siteId === item.siteId;
         },
         pathFav: (o) => {
-          return o.path === item.path && o.siteId === item.siteId;
+          return isMenu
+            ? o.path === item.path && o.siteId === item.siteId
+            : o.ID === item.ID &&
+                o.siteId === item.siteId &&
+                o.post_title === item.post_title;
         },
       });
 
@@ -358,47 +383,97 @@ export class StreamlineEntries {
       });
     };
 
+    const onClickPostsEditToggle = (state) => {
+      this.editing = {
+        ...this.editing,
+        [item.ID]: state,
+      };
+
+      const button = this.el.shadowRoot.querySelector(
+        `[data-row="${item.ID}"] button`
+      );
+
+      if (state) {
+        button.classList.add('!opacity-100');
+      } else {
+        button.classList.remove('!opacity-100');
+        this.el.shadowRoot
+          .querySelectorAll(`[data-row="${item.ID}"] input`)
+          .forEach((item) => (item as HTMLInputElement).blur());
+      }
+    };
+
     const onClick = () =>
       isHistory ? onClickHistory() : isSite ? onClickSites() : false;
 
+    const dropdown = [
+      { text: isFav ? 'Unfavourite' : 'Favourite', onClick: setFav },
+      isPost && {
+        text: isEdit ? 'Save' : 'Edit',
+        onClick: isEdit
+          ? () => onClickPostsEditToggle(false)
+          : () => onClickPostsEditToggle(true),
+      },
+      isPost && { text: 'View' },
+    ];
+
+    const rowClass = 'text-sm font-medium text-slate-600 h-[42px]';
+
     return (
-      <li class={`relative focus-within:bg-slate-50`}>
+      <li class={`relative`} data-row={item.ID}>
         <a
-          tabindex={0}
           data-focus={true}
+          tabindex={isEdit ? -1 : 0}
           href={item.href && item.href}
           class={{
             [this.px]: true,
-            'relative cursor-pointer focus-white flex items-center flex-wrap cursor-pointer w-full inline-block py-3 text-sm font-medium text-slate-600 peer hover:text-blue-500 hover:bg-slate-50':
+            [rowClass]: true,
+            'relative focus-white flex items-center flex-wrap cursor-pointer w-full inline-block peer hover:text-blue-500 hover:bg-slate-50':
               true,
-            'pointer-events-none': isCurrentSite && isSite,
+            'pointer-events-none': (isCurrentSite && isSite) || isEdit,
           }}
           onClick={onClick}
           onMouseDown={(e) => e.preventDefault()}
         >
           {isFav && stateLocal.active !== 'fav' && (
             <span
-              class={`text-red-500 mr-2 inline-block absolute left-px scale-50 sm:scale-75 sm:left-2`}
+              class={`text-red-500 mr-2 inline-block absolute left-px scale-50 max-w-4/5 truncate sm:scale-75 sm:left-2 lg:left-4`}
             >
               <IconHeart />
             </span>
           )}
-          {isTable ? (
-            <span class="grid grid-cols-[1fr_1fr_1fr] gap-2 w-full">
-              {table.map((item) => {
-                return <span>{item}</span>;
-              })}
-            </span>
-          ) : (
-            item.name
-          )}
+          {!isTable && item.name}
         </a>
+        {isTable && (
+          <div
+            class={`${this.px} grid grid-cols-[1fr_1fr_1fr] gap-2 w-full absolute top-0 pointer-events-none`}
+          >
+            {table.map((itemNested) => {
+              return (
+                <div class={`h-[42px] flex items-center relative`}>
+                  <input
+                    type="text"
+                    tabindex={itemNested.id && isEdit ? 0 : -1}
+                    disabled={!itemNested.id && isEdit}
+                    class={{
+                      [rowClass]: true,
+                      'pointer-events-none leading-none select-text absolute top-0 left-0 focus-none w-4/5 bg-transparent':
+                        true,
+                      // @ts-ignore
+                      '!text-green-500 !pointer-events-auto':
+                        isEdit && itemNested.id,
+                    }}
+                    value={itemNested.text}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
         {isDropdown && (
           <Dropdown
             classOuter={`w-12 absolute top-0 right-3 sm:right-6 lg:right-8 peer-hover:opacity-100`}
-            items={[
-              { text: isFav ? 'Unfavourite' : 'Favourite', onClick: setFav },
-            ]}
+            items={dropdown}
           />
         )}
       </li>
@@ -452,7 +527,7 @@ export class StreamlineEntries {
               })}
             </div>
           )}
-          <ul data-focus-parent={true}>
+          <ul>
             {Object.values(item.children as unknown).map(
               (itemInner, indexInner) => {
                 return itemInner.children ? (

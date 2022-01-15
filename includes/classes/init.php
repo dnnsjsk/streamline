@@ -24,7 +24,6 @@ class Init
         self::injectData();
         self::addContainer();
         self::adminBar();
-        //self::registerUserMeta();
     }
 
     /**
@@ -209,6 +208,7 @@ class Init
                         get_edit_post_link($post->ID)
                     );
                     $post->name = $post->post_title;
+                    $post->type = 'post';
                     if (
                         is_multisite() &&
                         function_exists("restore_current_blog")
@@ -350,25 +350,5 @@ class Init
                 ],
             ]);
         });
-    }
-
-    /**
-     * Register user meta for REST.
-     *
-     * @date    02/01/2022
-     * @since   1.0.25
-     */
-    private function registerUserMeta()
-    {
-        register_meta("user", "streamline_search_history_sites", [
-            "type" => "array",
-            "single" => true,
-            "show_in_rest" => true,
-        ]);
-        register_meta("user", "streamline_search_history_posts", [
-            "type" => "array",
-            "single" => true,
-            "show_in_rest" => true,
-        ]);
     }
 }

@@ -36,7 +36,7 @@ export class StreamlineSidebar {
         <IconWordPress />
       ) : type === 'site' ? (
         <IconSites />
-      ) : type === 'network' ? (
+      ) : type === 'networkMenu' ? (
         <IconNetwork />
       ) : type === 'menu' ? (
         <IconMenu />
@@ -73,7 +73,7 @@ export class StreamlineSidebar {
             true,
           'focus-darker mr-auto bg-[#020204] text-white fill-current h-[var(--sl-side-w)] w-[calc(var(--sl-side-w))] hover:bg-[#080d17] sm:mr-0 sm:h-[64px] sm:min-h-[64px]':
             type === 'wordpress',
-          '!justify-items-center !content-center text-slate-200 hover:text-blue-400 lg:!justify-items-start !grid focus-dark w-full w-full sm:w-[var(--sl-side-w)] sm:h-[var(--sl-side-w)] sm:min-h-[var(--sl-side-w)] lg:h-[48px] lg:min-h-[48px]':
+          'focus-dark !justify-items-center !content-center text-slate-200 hover:text-blue-400 lg:!justify-items-start !grid focus-dark w-full w-full sm:w-[var(--sl-side-w)] sm:h-[var(--sl-side-w)] sm:min-h-[var(--sl-side-w)] lg:h-[48px] lg:min-h-[48px]':
             type !== 'wordpress',
           'sm:!grid-rows-[20px,20px] lg:!grid-rows-1 lg:grid-cols-[32px,1fr] lg:px-5':
             type !== 'settings' && type !== 'wordpress',

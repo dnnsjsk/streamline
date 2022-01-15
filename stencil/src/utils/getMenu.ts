@@ -76,8 +76,8 @@ export function getMenu(obj = {} as any) {
     ];
 
     if (isNetwork) {
-      state.entriesNetwork = data;
-      state.entriesNetworkActive = data;
+      state.entriesNetworkMenu = data;
+      state.entriesNetworkMenuActive = data;
     } else {
       state.entriesMenu = data;
       state.entriesMenuActive = data;
@@ -100,7 +100,7 @@ export function getMenu(obj = {} as any) {
         resetView();
 
         // console.log(state.entriesMenu);
-        // console.log(state.entriesNetwork);
+        // console.log(state.entriesNetworkMenu);
       })
       .catch(() => {});
     // @ts-ignore

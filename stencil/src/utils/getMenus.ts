@@ -7,7 +7,10 @@ export function getMenus() {
     getMenu({ network: false, adminUrl: state.data.adminUrl });
   }
 
-  if (stateLocal.active === 'network' && state.entriesNetwork.length === 0) {
+  if (
+    stateLocal.active === 'networkMenu' &&
+    state.entriesNetworkMenu.length === 0
+  ) {
     getMenu({ network: true });
   }
 }

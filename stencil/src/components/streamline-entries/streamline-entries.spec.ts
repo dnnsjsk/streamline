@@ -1,6 +1,5 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { StreamlineEntries } from './streamline-entries';
-import { StreamlineButton } from '../streamline-button/streamline-button';
 import { StreamlinePost } from '../streamline-post/streamline-post';
 import { dispose, state } from '../../store/internal';
 import { disposeLocal, stateLocal } from '../../store/local';
@@ -65,7 +64,7 @@ describe('Render entries with', () => {
     it('and all favourites are removed until there is none left', async () => {
       stateLocal.active = 'fav';
       const page = await newSpecPage({
-        components: [StreamlineEntries, StreamlineButton],
+        components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
@@ -161,7 +160,7 @@ describe('Render entries with', () => {
     it('and three elements are favourites', async () => {
       stateLocal.active = 'menu';
       const page = await newSpecPage({
-        components: [StreamlineEntries, StreamlineButton],
+        components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
       await page.waitForChanges();

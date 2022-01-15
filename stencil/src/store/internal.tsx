@@ -39,8 +39,8 @@ const { state, dispose, onChange } = createStore({
   entriesMenu: [],
   entriesMenuActive: [],
   entriesMenuCurrentPath: '',
-  entriesNetwork: [],
-  entriesNetworkActive: [],
+  entriesNetworkMenu: [],
+  entriesNetworkMenuActive: [],
   entriesPost: [],
   entriesPostActive: [],
   entriesPostIsQuery: false,
@@ -164,7 +164,7 @@ const { state, dispose, onChange } = createStore({
   isSearchFocus: true,
   isSlash: false,
   focusIndex: -1,
-  menus: ['site', 'network', 'fav', 'menu', 'post', 'settings'],
+  menus: ['site', 'networkMenu', 'fav', 'menu', 'post', 'settings'],
   menu: {
     site: {
       name: 'site',
@@ -177,8 +177,8 @@ const { state, dispose, onChange } = createStore({
       <p>After searching and selecting a site, the <strong>menu</strong> tab will show the admin menu of the chosen site, while the <strong>post</strong> tab makes it possible to search for posts of the respective subsite.</p>
       `,
     },
-    network: {
-      name: 'network',
+    networkMenu: {
+      name: 'networkMenu',
       // @ts-ignore
       condition: window.streamlineData.network && !isTest,
       text: 'Network',

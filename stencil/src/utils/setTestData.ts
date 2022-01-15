@@ -1487,8 +1487,8 @@ export function setTestData() {
   stateLocal.active = 'menu';
   state.entriesSite = site;
   state.entriesSiteActive = site;
-  state.entriesNetwork = network;
-  state.entriesNetworkActive = network;
+  state.entriesNetworkMenu = network;
+  state.entriesNetworkMenuActive = network;
   state.entriesMenu = menu;
   state.entriesMenuActive = menu;
   state.entriesFav = fav;
