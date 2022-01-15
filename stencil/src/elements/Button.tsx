@@ -9,7 +9,7 @@ export function Button(props) {
       class={{
         'focus-out inline-flex items-center justify-center font-semibold text-xs':
           true,
-        'px-3 py-2 bg-blue-500 border-blue-500 text-white hover:bg-blue-600 hover:border-blue-600 sm:px-4':
+        'px-3 py-2 bg-blue-600 border-blue-600 text-white hover:bg-blue-700 hover:border-blue-700 sm:px-4':
           props.primary,
         'px-2 py-1 bg-white border border-slate-200 text-slate-600 hover:text-slate-50 hover:bg-slate-900 hover:border-slate-900 sm:px-3 sm:py-1.5':
           !props.primary,

@@ -15,7 +15,7 @@ Do things faster.
 
 == Changelog ==
 
-= 1.0.25 =
+= 1.1.0 =
 * Enhancement: faster rendering performance by using less web components
 * Enhancement: remove <streamline-box> component wrapper
 * Enhancement: show sidebar at bottom on smaller screen sizes

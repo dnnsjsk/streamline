@@ -508,7 +508,7 @@ export class StreamlineEntries {
     const dropdown = [
       !isEdit && { text: isFav ? 'Unfavourite' : 'Favourite', onClick: setFav },
       isPost && {
-        text: isEdit ? 'Save' : 'Edit',
+        text: isEdit ? 'Save' : 'Edit Inline',
         onClick: isEdit
           ? () => onClickPostsEditToggle(false)
           : () => onClickPostsEditToggle(true),
@@ -518,7 +518,8 @@ export class StreamlineEntries {
           text: 'Cancel',
           onClick: onClickPostsCancel,
         },
-      isPost && !isEdit && { text: 'View' },
+      isPost && !isEdit && { text: 'View Post', href: item.guid },
+      isPost && !isEdit && { text: 'Edit Post', href: atob(item.hrefEdit) },
     ];
 
     const rowClass = 'text-sm font-medium text-slate-600 h-[42px]';
@@ -528,11 +529,11 @@ export class StreamlineEntries {
         <a
           data-focus={true}
           tabindex={isEdit ? -1 : 0}
-          href={item.href && item.href}
+          href={item.href || item.guid}
           class={{
             [this.px]: true,
             [rowClass]: true,
-            'relative focus-white flex items-center flex-wrap cursor-pointer w-full inline-block peer hover:text-blue-500 hover:bg-slate-50':
+            'relative focus-white flex items-center flex-wrap cursor-pointer w-full inline-block peer hover:text-blue-600 hover:bg-slate-50':
               true,
             'pointer-events-none': (isCurrentSite && isSite) || isEdit,
           }}
@@ -550,7 +551,7 @@ export class StreamlineEntries {
                 </span>
               ) : (
                 <span
-                  class={`text-green-600 inline-block scale-75 sm:scale-100`}
+                  class={`text-green-600 inline-block scale-50 sm:scale-100`}
                 >
                   <IconCheck />
                 </span>
@@ -561,7 +562,7 @@ export class StreamlineEntries {
         </a>
         {isTable && (
           <div
-            class={`${this.px} grid grid-cols-[1fr_1fr_1fr] gap-2 w-full absolute top-0 pointer-events-none`}
+            class={`${this.px} grid grid-cols-[1fr_1fr_1fr] gap-2 w-full absolute top-0 pointer-events-none text-slate-700 peer-hover:text-blue-600`}
           >
             {table.map((itemNested) => {
               return (
@@ -577,7 +578,6 @@ export class StreamlineEntries {
                       // @ts-ignore
                       'text-green-600 !pointer-events-auto placeholder-rose-600':
                         isEdit && itemNested.id,
-                      'text-slate-600': !isEdit && !itemNested.id,
                     }}
                     value={itemNested.text}
                     placeholder="No value"
@@ -687,35 +687,6 @@ export class StreamlineEntries {
     );
   };
 
-  // @ts-ignore
-  private post = (arr = []) => {
-    return Object.values(this.getArr(arr, 'post') as unknown).map((item) => {
-      return (
-        <div>
-          {this.getHeader(item)}
-          <ul class={`mt-3 sm:mt-6`}>
-            {Object.values(item.children as unknown).map((itemInner) => {
-              return (
-                <li class={`${this.border} flex flex-col mb-3`}>
-                  <streamline-post
-                    data-focus={true}
-                    href-edit={itemInner.hrefEdit}
-                    href-view={itemInner.guid}
-                    post-id={itemInner.ID}
-                    post-title={itemInner.post_title}
-                    post-type={itemInner.post_type}
-                    post-slug={itemInner.post_name}
-                    site-id={itemInner.siteId}
-                  />
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      );
-    });
-  };
-
   private settingsOnChange = (id, type, value) => {
     state.entriesSettingsSave = {
       ...state.entriesSettingsSave,
@@ -771,36 +742,73 @@ export class StreamlineEntries {
                               >
                                 <label
                                   htmlFor={`setting-${itemSub.id}`}
-                                  class={`w-full grid grid-cols-[75px,1fr] gap-6 select-none group ${
-                                    itemSub.choices ? '' : 'cursor-pointer'
-                                  }`}
+                                  class={{
+                                    'cursor-pointer w-full grid gap-2 select-none group sm:grid-cols-[100px,1fr] sm:gap-6':
+                                      true,
+                                    'cursor-pointer': !itemSub.choices,
+                                  }}
                                 >
                                   <div
                                     class={`relative mt-0.5 inline-block h-[max-content] w-[max-content] focus-in-white-out`}
                                   >
-                                    <input
-                                      data-focus={true}
-                                      type="checkbox"
-                                      id={`setting-${itemSub.id}`}
-                                      class="sr-only peer"
-                                      checked={
-                                        state.entriesSettingsLoad[itemSub.id]
-                                          .default
-                                      }
-                                      onInput={(e) =>
-                                        this.settingsOnChange(
-                                          itemSub.id,
-                                          'default',
-                                          (e.target as HTMLInputElement).checked
-                                        )
-                                      }
-                                    />
-                                    <div
-                                      class={`block bg-slate-300 w-14 h-5 transition ease-in-out duration-200 group-hover:bg-slate-400 peer-checked:bg-blue-500`}
-                                    />
-                                    <div
-                                      class={`dot absolute left-1 top-1 bg-white w-3 h-3 transition ease-in-out duration-200`}
-                                    />
+                                    {itemSub.choices ? (
+                                      <select
+                                        data-focus={true}
+                                        class="text-xs focus-none cursor-pointer w-[100px]"
+                                        onInput={(e) =>
+                                          this.settingsOnChange(
+                                            itemSub.id,
+                                            'default',
+                                            (e.target as HTMLInputElement).value
+                                          )
+                                        }
+                                      >
+                                        {Object.entries(itemSub.choices).map(
+                                          ([key, value]) => {
+                                            return (
+                                              <option
+                                                selected={
+                                                  state.entriesSettingsLoad[
+                                                    itemSub.id
+                                                  ].default === key
+                                                }
+                                                value={key}
+                                              >
+                                                {value}
+                                              </option>
+                                            );
+                                          }
+                                        )}
+                                      </select>
+                                    ) : (
+                                      [
+                                        <input
+                                          data-focus={true}
+                                          type="checkbox"
+                                          id={`setting-${itemSub.id}`}
+                                          class="sr-only peer"
+                                          checked={
+                                            state.entriesSettingsLoad[
+                                              itemSub.id
+                                            ].default
+                                          }
+                                          onInput={(e) =>
+                                            this.settingsOnChange(
+                                              itemSub.id,
+                                              'default',
+                                              (e.target as HTMLInputElement)
+                                                .checked
+                                            )
+                                          }
+                                        />,
+                                        <div
+                                          class={`block bg-slate-300 w-14 h-5 transition ease-in-out duration-200 group-hover:bg-slate-400 peer-checked:bg-blue-600`}
+                                        />,
+                                        <div
+                                          class={`dot absolute left-1 top-1 bg-white w-3 h-3 transition ease-in-out duration-200`}
+                                        />,
+                                      ]
+                                    )}
                                   </div>
                                   <div class={`w-full`}>
                                     <div

@@ -48,9 +48,22 @@ export class StreamlineContainer {
     });
     state.entriesSettingsSave = state.entriesSettingsLoad;
 
+    if (!state.menus.includes(stateLocal.active)) {
+      stateLocal.active = 'menu';
+    } else if (
+      state.entriesSettingsLoad.behaviourDefaultTab.default !== 'last'
+    ) {
+      stateLocal.active = state.entriesSettingsLoad.behaviourDefaultTab.default;
+    }
+
     document.addEventListener('keydown', (e) => {
       if (e.key === 'k' && getMetaKey(e)) {
         e.preventDefault();
+        if (state.entriesSettingsLoad.behaviourDefaultTab.default !== 'last') {
+          stateLocal.active =
+            state.entriesSettingsLoad.behaviourDefaultTab.default;
+          getMenus();
+        }
         state.visible = !state.visible;
       }
 

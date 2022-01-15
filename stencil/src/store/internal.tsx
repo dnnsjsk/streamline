@@ -88,6 +88,26 @@ const { state, dispose, onChange } = createStore({
         {
           children: [
             {
+              id: 'behaviourDefaultTab',
+              name: 'Default tab',
+              nameParent: 'Behaviour',
+              label: 'Which tab should be opened by default when opening app',
+              choices: {
+                last: 'Last',
+                site: 'Site',
+                networkMenu: 'Network',
+                fav: 'Faves',
+                menu: 'Menu',
+                post: 'Post',
+                settings: 'Settings',
+              },
+            },
+          ],
+          name: 'Behaviour',
+        },
+        {
+          children: [
+            {
               id: 'searchResetInput',
               name: 'Reset search',
               nameParent: 'Searchbar',
@@ -131,6 +151,9 @@ const { state, dispose, onChange } = createStore({
     },
     keyExit: {
       default: true,
+    },
+    behaviourDefaultTab: {
+      default: 'last',
     },
     searchResetInput: {
       default: true,
