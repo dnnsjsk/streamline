@@ -1,6 +1,5 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { StreamlineEntries } from './streamline-entries';
-import { StreamlinePost } from '../streamline-post/streamline-post';
 import { dispose, state } from '../../store/internal';
 import { disposeLocal, stateLocal } from '../../store/local';
 import { setData } from '../../test/setData';
@@ -12,20 +11,6 @@ beforeEach(async () => {
 });
 
 describe('Render entries with', () => {
-  // eslint-disable-next-line jest/no-commented-out-tests
-  /*
-  it("mode set to 'slash'", async () => {
-    state.isSlash = true;
-    stateLocal.active = 'menu';
-    const page = await newSpecPage({
-      components: [StreamlineEntries],
-      html: `<streamline-entries></streamline-entries>`,
-    });
-    const el = page.doc.querySelector('streamline-entries').shadowRoot;
-    const length = el.querySelectorAll('li').length;
-    expect(length).toBe(2);
-  });
-   */
   describe('dot menu', () => {
     it("mode set to 'help'", async () => {
       state.isHelp = true;
@@ -230,7 +215,7 @@ describe('Render entries with', () => {
     it('and three elements are favourites', async () => {
       stateLocal.active = 'post';
       const page = await newSpecPage({
-        components: [StreamlineEntries, StreamlinePost],
+        components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
       await page.waitForChanges();

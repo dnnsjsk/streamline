@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, h, Element, State } from '@stencil/core';
 import { state } from '../../store/internal';
-import { stateLocal } from '../../store/local';
+import { stateLocal, onChangeLocal } from '../../store/local';
 import { setEntries } from '../../utils/setEntries';
 import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
 import { Loader } from '../../elements/Loader';
@@ -17,11 +17,12 @@ import { getMenus } from '../../utils/getMenus';
 import { getMenu } from '../../utils/getMenu';
 import { getMetaKey } from '../../utils/getMetaKey';
 import { doQuery } from '../../utils/doQuery';
-import { someDeep } from 'deepdash-es/standalone';
+import { findDeep, someDeep } from 'deepdash-es/standalone';
 import { setFavourite } from '../../utils/setFavourite';
 import { Dropdown } from '../../elements/Dropdown';
 import { Button } from '../../elements/Button';
 import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
+import { set } from 'lodash-es';
 
 /**
  * Entries.
@@ -66,6 +67,10 @@ export class StreamlineEntries {
           this.cycleEntries('up');
         }
       }
+    });
+
+    onChangeLocal('active', () => {
+      this.editing = {};
     });
   }
 
@@ -280,7 +285,8 @@ export class StreamlineEntries {
   private row = (item) => {
     let isFav = false;
 
-    const isEdit = this.editing?.[item.ID];
+    const isEdit = this.editing?.[item.ID]?.active;
+
     const isSite = item.blog_id;
     const isHistory = item.type === 'history';
     const isPost = item.type === 'post';
@@ -293,16 +299,7 @@ export class StreamlineEntries {
     const table = isSite
       ? [
           {
-            text: (
-              <span class="flex items-center">
-                {isCurrentSite && (
-                  <span class={`text-green-500 mr-2`}>
-                    <IconCheck />
-                  </span>
-                )}
-                {item.domain}
-              </span>
-            ),
+            text: item.domain,
           },
           {
             text: item.path,
@@ -383,23 +380,125 @@ export class StreamlineEntries {
       });
     };
 
-    const onClickPostsEditToggle = (state) => {
+    const onClickPostsEditToggle = (edit) => {
+      const isSaveable =
+        this.el.shadowRoot.querySelectorAll(
+          `[data-row="${item.ID}"] input:placeholder-shown`
+        ).length >= 1;
+
+      if (!edit && isSaveable) {
+        return false;
+      }
+
       this.editing = {
         ...this.editing,
-        [item.ID]: state,
+        [item.ID]: {
+          ...this.editing?.[item.ID],
+          values: Object.fromEntries(
+            [
+              ...this.el.shadowRoot.querySelectorAll(
+                `[data-row="${item.ID}"] input[data-id]`
+              ),
+            ].map((item) => [
+              [item.getAttribute('data-id')],
+              {
+                defaultValue: (item as HTMLInputElement).value,
+              },
+            ])
+          ),
+          active: edit,
+        },
       };
 
       const button = this.el.shadowRoot.querySelector(
         `[data-row="${item.ID}"] button`
       );
 
-      if (state) {
+      if (edit) {
         button.classList.add('!opacity-100');
+        state.isSearch = false;
       } else {
         button.classList.remove('!opacity-100');
+        state.isSearch = true;
+
+        const obj = {
+          postId: item.ID,
+          siteId: item.siteId,
+          values: {},
+        };
         this.el.shadowRoot
-          .querySelectorAll(`[data-row="${item.ID}"] input`)
-          .forEach((item) => (item as HTMLInputElement).blur());
+          .querySelectorAll(`[data-row="${item.ID}"] input[data-id]`)
+          .forEach((itemNested) => {
+            const key = itemNested.getAttribute('data-id');
+            obj.values[key] = (itemNested as HTMLInputElement).value;
+          });
+
+        [
+          'entriesFav',
+          'entriesFavActive',
+          'entriesPost',
+          'entriesPostActive',
+        ].forEach((itemNested) => {
+          state[itemNested].forEach(() => {
+            const newFavs = [...state[itemNested]];
+            const path = findDeep(
+              newFavs,
+              (o) => {
+                return o.siteId === item.siteId && o.ID === item.ID;
+              },
+              {
+                childrenPath: ['children'],
+              }
+            );
+            if (path) {
+              const currentPath = path.context['_item'].strPath;
+              set(newFavs, `${currentPath}.name`, obj.values['post_title']);
+              set(
+                newFavs,
+                `${currentPath}.post_title`,
+                obj.values['post_title']
+              );
+              set(newFavs, `${currentPath}.post_name`, obj.values['post_name']);
+
+              state[itemNested] = newFavs;
+            }
+          });
+        });
+
+        if (!state.test) {
+          fetchAjax({
+            type: 'post',
+            query: obj,
+          });
+        }
+      }
+
+      this.el.shadowRoot
+        .querySelectorAll(`[data-row="${item.ID}"] input`)
+        .forEach((item) => (item as HTMLInputElement).blur());
+    };
+
+    const onClickPostsCancel = () => {
+      this.editing = {
+        ...this.editing,
+        [item.ID]: {
+          ...this.editing?.[item.ID],
+          active: false,
+        },
+      };
+
+      this.el.shadowRoot
+        .querySelectorAll(`[data-row="${item.ID}"] input[data-id]`)
+        .forEach((itemNested) => {
+          (itemNested as HTMLInputElement).value =
+            this.editing[item.ID].values[
+              itemNested.getAttribute('data-id')
+            ].defaultValue;
+          (itemNested as HTMLInputElement).blur();
+        });
+
+      if (JSON.stringify(this.editing).indexOf('"active":true') === -1) {
+        state.isSearch = true;
       }
     };
 
@@ -407,14 +506,19 @@ export class StreamlineEntries {
       isHistory ? onClickHistory() : isSite ? onClickSites() : false;
 
     const dropdown = [
-      { text: isFav ? 'Unfavourite' : 'Favourite', onClick: setFav },
+      !isEdit && { text: isFav ? 'Unfavourite' : 'Favourite', onClick: setFav },
       isPost && {
         text: isEdit ? 'Save' : 'Edit',
         onClick: isEdit
           ? () => onClickPostsEditToggle(false)
           : () => onClickPostsEditToggle(true),
       },
-      isPost && { text: 'View' },
+      isPost &&
+        isEdit && {
+          text: 'Cancel',
+          onClick: onClickPostsCancel,
+        },
+      isPost && !isEdit && { text: 'View' },
     ];
 
     const rowClass = 'text-sm font-medium text-slate-600 h-[42px]';
@@ -435,11 +539,22 @@ export class StreamlineEntries {
           onClick={onClick}
           onMouseDown={(e) => e.preventDefault()}
         >
-          {isFav && stateLocal.active !== 'fav' && (
+          {((isFav && stateLocal.active !== 'fav') ||
+            (isCurrentSite && stateLocal.active === 'site')) && (
             <span
-              class={`text-red-500 mr-2 inline-block absolute left-px scale-50 max-w-4/5 truncate sm:scale-75 sm:left-2 lg:left-4`}
+              class={`mr-2 flex absolute left-px top-1/2 -translate-y-1/2 sm:left-2 lg:left-4`}
             >
-              <IconHeart />
+              {isFav ? (
+                <span class={`text-rose-500 inline-block scale-50 sm:scale-75`}>
+                  <IconHeart />
+                </span>
+              ) : (
+                <span
+                  class={`text-green-600 inline-block scale-75 sm:scale-100`}
+                >
+                  <IconCheck />
+                </span>
+              )}
             </span>
           )}
           {!isTable && item.name}
@@ -452,18 +567,20 @@ export class StreamlineEntries {
               return (
                 <div class={`h-[42px] flex items-center relative`}>
                   <input
+                    data-id={itemNested.id}
                     type="text"
                     tabindex={itemNested.id && isEdit ? 0 : -1}
                     disabled={!itemNested.id && isEdit}
                     class={{
-                      [rowClass]: true,
-                      'pointer-events-none leading-none select-text absolute top-0 left-0 focus-none w-4/5 bg-transparent':
+                      'text-sm font-medium h-[42px] pointer-events-none leading-none select-text absolute -top-px left-0 focus-none w-4/5 bg-transparent':
                         true,
                       // @ts-ignore
-                      '!text-green-500 !pointer-events-auto':
+                      'text-green-600 !pointer-events-auto placeholder-rose-600':
                         isEdit && itemNested.id,
+                      'text-slate-600': !isEdit && !itemNested.id,
                     }}
                     value={itemNested.text}
+                    placeholder="No value"
                   />
                 </div>
               );

@@ -9,15 +9,9 @@
 
  - [streamline-container](../streamline-container)
 
-### Depends on
-
-- [streamline-post](../streamline-post)
-
 ### Graph
 ```mermaid
 graph TD;
-  streamline-entries --> streamline-post
-  streamline-post --> streamline-input
   streamline-container --> streamline-entries
   style streamline-entries fill:#f9f,stroke:#333,stroke-width:4px
 ```

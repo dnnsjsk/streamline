@@ -48,8 +48,6 @@ graph TD;
   streamline-container --> streamline-sidebar
   streamline-container --> streamline-search
   streamline-container --> streamline-entries
-  streamline-entries --> streamline-post
-  streamline-post --> streamline-input
   style streamline-container fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

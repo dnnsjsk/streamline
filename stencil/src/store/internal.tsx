@@ -277,4 +277,4 @@ onChange('visible', (value) => {
   }
 });
 
-export { state, dispose, onChange as onChangeInternal };
+export { state, dispose, onChange };

@@ -14,23 +14,6 @@ export namespace Components {
     }
     interface StreamlineEntries {
     }
-    interface StreamlineInput {
-        "ident": string;
-        "invalid": boolean;
-        "placeholder": string;
-        "value": string;
-    }
-    interface StreamlinePost {
-        "favourite": boolean;
-        "hrefEdit": string;
-        "hrefView": string;
-        "invalid": boolean;
-        "postId": number;
-        "postSlug": string;
-        "postTitle": string;
-        "postType": string;
-        "siteId": number;
-    }
     interface StreamlineSearch {
     }
     interface StreamlineSidebar {
@@ -49,18 +32,6 @@ declare global {
         prototype: HTMLStreamlineEntriesElement;
         new (): HTMLStreamlineEntriesElement;
     };
-    interface HTMLStreamlineInputElement extends Components.StreamlineInput, HTMLStencilElement {
-    }
-    var HTMLStreamlineInputElement: {
-        prototype: HTMLStreamlineInputElement;
-        new (): HTMLStreamlineInputElement;
-    };
-    interface HTMLStreamlinePostElement extends Components.StreamlinePost, HTMLStencilElement {
-    }
-    var HTMLStreamlinePostElement: {
-        prototype: HTMLStreamlinePostElement;
-        new (): HTMLStreamlinePostElement;
-    };
     interface HTMLStreamlineSearchElement extends Components.StreamlineSearch, HTMLStencilElement {
     }
     var HTMLStreamlineSearchElement: {
@@ -76,8 +47,6 @@ declare global {
     interface HTMLElementTagNameMap {
         "streamline-container": HTMLStreamlineContainerElement;
         "streamline-entries": HTMLStreamlineEntriesElement;
-        "streamline-input": HTMLStreamlineInputElement;
-        "streamline-post": HTMLStreamlinePostElement;
         "streamline-search": HTMLStreamlineSearchElement;
         "streamline-sidebar": HTMLStreamlineSidebarElement;
     }
@@ -89,23 +58,6 @@ declare namespace LocalJSX {
     }
     interface StreamlineEntries {
     }
-    interface StreamlineInput {
-        "ident"?: string;
-        "invalid"?: boolean;
-        "placeholder"?: string;
-        "value"?: string;
-    }
-    interface StreamlinePost {
-        "favourite"?: boolean;
-        "hrefEdit"?: string;
-        "hrefView"?: string;
-        "invalid"?: boolean;
-        "postId"?: number;
-        "postSlug"?: string;
-        "postTitle"?: string;
-        "postType"?: string;
-        "siteId"?: number;
-    }
     interface StreamlineSearch {
     }
     interface StreamlineSidebar {
@@ -113,8 +65,6 @@ declare namespace LocalJSX {
     interface IntrinsicElements {
         "streamline-container": StreamlineContainer;
         "streamline-entries": StreamlineEntries;
-        "streamline-input": StreamlineInput;
-        "streamline-post": StreamlinePost;
         "streamline-search": StreamlineSearch;
         "streamline-sidebar": StreamlineSidebar;
     }
@@ -125,8 +75,6 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "streamline-container": LocalJSX.StreamlineContainer & JSXBase.HTMLAttributes<HTMLStreamlineContainerElement>;
             "streamline-entries": LocalJSX.StreamlineEntries & JSXBase.HTMLAttributes<HTMLStreamlineEntriesElement>;
-            "streamline-input": LocalJSX.StreamlineInput & JSXBase.HTMLAttributes<HTMLStreamlineInputElement>;
-            "streamline-post": LocalJSX.StreamlinePost & JSXBase.HTMLAttributes<HTMLStreamlinePostElement>;
             "streamline-search": LocalJSX.StreamlineSearch & JSXBase.HTMLAttributes<HTMLStreamlineSearchElement>;
             "streamline-sidebar": LocalJSX.StreamlineSidebar & JSXBase.HTMLAttributes<HTMLStreamlineSidebarElement>;
         }

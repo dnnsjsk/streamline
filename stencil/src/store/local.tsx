@@ -11,4 +11,8 @@ onChange('active', () => {
   setSearchPlaceholder();
 });
 
-export { state as stateLocal, dispose as disposeLocal };
+export {
+  state as stateLocal,
+  dispose as disposeLocal,
+  onChange as onChangeLocal,
+};
