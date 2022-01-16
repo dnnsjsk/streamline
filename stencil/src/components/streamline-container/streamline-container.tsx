@@ -5,10 +5,8 @@ import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
 import { stateLocal } from '../../store/local';
 import { getMenus } from '../../utils/getMenus';
 import { getMetaKey } from '../../utils/getMetaKey';
-import { setTestData } from '../../utils/setTestData';
 import { setEntries } from '../../utils/setEntries';
 import { focusSearch } from '../../utils/focusSearch';
-import { Dropdown } from '../../elements/Dropdown';
 
 /**
  * Container.
@@ -28,10 +26,6 @@ export class StreamlineContainer {
   @Prop({ reflect: true, mutable: true }) visible: boolean;
 
   connectedCallback() {
-    if (state.test) {
-      setTestData();
-    }
-
     setEntries();
 
     state.isMac = this.mac || navigator.userAgent.indexOf('Mac OS X') !== -1;
@@ -133,6 +127,13 @@ export class StreamlineContainer {
   };
 
   @Method()
+  async setData(data) {
+    Object.entries(data).forEach(([key, value]) => {
+      state[key] = value;
+    });
+  }
+
+  @Method()
   async toggle() {
     state.visible = !state.visible;
   }
@@ -181,13 +182,14 @@ export class StreamlineContainer {
                 class={`bg-slate-50 grid grid-cols-[1fr,var(--sl-side-w)] lg:grid-cols-[1fr,64px]`}
               >
                 <streamline-search class="h-[var(--sl-side-w)] w-full lg:h-[64px]" />
-                <Dropdown
-                  classOuter={`w-full relative !opacity-100 !pointer-events-auto`}
+                <streamline-dropdown
+                  type="main"
                   items={[
                     {
                       text: state.isHelp ? 'Close help' : 'Show help',
                       onClick: () => {
                         state.isHelp = !state.isHelp;
+                        state.isSearch = !state.isSearch;
                       },
                     },
                   ]}

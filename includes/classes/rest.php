@@ -2,6 +2,8 @@
 
 namespace Streamline;
 
+use stdClass;
+
 /**
  * Rest class.
  *
@@ -77,7 +79,7 @@ class Rest
     function updateSearches($userId, $type, $value)
     {
         $key = "streamline_search_history_" . $type;
-        $meta = get_user_meta($userId, $key, true) ?: [];
+        $meta = array_slice(get_user_meta($userId, $key, true) ?: [], 0, 50);
         $meta[] = $value;
         delete_user_meta($userId, $key);
         update_user_meta($userId, $key, $meta);
@@ -96,18 +98,25 @@ class Rest
         ]);
 
         $index = -1;
+        $newArr = [];
+
         foreach ($arr as $site) {
+            $obj = new stdClass();
             $id = $site->blog_id;
             $index++;
             switch_to_blog($id);
-            $arr[$index]->name = get_bloginfo("name");
-            $arr[$index]->siteId = $id;
-            $arr[$index]->adminUrl = get_admin_url();
-            $arr[$index]->path = get_site($id)->path;
+            $obj->adminUrl = get_admin_url();
+            $obj->domain = $site->domain;
+            $obj->name = get_bloginfo("name");
+            $obj->path = get_site($id)->path;
+            $obj->siteId = $id;
+            $obj->type = "site";
+            $newArr[$index] = $obj;
             restore_current_blog();
         }
 
-        $get["children"] = $arr;
+        $get["children"] = $newArr;
+        $get["isMultisite"] = is_multisite();
 
         self::updateSearches($data["userId"], "sites", $data["value"]);
 
@@ -127,37 +136,46 @@ class Rest
             "post_type" => "any",
         ];
 
+        $index = -1;
+        $newArr = [];
+
         if (is_multisite() && function_exists("get_site")) {
             switch_to_blog($data["siteId"]);
             $path = get_site(get_current_blog_id())->path;
             $arr = get_posts($args);
+
+            foreach ($arr as $post) {
+                $index++;
+                $postData = Init::getPostData($post);
+                $postData->hrefEdit = base64_encode(
+                    get_edit_post_link($post->ID)
+                );
+                $postData->siteId = $data["siteId"];
+                $arr[$index] = $postData;
+            }
             restore_current_blog();
         } else {
             $path = "/";
             $arr = get_posts($args);
+
+            foreach ($arr as $post) {
+                $index++;
+                $postData = Init::getPostData($post);
+                $postData->hrefEdit = base64_encode(
+                    get_edit_post_link($post->ID)
+                );
+                $postData->siteId = $data["siteId"];
+                $arr[$index] = $postData;
+            }
         }
 
-        $index = -1;
-        foreach ($arr as $post) {
-            $index++;
-            $arr[$index]->hrefEdit = base64_encode(
-                get_edit_post_link($post->ID)
-            );
-            $arr[$index]->name = $post->post_title;
-            $arr[$index]->siteId = get_current_blog_id();
-            $arr[$index]->sitePath = $path;
-            $arr[$index]->type = "post";
-            unset($arr[$index]->post_content);
-        }
-
-        $newArr = [];
         foreach ($arr as $post) {
             $newArr[$post->ID] = $post;
         }
 
         $get["children"] = $newArr;
-        $get["path"] = $path;
         $get["isMultisite"] = is_multisite();
+        $get["path"] = $path;
 
         self::updateSearches($data["userId"], "posts", $data["value"]);
 

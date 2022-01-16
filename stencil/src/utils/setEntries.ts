@@ -31,4 +31,6 @@ export function setEntries() {
                 : state.entriesPostCurrentPath,
           },
         ];
+
+  // console.log(state[`entries${capitalizeFirstLetter(stateLocal.active)}Active`]);
 }

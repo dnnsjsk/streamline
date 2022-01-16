@@ -16,13 +16,22 @@ Do things faster.
 == Changelog ==
 
 = 1.1.0 =
+* Enhancement: better color contrast throughout
 * Enhancement: faster rendering performance by using less web components
-* Enhancement: remove <streamline-box> component wrapper
-* Enhancement: show sidebar at bottom on smaller screen sizes
+* Enhancement: prevent test data from ending up in JS bundles
+* Enhancement: reduce JSON data being sent back from servers for sites and posts
+* Enhancement: remove <streamline-box> component
+* Enhancement: remove <streamline-button> component
+* Enhancement: remove <streamline-input> component
+* Enhancement: remove <streamline-post> component
+* Enhancement: show sidebar at bottom on smaller screen size
 * Fix: 'Enter' button not showing after switching tabs (post/site)
 * Fix: correct context menu positioning on lower screen sizes
 * Fix: don't allow empty search queries
+* Fix: favourites not working correctly when post names are the same on multisite
 * Fix: minor UI bugs
+* Fix: show correct post edit link after adding to favourites
+* New: default tab setting
 * New: reset search query button for sites and posts
 * New: show history of searches for sites and posts
 * New: unified UI for all data types

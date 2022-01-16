@@ -1,5 +1,4 @@
 import { state } from '../store/internal';
-import { getQuery } from './getQuery';
 import { setSearchPlaceholder } from './setSearchPlaceholder';
 import { resetView } from './resetView';
 import { capitalizeFirstLetter } from './capitalizeFirstLetter';
@@ -24,22 +23,31 @@ export function doQuery(obj) {
   )
     .then((response) => response.json())
     .then((data) => {
-      getQuery({
-        children: data.children,
-        isMultisite: data.isMultisite,
-        path: state.currentSite.path,
-        search: obj.search,
-        type: obj.type,
-        queryValue: obj.search,
-      });
+      state[`entries${capitalizeFirstLetter(obj.type)}`] = [
+        {
+          children: data.children,
+          isMultisite: data.isMultisite,
+          path: state.currentSite.path,
+          queryValue: obj.search,
+          siteId: state.currentSite.id,
+          type: obj.type,
+        },
+      ];
+
+      if (obj.type === 'post') {
+        state.entriesPostCurrentPath = state.currentSite.path;
+      }
+
       setSearchPlaceholder();
       state[`historySearches${capitalizeFirstLetter(obj.type)}`] = [
         obj.search,
         ...state[`historySearches${capitalizeFirstLetter(obj.type)}`],
       ];
+
       if (obj.callback === 'posts' || obj.callback === 'sites') {
         resetView();
       }
+
       state.isLoading = false;
       state[`entries${capitalizeFirstLetter(stateLocal.active)}IsQuery`] = true;
     });

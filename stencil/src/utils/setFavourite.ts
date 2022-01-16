@@ -78,8 +78,6 @@ export function setFavourite(obj) {
     setEntries();
   }
 
-  // console.log(state.entriesFav);
-
   if (!state.test) {
     fetchAjax({
       type: 'favourites',

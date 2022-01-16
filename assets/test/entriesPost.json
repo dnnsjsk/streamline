@@ -1,0 +1,66 @@
+[
+  {
+    "children": {
+      "97": {
+        "ID": 97,
+        "guid": "https://fabrikat.local/spx/?page_id=97",
+        "post_name": "changelog",
+        "post_type": "page",
+        "post_title": "Changelog",
+        "name": "Changelog",
+        "type": "post",
+        "hrefEdit": "aHR0cHM6Ly9mYWJyaWthdC5sb2NhbC9zcHgvd3AtYWRtaW4vcG9zdC5waHA/cG9zdD05NyZhbXA7YWN0aW9uPWVkaXQ=",
+        "siteId": "303"
+      },
+      "684": {
+        "ID": 684,
+        "guid": "https://fabrikat.local/spx/?p=684",
+        "post_name": "how-to-blog-correctly",
+        "post_type": "post",
+        "post_title": "How to blog correctly",
+        "name": "How to blog correctly",
+        "type": "post",
+        "hrefEdit": "aHR0cHM6Ly9mYWJyaWthdC5sb2NhbC9zcHgvd3AtYWRtaW4vcG9zdC5waHA/cG9zdD02ODQmYW1wO2FjdGlvbj1lZGl0",
+        "siteId": "303"
+      },
+      "1179": {
+        "ID": 1179,
+        "guid": "https://fabrikat.local/spx/?p=1179",
+        "post_name": "time-to-log-out",
+        "post_type": "post",
+        "post_title": "Time to log out",
+        "name": "Time to log out",
+        "type": "post",
+        "hrefEdit": "aHR0cHM6Ly9mYWJyaWthdC5sb2NhbC9zcHgvd3AtYWRtaW4vcG9zdC5waHA/cG9zdD0xMTc5JmFtcDthY3Rpb249ZWRpdA==",
+        "siteId": "303"
+      },
+      "9999": {
+        "ID": 99999,
+        "guid": "https://fabrikat.local/spx/?p=1179",
+        "post_name": "logical-thinking",
+        "post_type": "post",
+        "post_title": "Logical thinking for dummies",
+        "name": "Logical thinking for dummies",
+        "type": "post",
+        "hrefEdit": "aHR0cHM6Ly9mYWJyaWthdC5sb2NhbC9zcHgvd3AtYWRtaW4vcG9zdC5waHA/cG9zdD0xMTc5JmFtcDthY3Rpb249ZWRpdA==",
+        "siteId": "303"
+      },
+      "10000": {
+        "ID": 10000,
+        "guid": "https://fabrikat.local/spx/?p=1179",
+        "post_name": "developing-streamline",
+        "post_type": "post",
+        "post_title": "Developing Streamline",
+        "name": "Developing Streamline",
+        "type": "post",
+        "hrefEdit": "aHR0cHM6Ly9mYWJyaWthdC5sb2NhbC9zcHgvd3AtYWRtaW4vcG9zdC5waHA/cG9zdD0xMTc5JmFtcDthY3Rpb249ZWRpdA==",
+        "siteId": "303"
+      }
+    },
+    "isMultisite": true,
+    "path": "/spx/",
+    "queryValue": "documentation",
+    "siteId": "303",
+    "type": "post"
+  }
+]

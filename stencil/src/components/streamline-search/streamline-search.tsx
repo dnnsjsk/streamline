@@ -49,7 +49,9 @@ export class StreamlineSearch {
         state.isEnter = true;
         this.command = stateLocal.active;
       }
-    } else if (
+    }
+    /*
+    if (
       // (e.target.value.startsWith('/') && isLocalCommands()) ||
       e.target.value.startsWith('/')
     ) {
@@ -67,6 +69,7 @@ export class StreamlineSearch {
         state.isEnter = false;
       }
     }
+     */
   };
 
   private handleKeydown = (e) => {

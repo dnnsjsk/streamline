@@ -2,6 +2,8 @@
 
 namespace Streamline;
 
+use stdClass;
+
 /**
  * Init class.
  *
@@ -200,15 +202,10 @@ class Init
                     if (is_multisite() && function_exists("switch_to_blog")) {
                         switch_to_blog($post->siteId);
                     }
-                    $freshPost = get_post($post->ID);
-                    foreach ($freshPost as $k => $v) {
+                    $postData = self::getPostData($post);
+                    foreach ($postData as $k => $v) {
                         $post->$k = $v;
                     }
-                    $post->hrefEdit = base64_encode(
-                        get_edit_post_link($post->ID)
-                    );
-                    $post->name = $post->post_title;
-                    $post->type = 'post';
                     if (
                         is_multisite() &&
                         function_exists("restore_current_blog")
@@ -230,10 +227,10 @@ class Init
             "isNetwork" => is_network_admin(),
             "network" => !is_multisite() ? false : network_admin_url(),
             "settings" => json_encode($settings),
-            "siteId" => get_current_blog_id(),
+            "siteId" => strval(get_current_blog_id()),
             "sitePath" => is_multisite() ? $currentSite[0]->path : "/",
             "siteUrl" => get_site_url(),
-            "userId" => get_current_user_id(),
+            "userId" => strval(get_current_user_id()),
         ]);
         echo ";";
         // echo "console.log(JSON.parse(streamlineData.favourites));";
@@ -350,5 +347,25 @@ class Init
                 ],
             ]);
         });
+    }
+
+    /**
+     * Get post data.
+     *
+     * @date    15/01/2021
+     * @since   1.1.0
+     */
+    public static function getPostData($post): stdClass
+    {
+        $obj = new stdClass();
+        $obj->ID = $post->ID;
+        $obj->guid = $post->guid;
+        $obj->post_name = $post->post_name;
+        $obj->post_type = $post->post_type;
+        $obj->post_title = $post->post_title;
+        $obj->name = $post->post_title;
+        $obj->type = "post";
+
+        return $obj;
     }
 }

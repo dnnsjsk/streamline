@@ -111,7 +111,7 @@ export class StreamlineSidebar {
           class={`inner grid grid-flow-col h-full overflow-x-auto overflow-y-hidden w-[calc(100%-var(--sl-side-w))] sm:w-full sm:overflow-x-hidden sm:flex sm:flex-col sm:overflow-y-auto sm:h-[calc(100%-64px)]`}
         >
           {Object.values(state.menu).map((item) => {
-            return item['condition'] && this.button(item.name);
+            return item.condition && this.button(item.name);
           })}
         </div>
       </nav>

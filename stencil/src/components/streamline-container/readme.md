@@ -13,6 +13,16 @@
 
 ## Methods
 
+### `setData(data: any) => Promise<void>`
+
+
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
 ### `toggle() => Promise<void>`
 
 
@@ -40,6 +50,7 @@ Type: `Promise<void>`
 
 - [streamline-sidebar](../streamline-sidebar)
 - [streamline-search](../streamline-search)
+- [streamline-dropdown](../streamline-dropdown)
 - [streamline-entries](../streamline-entries)
 
 ### Graph
@@ -47,7 +58,9 @@ Type: `Promise<void>`
 graph TD;
   streamline-container --> streamline-sidebar
   streamline-container --> streamline-search
+  streamline-container --> streamline-dropdown
   streamline-container --> streamline-entries
+  streamline-entries --> streamline-dropdown
   style streamline-container fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

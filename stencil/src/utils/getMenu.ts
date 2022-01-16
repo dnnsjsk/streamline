@@ -98,35 +98,7 @@ export function getMenu(obj = {} as any) {
         const html = parser.parseFromString(data, 'text/html');
         get(html);
         resetView();
-
-        // console.log(state.entriesMenu);
-        // console.log(state.entriesNetworkMenu);
       })
       .catch(() => {});
-    // @ts-ignore
-    // eslint-disable-next-line no-undef
-    /*
-    fetch(streamline.ajax, {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: new Headers({
-        'Content-Type': 'application/x-www-form-urlencoded',
-      }),
-      body: `action=streamlineMenu&url=${
-        obj.adminUrl || state.data.adminUrl
-        // @ts-ignore
-        // eslint-disable-next-line no-undef
-      }&nonce=${streamline.nonce}`,
-    })
-      .then((response) => response.text())
-      .then((data) => {
-        const parser = new DOMParser();
-        const html = parser.parseFromString(data, 'text/html');
-        console.log(html);
-        get(html);
-        resetView();
-        stateLocal.active = 'menu';
-      });
-     */
   }
 }

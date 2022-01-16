@@ -8,9 +8,14 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface StreamlineContainer {
         "mac": boolean;
+        "setData": (data: any) => Promise<void>;
         "toggle": () => Promise<void>;
         "toggleTestFull": (type: any) => Promise<void>;
         "visible": boolean;
+    }
+    interface StreamlineDropdown {
+        "items": any[];
+        "type": string;
     }
     interface StreamlineEntries {
     }
@@ -25,6 +30,12 @@ declare global {
     var HTMLStreamlineContainerElement: {
         prototype: HTMLStreamlineContainerElement;
         new (): HTMLStreamlineContainerElement;
+    };
+    interface HTMLStreamlineDropdownElement extends Components.StreamlineDropdown, HTMLStencilElement {
+    }
+    var HTMLStreamlineDropdownElement: {
+        prototype: HTMLStreamlineDropdownElement;
+        new (): HTMLStreamlineDropdownElement;
     };
     interface HTMLStreamlineEntriesElement extends Components.StreamlineEntries, HTMLStencilElement {
     }
@@ -46,6 +57,7 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "streamline-container": HTMLStreamlineContainerElement;
+        "streamline-dropdown": HTMLStreamlineDropdownElement;
         "streamline-entries": HTMLStreamlineEntriesElement;
         "streamline-search": HTMLStreamlineSearchElement;
         "streamline-sidebar": HTMLStreamlineSidebarElement;
@@ -56,6 +68,10 @@ declare namespace LocalJSX {
         "mac"?: boolean;
         "visible"?: boolean;
     }
+    interface StreamlineDropdown {
+        "items"?: any[];
+        "type"?: string;
+    }
     interface StreamlineEntries {
     }
     interface StreamlineSearch {
@@ -64,6 +80,7 @@ declare namespace LocalJSX {
     }
     interface IntrinsicElements {
         "streamline-container": StreamlineContainer;
+        "streamline-dropdown": StreamlineDropdown;
         "streamline-entries": StreamlineEntries;
         "streamline-search": StreamlineSearch;
         "streamline-sidebar": StreamlineSidebar;
@@ -74,6 +91,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "streamline-container": LocalJSX.StreamlineContainer & JSXBase.HTMLAttributes<HTMLStreamlineContainerElement>;
+            "streamline-dropdown": LocalJSX.StreamlineDropdown & JSXBase.HTMLAttributes<HTMLStreamlineDropdownElement>;
             "streamline-entries": LocalJSX.StreamlineEntries & JSXBase.HTMLAttributes<HTMLStreamlineEntriesElement>;
             "streamline-search": LocalJSX.StreamlineSearch & JSXBase.HTMLAttributes<HTMLStreamlineSearchElement>;
             "streamline-sidebar": LocalJSX.StreamlineSidebar & JSXBase.HTMLAttributes<HTMLStreamlineSidebarElement>;

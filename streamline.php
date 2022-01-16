@@ -10,12 +10,12 @@
  * License URI: https://www.gnu.org/licenses/gpl-2.0.txt
  */
 
-define("STREAMLINE", __FILE__);
-define("STREAMLINE_DIR", __DIR__);
-define("STREAMLINE_STORE_URL", "http://wpstreamline.com");
-define("STREAMLINE_ITEM_ID", 45);
-define("STREAMLINE_ITEM_NAME", "Streamline");
-define("STREAMLINE_LICENSE_PAGE", "streamline");
+const STREAMLINE = __FILE__;
+const STREAMLINE_DIR = __DIR__;
+const STREAMLINE_STORE_URL = "http://wpstreamline.com";
+const STREAMLINE_ITEM_ID = 45;
+const STREAMLINE_ITEM_NAME = "Streamline";
+const STREAMLINE_LICENSE_PAGE = "streamline";
 
 use Streamline\Init;
 use Streamline\Rest;

@@ -19,7 +19,6 @@ import { getMetaKey } from '../../utils/getMetaKey';
 import { doQuery } from '../../utils/doQuery';
 import { findDeep, someDeep } from 'deepdash-es/standalone';
 import { setFavourite } from '../../utils/setFavourite';
-import { Dropdown } from '../../elements/Dropdown';
 import { Button } from '../../elements/Button';
 import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
 import { set } from 'lodash-es';
@@ -287,7 +286,7 @@ export class StreamlineEntries {
 
     const isEdit = this.editing?.[item.ID]?.active;
 
-    const isSite = item.blog_id;
+    const isSite = item.type === 'site';
     const isHistory = item.type === 'history';
     const isPost = item.type === 'post';
     const isMenu = item.type === 'menu' || item.type === 'networkMenu';
@@ -305,14 +304,14 @@ export class StreamlineEntries {
             text: item.path,
           },
           {
-            text: item.blog_id,
+            text: item.siteId,
           },
         ]
       : isPost
       ? [
           { text: item.post_title, id: 'post_title' },
-          { text: item.post_type },
           { text: item.post_name, id: 'post_name' },
+          { text: item.post_type },
         ]
       : [];
 
@@ -324,8 +323,12 @@ export class StreamlineEntries {
               state.entriesFav,
               (o) => {
                 return isMenu
-                  ? o?.path === item.path && o?.siteId === item.siteId
-                  : o?.ID === item.ID && o?.siteId === item.siteId;
+                  ? o?.path === item.path &&
+                      o?.siteId === item.siteId &&
+                      o.type === item.type
+                  : o?.ID === item.ID &&
+                      o?.siteId === item.siteId &&
+                      o.type === item.type;
               },
               { childrenPath: ['children'] }
             );
@@ -360,6 +363,7 @@ export class StreamlineEntries {
         callback: `${stateLocal.active}s`,
         type: stateLocal.active,
         search: item.name,
+        id: item.siteId,
       });
     };
 
@@ -371,6 +375,7 @@ export class StreamlineEntries {
 
       state.entriesPost = [];
       state.entriesPostActive = [];
+      state.entriesPostIsQuery = false;
 
       getMenu({
         adminUrl: item.adminUrl,
@@ -410,15 +415,15 @@ export class StreamlineEntries {
         },
       };
 
-      const button = this.el.shadowRoot.querySelector(
-        `[data-row="${item.ID}"] button`
+      const dropdownButton = this.el.shadowRoot.querySelector(
+        `[data-row="${item.ID}"] streamline-dropdown`
       );
 
       if (edit) {
-        button.classList.add('!opacity-100');
+        dropdownButton.classList.add('!opacity-100');
         state.isSearch = false;
       } else {
-        button.classList.remove('!opacity-100');
+        dropdownButton.classList.remove('!opacity-100');
         state.isSearch = true;
 
         const obj = {
@@ -588,8 +593,9 @@ export class StreamlineEntries {
           </div>
         )}
         {isDropdown && (
-          <Dropdown
-            classOuter={`w-12 absolute top-0 right-3 sm:right-6 lg:right-8 peer-hover:opacity-100`}
+          <streamline-dropdown
+            class="w-12 absolute block h-full top-0 right-4 sm:right-8 lg:right-12 opacity-0 focus-within:opacity-100 hover:opacity-100 peer-hover:opacity-100"
+            type="entry"
             items={dropdown}
           />
         )}
@@ -599,6 +605,7 @@ export class StreamlineEntries {
 
   private rows = (arr = []) => {
     const isHistory =
+      !state.test &&
       (stateLocal.active === 'post' || stateLocal.active === 'site') &&
       !state[`entries${capitalizeFirstLetter(stateLocal.active)}IsQuery`] &&
       state[`historySearches${capitalizeFirstLetter(stateLocal.active)}`]
@@ -622,7 +629,7 @@ export class StreamlineEntries {
         stateLocal.active === 'site'
           ? ['Domain', 'Path', 'ID']
           : item.type === 'post'
-          ? ['Title', 'Post type', 'Slug']
+          ? ['Title', 'Slug', 'Post type']
           : [];
 
       return (
@@ -766,16 +773,19 @@ export class StreamlineEntries {
                                         {Object.entries(itemSub.choices).map(
                                           ([key, value]) => {
                                             return (
-                                              <option
-                                                selected={
-                                                  state.entriesSettingsLoad[
-                                                    itemSub.id
-                                                  ].default === key
-                                                }
-                                                value={key}
-                                              >
-                                                {value}
-                                              </option>
+                                              (key === 'last' ||
+                                                state.menu[key].condition) && (
+                                                <option
+                                                  selected={
+                                                    state.entriesSettingsLoad[
+                                                      itemSub.id
+                                                    ].default === key
+                                                  }
+                                                  value={key}
+                                                >
+                                                  {value}
+                                                </option>
+                                              )
                                             );
                                           }
                                         )}
