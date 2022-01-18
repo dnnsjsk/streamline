@@ -139,34 +139,22 @@ class Rest
         $index = -1;
         $newArr = [];
 
-        if (is_multisite() && function_exists("get_site")) {
+        if (is_multisite() && function_exists("switch_to_blog")) {
             switch_to_blog($data["siteId"]);
-            $path = get_site(get_current_blog_id())->path;
-            $arr = get_posts($args);
+        }
+        $path = get_site(get_current_blog_id())->path;
+        $arr = get_posts($args);
 
-            foreach ($arr as $post) {
-                $index++;
-                $postData = Init::getPostData($post);
-                $postData->hrefEdit = base64_encode(
-                    get_edit_post_link($post->ID)
-                );
-                $postData->siteId = $data["siteId"];
-                $arr[$index] = $postData;
-            }
+        foreach ($arr as $post) {
+            $index++;
+            $postData = Init::getPostData($post);
+            $postData->hrefEdit = base64_encode(get_edit_post_link($post->ID));
+            $postData->siteId = $data["siteId"];
+            $arr[$index] = $postData;
+        }
+
+        if (is_multisite() && function_exists("restore_current_blog")) {
             restore_current_blog();
-        } else {
-            $path = "/";
-            $arr = get_posts($args);
-
-            foreach ($arr as $post) {
-                $index++;
-                $postData = Init::getPostData($post);
-                $postData->hrefEdit = base64_encode(
-                    get_edit_post_link($post->ID)
-                );
-                $postData->siteId = $data["siteId"];
-                $arr[$index] = $postData;
-            }
         }
 
         foreach ($arr as $post) {

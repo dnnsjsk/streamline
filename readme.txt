@@ -17,6 +17,7 @@ Do things faster.
 
 = 1.1.0 =
 * Enhancement: better color contrast throughout
+* Enhancement: don't use transforms to center container
 * Enhancement: faster rendering performance by using less web components
 * Enhancement: prevent test data from ending up in JS bundles
 * Enhancement: reduce JSON data being sent back from servers for sites and posts
@@ -24,6 +25,7 @@ Do things faster.
 * Enhancement: remove <streamline-button> component
 * Enhancement: remove <streamline-input> component
 * Enhancement: remove <streamline-post> component
+* Enhancement: remove body-scroll-lock library and replace with custom code
 * Enhancement: show sidebar at bottom on smaller screen size
 * Fix: 'Enter' button not showing after switching tabs (post/site)
 * Fix: correct context menu positioning on lower screen sizes
@@ -34,6 +36,7 @@ Do things faster.
 * New: default tab setting
 * New: reset search query button for sites and posts
 * New: show history of searches for sites and posts
+* New: show post status for posts
 * New: unified UI for all data types
 
 = 1.0.24 =

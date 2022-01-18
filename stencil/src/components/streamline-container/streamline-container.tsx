@@ -160,7 +160,7 @@ export class StreamlineContainer {
     return (
       <Host>
         <div
-          class={`fixed top-0 left-0 w-full h-full z-[9999999999999999] ${
+          class={`fixed flex items-center justify-center top-0 left-0 w-full h-full z-[9999999999999999] ${
             state.visible
               ? 'block pointer-events-auto'
               : 'hidden pointer-events-none'
@@ -175,14 +175,14 @@ export class StreamlineContainer {
             }`}
             onClick={() => (state.visible = false)}
           />
-          <div class="inner w-full h-full absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[1024px] max-h-[700px] bg-white overflow-hidden grid">
+          <div class="inner w-full h-full absolute max-w-[1024px] max-h-[700px] bg-white overflow-hidden grid">
             <streamline-sidebar />
             <div class="h-full w-full absolute bottom-[var(--sl-side-w)] h-[calc(100%-var(--sl-side-w))] sm:bottom-0 sm:left-[var(--sl-side-w)] sm:w-[calc(100%-var(--sl-side-w))] sm:top-0 sm:h-full">
               <div
                 class={`bg-slate-50 grid grid-cols-[1fr,var(--sl-side-w)] lg:grid-cols-[1fr,64px]`}
               >
                 <streamline-search class="h-[var(--sl-side-w)] w-full lg:h-[64px]" />
-                <streamline-dropdown
+                <streamline-ui-dropdown
                   type="main"
                   items={[
                     {
@@ -197,6 +197,7 @@ export class StreamlineContainer {
               </div>
               <streamline-entries />
             </div>
+            <streamline-ui-drawer class="sm:hidden" />
           </div>
         </div>
       </Host>

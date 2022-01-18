@@ -50,17 +50,20 @@ Type: `Promise<void>`
 
 - [streamline-sidebar](../streamline-sidebar)
 - [streamline-search](../streamline-search)
-- [streamline-dropdown](../streamline-dropdown)
+- [streamline-ui-dropdown](../ui/streamline-ui-dropdown)
 - [streamline-entries](../streamline-entries)
+- [streamline-ui-drawer](../ui/streamline-ui-drawer)
 
 ### Graph
 ```mermaid
 graph TD;
   streamline-container --> streamline-sidebar
   streamline-container --> streamline-search
-  streamline-container --> streamline-dropdown
+  streamline-container --> streamline-ui-dropdown
   streamline-container --> streamline-entries
-  streamline-entries --> streamline-dropdown
+  streamline-container --> streamline-ui-drawer
+  streamline-entries --> streamline-ui-dropdown
+  streamline-ui-drawer --> streamline-ui-input
   style streamline-container fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

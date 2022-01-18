@@ -11,12 +11,12 @@
 
 ### Depends on
 
-- [streamline-dropdown](../streamline-dropdown)
+- [streamline-ui-dropdown](../ui/streamline-ui-dropdown)
 
 ### Graph
 ```mermaid
 graph TD;
-  streamline-entries --> streamline-dropdown
+  streamline-entries --> streamline-ui-dropdown
   streamline-container --> streamline-entries
   style streamline-entries fill:#f9f,stroke:#333,stroke-width:4px
 ```

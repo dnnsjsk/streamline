@@ -1,7 +1,5 @@
 # streamline-dropdown
 
-
-
 <!-- Auto Generated Below -->
 
 
@@ -17,15 +15,15 @@
 
 ### Used by
 
- - [streamline-container](../streamline-container)
- - [streamline-entries](../streamline-entries)
+ - [streamline-container](../../streamline-container)
+ - [streamline-entries](../../streamline-entries)
 
 ### Graph
 ```mermaid
 graph TD;
-  streamline-container --> streamline-dropdown
-  streamline-entries --> streamline-dropdown
-  style streamline-dropdown fill:#f9f,stroke:#333,stroke-width:4px
+  streamline-container --> streamline-ui-dropdown
+  streamline-entries --> streamline-ui-dropdown
+  style streamline-ui-dropdown fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
 ----------------------------------------------

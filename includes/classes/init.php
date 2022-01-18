@@ -202,7 +202,8 @@ class Init
                     if (is_multisite() && function_exists("switch_to_blog")) {
                         switch_to_blog($post->siteId);
                     }
-                    $postData = self::getPostData($post);
+                    $freshPost = get_post($post->ID);
+                    $postData = self::getPostData($freshPost);
                     foreach ($postData as $k => $v) {
                         $post->$k = $v;
                     }
@@ -363,6 +364,7 @@ class Init
         $obj->post_name = $post->post_name;
         $obj->post_type = $post->post_type;
         $obj->post_title = $post->post_title;
+        $obj->post_status = $post->post_status;
         $obj->name = $post->post_title;
         $obj->type = "post";
 

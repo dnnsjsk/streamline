@@ -7,19 +7,23 @@ export function Button(props) {
     <button
       {...props}
       class={{
-        'focus-out inline-flex items-center justify-center font-semibold text-xs':
+        [props.class]: props.class,
+        'focus-out inline-flex items-center justify-center font-semibold text-sm':
           true,
-        'px-3 py-2 bg-blue-600 border-blue-600 text-white hover:bg-blue-700 hover:border-blue-700 sm:px-4':
-          props.primary,
+        'px-3 py-2 sm:px-4':
+          props.type === 'primary' || props.type === 'secondary',
+        'bg-blue-600 text-white border-blue-600 text-white hover:bg-blue-700 hover:border-blue-700':
+          props.type === 'primary',
+        'bg-slate-200 text-slate-600 border-slate-200 hover:bg-slate-900 hover:border-slate-900 hover:text-white':
+          props.type === 'secondary',
         'px-2 py-1 bg-white border border-slate-200 text-slate-600 hover:text-slate-50 hover:bg-slate-900 hover:border-slate-900 sm:px-3 sm:py-1.5':
-          !props.primary,
-        [props.classOuter]: props.classOuter,
+          props.type === 'tertiary',
         'opacity-50 pointer-events-none': props.invalid,
-        '!w-5 !h-5 absolute !p-0 mr-2': props.back,
+        '!w-5 !h-5 absolute !p-0 mr-2': props.type === 'back',
       }}
       onMouseDown={(e) => e.preventDefault()}
     >
-      {props.text === 'Search' && (
+      {props.text === 'search' && (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="fill-current w-2 rotate-90 ml-1 mr-2 origin-right-center"
@@ -31,7 +35,7 @@ export function Button(props) {
           />
         </svg>
       )}
-      {props.back ? <IconTimes /> : props.text}
+      {props.type === 'back' ? <IconTimes /> : props.text}
     </button>
   );
 }

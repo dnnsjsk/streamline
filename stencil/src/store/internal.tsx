@@ -1,7 +1,7 @@
 import { createStore } from '@stencil/store';
 import equal from 'fast-deep-equal/es6';
 import { focusSearch } from '../utils/focusSearch';
-import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
+import { blurSearch } from '../utils/blurSearch';
 
 const isTest = document
   .querySelector('streamline-container')
@@ -32,6 +32,14 @@ const { state, dispose, onChange } = createStore({
   },
   // @ts-ignore
   data: window.streamlineData,
+  drawer: {
+    active: false,
+    items: [],
+    onSave: null,
+    postType: '',
+    status: '',
+    title: '',
+  },
   // @ts-ignore
   entriesFav: JSON.parse(window.streamlineData.favourites),
   // @ts-ignore
@@ -249,12 +257,17 @@ const { state, dispose, onChange } = createStore({
       `,
     },
   },
+  scroll: 0,
   searchNoValue: 'No entries found',
   searchPlaceholder: '',
   searchValue: '',
   test: isTest,
   testFull: false,
   visible: false,
+});
+
+onChange('drawer', () => {
+  blurSearch();
 });
 
 onChange('entriesSettingsSave', (value) => {
@@ -279,11 +292,17 @@ onChange('visible', (value) => {
 
   if (el) {
     if (value === true) {
-      disableBodyScroll(el, {
-        reserveScrollBarGap: true,
-      });
+      state.scroll = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.overflow = 'hidden';
+      document.body.style.left = '0';
+      document.body.style.top = '0';
     } else {
-      clearAllBodyScrollLocks();
+      document.body.style.removeProperty('position');
+      document.body.style.removeProperty('overflow');
+      document.body.style.removeProperty('left');
+      document.body.style.removeProperty('top');
+      window.scroll(0, state.scroll);
     }
   }
 

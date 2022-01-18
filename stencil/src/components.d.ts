@@ -13,15 +13,23 @@ export namespace Components {
         "toggleTestFull": (type: any) => Promise<void>;
         "visible": boolean;
     }
-    interface StreamlineDropdown {
-        "items": any[];
-        "type": string;
-    }
     interface StreamlineEntries {
     }
     interface StreamlineSearch {
     }
     interface StreamlineSidebar {
+    }
+    interface StreamlineUiDrawer {
+    }
+    interface StreamlineUiDropdown {
+        "items": any[];
+        "type": string;
+    }
+    interface StreamlineUiInput {
+        "invalid": boolean;
+        "label": string;
+        "uid": string;
+        "value": string;
     }
 }
 declare global {
@@ -30,12 +38,6 @@ declare global {
     var HTMLStreamlineContainerElement: {
         prototype: HTMLStreamlineContainerElement;
         new (): HTMLStreamlineContainerElement;
-    };
-    interface HTMLStreamlineDropdownElement extends Components.StreamlineDropdown, HTMLStencilElement {
-    }
-    var HTMLStreamlineDropdownElement: {
-        prototype: HTMLStreamlineDropdownElement;
-        new (): HTMLStreamlineDropdownElement;
     };
     interface HTMLStreamlineEntriesElement extends Components.StreamlineEntries, HTMLStencilElement {
     }
@@ -55,12 +57,32 @@ declare global {
         prototype: HTMLStreamlineSidebarElement;
         new (): HTMLStreamlineSidebarElement;
     };
+    interface HTMLStreamlineUiDrawerElement extends Components.StreamlineUiDrawer, HTMLStencilElement {
+    }
+    var HTMLStreamlineUiDrawerElement: {
+        prototype: HTMLStreamlineUiDrawerElement;
+        new (): HTMLStreamlineUiDrawerElement;
+    };
+    interface HTMLStreamlineUiDropdownElement extends Components.StreamlineUiDropdown, HTMLStencilElement {
+    }
+    var HTMLStreamlineUiDropdownElement: {
+        prototype: HTMLStreamlineUiDropdownElement;
+        new (): HTMLStreamlineUiDropdownElement;
+    };
+    interface HTMLStreamlineUiInputElement extends Components.StreamlineUiInput, HTMLStencilElement {
+    }
+    var HTMLStreamlineUiInputElement: {
+        prototype: HTMLStreamlineUiInputElement;
+        new (): HTMLStreamlineUiInputElement;
+    };
     interface HTMLElementTagNameMap {
         "streamline-container": HTMLStreamlineContainerElement;
-        "streamline-dropdown": HTMLStreamlineDropdownElement;
         "streamline-entries": HTMLStreamlineEntriesElement;
         "streamline-search": HTMLStreamlineSearchElement;
         "streamline-sidebar": HTMLStreamlineSidebarElement;
+        "streamline-ui-drawer": HTMLStreamlineUiDrawerElement;
+        "streamline-ui-dropdown": HTMLStreamlineUiDropdownElement;
+        "streamline-ui-input": HTMLStreamlineUiInputElement;
     }
 }
 declare namespace LocalJSX {
@@ -68,22 +90,32 @@ declare namespace LocalJSX {
         "mac"?: boolean;
         "visible"?: boolean;
     }
-    interface StreamlineDropdown {
-        "items"?: any[];
-        "type"?: string;
-    }
     interface StreamlineEntries {
     }
     interface StreamlineSearch {
     }
     interface StreamlineSidebar {
     }
+    interface StreamlineUiDrawer {
+    }
+    interface StreamlineUiDropdown {
+        "items"?: any[];
+        "type"?: string;
+    }
+    interface StreamlineUiInput {
+        "invalid"?: boolean;
+        "label"?: string;
+        "uid"?: string;
+        "value"?: string;
+    }
     interface IntrinsicElements {
         "streamline-container": StreamlineContainer;
-        "streamline-dropdown": StreamlineDropdown;
         "streamline-entries": StreamlineEntries;
         "streamline-search": StreamlineSearch;
         "streamline-sidebar": StreamlineSidebar;
+        "streamline-ui-drawer": StreamlineUiDrawer;
+        "streamline-ui-dropdown": StreamlineUiDropdown;
+        "streamline-ui-input": StreamlineUiInput;
     }
 }
 export { LocalJSX as JSX };
@@ -91,10 +123,12 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "streamline-container": LocalJSX.StreamlineContainer & JSXBase.HTMLAttributes<HTMLStreamlineContainerElement>;
-            "streamline-dropdown": LocalJSX.StreamlineDropdown & JSXBase.HTMLAttributes<HTMLStreamlineDropdownElement>;
             "streamline-entries": LocalJSX.StreamlineEntries & JSXBase.HTMLAttributes<HTMLStreamlineEntriesElement>;
             "streamline-search": LocalJSX.StreamlineSearch & JSXBase.HTMLAttributes<HTMLStreamlineSearchElement>;
             "streamline-sidebar": LocalJSX.StreamlineSidebar & JSXBase.HTMLAttributes<HTMLStreamlineSidebarElement>;
+            "streamline-ui-drawer": LocalJSX.StreamlineUiDrawer & JSXBase.HTMLAttributes<HTMLStreamlineUiDrawerElement>;
+            "streamline-ui-dropdown": LocalJSX.StreamlineUiDropdown & JSXBase.HTMLAttributes<HTMLStreamlineUiDropdownElement>;
+            "streamline-ui-input": LocalJSX.StreamlineUiInput & JSXBase.HTMLAttributes<HTMLStreamlineUiInputElement>;
         }
     }
 }

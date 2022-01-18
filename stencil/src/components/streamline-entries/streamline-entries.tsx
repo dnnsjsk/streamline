@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
-import { Component, h, Element, State } from '@stencil/core';
+import { Component, Element, h, State } from '@stencil/core';
 import { state } from '../../store/internal';
-import { stateLocal, onChangeLocal } from '../../store/local';
+import { onChangeLocal, stateLocal } from '../../store/local';
 import { setEntries } from '../../utils/setEntries';
 import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
 import { Loader } from '../../elements/Loader';
@@ -21,7 +21,7 @@ import { findDeep, someDeep } from 'deepdash-es/standalone';
 import { setFavourite } from '../../utils/setFavourite';
 import { Button } from '../../elements/Button';
 import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
-import { set } from 'lodash-es';
+import { set, isString, camelCase } from 'lodash-es';
 
 /**
  * Entries.
@@ -146,7 +146,7 @@ export class StreamlineEntries {
             state.entriesFavActive[0].children.length !== 0 &&
             !state.isHelp && (
               <div
-                class={`flex-shrink-0 text-slate-400 flex items-center justify-center mr-3`}
+                class={`flex-shrink-0 text-blue-600 flex items-center justify-center mr-3`}
               >
                 {item.type === 'menu' && <IconMenu />}
                 {item.type === 'networkMenu' && <IconNetwork />}
@@ -155,7 +155,7 @@ export class StreamlineEntries {
             )}
           {isQueryWithClose && (
             <Button
-              back
+              type="back"
               onClick={() => {
                 state[
                   `entries${capitalizeFirstLetter(stateLocal.active)}IsQuery`
@@ -261,7 +261,7 @@ export class StreamlineEntries {
                   }
                   tabindex={state.entriesSettingsHaveChanged ? 0 : -1}
                   invalid={!state.entriesSettingsHaveChanged}
-                  primary
+                  type="primary"
                   text={itemInner.text}
                 />
               )
@@ -281,7 +281,7 @@ export class StreamlineEntries {
     );
   };
 
-  private row = (item) => {
+  private row = (item, outerTable) => {
     let isFav = false;
 
     const isEdit = this.editing?.[item.ID]?.active;
@@ -309,6 +309,36 @@ export class StreamlineEntries {
         ]
       : isPost
       ? [
+          {
+            text: () => {
+              const isPublish = item.post_status === 'publish';
+              const isFuture = item.post_status === 'future';
+              const isDraft = item.post_status === 'draft';
+              const isPending = item.post_status === 'pending';
+              const isPrivate = item.post_status === 'private';
+              return (
+                <span
+                  class={{
+                    'px-2.5 py-1 text-xs uppercase font-semibold': true,
+                    'bg-green-100 text-green-600': isPublish,
+                    'bg-purple-100 text-purple-600': isFuture,
+                    'bg-yellow-100 text-yellow-600': isDraft,
+                    'bg-indigo-100 text-indigo-600': isPending,
+                    'border border-slate-500 text-slate-600': isPending,
+                    'bg-slate-100 text-slate-600':
+                      !isPublish &&
+                      !isFuture &&
+                      !isDraft &&
+                      !isPending &&
+                      !isPrivate,
+                  }}
+                >
+                  {item.post_status}
+                </span>
+              );
+            },
+            value: item.post_status,
+          },
           { text: item.post_title, id: 'post_title' },
           { text: item.post_name, id: 'post_name' },
           { text: item.post_type },
@@ -416,7 +446,7 @@ export class StreamlineEntries {
       };
 
       const dropdownButton = this.el.shadowRoot.querySelector(
-        `[data-row="${item.ID}"] streamline-dropdown`
+        `[data-row="${item.ID}"] streamline-ui-dropdown`
       );
 
       if (edit) {
@@ -484,6 +514,10 @@ export class StreamlineEntries {
     };
 
     const onClickPostsCancel = () => {
+      const dropdownButton = this.el.shadowRoot.querySelector(
+        `[data-row="${item.ID}"] streamline-ui-dropdown`
+      );
+
       this.editing = {
         ...this.editing,
         [item.ID]: {
@@ -502,13 +536,52 @@ export class StreamlineEntries {
           (itemNested as HTMLInputElement).blur();
         });
 
+      dropdownButton.classList.remove('!opacity-100');
+
       if (JSON.stringify(this.editing).indexOf('"active":true') === -1) {
         state.isSearch = true;
       }
     };
 
-    const onClick = () =>
-      isHistory ? onClickHistory() : isSite ? onClickSites() : false;
+    const onClick = (e) =>
+      isHistory
+        ? onClickHistory()
+        : isSite
+        ? onClickSites()
+        : isPost && window.innerWidth <= 639
+        ? e.preventDefault()
+        : false;
+
+    const onDblClick = (e) => {
+      if (isPost && window.innerWidth <= 639) {
+        e.preventDefault();
+        const obj = {} as any;
+        Object.values(table).forEach((item, index) => {
+          obj[camelCase(outerTable[index])] = {
+            value: item.value || item.text,
+            id: item.id,
+          };
+        });
+        state.drawer = {
+          ...state.drawer,
+          active: true,
+          title: `Editing: ${obj.title.value}`,
+          postType: obj.postType.value,
+          status: obj.postType.status,
+          items: Object.entries(obj as unknown)
+            .map(([key, value]) => {
+              return (
+                value.id && {
+                  id: value.id,
+                  value: item[value.id],
+                  label: key,
+                }
+              );
+            })
+            .filter((x) => x),
+        };
+      }
+    };
 
     const dropdown = [
       !isEdit && { text: isFav ? 'Unfavourite' : 'Favourite', onClick: setFav },
@@ -538,11 +611,12 @@ export class StreamlineEntries {
           class={{
             [this.px]: true,
             [rowClass]: true,
-            'relative focus-white flex items-center flex-wrap cursor-pointer w-full inline-block peer hover:text-blue-600 hover:bg-slate-50':
+            'relative focus-white flex items-center flex-wrap cursor-pointer w-full inline-block peer sm:hover:text-blue-600 sm:hover:bg-slate-50':
               true,
             'pointer-events-none': (isCurrentSite && isSite) || isEdit,
           }}
           onClick={onClick}
+          onDblClick={onDblClick}
           onMouseDown={(e) => e.preventDefault()}
         >
           {((isFav && stateLocal.active !== 'fav') ||
@@ -567,34 +641,38 @@ export class StreamlineEntries {
         </a>
         {isTable && (
           <div
-            class={`${this.px} grid grid-cols-[1fr_1fr_1fr] gap-2 w-full absolute top-0 pointer-events-none text-slate-700 peer-hover:text-blue-600`}
+            class={`${this.px} grid auto-cols-[minmax(150px,_1fr)] grid-flow-col gap-2 w-full absolute top-0 pointer-events-none text-slate-700 sm:peer-hover:text-blue-600`}
           >
             {table.map((itemNested) => {
               return (
                 <div class={`h-[42px] flex items-center relative`}>
-                  <input
-                    data-id={itemNested.id}
-                    type="text"
-                    tabindex={itemNested.id && isEdit ? 0 : -1}
-                    disabled={!itemNested.id && isEdit}
-                    class={{
-                      'text-sm font-medium h-[42px] pointer-events-none leading-none select-text absolute -top-px left-0 focus-none w-4/5 bg-transparent':
-                        true,
-                      // @ts-ignore
-                      'text-green-600 !pointer-events-auto placeholder-rose-600':
-                        isEdit && itemNested.id,
-                    }}
-                    value={itemNested.text}
-                    placeholder="No value"
-                  />
+                  {isString(itemNested.text) ? (
+                    <input
+                      data-id={itemNested.id}
+                      type="text"
+                      tabindex={itemNested.id && isEdit ? 0 : -1}
+                      disabled={!itemNested.id && isEdit}
+                      class={{
+                        'text-sm font-medium h-[42px] pointer-events-none leading-none select-text absolute -top-px left-0 focus-none w-4/5 bg-transparent':
+                          true,
+                        // @ts-ignore
+                        'text-green-600 !pointer-events-auto placeholder-rose-600':
+                          isEdit && itemNested.id,
+                      }}
+                      value={itemNested.text}
+                      placeholder="No value"
+                    />
+                  ) : (
+                    itemNested.text()
+                  )}
                 </div>
               );
             })}
           </div>
         )}
         {isDropdown && (
-          <streamline-dropdown
-            class="w-12 absolute block h-full top-0 right-4 sm:right-8 lg:right-12 opacity-0 focus-within:opacity-100 hover:opacity-100 peer-hover:opacity-100"
+          <streamline-ui-dropdown
+            class="hidden w-12 absolute block h-full top-0 right-4 opacity-0 focus-within:opacity-100 hover:opacity-100 peer-hover:opacity-100 sm:block sm:right-8 lg:right-12"
             type="entry"
             items={dropdown}
           />
@@ -625,11 +703,19 @@ export class StreamlineEntries {
       : this.getArr(arr, stateLocal.active);
 
     return Object.values(array as unknown).map((item) => {
+      const onScroll = (e) => {
+        this.el.shadowRoot.querySelector(`div[data-uid="${uid}"]`).scrollLeft =
+          Math.round(e.target.scrollLeft);
+      };
+
+      const uid =
+        Date.now().toString(36) + Math.random().toString(36).substr(2);
+
       const table =
         stateLocal.active === 'site'
           ? ['Domain', 'Path', 'ID']
           : item.type === 'post'
-          ? ['Title', 'Slug', 'Post type']
+          ? ['Status', 'Title', 'Slug', 'Post type']
           : [];
 
       return (
@@ -637,21 +723,34 @@ export class StreamlineEntries {
           {this.getHeader(item, true)}
           {(item.type === 'post' || item.type === 'site') && (
             <div
-              class={`${this.px} ${this.borderB} grid grid-cols-[1fr_1fr_1fr] sticky top-[63px] gap-2 z-10 bg-white sm:top-[67px]`}
+              data-uid={uid}
+              class={`${this.borderB} overflow-x-auto scrollbar-none pointer-events-none sticky top-[62px] z-10 bg-white sm:top-[67px]`}
             >
-              {table.map((item) => {
-                return (
-                  <span
-                    key={item}
-                    class="py-1.5 text-xs uppercase font-semibold font-slate-500"
-                  >
-                    {item}
-                  </span>
-                );
-              })}
+              <div
+                class={`${this.px} grid grid-flow-col auto-cols-[minmax(150px,_1fr)] gap-2`}
+              >
+                {table.map((item) => {
+                  return (
+                    <span
+                      key={item}
+                      class="py-1.5 text-xs uppercase font-semibold font-slate-500 whitespace-nowrap"
+                    >
+                      {item}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
           )}
-          <ul>
+          <ul
+            data-uid={uid}
+            onScroll={
+              item.type === 'post' || item.type === 'site'
+                ? (e) => onScroll(e)
+                : undefined
+            }
+            class="overflow-x-auto"
+          >
             {Object.values(item.children as unknown).map(
               (itemInner, indexInner) => {
                 return itemInner.children ? (
@@ -664,13 +763,13 @@ export class StreamlineEntries {
                     <ul>
                       {Object.values(itemInner.children as unknown).map(
                         (itemSub) => {
-                          return this.row(itemSub);
+                          return this.row(itemSub, table);
                         }
                       )}
                     </ul>
                   </li>
                 ) : (
-                  this.row(itemInner)
+                  this.row(itemInner, table)
                 );
               }
             )}
@@ -890,7 +989,7 @@ export class StreamlineEntries {
         ) : (
           <div
             tabindex={-1}
-            class={`focus-none inner pb-6 relative h-[calc(100%-var(--sl-side-w))] overflow-x-auto overflow-y-scroll w-full bg-white lg:pb-10 ${
+            class={`focus-none inner pb-6 relative h-[calc(100%-var(--sl-side-w))] overflow-y-scroll w-full bg-white lg:pb-10 ${
               state.isProcessing ? 'pointer-events-none opacity-50' : ''
             }`}
           >

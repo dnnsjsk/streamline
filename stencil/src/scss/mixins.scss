@@ -55,29 +55,50 @@
 }
 
 @mixin host {
+  box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
 
   * {
-    user-select: none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-  }
-}
-
-@mixin scrollbar() {
-  &::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    -webkit-overflow-scrolling: touch;
   }
 
-  &::-webkit-scrollbar-track {
-    background: #ffffff;
+  .overflow-x-auto,
+  .overflow-x-scroll,
+  .overflow-y-auto,
+  .overflow-y-scroll {
+    &:not(.scrollbar-none) {
+      &::-webkit-scrollbar {
+        width: 8px;
+        height: 4px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: #ffffff;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 0;
+      }
+    }
   }
 
-  &::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 0px;
+  .scrollbar-none {
+    &::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: transparent;
+    }
   }
 }

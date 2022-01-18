@@ -115,8 +115,8 @@ export class StreamlineSearch {
         {state.isSearch && [
           <input
             part="search"
-            class="select peer bg-transparent focus:outline-none w-full h-[var(--sl-side-w)] text-[18px] h-full w-full m-0 p-0 font-normal placeholder-slate-500 text-slate-900 px-9 lg:h-[64px] lg:px-12"
-            type="text"
+            class="peer bg-transparent focus:outline-none w-full h-[var(--sl-side-w)] text-[18px] h-full w-full m-0 p-0 font-normal placeholder-slate-500 text-slate-900 px-9 lg:h-[64px] lg:px-12"
+            type="search"
             placeholder={state.searchPlaceholder}
             value={state.searchValue}
             onInput={this.handleChange}
@@ -136,7 +136,7 @@ export class StreamlineSearch {
           </svg>,
           state.isEnter && (
             <div class="absolute right-3 -translate-y-1/2 top-1/2 sm:right-4">
-              <Button onClick={this.startQuery} text="Search" />
+              <Button onClick={this.startQuery} type="tertiary" text="Search" />
             </div>
           ),
         ]}
