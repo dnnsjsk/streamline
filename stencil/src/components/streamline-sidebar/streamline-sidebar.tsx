@@ -77,6 +77,7 @@ export class StreamlineSidebar {
             type !== 'wordpress',
           'sm:!grid-rows-[20px,20px] lg:!grid-rows-1 lg:grid-cols-[32px,1fr] lg:px-5':
             type !== 'settings' && type !== 'wordpress',
+          'mb-3': type === 'networkMenu',
           'sm:mt-auto': type === 'settings',
           'bg-slate-800 pointer-events-none': type === stateLocal.active,
         }}

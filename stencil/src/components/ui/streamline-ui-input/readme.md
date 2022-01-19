@@ -7,12 +7,13 @@
 
 ## Properties
 
-| Property  | Attribute | Description | Type      | Default     |
-| --------- | --------- | ----------- | --------- | ----------- |
-| `invalid` | `invalid` |             | `boolean` | `undefined` |
-| `label`   | `label`   |             | `string`  | `undefined` |
-| `uid`     | `uid`     |             | `string`  | `undefined` |
-| `value`   | `value`   |             | `string`  | `undefined` |
+| Property      | Attribute | Description | Type       | Default     |
+| ------------- | --------- | ----------- | ---------- | ----------- |
+| `handleInput` | --        |             | `Function` | `undefined` |
+| `invalid`     | `invalid` |             | `boolean`  | `undefined` |
+| `label`       | `label`   |             | `string`   | `undefined` |
+| `uid`         | `uid`     |             | `string`   | `undefined` |
+| `value`       | `value`   |             | `string`   | `undefined` |
 
 
 ## Dependencies

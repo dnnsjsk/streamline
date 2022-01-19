@@ -19,11 +19,11 @@ export function Button(props) {
         'px-2 py-1 bg-white border border-slate-200 text-slate-600 hover:text-slate-50 hover:bg-slate-900 hover:border-slate-900 sm:px-3 sm:py-1.5':
           props.type === 'tertiary',
         'opacity-50 pointer-events-none': props.invalid,
-        '!w-5 !h-5 absolute !p-0 mr-2': props.type === 'back',
+        'border border-slate-200 text-slate-600 hover:text-slate-50 hover:bg-slate-900 hover:border-slate-900 !w-5 !h-5 absolute !p-0 mr-2': props.type === 'back',
       }}
       onMouseDown={(e) => e.preventDefault()}
     >
-      {props.text === 'search' && (
+      {props.text === 'Search' && (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="fill-current w-2 rotate-90 ml-1 mr-2 origin-right-center"

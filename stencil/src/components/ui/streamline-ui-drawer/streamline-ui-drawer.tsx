@@ -1,10 +1,10 @@
 // eslint-disable-next-line no-unused-vars
-import { Component, Element, h, Host } from '@stencil/core';
+import { Component, Element, h, Host, State } from '@stencil/core';
 import { Button } from '../../../elements/Button';
 import { state } from '../../../store/internal';
 
 /**
- * Dropdown.
+ * Drawer.
  */
 @Component({
   tag: 'streamline-ui-drawer',
@@ -15,10 +15,48 @@ export class StreamlineUiDrawer {
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineUiDrawerElement;
 
-  private hide = () => {
+  @State() canSave: boolean = true;
+
+  private close = () => {
     state.drawer = {
       ...state.drawer,
       active: false,
+    };
+
+    setTimeout(() => {
+      state.drawer = {
+        active: false,
+        items: [],
+        onSave: null,
+        postType: '',
+        postId: 0,
+        status: '',
+        title: '',
+        values: {},
+      };
+      this.canSave = true;
+    }, 500);
+  };
+
+  private save = () => {
+    state.drawer.onSave();
+    this.close();
+  };
+
+  private onInput = () => {
+    setTimeout(() => {
+      this.canSave =
+        this.el.shadowRoot.querySelectorAll('streamline-ui-input[invalid]')
+          .length === 0;
+    }, 50);
+
+    state.drawer = {
+      ...state.drawer,
+      values: Object.fromEntries(
+        [...this.el.shadowRoot.querySelectorAll(`streamline-ui-input`)].map(
+          (itemNested) => [[itemNested.getAttribute('uid')], itemNested.value]
+        )
+      ),
     };
   };
 
@@ -32,7 +70,7 @@ export class StreamlineUiDrawer {
         }}
       >
         <div
-          onClick={this.hide}
+          onClick={this.close}
           class={{
             'cursor-pointer absolute left-0 top-0 h-full w-full z-[99] bg-black/80 backdrop-blur-sm duration-200 ease-in-out transition':
               true,
@@ -66,6 +104,7 @@ export class StreamlineUiDrawer {
                   uid={item.id}
                   label={item.label}
                   value={item.value}
+                  handleInput={this.onInput}
                 />
               );
             })}
@@ -76,9 +115,11 @@ export class StreamlineUiDrawer {
             }}
           >
             <Button
+              onClick={this.save}
               type="primary"
               text="Save"
               class="w-full !py-4 !text-base"
+              invalid={!this.canSave}
             />
           </div>
         </div>

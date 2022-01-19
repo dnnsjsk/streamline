@@ -17,11 +17,12 @@ import { getMenus } from '../../utils/getMenus';
 import { getMenu } from '../../utils/getMenu';
 import { getMetaKey } from '../../utils/getMetaKey';
 import { doQuery } from '../../utils/doQuery';
-import { findDeep, someDeep } from 'deepdash-es/standalone';
+import { someDeep } from 'deepdash-es/standalone';
 import { setFavourite } from '../../utils/setFavourite';
 import { Button } from '../../elements/Button';
 import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
-import { set, isString, camelCase } from 'lodash-es';
+import { isString, camelCase, debounce } from 'lodash-es';
+import { savePost } from '../../utils/savePost';
 
 /**
  * Entries.
@@ -47,6 +48,33 @@ export class StreamlineEntries {
     getMenus();
     setEntries();
 
+    window.addEventListener(
+      'resize',
+      debounce(() => {
+        if (window.innerWidth <= 639 && state.entriesEditing !== {}) {
+          this.el.shadowRoot
+            .querySelectorAll('streamline-ui-dropdown')
+            .forEach((item) => {
+              item.classList.remove('!opacity-100');
+            });
+          this.el.shadowRoot.querySelectorAll(`[data-row]`).forEach((item) => {
+            const id = item.getAttribute('data-row');
+            item.querySelectorAll('input[data-id]').forEach((itemNested) => {
+              if (state.entriesEditing?.[id]?.active) {
+                (itemNested as HTMLInputElement).value =
+                  state.entriesEditing[id].values[
+                    itemNested.getAttribute('data-id')
+                  ].defaultValue;
+                (itemNested as HTMLInputElement).blur();
+              }
+            });
+          });
+          state.entriesEditing = {};
+          state.isSearch = true;
+        }
+      }, 500)
+    );
+
     document.addEventListener('keydown', (e) => {
       if (state.visible) {
         if (
@@ -69,7 +97,7 @@ export class StreamlineEntries {
     });
 
     onChangeLocal('active', () => {
-      this.editing = {};
+      state.entriesEditing = {};
     });
   }
 
@@ -272,19 +300,18 @@ export class StreamlineEntries {
     );
   }
 
-  private getArr = (arr = [], type) => {
+  private getArr = (type) => {
     return (
-      (arr.length >= 1 && arr) ||
-      (state[`entries${capitalizeFirstLetter(type)}Active`]?.length >= 1 &&
-        (state[`entries${capitalizeFirstLetter(type)}Active`] ||
-          state[`entries${capitalizeFirstLetter(type)}`]))
+      state[`entries${capitalizeFirstLetter(type)}Active`]?.length >= 1 &&
+      (state[`entries${capitalizeFirstLetter(type)}Active`] ||
+        state[`entries${capitalizeFirstLetter(type)}`])
     );
   };
 
   private row = (item, outerTable) => {
     let isFav = false;
 
-    const isEdit = this.editing?.[item.ID]?.active;
+    const isEdit = state.entriesEditing?.[item.ID]?.active;
 
     const isSite = item.type === 'site';
     const isHistory = item.type === 'history';
@@ -425,10 +452,10 @@ export class StreamlineEntries {
         return false;
       }
 
-      this.editing = {
-        ...this.editing,
+      state.entriesEditing = {
+        ...state.entriesEditing,
         [item.ID]: {
-          ...this.editing?.[item.ID],
+          ...state.entriesEditing?.[item.ID],
           values: Object.fromEntries(
             [
               ...this.el.shadowRoot.querySelectorAll(
@@ -456,56 +483,15 @@ export class StreamlineEntries {
         dropdownButton.classList.remove('!opacity-100');
         state.isSearch = true;
 
-        const obj = {
-          postId: item.ID,
-          siteId: item.siteId,
-          values: {},
-        };
+        const values = {};
         this.el.shadowRoot
           .querySelectorAll(`[data-row="${item.ID}"] input[data-id]`)
           .forEach((itemNested) => {
             const key = itemNested.getAttribute('data-id');
-            obj.values[key] = (itemNested as HTMLInputElement).value;
+            values[key] = (itemNested as HTMLInputElement).value;
           });
 
-        [
-          'entriesFav',
-          'entriesFavActive',
-          'entriesPost',
-          'entriesPostActive',
-        ].forEach((itemNested) => {
-          state[itemNested].forEach(() => {
-            const newFavs = [...state[itemNested]];
-            const path = findDeep(
-              newFavs,
-              (o) => {
-                return o.siteId === item.siteId && o.ID === item.ID;
-              },
-              {
-                childrenPath: ['children'],
-              }
-            );
-            if (path) {
-              const currentPath = path.context['_item'].strPath;
-              set(newFavs, `${currentPath}.name`, obj.values['post_title']);
-              set(
-                newFavs,
-                `${currentPath}.post_title`,
-                obj.values['post_title']
-              );
-              set(newFavs, `${currentPath}.post_name`, obj.values['post_name']);
-
-              state[itemNested] = newFavs;
-            }
-          });
-        });
-
-        if (!state.test) {
-          fetchAjax({
-            type: 'post',
-            query: obj,
-          });
-        }
+        savePost(item, values);
       }
 
       this.el.shadowRoot
@@ -518,10 +504,10 @@ export class StreamlineEntries {
         `[data-row="${item.ID}"] streamline-ui-dropdown`
       );
 
-      this.editing = {
-        ...this.editing,
+      state.entriesEditing = {
+        ...state.entriesEditing,
         [item.ID]: {
-          ...this.editing?.[item.ID],
+          ...state.entriesEditing?.[item.ID],
           active: false,
         },
       };
@@ -530,7 +516,7 @@ export class StreamlineEntries {
         .querySelectorAll(`[data-row="${item.ID}"] input[data-id]`)
         .forEach((itemNested) => {
           (itemNested as HTMLInputElement).value =
-            this.editing[item.ID].values[
+            state.entriesEditing[item.ID].values[
               itemNested.getAttribute('data-id')
             ].defaultValue;
           (itemNested as HTMLInputElement).blur();
@@ -538,7 +524,9 @@ export class StreamlineEntries {
 
       dropdownButton.classList.remove('!opacity-100');
 
-      if (JSON.stringify(this.editing).indexOf('"active":true') === -1) {
+      if (
+        JSON.stringify(state.entriesEditing).indexOf('"active":true') === -1
+      ) {
         state.isSearch = true;
       }
     };
@@ -566,6 +554,10 @@ export class StreamlineEntries {
           ...state.drawer,
           active: true,
           title: `Editing: ${obj.title.value}`,
+          onSave: () => {
+            savePost(item, state.drawer.values);
+          },
+          postId: item.ID,
           postType: obj.postType.value,
           status: obj.postType.status,
           items: Object.entries(obj as unknown)
@@ -663,7 +655,7 @@ export class StreamlineEntries {
                       placeholder="No value"
                     />
                   ) : (
-                    itemNested.text()
+                    itemNested.text?.()
                   )}
                 </div>
               );
@@ -681,7 +673,7 @@ export class StreamlineEntries {
     );
   };
 
-  private rows = (arr = []) => {
+  private rows = () => {
     const isHistory =
       !state.test &&
       (stateLocal.active === 'post' || stateLocal.active === 'site') &&
@@ -700,7 +692,7 @@ export class StreamlineEntries {
             })),
           },
         ]
-      : this.getArr(arr, stateLocal.active);
+      : this.getArr(stateLocal.active);
 
     return Object.values(array as unknown).map((item) => {
       const onScroll = (e) => {

@@ -123,7 +123,9 @@ export class StreamlineContainer {
       }
     }
 
-    getMenus();
+    if (!state.test) {
+      getMenus();
+    }
   };
 
   @Method()
@@ -131,6 +133,7 @@ export class StreamlineContainer {
     Object.entries(data).forEach(([key, value]) => {
       state[key] = value;
     });
+    setEntries();
   }
 
   @Method()

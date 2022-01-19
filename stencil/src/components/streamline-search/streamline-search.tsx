@@ -116,7 +116,7 @@ export class StreamlineSearch {
           <input
             part="search"
             class="peer bg-transparent focus:outline-none w-full h-[var(--sl-side-w)] text-[18px] h-full w-full m-0 p-0 font-normal placeholder-slate-500 text-slate-900 px-9 lg:h-[64px] lg:px-12"
-            type="search"
+            type="text"
             placeholder={state.searchPlaceholder}
             value={state.searchValue}
             onInput={this.handleChange}

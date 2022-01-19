@@ -16,6 +16,8 @@ export class StreamlineUiInput {
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineUiInputElement;
 
+  @Prop() handleInput: Function;
+
   @Prop({ reflect: true, mutable: true }) invalid: boolean;
 
   @Prop() label: string;
@@ -35,22 +37,7 @@ export class StreamlineUiInput {
   private onInput = (e) => {
     this.value = e.target.value;
     this.invalid = this.value === '';
-
-    const parent = (this.el.getRootNode() as ShadowRoot).host;
-
-    setTimeout(() => {
-      if (parent?.tagName === 'STREAMLINE-DRAWER') {
-        const invalid = parent.shadowRoot.querySelectorAll(
-          'streamline-ui-input[invalid]'
-        );
-        const isValid = invalid.length === 0;
-        if (!isValid) {
-          parent.setAttribute('invalid', 'true');
-        } else {
-          parent.removeAttribute('invalid');
-        }
-      }
-    }, 50);
+    this.handleInput(e);
   };
 
   render() {

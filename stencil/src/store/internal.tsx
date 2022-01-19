@@ -37,9 +37,12 @@ const { state, dispose, onChange } = createStore({
     items: [],
     onSave: null,
     postType: '',
+    postId: 0,
     status: '',
     title: '',
+    values: {},
   },
+  entriesEditing: {},
   // @ts-ignore
   entriesFav: JSON.parse(window.streamlineData.favourites),
   // @ts-ignore

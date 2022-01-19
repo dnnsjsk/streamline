@@ -26,6 +26,7 @@ export namespace Components {
         "type": string;
     }
     interface StreamlineUiInput {
+        "handleInput": Function;
         "invalid": boolean;
         "label": string;
         "uid": string;
@@ -103,6 +104,7 @@ declare namespace LocalJSX {
         "type"?: string;
     }
     interface StreamlineUiInput {
+        "handleInput"?: Function;
         "invalid"?: boolean;
         "label"?: string;
         "uid"?: string;
