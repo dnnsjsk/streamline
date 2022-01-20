@@ -4,44 +4,74 @@ import { state, dispose } from '../../store/internal';
 import { StreamlineSearch } from '../streamline-search/streamline-search';
 import { stateLocal, disposeLocal } from '../../store/local';
 
+const cycle = async (page, key) => {
+  stateLocal.active = 'menu';
+  state.visible = true;
+  const eventUp = new KeyboardEvent('keydown', {
+    [key]: true,
+    key: 'ArrowUp',
+  });
+  const eventDown = new KeyboardEvent('keydown', {
+    [key]: true,
+    key: 'ArrowDown',
+  });
+  page.doc.dispatchEvent(eventUp);
+  await page.waitForChanges();
+  expect(stateLocal.active).toBe('fav');
+  page.doc.dispatchEvent(eventUp);
+  await page.waitForChanges();
+  expect(stateLocal.active).toBe('networkMenu');
+  page.doc.dispatchEvent(eventUp);
+  await page.waitForChanges();
+  expect(stateLocal.active).toBe('site');
+  page.doc.dispatchEvent(eventDown);
+  await page.waitForChanges();
+  expect(stateLocal.active).toBe('networkMenu');
+  page.doc.dispatchEvent(eventDown);
+  await page.waitForChanges();
+  expect(stateLocal.active).toBe('fav');
+  page.doc.dispatchEvent(eventDown);
+  await page.waitForChanges();
+  expect(stateLocal.active).toBe('menu');
+  page.doc.dispatchEvent(eventDown);
+  await page.waitForChanges();
+  expect(stateLocal.active).toBe('post');
+  page.doc.dispatchEvent(eventDown);
+  await page.waitForChanges();
+  expect(stateLocal.active).toBe('settings');
+  page.doc.dispatchEvent(eventDown);
+  await page.waitForChanges();
+  expect(stateLocal.active).toBe('site');
+};
+
 beforeEach(async () => {
   dispose();
   disposeLocal();
 });
 
-describe('Render container', () => {
-  it('closed', async () => {
-    state.visible = true;
+describe('App should', () => {
+  it('open correct default tab', async () => {
+    stateLocal.active = 'fav';
     const page = await newSpecPage({
       components: [StreamlineContainer],
       html: `<streamline-container></streamline-container>`,
     });
-    expect(page.root).toEqualHtml(`
-<streamline-container>
-      <mock:shadow-root>
-        <div class="fixed h-full hidden left-0 pointer-events-none top-0 w-full z-[9999999999999999]">
-          <div class="bg-black/90 fixed h-full left-0 top-0 w-full" tabindex="-1"></div>
-          <streamline-box></streamline-box>
-        </div>
-      </mock:shadow-root>
-    </streamline-container>
-  `);
-  });
-  it('open', async () => {
-    const page = await newSpecPage({
-      components: [StreamlineContainer],
-      html: `<streamline-container visible></streamline-container>`,
-    });
-    expect(page.root).toEqualHtml(`
-<streamline-container visible="">
-      <mock:shadow-root>
-        <div class="block fixed h-full left-0 pointer-events-auto top-0 w-full z-[9999999999999999]">
-          <div class="bg-black/90 fixed h-full left-0 top-0 w-full" tabindex="-1"></div>
-          <streamline-box></streamline-box>
-        </div>
-      </mock:shadow-root>
-    </streamline-container>
-  `);
+    state.visible = true;
+    expect(stateLocal.active).toBe('fav');
+    state.entriesSettingsLoad = {
+      ...state.entriesSettingsLoad,
+      ...{
+        behaviourDefaultTab: {
+          default: 'menu',
+        },
+      },
+    };
+    await page.waitForChanges();
+    state.visible = false;
+    await page.waitForChanges();
+    state.visible = true;
+    await page.waitForChanges();
+    expect(stateLocal.active).toBe('menu');
   });
 });
 
@@ -139,91 +169,21 @@ describe('Key press should', () => {
     await page.waitForChanges();
     expect(state.isSearchFocus).toBe(false);
   });
+  // eslint-disable-next-line jest/expect-expect
   it('cycle through modes on mac', async () => {
-    stateLocal.active = 'menu';
     const page = await newSpecPage({
       components: [StreamlineContainer],
       html: `<streamline-container mac="true"></streamline-container>`,
     });
-    state.visible = true;
-    const eventUp = new KeyboardEvent('keydown', {
-      metaKey: true,
-      key: 'ArrowUp',
-    });
-    const eventDown = new KeyboardEvent('keydown', {
-      metaKey: true,
-      key: 'ArrowDown',
-    });
-    page.doc.dispatchEvent(eventUp);
-    await page.waitForChanges();
-    expect(stateLocal.active).toBe('fav');
-    page.doc.dispatchEvent(eventUp);
-    await page.waitForChanges();
-    expect(stateLocal.active).toBe('network');
-    page.doc.dispatchEvent(eventUp);
-    await page.waitForChanges();
-    expect(stateLocal.active).toBe('site');
-    page.doc.dispatchEvent(eventDown);
-    await page.waitForChanges();
-    expect(stateLocal.active).toBe('network');
-    page.doc.dispatchEvent(eventDown);
-    await page.waitForChanges();
-    expect(stateLocal.active).toBe('fav');
-    page.doc.dispatchEvent(eventDown);
-    await page.waitForChanges();
-    expect(stateLocal.active).toBe('menu');
-    page.doc.dispatchEvent(eventDown);
-    await page.waitForChanges();
-    expect(stateLocal.active).toBe('post');
-    page.doc.dispatchEvent(eventDown);
-    await page.waitForChanges();
-    expect(stateLocal.active).toBe('settings');
-    page.doc.dispatchEvent(eventDown);
-    await page.waitForChanges();
-    expect(stateLocal.active).toBe('site');
+    await cycle(page, 'metaKey');
   });
+  // eslint-disable-next-line jest/expect-expect
   it('cycle through modes on windows', async () => {
-    stateLocal.active = 'menu';
     const page = await newSpecPage({
       components: [StreamlineContainer],
       html: `<streamline-container></streamline-container>`,
     });
-    state.visible = true;
-    const eventUp = new KeyboardEvent('keydown', {
-      ctrlKey: true,
-      key: 'ArrowUp',
-    });
-    const eventDown = new KeyboardEvent('keydown', {
-      ctrlKey: true,
-      key: 'ArrowDown',
-    });
-    page.doc.dispatchEvent(eventUp);
-    await page.waitForChanges();
-    expect(stateLocal.active).toBe('fav');
-    page.doc.dispatchEvent(eventUp);
-    await page.waitForChanges();
-    expect(stateLocal.active).toBe('network');
-    page.doc.dispatchEvent(eventUp);
-    await page.waitForChanges();
-    expect(stateLocal.active).toBe('site');
-    page.doc.dispatchEvent(eventDown);
-    await page.waitForChanges();
-    expect(stateLocal.active).toBe('network');
-    page.doc.dispatchEvent(eventDown);
-    await page.waitForChanges();
-    expect(stateLocal.active).toBe('fav');
-    page.doc.dispatchEvent(eventDown);
-    await page.waitForChanges();
-    expect(stateLocal.active).toBe('menu');
-    page.doc.dispatchEvent(eventDown);
-    await page.waitForChanges();
-    expect(stateLocal.active).toBe('post');
-    page.doc.dispatchEvent(eventDown);
-    await page.waitForChanges();
-    expect(stateLocal.active).toBe('settings');
-    page.doc.dispatchEvent(eventDown);
-    await page.waitForChanges();
-    expect(stateLocal.active).toBe('site');
+    await cycle(page, 'ctrlKey');
   });
   it('not cycle through modes', async () => {
     stateLocal.active = 'menu';

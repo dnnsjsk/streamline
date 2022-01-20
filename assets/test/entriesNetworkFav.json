@@ -1,0 +1,44 @@
+[
+  {
+    "children": {
+      "774": {
+        "ID": 774,
+        "guid": "https://fabrikat.local/blockstudio/?page_id=774",
+        "post_name": "home",
+        "post_type": "page",
+        "post_title": "Home",
+        "post_status": "publish",
+        "name": "Home",
+        "type": "post",
+        "hrefEdit": "aHR0cHM6Ly9mYWJyaWthdC5sb2NhbC9ibG9ja3N0dWRpby93cC1hZG1pbi9wb3N0LnBocD9wb3N0PTc3NCZhbXA7YWN0aW9uPWVkaXQ=",
+        "siteId": "309"
+      }
+    },
+    "isMultisite": true,
+    "path": "/blockstudio/",
+    "queryValue": "home",
+    "siteId": "309",
+    "type": "post"
+  },
+  {
+    "children": {
+      "25": {
+        "ID": 25,
+        "guid": "https://fabrikat.local/streamline/?page_id=25",
+        "post_name": "home",
+        "post_type": "page",
+        "post_title": "Home",
+        "post_status": "publish",
+        "name": "Home",
+        "type": "post",
+        "hrefEdit": "aHR0cHM6Ly9mYWJyaWthdC5sb2NhbC9zdHJlYW1saW5lL3dwLWFkbWluL3Bvc3QucGhwP3Bvc3Q9MjUmYW1wO2FjdGlvbj1lZGl0",
+        "siteId": "314"
+      }
+    },
+    "isMultisite": true,
+    "path": "/streamline/",
+    "queryValue": "home",
+    "siteId": "314",
+    "type": "post"
+  }
+]

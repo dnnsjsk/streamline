@@ -31,24 +31,19 @@ export class StreamlineContainer {
     state.isMac = this.mac || navigator.userAgent.indexOf('Mac OS X') !== -1;
 
     state.entriesSettingsActive = state.entriesSettings;
+
     state.entriesSettings[0].children.forEach((item) => {
       item.children.forEach((itemInner) => {
         state.entriesSettingsLoad[itemInner.id] = {
           default:
-            JSON.parse(state.data.settings)[itemInner.id]?.default ??
+            (state.test
+              ? state.entriesSettings
+              : JSON.parse(state.data.settings))[itemInner.id]?.default ??
             state.entriesSettingsLoad[itemInner.id].default,
         };
       });
     });
     state.entriesSettingsSave = state.entriesSettingsLoad;
-
-    if (!state.menus.includes(stateLocal.active)) {
-      stateLocal.active = 'menu';
-    } else if (
-      state.entriesSettingsLoad.behaviourDefaultTab.default !== 'last'
-    ) {
-      stateLocal.active = state.entriesSettingsLoad.behaviourDefaultTab.default;
-    }
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'k' && getMetaKey(e)) {
@@ -123,15 +118,14 @@ export class StreamlineContainer {
       }
     }
 
-    if (!state.test) {
-      getMenus();
-    }
+    getMenus();
   };
 
   @Method()
   async setData(data) {
     Object.entries(data).forEach(([key, value]) => {
       state[key] = value;
+      state[`${key}Active`] = value;
     });
     setEntries();
   }

@@ -45,6 +45,7 @@ export class StreamlineUiInput {
       <Host class="block">
         <div class="relative mt-1 w-full">
           <input
+            title={this.value}
             ref={(el) => (this.input = el as HTMLInputElement)}
             type="text"
             id={this.uid}
@@ -52,9 +53,11 @@ export class StreamlineUiInput {
             value={this.value}
             placeholder="No value"
             onInput={this.onInput}
-            class={`peer px-3 h-12 w-full border border-slate-300 font-medium text-base text-slate-900 placeholder-rose-600 bg-white focus:outline-none focus-border ${
-              this.invalid ? 'border-invalid' : ''
-            }`}
+            class={{
+              'truncate peer px-3 h-12 w-full border border-slate-300 font-medium text-base text-slate-900 placeholder-rose-600 bg-white focus:outline-none focus-border':
+                true,
+              'border-invalid': this.invalid,
+            }}
           />
           <label
             htmlFor={this.uid}

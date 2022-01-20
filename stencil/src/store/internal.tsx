@@ -2,6 +2,7 @@ import { createStore } from '@stencil/store';
 import equal from 'fast-deep-equal/es6';
 import { focusSearch } from '../utils/focusSearch';
 import { blurSearch } from '../utils/blurSearch';
+import { stateLocal } from './local';
 
 const isTest = document
   .querySelector('streamline-container')
@@ -30,6 +31,7 @@ const { state, dispose, onChange } = createStore({
     // @ts-ignore
     path: window.streamlineData.sitePath,
   },
+  bodyStyle: {},
   // @ts-ignore
   data: window.streamlineData,
   drawer: {
@@ -288,23 +290,44 @@ onChange('searchValue', (value) => {
 });
 
 onChange('visible', (value) => {
+  if (!state.menus.includes(stateLocal.active)) {
+    stateLocal.active = 'menu';
+  } else if (state.entriesSettingsLoad.behaviourDefaultTab.default !== 'last') {
+    stateLocal.active = state.entriesSettingsLoad.behaviourDefaultTab.default;
+  }
+
   const el = document
     ?.querySelector('streamline-container')
     ?.shadowRoot?.querySelector('streamline-entries')
     ?.shadowRoot?.querySelector('div > div');
 
   if (el) {
+    const values = ['position', 'overflow', 'left', 'top', 'width'];
+
     if (value === true) {
+      values.forEach((item) => {
+        const style = document.body.style[item];
+        if (style) {
+          state.bodyStyle = {
+            ...state.bodyStyle,
+            [item]: style,
+          };
+        }
+      });
       state.scroll = window.scrollY;
       document.body.style.position = 'fixed';
       document.body.style.overflow = 'hidden';
       document.body.style.left = '0';
       document.body.style.top = '0';
+      document.body.style.width = '100%';
     } else {
-      document.body.style.removeProperty('position');
-      document.body.style.removeProperty('overflow');
-      document.body.style.removeProperty('left');
-      document.body.style.removeProperty('top');
+      values.forEach((item) => {
+        if (state.bodyStyle[item]) {
+          document.body.style[item] = state.bodyStyle[item];
+        } else {
+          document.body.style.removeProperty(item);
+        }
+      });
       window.scroll(0, state.scroll);
     }
   }

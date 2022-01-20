@@ -16,11 +16,14 @@ Do things faster.
 == Changelog ==
 
 = 1.1.0 =
+* Enhancement: add <streamline-dropdown> component
+* Enhancement: apply original styles to body after closing app
 * Enhancement: better color contrast throughout
 * Enhancement: don't use transforms to center container
 * Enhancement: prevent test data from ending up in JS bundles
 * Enhancement: reduce JSON data being sent back from servers for sites and posts
 * Enhancement: remove <streamline-box> component
+* Enhancement: remove <streamline-button> component
 * Enhancement: remove <streamline-post> component
 * Enhancement: remove body-scroll-lock library and replace with custom code
 * Enhancement: show sidebar at bottom on smaller screen size

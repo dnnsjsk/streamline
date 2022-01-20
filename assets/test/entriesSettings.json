@@ -1,0 +1,102 @@
+[
+  {
+    "children": [
+      {
+        "children": [
+          {
+            "id": "keyNavigation",
+            "name": "Entry navigation",
+            "nameParent": "Key shortcuts",
+            "label": "Navigate between entry items",
+            "metaKey": false,
+            "keys": [
+              "↑",
+              "↓"
+            ]
+          },
+          {
+            "id": "keyNavigationTabs",
+            "name": "Tab navigation",
+            "nameParent": "Key shortcuts",
+            "label": "Navigate between top-level tab items",
+            "metaKey": true,
+            "keys": [
+              "↑",
+              "↓"
+            ]
+          },
+          {
+            "id": "keySearch",
+            "name": "Focus search",
+            "nameParent": "Key shortcuts",
+            "label": "Focus the search bar",
+            "metaKey": true,
+            "keys": [
+              "s"
+            ]
+          },
+          {
+            "id": "keyExit",
+            "name": "Close",
+            "nameParent": "Key shortcuts",
+            "label": "Exit the app",
+            "metaKey": false,
+            "keys": [
+              "esc"
+            ]
+          }
+        ],
+        "name": "Key shortcuts"
+      },
+      {
+        "children": [
+          {
+            "id": "behaviourDefaultTab",
+            "name": "Default tab",
+            "nameParent": "Behaviour",
+            "label": "Which tab should be opened by default when opening app",
+            "choices": {
+              "last": "Last",
+              "site": "Site",
+              "networkMenu": "Network",
+              "fav": "Faves",
+              "menu": "Menu",
+              "post": "Post",
+              "settings": "Settings"
+            }
+          }
+        ],
+        "name": "Behaviour"
+      },
+      {
+        "children": [
+          {
+            "id": "searchResetInput",
+            "name": "Reset search",
+            "nameParent": "Searchbar",
+            "label": "Resets search value after switching tabs"
+          },
+          {
+            "id": "searchFocus",
+            "name": "Always focus",
+            "nameParent": "Searchbar",
+            "label": "Focus searchbar after switching tabs"
+          }
+        ],
+        "name": "Searchbar"
+      },
+      {
+        "children": [
+          {
+            "id": "appearanceBlur",
+            "name": "Enable background blur",
+            "nameParent": "Appearance",
+            "label": "Enabling the overlay blur can decrease performance on slower machines"
+          }
+        ],
+        "name": "Appearance"
+      }
+    ],
+    "type": "settings"
+  }
+]

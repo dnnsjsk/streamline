@@ -121,7 +121,7 @@ export class StreamlineEntries {
     (focusEls[state.focusIndex] as HTMLElement)?.focus();
   };
 
-  private getHeader(item, test = false) {
+  private getHeader(item, mb = false) {
     const isQuery = item.type === 'post' || item.type === 'site';
     const isQueryMode =
       stateLocal.active === 'site' || stateLocal.active === 'post';
@@ -160,13 +160,16 @@ export class StreamlineEntries {
 
     return (
       <div
-        class={`${
-          stateLocal.active === 'settings'
-            ? 'flex-row items-center justify-between'
-            : 'flex-col items-start sm:justify-between'
-        } ${test ? '!mb-0' : ''} ${
-          this.px
-        } relative min-h-[60px] pt-5 flex flex-wrap mb-1 pb-1.5 flex sticky -top-2 bg-white z-20 border-b border-slate-300 sm:min-h-[75px] sm:mb-4 sm:flex-row sm:items-center sm:pt-6 sm:pb-2 sm:-top-2`}
+        class={{
+          'flex-row items-center justify-between':
+            stateLocal.active === 'settings',
+          'flex-col items-start sm:justify-between':
+            stateLocal.active !== 'settings',
+          '!mb-0': mb,
+          [this.px]: true,
+          'relative min-h-[60px] pt-5 flex flex-wrap mb-1 pb-1.5 flex sticky -top-2 bg-white z-20 border-b border-slate-300 sm:min-h-[75px] sm:mb-4 sm:flex-row sm:items-center sm:pt-6 sm:pb-2 sm:-top-2':
+            true,
+        }}
       >
         <div class={`absolute -left-full top-0 h-full bg-white z-[-1]`} />
         <div class={`flex items-center flex-row max-w-full`}>
@@ -350,8 +353,8 @@ export class StreamlineEntries {
                     'bg-green-100 text-green-600': isPublish,
                     'bg-purple-100 text-purple-600': isFuture,
                     'bg-yellow-100 text-yellow-600': isDraft,
-                    'bg-indigo-100 text-indigo-600': isPending,
-                    'border border-slate-500 text-slate-600': isPending,
+                    'bg-lime-100 text-lime-600': isPending,
+                    'bg-blue-100 text-blue-600': isPrivate,
                     'bg-slate-100 text-slate-600':
                       !isPublish &&
                       !isFuture &&
@@ -599,7 +602,7 @@ export class StreamlineEntries {
         <a
           data-focus={true}
           tabindex={isEdit ? -1 : 0}
-          href={item.href || item.guid}
+          href={state.test ? '#0' : item.href || item.guid}
           class={{
             [this.px]: true,
             [rowClass]: true,
@@ -640,12 +643,13 @@ export class StreamlineEntries {
                 <div class={`h-[42px] flex items-center relative`}>
                   {isString(itemNested.text) ? (
                     <input
+                      title={itemNested.text}
                       data-id={itemNested.id}
                       type="text"
                       tabindex={itemNested.id && isEdit ? 0 : -1}
                       disabled={!itemNested.id && isEdit}
                       class={{
-                        'text-sm font-medium h-[42px] pointer-events-none leading-none select-text absolute -top-px left-0 focus-none w-4/5 bg-transparent':
+                        'truncate text-sm font-medium h-[42px] pointer-events-none leading-none select-text absolute -top-px left-0 focus-none w-4/5 bg-transparent':
                           true,
                         // @ts-ignore
                         'text-green-600 !pointer-events-auto placeholder-rose-600':
@@ -814,7 +818,7 @@ export class StreamlineEntries {
       return (
         <div>
           {this.getHeader(item)}
-          <ul class={`${this.px} space-y-4`}>
+          <ul class={`${this.px} space-y-4 sm:space-y-6`}>
             {Object.values(item.children as unknown).map(
               (itemInner, indexInner) => {
                 return (
