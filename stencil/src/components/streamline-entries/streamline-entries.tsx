@@ -598,7 +598,7 @@ export class StreamlineEntries {
     const rowClass = 'text-sm font-medium text-slate-600 h-[42px]';
 
     return (
-      <li class={`relative`} data-row={item.ID}>
+      <li class={`relative`} data-entry={true} data-row={item.ID}>
         <a
           data-focus={true}
           tabindex={isEdit ? -1 : 0}

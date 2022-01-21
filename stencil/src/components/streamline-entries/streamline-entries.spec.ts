@@ -2,26 +2,27 @@ import { newSpecPage } from '@stencil/core/testing';
 import { StreamlineEntries } from './streamline-entries';
 import { dispose, state } from '../../store/internal';
 import { disposeLocal, stateLocal } from '../../store/local';
-import { setData } from '../../test/setData';
+import { StreamlineUiDropdown } from '../ui/streamline-ui-dropdown/streamline-ui-dropdown';
+const networkFav = require('../../../../assets/test/entriesNetworkFav.json');
 
 beforeEach(async () => {
   dispose();
   disposeLocal();
-  setData();
 });
 
 describe('Render entries with', () => {
   describe('dot menu', () => {
     it("mode set to 'help'", async () => {
-      state.isHelp = true;
-      stateLocal.active = 'menu';
+      stateLocal.active = 'fav';
       const page = await newSpecPage({
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
+      state.isHelp = true;
+      await page.waitForChanges();
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
       const length = el.querySelectorAll('p').length;
-      expect(length).toBe(1);
+      expect(length).toBe(2);
     });
   });
   describe("mode set to 'favourites'", () => {
@@ -33,7 +34,7 @@ describe('Render entries with', () => {
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
       const lengthLi = el.querySelectorAll('li').length;
-      expect(lengthLi).toBe(23);
+      expect(lengthLi).toBe(18);
     });
     it("and search is 'me'", async () => {
       stateLocal.active = 'fav';
@@ -43,53 +44,184 @@ describe('Render entries with', () => {
         html: `<streamline-entries></streamline-entries>`,
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
-      const lengthLi = el.querySelectorAll('li').length;
-      expect(lengthLi).toBe(6);
+      const lengthLi = el.querySelectorAll('[data-entry]').length;
+      expect(lengthLi).toBe(3);
     });
     it('and all favourites are removed until there is none left', async () => {
       stateLocal.active = 'fav';
       const page = await newSpecPage({
-        components: [StreamlineEntries],
+        components: [StreamlineEntries, StreamlineUiDropdown],
         html: `<streamline-entries></streamline-entries>`,
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
-      const buttons = el.querySelectorAll('streamline-button');
-      for (const item of Array.from(buttons).reverse()) {
-        const index = Array.from(buttons).reverse().indexOf(item);
-        const button = item.shadowRoot.querySelector('button');
-        button.click();
+      const rows = el.querySelectorAll('[data-entry]');
+      for (const item of Array.from(rows).reverse()) {
+        const index = Array.from(rows).reverse().indexOf(item);
+        const unfavouriteButton = item
+          .querySelector('streamline-ui-dropdown')
+          .shadowRoot.querySelector('a');
+        const click = new KeyboardEvent('click');
+        unfavouriteButton.dispatchEvent(click);
         await page.waitForChanges();
-        const lengthLi = el.querySelectorAll('li').length;
+        const lengthEntry = el.querySelectorAll('[data-entry]').length;
+        if (index === 0) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(2);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(11);
+        } else if (index === 1) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(2);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(10);
+        } else if (index === 2) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(2);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(9);
+        } else if (index === 3) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(2);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(8);
+        } else if (index === 4) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(2);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(7);
+        } else if (index === 5) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(2);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(6);
+        } else if (index === 6) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(2);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(5);
+        } else if (index === 7) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(2);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(4);
+        } else if (index === 8) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(1);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(3);
+        } else if (index === 9) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(1);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(2);
+        } else if (index === 10) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(1);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(1);
+        } else if (index === 11) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(0);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(0);
+        }
+      }
+    });
+    it('and all favourites are removed until there is none left on multisite', async () => {
+      stateLocal.active = 'fav';
+      state.entriesFav = networkFav;
+      const page = await newSpecPage({
+        components: [StreamlineEntries, StreamlineUiDropdown],
+        html: `<streamline-entries></streamline-entries>`,
+      });
+      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const rows = el.querySelectorAll('[data-entry]');
+      for (const item of Array.from(rows).reverse()) {
+        const index = Array.from(rows).reverse().indexOf(item);
+        const unfavouriteButton = item
+          .querySelector('streamline-ui-dropdown')
+          .shadowRoot.querySelector('a');
+        const click = new KeyboardEvent('click');
+        unfavouriteButton.dispatchEvent(click);
+        await page.waitForChanges();
+        const lengthEntry = el.querySelectorAll('[data-entry]').length;
         if (index === 0) {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(state.entriesFav.length).toBe(4);
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(lengthLi).toBe(21);
+          expect(lengthEntry).toBe(13);
+        } else if (index === 1) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(4);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(12);
         } else if (index === 2) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(4);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(11);
+        } else if (index === 3) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(4);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(10);
+        } else if (index === 4) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(4);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(9);
+        } else if (index === 5) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(4);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(8);
+        } else if (index === 6) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(4);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(7);
+        } else if (index === 7) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(4);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(6);
+        } else if (index === 8) {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(state.entriesFav.length).toBe(3);
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(lengthLi).toBe(18);
-        } else if (index === 8) {
+          expect(lengthEntry).toBe(5);
+        } else if (index === 9) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(3);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(4);
+        } else if (index === 10) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(3);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(3);
+        } else if (index === 11) {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(state.entriesFav.length).toBe(2);
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(lengthLi).toBe(8);
-        } else if (index === 11) {
+          expect(lengthEntry).toBe(2);
+        } else if (index === 12) {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(state.entriesFav.length).toBe(1);
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(lengthLi).toBe(3);
-        } else if (index === 14) {
+          expect(lengthEntry).toBe(1);
+        } else if (index === 13) {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(state.entriesFav.length).toBe(0);
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(lengthLi).toBe(0);
+          expect(lengthEntry).toBe(0);
         }
       }
     });
   });
 
+  // eslint-disable-next-line jest/no-commented-out-tests
+  /*
   describe("mode set to 'menu'", () => {
     it('and all elements shown', async () => {
       stateLocal.active = 'menu';
@@ -230,8 +362,10 @@ describe('Render entries with', () => {
       expect(favs).toBe(3);
     });
   });
+   */
 });
 
+/*
 describe('Cycling with up and down arrow keys', () => {
   it('should work', async () => {
     state.visible = true;
@@ -283,3 +417,4 @@ describe('Cycling with up and down arrow keys', () => {
     expect(state.focusIndex).toBe(-1);
   });
 });
+ */

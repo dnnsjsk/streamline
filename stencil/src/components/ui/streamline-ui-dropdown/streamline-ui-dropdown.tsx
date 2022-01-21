@@ -12,7 +12,7 @@ import { computePosition, flip, shift } from '@floating-ui/dom';
   styleUrl: 'streamline-ui-dropdown.scss',
 })
 export class StreamlineUiDropdown {
-  private button: HTMLButtonElement;
+  private button: HTMLElement;
   private dropdown: HTMLElement;
 
   // eslint-disable-next-line no-undef
@@ -56,8 +56,9 @@ export class StreamlineUiDropdown {
   render() {
     return (
       <Host>
-        <button
-          ref={(el) => (this.button = el as HTMLButtonElement)}
+        <div
+          role="button"
+          ref={(el) => (this.button = el as HTMLElement)}
           onFocus={this.setPosition}
           onMouseEnter={this.setPosition}
           onMouseDown={(e) => e.preventDefault()}
@@ -107,7 +108,7 @@ export class StreamlineUiDropdown {
               );
             })}
           </div>
-        </button>
+        </div>
       </Host>
     );
   }
