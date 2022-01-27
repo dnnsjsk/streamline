@@ -17,8 +17,8 @@ describe('Render search', () => {
     await page.waitForChanges();
     const el = page.doc
       .querySelector('streamline-search')
-      .shadowRoot.querySelector('streamline-button');
-    expect(el).toBe(null);
+      .shadowRoot.querySelectorAll('button');
+    expect(el.length).toBe(0);
   });
   it('with enter button', async () => {
     state.isEnter = true;
@@ -29,29 +29,10 @@ describe('Render search', () => {
     await page.waitForChanges();
     const el = page.doc
       .querySelector('streamline-search')
-      .shadowRoot.querySelector('streamline-button');
-    expect(el).toEqualHtml(`
-<streamline-button text="Search" type="button"></streamline-button>
-    `);
+      .shadowRoot.querySelectorAll('button');
+    expect(el.length).toBe(1);
   });
 });
-
-// eslint-disable-next-line jest/no-commented-out-tests
-/*
-it("Activate 'slash' mode after typing '/'", async () => {
-  state.searchValue = '/';
-  const page = await newSpecPage({
-    components: [StreamlineSearch],
-    html: `<streamline-search></streamline-search>`,
-  });
-  const input = page.doc
-    .querySelector('streamline-search')
-    .shadowRoot.querySelector('input');
-  input.value = '/';
-  input.dispatchEvent(new Event('input'));
-  expect(state.isSlash).toBe(true);
-});
- */
 
 describe('Search value between different modes should', () => {
   it("persist'", async () => {
@@ -81,3 +62,20 @@ describe('Search value between different modes should', () => {
     expect(state.searchValue).toBe('');
   });
 });
+
+// eslint-disable-next-line jest/no-commented-out-tests
+/*
+it("Activate 'slash' mode after typing '/'", async () => {
+  state.searchValue = '/';
+  const page = await newSpecPage({
+    components: [StreamlineSearch],
+    html: `<streamline-search></streamline-search>`,
+  });
+  const input = page.doc
+    .querySelector('streamline-search')
+    .shadowRoot.querySelector('input');
+  input.value = '/';
+  input.dispatchEvent(new Event('input'));
+  expect(state.isSlash).toBe(true);
+});
+ */

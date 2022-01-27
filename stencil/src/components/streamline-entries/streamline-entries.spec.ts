@@ -4,10 +4,16 @@ import { dispose, state } from '../../store/internal';
 import { disposeLocal, stateLocal } from '../../store/local';
 import { StreamlineUiDropdown } from '../ui/streamline-ui-dropdown/streamline-ui-dropdown';
 const networkFav = require('../../../../assets/test/entriesNetworkFav.json');
+const menu = require('../../../../assets/test/entriesMenu.json');
+const fav = require('../../../../assets/test/entriesFav.json');
+const post = require('../../../../assets/test/entriesPost.json');
 
 beforeEach(async () => {
   dispose();
   disposeLocal();
+  state.entriesMenu = menu;
+  state.entriesPost = post;
+  state.entriesPostIsQuery = true;
 });
 
 describe('Render entries with', () => {
@@ -221,7 +227,6 @@ describe('Render entries with', () => {
   });
 
   // eslint-disable-next-line jest/no-commented-out-tests
-  /*
   describe("mode set to 'menu'", () => {
     it('and all elements shown', async () => {
       stateLocal.active = 'menu';
@@ -232,8 +237,8 @@ describe('Render entries with', () => {
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
       const lengthLi = el.querySelectorAll('li').length;
       const results = el.querySelector('.results-amount').innerHTML.trim();
-      expect(lengthLi).toBe(49);
-      expect(results).toBe('Showing 38 results');
+      expect(lengthLi).toBe(77);
+      expect(results).toBe('Showing 63 results');
     });
     it("and search is 'med'", async () => {
       stateLocal.active = 'menu';
@@ -274,23 +279,16 @@ describe('Render entries with', () => {
       expect(lengthLi).toBe(0);
       expect(results).toBe('Showing 0 results');
     });
-    it('and three elements are favourites', async () => {
+    it('and nine elements are favourites', async () => {
+      state.entriesFav = fav;
       stateLocal.active = 'menu';
       const page = await newSpecPage({
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
-      await page.waitForChanges();
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
-      const buttons = el.querySelectorAll('streamline-button');
-      await page.waitForChanges();
-      let favs = 0;
-      for (const item of Array.from(buttons)) {
-        if (item.getAttribute('favourite') === '') {
-          favs++;
-        }
-      }
-      expect(favs).toBe(3);
+      const favs = el.querySelectorAll('.text-rose-500');
+      expect(favs.length).toBe(9);
     });
   });
 
@@ -302,8 +300,8 @@ describe('Render entries with', () => {
         html: `<streamline-entries></streamline-entries>`,
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
-      const lengthLi = el.querySelectorAll('li').length;
-      expect(lengthLi).toBe(3);
+      const lengthRow = el.querySelectorAll('[data-row]').length;
+      expect(lengthRow).toBe(9);
     });
     it("and search is 'me'", async () => {
       stateLocal.active = 'post';
@@ -313,10 +311,10 @@ describe('Render entries with', () => {
         html: `<streamline-entries></streamline-entries>`,
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
-      const lengthLi = el.querySelectorAll('li').length;
+      const lengthRow = el.querySelectorAll('[data-row]').length;
       const results = el.querySelector('.results-amount').innerHTML.trim();
-      expect(lengthLi).toBe(2);
-      expect(results).toBe('Showing 2 results');
+      expect(lengthRow).toBe(1);
+      expect(results).toBe('Showing 1 result');
     });
     it("and search is 'Hello world'", async () => {
       stateLocal.active = 'post';
@@ -326,25 +324,13 @@ describe('Render entries with', () => {
         html: `<streamline-entries></streamline-entries>`,
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
-      const lengthLi = el.querySelectorAll('li').length;
+      const lengthRow = el.querySelectorAll('[data-row]').length;
       const results = el.querySelector('.results-amount').innerHTML.trim();
-      expect(lengthLi).toBe(1);
-      expect(results).toBe('Showing 1 result');
-    });
-    it("and search is 'xlsbvhaysgf'", async () => {
-      stateLocal.active = 'post';
-      state.searchValue = 'xlsbvhaysgf';
-      const page = await newSpecPage({
-        components: [StreamlineEntries],
-        html: `<streamline-entries></streamline-entries>`,
-      });
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
-      const lengthLi = el.querySelectorAll('li').length;
-      const results = el.querySelector('.results-amount').innerHTML.trim();
-      expect(lengthLi).toBe(0);
+      expect(lengthRow).toBe(0);
       expect(results).toBe('Showing 0 results');
     });
     it('and three elements are favourites', async () => {
+      state.entriesFav = fav;
       stateLocal.active = 'post';
       const page = await newSpecPage({
         components: [StreamlineEntries],
@@ -352,22 +338,14 @@ describe('Render entries with', () => {
       });
       await page.waitForChanges();
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
-      const buttons = el.querySelectorAll('streamline-post');
-      let favs = 0;
-      for (const item of Array.from(buttons)) {
-        if (item.getAttribute('favourite') === '') {
-          favs++;
-        }
-      }
-      expect(favs).toBe(3);
+      const favs = el.querySelectorAll('.text-rose-500');
+      expect(favs.length).toBe(3);
     });
   });
-   */
 });
 
-/*
-describe('Cycling with up and down arrow keys', () => {
-  it('should work', async () => {
+describe('Key press', () => {
+  it('should cycle through all entries', async () => {
     state.visible = true;
     const page = await newSpecPage({
       components: [StreamlineEntries],
@@ -381,13 +359,13 @@ describe('Cycling with up and down arrow keys', () => {
     });
     page.doc.dispatchEvent(eventUp);
     await page.waitForChanges();
-    expect(state.focusIndex).toBe(37);
+    expect(state.focusIndex).toBe(62);
     page.doc.dispatchEvent(eventUp);
     await page.waitForChanges();
-    expect(state.focusIndex).toBe(36);
+    expect(state.focusIndex).toBe(61);
     page.doc.dispatchEvent(eventDown);
     await page.waitForChanges();
-    expect(state.focusIndex).toBe(37);
+    expect(state.focusIndex).toBe(62);
     page.doc.dispatchEvent(eventDown);
     await page.waitForChanges();
     expect(state.focusIndex).toBe(0);
@@ -395,7 +373,7 @@ describe('Cycling with up and down arrow keys', () => {
     await page.waitForChanges();
     expect(state.focusIndex).toBe(1);
   });
-  it('should not work', async () => {
+  it('should not cycle through all entries', async () => {
     state.visible = true;
     const page = await newSpecPage({
       components: [StreamlineEntries],
@@ -417,4 +395,3 @@ describe('Cycling with up and down arrow keys', () => {
     expect(state.focusIndex).toBe(-1);
   });
 });
- */

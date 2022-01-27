@@ -118,7 +118,7 @@ export class StreamlineEntries {
       }
     }
 
-    (focusEls[state.focusIndex] as HTMLElement)?.focus();
+    (focusEls[state.focusIndex] as HTMLElement)?.focus?.();
   };
 
   private getHeader(item, mb = false) {
