@@ -29,7 +29,7 @@ export class StreamlineUiInput {
   componentDidLoad() {
     onChange('isProcessing', (value) => {
       if (value === true) {
-        this.input.blur();
+        this.input?.blur?.();
       }
     });
   }

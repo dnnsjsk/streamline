@@ -65,7 +65,7 @@ export class StreamlineEntries {
                   state.entriesEditing[id].values[
                     itemNested.getAttribute('data-id')
                   ].defaultValue;
-                (itemNested as HTMLInputElement).blur();
+                (itemNested as HTMLInputElement)?.blur?.();
               }
             });
           });
@@ -446,12 +446,18 @@ export class StreamlineEntries {
     };
 
     const onClickPostsEditToggle = (edit) => {
-      const isSaveable =
-        this.el.shadowRoot.querySelectorAll(
-          `[data-row="${item.ID}"] input:placeholder-shown`
-        ).length >= 1;
+      const isSaveable = () => {
+        const inputs = this.el.shadowRoot.querySelectorAll(
+          `[data-row="${item.ID}"] input`
+        );
 
-      if (!edit && isSaveable) {
+        for (const input of inputs)
+          if ((input as HTMLInputElement).value !== '') return false;
+
+        return true;
+      };
+
+      if (!edit && !isSaveable) {
         return false;
       }
 
@@ -499,7 +505,7 @@ export class StreamlineEntries {
 
       this.el.shadowRoot
         .querySelectorAll(`[data-row="${item.ID}"] input`)
-        .forEach((item) => (item as HTMLInputElement).blur());
+        .forEach((item) => (item as HTMLInputElement)?.blur?.());
     };
 
     const onClickPostsCancel = () => {
@@ -522,7 +528,7 @@ export class StreamlineEntries {
             state.entriesEditing[item.ID].values[
               itemNested.getAttribute('data-id')
             ].defaultValue;
-          (itemNested as HTMLInputElement).blur();
+          (itemNested as HTMLInputElement)?.blur?.();
         });
 
       dropdownButton.classList.remove('!opacity-100');

@@ -3,6 +3,10 @@ import { StreamlineEntries } from './streamline-entries';
 import { dispose, state } from '../../store/internal';
 import { disposeLocal, stateLocal } from '../../store/local';
 import { StreamlineUiDropdown } from '../ui/streamline-ui-dropdown/streamline-ui-dropdown';
+import matchMediaPolyfill from 'mq-polyfill';
+import { StreamlineContainer } from '../streamline-container/streamline-container';
+import { StreamlineUiDrawer } from '../ui/streamline-ui-drawer/streamline-ui-drawer';
+import { StreamlineUiInput } from '../ui/streamline-ui-input/streamline-ui-input';
 const networkFav = require('../../../../assets/test/entriesNetworkFav.json');
 const menu = require('../../../../assets/test/entriesMenu.json');
 const fav = require('../../../../assets/test/entriesFav.json');
@@ -226,7 +230,6 @@ describe('Render entries with', () => {
     });
   });
 
-  // eslint-disable-next-line jest/no-commented-out-tests
   describe("mode set to 'menu'", () => {
     it('and all elements shown', async () => {
       stateLocal.active = 'menu';
@@ -340,6 +343,123 @@ describe('Render entries with', () => {
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
       const favs = el.querySelectorAll('.text-rose-500');
       expect(favs.length).toBe(3);
+    });
+    it('and an element is being edited, saved, edited, cancelled, edited in drawer and saved', async () => {
+      matchMediaPolyfill(window);
+      stateLocal.active = 'post';
+      const page = await newSpecPage({
+        components: [
+          StreamlineContainer,
+          StreamlineEntries,
+          StreamlineUiDropdown,
+          StreamlineUiDrawer,
+          StreamlineUiInput,
+        ],
+        html: `<streamline-container></streamline-container>`,
+      });
+      window.resizeTo = function resizeTo(width, height) {
+        Object.assign(this, {
+          innerWidth: width,
+          innerHeight: height,
+          outerWidth: width,
+          outerHeight: height,
+        }).dispatchEvent(new this.Event('resize'));
+      };
+      const click = new KeyboardEvent('click');
+      const dblClick = new KeyboardEvent('dblclick');
+      const input = new KeyboardEvent('input');
+
+      await page.waitForChanges();
+      const container = page.doc.querySelector(
+        'streamline-container'
+      ).shadowRoot;
+      const entries = container.querySelector('streamline-entries').shadowRoot;
+
+      // List.
+      const editInline = entries
+        .querySelector('[data-row="1000"] streamline-ui-dropdown')
+        .shadowRoot.querySelector('a:nth-of-type(2)');
+      expect(editInline.innerHTML).toBe('Edit Inline');
+      editInline.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(entries.querySelectorAll('input.text-green-600').length).toBe(2);
+      expect(editInline.innerHTML).toBe('Cancel');
+      const inputTitle = entries.querySelector(
+        'input.text-green-600'
+      ) as HTMLInputElement;
+      inputTitle.value = 'super_string';
+      expect(entries.querySelectorAll('input.text-green-600').length).toBe(2);
+      const saveInline = entries
+        .querySelector('streamline-ui-dropdown')
+        .shadowRoot.querySelector('a:nth-of-type(1)');
+      expect(saveInline.innerHTML).toBe('Save');
+      saveInline.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(entries.querySelectorAll('input.text-green-600').length).toBe(0);
+      expect(
+        JSON.stringify(state.entriesPost).includes('"name":"super_string"')
+      ).toBe(true);
+      editInline.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(entries.querySelectorAll('input.text-green-600').length).toBe(2);
+      editInline.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(entries.querySelectorAll('input.text-green-600').length).toBe(0);
+
+      // Drawer.
+      window.resizeTo(375, 700);
+      const row = entries.querySelector('[data-row="1000"] > a');
+      row.dispatchEvent(dblClick);
+      await page.waitForChanges();
+      expect(state.drawer.active).toBe(true);
+      const drawer = container.querySelector('streamline-ui-drawer').shadowRoot;
+      expect(drawer.querySelectorAll('streamline-ui-input').length).toBe(2);
+      expect(drawer.querySelector('streamline-ui-input').value).toBe(
+        'super_string'
+      );
+      const input1 = drawer
+        .querySelector('streamline-ui-input')
+        .shadowRoot.querySelector('input');
+      input1.value = 'super_string_1';
+      input1.dispatchEvent(input);
+      await page.waitForChanges();
+      drawer.querySelector('button').dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.drawer.active).toBe(false);
+      expect(
+        JSON.stringify(state.entriesPost).includes('"name":"super_string_1"')
+      ).toBe(true);
+    });
+  });
+
+  describe("mode set to 'settings'", () => {
+    it('and all elements shown', async () => {
+      stateLocal.active = 'settings';
+      const page = await newSpecPage({
+        components: [StreamlineEntries],
+        html: `<streamline-entries></streamline-entries>`,
+      });
+      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const checkboxes = el.querySelectorAll('input[type="checkbox"]').length;
+      const select = el.querySelectorAll('select').length;
+      expect(checkboxes).toBe(7);
+      expect(select).toBe(1);
+    });
+    it('and save button activating after changing a setting', async () => {
+      stateLocal.active = 'settings';
+      const page = await newSpecPage({
+        components: [StreamlineEntries],
+        html: `<streamline-entries></streamline-entries>`,
+      });
+      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const button = el.querySelector('button[type="primary"]');
+      expect(button.getAttribute('invalid')).toBe(null);
+      const checkbox = el.querySelector(
+        'input[type="checkbox"]'
+      ) as HTMLInputElement;
+      checkbox.checked = false;
+      await page.waitForChanges();
+      expect(button.hasAttribute('invalid')).toBe(false);
     });
   });
 });
