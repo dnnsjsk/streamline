@@ -315,7 +315,7 @@ onChange('visible', (value) => {
         }
       });
       state.scroll = window.scrollY;
-      document.body.style.position = 'fixed';
+      // document.body.style.position = 'fixed';
       document.body.style.overflow = 'hidden';
       document.body.style.left = '0';
       document.body.style.top = '0';
@@ -328,7 +328,7 @@ onChange('visible', (value) => {
           document.body.style.removeProperty(item);
         }
       });
-      window.scroll(0, state.scroll);
+      window.scrollTo(0, state.scroll);
     }
   }
 

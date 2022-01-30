@@ -22,7 +22,5 @@ export function setSearchPlaceholder() {
             ? `Search for a ${stateLocal.active} or filter entries`
             : `Search for a ${stateLocal.active}`
         }${commands}`
-      : stateLocal.active === 'settings'
-      ? 'Search settings'
-      : `Search entries${commands}`;
+      : `Filter entries${commands}`;
 }

@@ -8,13 +8,13 @@ export function resetView() {
   state.isSlash = false;
   state.isHelp = false;
   state.isSearch = true;
+  if (state.entriesSettingsLoad.searchResetInput.default) {
+    state.searchValue = '';
+  }
   if (stateLocal.active === 'site' || stateLocal.active === 'post') {
     state.isEnter = state.searchValue !== '';
   } else {
     state.isEnter = false;
-  }
-  if (state.entriesSettingsLoad.searchResetInput.default) {
-    state.searchValue = '';
   }
   setEntries();
   if (state.entriesSettingsLoad.searchFocus.default) {
