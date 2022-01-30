@@ -218,6 +218,6 @@ describe('In test mode', () => {
     });
     await page.waitForChanges();
     const placeholder = state.searchPlaceholder;
-    expect(placeholder).toBe('Search entries');
+    expect(placeholder).toBe('Filter entries');
   });
 });
