@@ -1,6 +1,6 @@
 import { createLocalStore } from 'stencil-store-storage';
-import { setSearchPlaceholder } from '../utils/setSearchPlaceholder';
-import { resetView } from '../utils/resetView';
+import { setSearchPlaceholder } from '../utils/set/setSearchPlaceholder';
+import { resetView } from '../utils/general/resetView';
 
 const { state, dispose, onChange } = createLocalStore('streamline', {
   active: 'menu',

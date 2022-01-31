@@ -1,12 +1,12 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, h, Prop, Method, Host, Element } from '@stencil/core';
 import { state } from '../../store/internal';
-import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
+import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
 import { stateLocal } from '../../store/local';
-import { getMenus } from '../../utils/getMenus';
-import { getMetaKey } from '../../utils/getMetaKey';
-import { setEntries } from '../../utils/setEntries';
-import { focusSearch } from '../../utils/focusSearch';
+import { getMenus } from '../../utils/get/getMenus';
+import { getMetaKey } from '../../utils/get/getMetaKey';
+import { setEntries } from '../../utils/set/setEntries';
+import { focusSearch } from '../../utils/search/focusSearch';
 
 /**
  * Container.

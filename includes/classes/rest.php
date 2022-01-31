@@ -48,6 +48,11 @@ class Rest
                         return $param;
                     },
                 ],
+                "amount" => [
+                    "validate_callback" => function ($param, $request, $key) {
+                        return is_numeric($param);
+                    },
+                ],
             ],
         ];
         add_action("rest_api_init", function () use ($args) {
@@ -95,6 +100,7 @@ class Rest
     {
         $arr = get_sites([
             "search" => $data["value"],
+            "posts_per_page" => $data["amount"],
         ]);
 
         $index = -1;
@@ -117,6 +123,7 @@ class Rest
 
         $get["children"] = $newArr;
         $get["isMultisite"] = is_multisite();
+        $get["total"] = array_sum((array) wp_count_sites());
 
         self::updateSearches($data["userId"], "sites", $data["value"]);
 
@@ -134,6 +141,7 @@ class Rest
         $args = [
             "s" => $data["value"],
             "post_type" => "any",
+            "posts_per_page" => $data["amount"],
         ];
 
         $index = -1;
@@ -163,6 +171,8 @@ class Rest
 
         $get["children"] = $newArr;
         $get["isMultisite"] = is_multisite();
+        $get["total"] = array_sum((array) wp_count_posts());
+
         $get["path"] = $path;
 
         self::updateSearches($data["userId"], "posts", $data["value"]);

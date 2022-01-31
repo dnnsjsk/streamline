@@ -2,27 +2,29 @@
 import { Component, Element, h, State } from '@stencil/core';
 import { state } from '../../store/internal';
 import { onChangeLocal, stateLocal } from '../../store/local';
-import { setEntries } from '../../utils/setEntries';
-import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
+import { setEntries } from '../../utils/set/setEntries';
+import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter';
 import { Loader } from '../../elements/Loader';
 import {
+  IconArrowLeft,
   IconCheck,
   IconHeart,
   IconMenu,
   IconNetwork,
   IconPost,
+  IconTimes,
 } from '../../icons';
-import { fetchAjax } from '../../utils/fetchAjax';
-import { getMenus } from '../../utils/getMenus';
-import { getMenu } from '../../utils/getMenu';
-import { getMetaKey } from '../../utils/getMetaKey';
-import { doQuery } from '../../utils/doQuery';
+import { fetchAjax } from '../../utils/query/fetchAjax';
+import { getMenus } from '../../utils/get/getMenus';
+import { getMenu } from '../../utils/get/getMenu';
+import { getMetaKey } from '../../utils/get/getMetaKey';
+import { doQuery } from '../../utils/query/doQuery';
 import { someDeep } from 'deepdash-es/standalone';
-import { setFavourite } from '../../utils/setFavourite';
+import { setFavourite } from '../../utils/set/setFavourite';
 import { Button } from '../../elements/Button';
-import { setSearchPlaceholder } from '../../utils/setSearchPlaceholder';
-import { isString, camelCase, debounce } from 'lodash-es';
-import { savePost } from '../../utils/savePost';
+import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
+import { isString, camelCase, debounce, isBoolean, isNumber } from 'lodash-es';
+import { savePost } from '../../utils/query/savePost';
 
 /**
  * Entries.
@@ -161,100 +163,124 @@ export class StreamlineEntries {
     return (
       <div
         class={{
-          'flex-row items-center justify-between':
-            stateLocal.active === 'settings',
-          'flex-col items-start sm:justify-between':
-            stateLocal.active !== 'settings',
-          '!mb-0': mb,
-          [this.px]: true,
-          'relative min-h-[60px] pt-5 flex flex-wrap mb-1 pb-1.5 flex sticky -top-2 bg-white z-20 border-b border-slate-300 sm:min-h-[75px] sm:mb-4 sm:flex-row sm:items-center sm:pt-6 sm:pb-2 sm:-top-2':
+          'mb-2 grid grid-cols-[minmax(0,1fr),auto] justify-between items-center relative min-h-[60px] pt-5 flex pb-1.5 sticky -top-2 bg-white z-20 border-b border-slate-300 sm:min-h-[75px] sm:pt-6 sm:pb-2 sm:-top-2 sm:mb-3':
             true,
+          [this.px]: true,
+          '!mb-0': mb,
         }}
       >
-        <div class={`absolute -left-full top-0 h-full bg-white z-[-1]`} />
-        <div class={`flex items-center flex-row max-w-full`}>
-          {stateLocal.active === 'fav' &&
-            state.entriesFavActive[0].children.length !== 0 &&
-            !state.isHelp && (
-              <div
-                class={`flex-shrink-0 text-blue-600 flex items-center justify-center mr-3`}
-              >
-                {item.type === 'menu' && <IconMenu />}
-                {item.type === 'networkMenu' && <IconNetwork />}
-                {item.type === 'post' && <IconPost />}
-              </div>
+        <div>
+          <div class={`absolute -left-full top-0 h-full bg-white z-[-1]`} />
+          <div class={`flex items-center flex-row max-w-full`}>
+            {stateLocal.active === 'fav' &&
+              state.entriesFavActive[0].children.length !== 0 &&
+              !state.isHelp && (
+                <div
+                  class={`flex-shrink-0 text-blue-600 flex items-center justify-center mr-3`}
+                >
+                  {item.type === 'menu' && <IconMenu />}
+                  {item.type === 'networkMenu' && <IconNetwork />}
+                  {item.type === 'post' && <IconPost />}
+                </div>
+              )}
+            {isQueryWithClose && (
+              <Button
+                type="back"
+                icon={<IconTimes />}
+                onClick={() => {
+                  state[
+                    `entries${capitalizeFirstLetter(stateLocal.active)}IsQuery`
+                  ] = false;
+                  state[`entries${capitalizeFirstLetter(stateLocal.active)}`] =
+                    [];
+                  state[
+                    `entries${capitalizeFirstLetter(stateLocal.active)}Active`
+                  ] = [];
+                  setSearchPlaceholder();
+                }}
+              />
             )}
-          {isQueryWithClose && (
-            <Button
-              type="back"
-              onClick={() => {
-                state[
-                  `entries${capitalizeFirstLetter(stateLocal.active)}IsQuery`
-                ] = false;
-                state[`entries${capitalizeFirstLetter(stateLocal.active)}`] =
-                  [];
-                state[
-                  `entries${capitalizeFirstLetter(stateLocal.active)}Active`
-                ] = [];
-                setSearchPlaceholder();
+            <h1
+              class={{
+                'text-slate-900 font-medium text-lg mr-6 whitespace-nowrap truncate leading-tight sm:text-xl':
+                  true,
+                'ml-8': isQueryWithClose,
               }}
-            />
-          )}
-          <h1
-            class={{
-              'text-slate-900 font-medium text-lg mr-6 whitespace-nowrap truncate leading-tight sm:text-xl':
-                true,
-              'ml-8': isQueryWithClose,
-            }}
-            innerHTML={`${
-              state.isSlash || isDotMenu
-                ? item.title
-                : item.type === 'networkMenu'
-                ? 'Network admin'
-                : isMenu
-                ? 'Admin menu' + path
-                : (stateLocal.active === 'post' ||
-                    stateLocal.active === 'site') &&
-                  state[`entries${capitalizeFirstLetter(stateLocal.active)}`][0]
-                    ?.queryValue
-                ? `${capitalizeFirstLetter(stateLocal.active)}s for: ` +
-                  `<span class="text-slate-400 italic">${
+              innerHTML={`${
+                state.isSlash || isDotMenu
+                  ? item.title
+                  : item.type === 'networkMenu'
+                  ? 'Network admin'
+                  : isMenu
+                  ? 'Admin menu' + path
+                  : (stateLocal.active === 'post' ||
+                      stateLocal.active === 'site') &&
                     state[
-                      `entries${stateLocal.active === 'post' ? 'Post' : 'Site'}`
+                      `entries${capitalizeFirstLetter(stateLocal.active)}`
                     ][0]?.queryValue
-                  }</span>` +
-                  path
-                : isQuery && stateLocal.active === 'fav'
-                ? `${capitalizeFirstLetter(item.type)}s` + path
-                : isQueryMode &&
-                  !state[
-                    `entries${capitalizeFirstLetter(stateLocal.active)}IsQuery`
-                  ] &&
-                  state[
-                    `historySearches${capitalizeFirstLetter(stateLocal.active)}`
-                  ]?.length === 0
-                ? `No query, search for a ${stateLocal.active} in the search bar`
-                : isQueryMode &&
-                  !state[
-                    `entries${capitalizeFirstLetter(stateLocal.active)}IsQuery`
-                  ] &&
-                  state[
-                    `historySearches${capitalizeFirstLetter(stateLocal.active)}`
-                  ]?.length > 0
-                ? `Search history`
-                : stateLocal.active === 'settings'
-                ? 'Settings'
-                : 'No results'
-            }`}
-          />
+                  ? `${capitalizeFirstLetter(stateLocal.active)}s for: ` +
+                    `<span class="text-slate-400 italic">${
+                      state[
+                        `entries${
+                          stateLocal.active === 'post' ? 'Post' : 'Site'
+                        }`
+                      ][0]?.queryValue
+                    }</span>` +
+                    path
+                  : isQuery && stateLocal.active === 'fav'
+                  ? `${capitalizeFirstLetter(item.type)}s` + path
+                  : isQueryMode &&
+                    !state[
+                      `entries${capitalizeFirstLetter(
+                        stateLocal.active
+                      )}IsQuery`
+                    ] &&
+                    state[
+                      `historySearches${capitalizeFirstLetter(
+                        stateLocal.active
+                      )}`
+                    ]?.length === 0
+                  ? `No query, search for a ${stateLocal.active} in the search bar`
+                  : isQueryMode &&
+                    !state[
+                      `entries${capitalizeFirstLetter(
+                        stateLocal.active
+                      )}IsQuery`
+                    ] &&
+                    state[
+                      `historySearches${capitalizeFirstLetter(
+                        stateLocal.active
+                      )}`
+                    ]?.length > 0
+                  ? `Search history`
+                  : stateLocal.active === 'settings'
+                  ? 'Settings'
+                  : 'No results'
+              }`}
+            />
+          </div>
+          <div class={`mt-0.5 sm:mt-1`}>
+            {[
+              {
+                type: 'text',
+                text: results,
+                condition: stateLocal.active !== 'settings' && isNotDotMenu,
+              },
+            ].map((item) => {
+              return (
+                item.condition && (
+                  <span
+                    class={`results-amount text-xs font-medium leading-tight text-slate-700 text-xs`}
+                  >
+                    {item.text}
+                  </span>
+                )
+              );
+            })}
+          </div>
         </div>
-        <div class={`flex flex-wrap space-x-4 divide-x`}>
-          {Object.values([
-            {
-              type: 'text',
-              text: results,
-              condition: stateLocal.active !== 'settings' && isNotDotMenu,
-            },
+        <div>
+          {[
             {
               type: 'button',
               text: 'Save',
@@ -275,29 +301,32 @@ export class StreamlineEntries {
                 }
               },
             },
-          ]).map((itemInner, itemIndex) => {
-            return itemInner.condition && itemInner.type === 'text' ? (
-              <span
-                class={`results-amount text-xs mt-1.5 sm:my-1.5 font-medium leading-tight text-slate-700 sm:text-sm ${
-                  itemIndex === 0 ? '' : 'pl-4'
-                }`}
-              >
-                {itemInner.text}
-              </span>
-            ) : (
-              itemInner.condition && itemInner.type === 'button' && (
+          ].map((item) => {
+            return (
+              item.condition && (
                 <Button
-                  onClick={
-                    state.entriesSettingsHaveChanged && itemInner.onClick
-                  }
+                  onClick={state.entriesSettingsHaveChanged && item.onClick}
                   tabindex={state.entriesSettingsHaveChanged ? 0 : -1}
                   invalid={!state.entriesSettingsHaveChanged}
                   type="primary"
-                  text={itemInner.text}
+                  text={item.text}
                 />
               )
             );
           })}
+          {(stateLocal.active === 'site' || stateLocal.active === 'post') && (
+            <div class={`grid grid-cols-2 gap-2`}>
+              <Button type="secondary" icon={<IconArrowLeft />} />
+              <Button
+                type="secondary"
+                icon={
+                  <span class={`rotate-180 inline-block`}>
+                    <IconArrowLeft />
+                  </span>
+                }
+              />
+            </div>
+          )}
         </div>
       </div>
     );
@@ -726,7 +755,7 @@ export class StreamlineEntries {
           {(item.type === 'post' || item.type === 'site') && (
             <div
               data-uid={uid}
-              class={`${this.borderB} overflow-x-auto scrollbar-none pointer-events-none sticky top-[62px] z-10 bg-white sm:top-[67px]`}
+              class={`${this.borderB} overflow-x-auto scrollbar-none pointer-events-none sticky top-[62px] z-10 bg-white sm:top-[72px]`}
             >
               <div
                 class={`${this.px} grid grid-flow-col auto-cols-[minmax(150px,_1fr)] gap-2`}
@@ -835,7 +864,7 @@ export class StreamlineEntries {
                     } flex flex-col`}
                   >
                     <h2
-                      class={`${this.h2} ${this.borderB} !text-lg mt-4 space-y-2 mb-6 inline-block leading-none pb-2`}
+                      class={`${this.h2} ${this.borderB} !text-lg mt-4 space-y-2 mb-3 inline-block leading-none pb-2 sm:mb-6`}
                     >
                       {itemInner.name}
                     </h2>
@@ -844,10 +873,7 @@ export class StreamlineEntries {
                         {Object.values(itemInner.children as unknown).map(
                           (itemSub, indexSub) => {
                             return (
-                              <li
-                                key={indexSub}
-                                class={`flex items-center mr-4`}
-                              >
+                              <li key={indexSub} class={`flex items-center`}>
                                 <label
                                   htmlFor={`setting-${itemSub.id}`}
                                   class={{
@@ -857,12 +883,23 @@ export class StreamlineEntries {
                                   }}
                                 >
                                   <div
-                                    class={`relative mt-0.5 inline-block h-[max-content] w-[max-content] focus-in-white-out`}
+                                    class={{
+                                      'relative mt-0.5 inline-block h-[max-content] focus-in-white-out':
+                                        true,
+                                      'w-[max-content]': isBoolean(
+                                        state.entriesSettingsLoad[itemSub.id]
+                                          .default
+                                      ),
+                                      'w-full': !isBoolean(
+                                        state.entriesSettingsLoad[itemSub.id]
+                                          .default
+                                      ),
+                                    }}
                                   >
                                     {itemSub.choices ? (
                                       <select
                                         data-focus={true}
-                                        class="text-xs focus-none cursor-pointer w-[100px]"
+                                        class="text-sm focus-none cursor-pointer w-[100px]"
                                         onInput={(e) =>
                                           this.settingsOnChange(
                                             itemSub.id,
@@ -891,6 +928,31 @@ export class StreamlineEntries {
                                           }
                                         )}
                                       </select>
+                                    ) : isNumber(
+                                        state.entriesSettingsLoad[itemSub.id]
+                                          .default
+                                      ) ? (
+                                      <input
+                                        data-focus={true}
+                                        id={`setting-${itemSub.id}`}
+                                        type="number"
+                                        class="text-sm focus-none max-w-[100px]"
+                                        min={10}
+                                        value={
+                                          state.entriesSettingsLoad[itemSub.id]
+                                            .default
+                                        }
+                                        onInput={(e) =>
+                                          this.settingsOnChange(
+                                            itemSub.id,
+                                            'default',
+                                            parseInt(
+                                              (e.target as HTMLInputElement)
+                                                .value
+                                            )
+                                          )
+                                        }
+                                      />
                                     ) : (
                                       [
                                         <input
@@ -921,7 +983,7 @@ export class StreamlineEntries {
                                       ]
                                     )}
                                   </div>
-                                  <div class={`w-full`}>
+                                  <div class={`w-full mt-0.5 sm:mt-0`}>
                                     <div
                                       class={`text-base text-slate-900 font-medium flex justify-between`}
                                     >

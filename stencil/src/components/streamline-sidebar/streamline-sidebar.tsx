@@ -1,10 +1,10 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, h } from '@stencil/core';
 import { state } from '../../store/internal';
-import { capitalizeFirstLetter } from '../../utils/capitalizeFirstLetter';
+import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter';
 import { stateLocal } from '../../store/local';
 import { Loader } from '../../elements/Loader';
-import { getMenus } from '../../utils/getMenus';
+import { getMenus } from '../../utils/get/getMenus';
 import {
   IconCustom,
   IconDots,

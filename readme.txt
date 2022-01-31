@@ -15,6 +15,10 @@ Do things faster.
 
 == Changelog ==
 
+= 1.1.1 =
+* Fix: minor UI bugs
+* New: setting for maximum number of displayed posts/sites per page
+
 = 1.1.0 =
 * Enhancement: add &lt;streamline-dropdown> component
 * Enhancement: apply original styles to body after closing app

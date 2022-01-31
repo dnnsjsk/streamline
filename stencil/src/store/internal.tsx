@@ -1,7 +1,7 @@
 import { createStore } from '@stencil/store';
 import equal from 'fast-deep-equal/es6';
-import { focusSearch } from '../utils/focusSearch';
-import { blurSearch } from '../utils/blurSearch';
+import { focusSearch } from '../utils/search/focusSearch';
+import { blurSearch } from '../utils/search/blurSearch';
 import { stateLocal } from './local';
 
 const isTest = document
@@ -147,6 +147,20 @@ const { state, dispose, onChange } = createStore({
           ],
           name: 'Appearance',
         },
+        {
+          children: [
+            {
+              id: 'queryAmount',
+              name: 'Post amount',
+              nameParent: 'Queries',
+              label: `Maximum number of displayed posts${
+                // @ts-ignore
+                window.streamlineData.network ? '/sites' : ''
+              } per page`,
+            },
+          ],
+          name: 'Queries',
+        },
       ],
       type: 'settings',
     },
@@ -176,6 +190,9 @@ const { state, dispose, onChange } = createStore({
     },
     appearanceBlur: {
       default: false,
+    },
+    queryAmount: {
+      default: 20,
     },
   },
   entriesSettingsSave: {},
