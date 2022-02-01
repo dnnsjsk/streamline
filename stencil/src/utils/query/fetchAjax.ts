@@ -1,7 +1,7 @@
 import { state } from '../../store/internal';
 
 export function fetchAjax(obj) {
-  state.isProcessing = true;
+  state.isLoading = true;
   // @ts-ignore
   // eslint-disable-next-line no-undef
   const streamline = window.streamline || false;
@@ -19,7 +19,7 @@ export function fetchAjax(obj) {
   })
     .then((response) => response && response.json())
     .then(() => {
-      state.isProcessing = false;
+      state.isLoading = false;
       obj.callback && obj.callback();
     })
     .catch(() => {

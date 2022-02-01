@@ -119,7 +119,7 @@ export class StreamlineUiDrawer {
               type="primary"
               text="Save"
               class="w-full !py-4 !text-base"
-              invalid={!this.canSave}
+              disabled={!this.canSave}
             />
           </div>
         </div>

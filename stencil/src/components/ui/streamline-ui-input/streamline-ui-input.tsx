@@ -27,7 +27,7 @@ export class StreamlineUiInput {
   @Prop({ mutable: true }) value: string;
 
   componentDidLoad() {
-    onChange('isProcessing', (value) => {
+    onChange('isLoading', (value) => {
       if (value === true) {
         this.input?.blur?.();
       }

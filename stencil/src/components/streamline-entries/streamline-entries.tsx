@@ -4,7 +4,6 @@ import { state } from '../../store/internal';
 import { onChangeLocal, stateLocal } from '../../store/local';
 import { setEntries } from '../../utils/set/setEntries';
 import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter';
-import { Loader } from '../../elements/Loader';
 import {
   IconArrowLeft,
   IconCheck,
@@ -132,10 +131,20 @@ export class StreamlineEntries {
     const isNotDotMenu = !state.isHelp;
     const isQueryWithClose =
       isQueryMode &&
-      state[`entries${capitalizeFirstLetter(stateLocal.active)}IsQuery`] &&
+      state[`entries${capitalizeFirstLetter(stateLocal.active)}Query`] &&
       state[`historySearches${capitalizeFirstLetter(stateLocal.active)}`]
         ?.length > 0 &&
       !state.isHelp;
+
+    const hasPages =
+      isQueryWithClose &&
+      stateLocal.active === 'post' &&
+      state[`entries${capitalizeFirstLetter(stateLocal.active)}Total`] >
+        state.entriesSettingsLoad.queryAmount.default;
+    const totalPages = Math.ceil(
+      state[`entries${capitalizeFirstLetter(stateLocal.active)}Total`] /
+        state.entriesSettingsLoad.queryAmount.default
+    );
 
     let menuNumber = 0;
     if (isMenu) {
@@ -153,6 +162,14 @@ export class StreamlineEntries {
       (isMenu && menuNumber === 1)
         ? `result`
         : `results`
+    }${
+      hasPages
+        ? ` (page ${
+            state[
+              `entries${capitalizeFirstLetter(stateLocal.active)}CurrentPage`
+            ]
+          } of ${totalPages})`
+        : ''
     }`;
 
     const path =
@@ -189,8 +206,13 @@ export class StreamlineEntries {
                 icon={<IconTimes />}
                 onClick={() => {
                   state[
-                    `entries${capitalizeFirstLetter(stateLocal.active)}IsQuery`
-                  ] = false;
+                    `entries${capitalizeFirstLetter(
+                      stateLocal.active
+                    )}CurrentPage`
+                  ] = 1;
+                  state[
+                    `entries${capitalizeFirstLetter(stateLocal.active)}Query`
+                  ] = '';
                   state[`entries${capitalizeFirstLetter(stateLocal.active)}`] =
                     [];
                   state[
@@ -231,9 +253,7 @@ export class StreamlineEntries {
                   ? `${capitalizeFirstLetter(item.type)}s` + path
                   : isQueryMode &&
                     !state[
-                      `entries${capitalizeFirstLetter(
-                        stateLocal.active
-                      )}IsQuery`
+                      `entries${capitalizeFirstLetter(stateLocal.active)}Query`
                     ] &&
                     state[
                       `historySearches${capitalizeFirstLetter(
@@ -243,9 +263,7 @@ export class StreamlineEntries {
                   ? `No query, search for a ${stateLocal.active} in the search bar`
                   : isQueryMode &&
                     !state[
-                      `entries${capitalizeFirstLetter(
-                        stateLocal.active
-                      )}IsQuery`
+                      `entries${capitalizeFirstLetter(stateLocal.active)}Query`
                     ] &&
                     state[
                       `historySearches${capitalizeFirstLetter(
@@ -307,24 +325,80 @@ export class StreamlineEntries {
                 <Button
                   onClick={state.entriesSettingsHaveChanged && item.onClick}
                   tabindex={state.entriesSettingsHaveChanged ? 0 : -1}
-                  invalid={!state.entriesSettingsHaveChanged}
+                  disabled={!state.entriesSettingsHaveChanged}
                   type="primary"
                   text={item.text}
                 />
               )
             );
           })}
-          {(stateLocal.active === 'site' || stateLocal.active === 'post') && (
+          {hasPages && stateLocal.active === 'post' && state.entriesPostQuery && (
             <div class={`grid grid-cols-2 gap-2`}>
-              <Button type="secondary" icon={<IconArrowLeft />} />
-              <Button
-                type="secondary"
-                icon={
-                  <span class={`rotate-180 inline-block`}>
-                    <IconArrowLeft />
-                  </span>
-                }
-              />
+              {[
+                {
+                  type: 'secondary',
+                  icon: <IconArrowLeft />,
+                  disabled:
+                    state[
+                      `entries${capitalizeFirstLetter(
+                        stateLocal.active
+                      )}CurrentPage`
+                    ] === 1,
+                  action: 'prev',
+                },
+                {
+                  type: 'secondary',
+                  icon: (
+                    <span class={`rotate-180 inline-block`}>
+                      <IconArrowLeft />
+                    </span>
+                  ),
+                  disabled:
+                    state[
+                      `entries${capitalizeFirstLetter(
+                        stateLocal.active
+                      )}CurrentPage`
+                    ] === totalPages,
+                  action: 'next',
+                },
+              ].map((item) => {
+                return (
+                  <Button
+                    type={item.type}
+                    icon={item.icon}
+                    disabled={item.disabled}
+                    onClick={() => {
+                      state[
+                        `entries${capitalizeFirstLetter(
+                          stateLocal.active
+                        )}CurrentPage`
+                      ] =
+                        item.action === 'next'
+                          ? state[
+                              `entries${capitalizeFirstLetter(
+                                stateLocal.active
+                              )}CurrentPage`
+                            ] + 1
+                          : state[
+                              `entries${capitalizeFirstLetter(
+                                stateLocal.active
+                              )}CurrentPage`
+                            ] - 1;
+
+                      doQuery({
+                        type: stateLocal.active,
+                        callback: stateLocal.active + 's',
+                        search:
+                          state[
+                            `entries${capitalizeFirstLetter(
+                              stateLocal.active
+                            )}Query`
+                          ],
+                      });
+                    }}
+                  />
+                );
+              })}
             </div>
           )}
         </div>
@@ -464,7 +538,7 @@ export class StreamlineEntries {
 
       state.entriesPost = [];
       state.entriesPostActive = [];
-      state.entriesPostIsQuery = false;
+      state.entriesPostQuery = '';
 
       getMenu({
         adminUrl: item.adminUrl,
@@ -716,7 +790,7 @@ export class StreamlineEntries {
     const isHistory =
       !state.test &&
       (stateLocal.active === 'post' || stateLocal.active === 'site') &&
-      !state[`entries${capitalizeFirstLetter(stateLocal.active)}IsQuery`] &&
+      !state[`entries${capitalizeFirstLetter(stateLocal.active)}Query`] &&
       state[`historySearches${capitalizeFirstLetter(stateLocal.active)}`]
         ?.length > 0;
 
@@ -1044,26 +1118,18 @@ export class StreamlineEntries {
             : 'h-full lg:h-[calc(100%+80px)]'
         } relative`}
       >
-        {state.isLoading ? (
-          <div
-            class={`w-full h-[calc(100%-var(--sl-side-w))] flex items-center justify-center bg-white/50 absolute top-0 left-0 backdrop-blur-sm z-10`}
-          >
-            <Loader sm={false} />
-          </div>
-        ) : (
-          <div
-            tabindex={-1}
-            class={`focus-none inner pb-6 relative h-[calc(100%-var(--sl-side-w))] overflow-y-scroll w-full bg-white lg:pb-10 ${
-              state.isProcessing ? 'pointer-events-none opacity-50' : ''
-            }`}
-          >
-            {state.isHelp
-              ? this.help()
-              : stateLocal.active === 'settings'
-              ? this.settings()
-              : this.rows()}
-          </div>
-        )}
+        <div
+          tabindex={-1}
+          class={`focus-none inner pb-6 relative h-[calc(100%-var(--sl-side-w))] overflow-y-scroll w-full bg-white lg:pb-10 ${
+            state.isLoading ? 'pointer-events-none opacity-50' : ''
+          }`}
+        >
+          {state.isHelp
+            ? this.help()
+            : stateLocal.active === 'settings'
+            ? this.settings()
+            : this.rows()}
+        </div>
         {isMultisite && (
           <div
             class={`mt-auto px-4 h-6 bg-slate-50 border-t border-slate-200 flex items-center text-slate-900`}

@@ -3,6 +3,7 @@
 namespace Streamline;
 
 use stdClass;
+use WP_Query;
 
 /**
  * Rest class.
@@ -53,6 +54,11 @@ class Rest
                         return is_numeric($param);
                     },
                 ],
+                "page" => [
+                    "validate_callback" => function ($param, $request, $key) {
+                        return is_numeric($param);
+                    },
+                ],
             ],
         ];
         add_action("rest_api_init", function () use ($args) {
@@ -84,7 +90,7 @@ class Rest
     function updateSearches($userId, $type, $value)
     {
         $key = "streamline_search_history_" . $type;
-        $meta = array_slice(get_user_meta($userId, $key, true) ?: [], 0, 50);
+        $meta = array_slice(get_user_meta($userId, $key, true) ?: [], -50);
         $meta[] = $value;
         delete_user_meta($userId, $key);
         update_user_meta($userId, $key, $meta);
@@ -100,7 +106,7 @@ class Rest
     {
         $arr = get_sites([
             "search" => $data["value"],
-            "posts_per_page" => $data["amount"],
+            "posts_per_page" => 100,
         ]);
 
         $index = -1;
@@ -123,7 +129,6 @@ class Rest
 
         $get["children"] = $newArr;
         $get["isMultisite"] = is_multisite();
-        $get["total"] = array_sum((array) wp_count_sites());
 
         self::updateSearches($data["userId"], "sites", $data["value"]);
 
@@ -142,6 +147,7 @@ class Rest
             "s" => $data["value"],
             "post_type" => "any",
             "posts_per_page" => $data["amount"],
+            "paged" => $data["page"],
         ];
 
         $index = -1;
@@ -151,27 +157,25 @@ class Rest
             switch_to_blog($data["siteId"]);
         }
         $path = get_site(get_current_blog_id())->path;
-        $arr = get_posts($args);
+        $query = new WP_Query($args);
 
-        foreach ($arr as $post) {
+        foreach ($query->get_posts() as $post) {
             $index++;
             $postData = Init::getPostData($post);
             $postData->hrefEdit = base64_encode(get_edit_post_link($post->ID));
             $postData->siteId = $data["siteId"];
-            $arr[$index] = $postData;
+            $newArr[$post->ID] = $postData;
         }
+
+	    wp_reset_postdata();
 
         if (is_multisite() && function_exists("restore_current_blog")) {
             restore_current_blog();
         }
 
-        foreach ($arr as $post) {
-            $newArr[$post->ID] = $post;
-        }
-
         $get["children"] = $newArr;
         $get["isMultisite"] = is_multisite();
-        $get["total"] = array_sum((array) wp_count_posts());
+        $get["total"] = $query->found_posts;
 
         $get["path"] = $path;
 

@@ -17,7 +17,7 @@ export function Button(props) {
           props.type === 'secondary',
         'px-2 py-1 bg-white border border-slate-200 text-slate-600 hover:text-slate-50 hover:bg-slate-900 hover:border-slate-900 sm:px-3 sm:py-1.5':
           props.type === 'tertiary',
-        'opacity-50 pointer-events-none': props.invalid,
+        'opacity-50 pointer-events-none': props.disabled,
         'border border-slate-200 text-slate-600 hover:text-slate-50 hover:bg-slate-900 hover:border-slate-900 !w-5 !h-5 absolute !p-0 mr-2':
           props.type === 'back',
       }}

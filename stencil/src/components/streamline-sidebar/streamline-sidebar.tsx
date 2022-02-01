@@ -83,7 +83,7 @@ export class StreamlineSidebar {
         }}
       >
         {type === 'wordpress' ? (
-          state.isProcessing ? (
+          state.isLoading ? (
             <Loader sm={true} />
           ) : (
             icon

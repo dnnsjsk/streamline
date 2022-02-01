@@ -56,8 +56,10 @@ const { state, dispose, onChange } = createStore({
   entriesNetworkMenuActive: [],
   entriesPost: [],
   entriesPostActive: [],
-  entriesPostIsQuery: false,
+  entriesPostCurrentPage: 1,
   entriesPostCurrentPath: '',
+  entriesPostQuery: '',
+  entriesPostTotal: 0,
   entriesSettings: [
     {
       children: [
@@ -153,10 +155,7 @@ const { state, dispose, onChange } = createStore({
               id: 'queryAmount',
               name: 'Post amount',
               nameParent: 'Queries',
-              label: `Maximum number of displayed posts${
-                // @ts-ignore
-                window.streamlineData.network ? '/sites' : ''
-              } per page`,
+              label: `Maximum number of displayed posts per page`,
             },
           ],
           name: 'Queries',
@@ -199,7 +198,9 @@ const { state, dispose, onChange } = createStore({
   entriesSettingsHaveChanged: false,
   entriesSite: [],
   entriesSiteActive: [],
-  entriesSiteIsQuery: false,
+  entriesSiteCurrentPage: 1,
+  entriesSiteQuery: '',
+  entriesSiteTotal: 0,
   historySearchesSite: JSON.parse(
     // @ts-ignore
     window.streamlineData.historySearchesSite
@@ -210,9 +211,8 @@ const { state, dispose, onChange } = createStore({
   ).reverse(),
   isEnter: false,
   isHelp: false,
-  isLoading: false,
   isMac: false,
-  isProcessing: false,
+  isLoading: false,
   isSearch: true,
   isSearchFocus: true,
   isSlash: false,

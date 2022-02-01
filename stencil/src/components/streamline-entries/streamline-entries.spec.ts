@@ -17,7 +17,7 @@ beforeEach(async () => {
   disposeLocal();
   state.entriesMenu = menu;
   state.entriesPost = post;
-  state.entriesPostIsQuery = true;
+  state.entriesPostQuery = 'test';
 });
 
 describe('Render entries with', () => {
@@ -453,7 +453,7 @@ describe('Render entries with', () => {
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
       const button = el.querySelector('button[type="primary"]');
-      expect(button.getAttribute('invalid')).toBe(null);
+      expect(button.getAttribute('disabled')).toBe(null);
       const checkbox = el.querySelector(
         'input[type="checkbox"]'
       ) as HTMLInputElement;

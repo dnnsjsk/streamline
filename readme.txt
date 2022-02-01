@@ -16,8 +16,11 @@ Do things faster.
 == Changelog ==
 
 = 1.1.1 =
+* Enhancement: use WP_Query for Rest call
+* Enhancement: use same loading state for all operations
 * Fix: minor UI bugs
-* New: setting for maximum number of displayed posts/sites per page
+* Fix: show the correct search history order
+* New: setting for maximum number of displayed posts per page
 
 = 1.1.0 =
 * Enhancement: add &lt;streamline-dropdown> component
