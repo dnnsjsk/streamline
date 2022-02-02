@@ -2,10 +2,20 @@ import { state } from '../../store/internal';
 import { stateLocal } from '../../store/local';
 import { filterDeep } from 'deepdash-es/standalone';
 import { capitalizeFirstLetter } from '../string/capitalizeFirstLetter';
+import { getEntriesSliced } from '../get/getEntriesSliced';
 
 export function setEntries() {
   const result = filterDeep(
-    state[`entries${capitalizeFirstLetter(stateLocal.active)}`],
+    state.test && stateLocal.active === 'post'
+      ? [
+          {
+            ...state.entriesPost[0],
+            children:
+              state.entriesPost?.[0]?.children &&
+              getEntriesSliced(state.entriesPost[0].children),
+          },
+        ]
+      : state[`entries${capitalizeFirstLetter(stateLocal.active)}`],
     (o) => {
       return (
         (o.name &&

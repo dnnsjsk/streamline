@@ -20,4 +20,9 @@ export function resetView() {
   if (state.entriesSettingsLoad.searchFocus.default) {
     focusSearch();
   }
+  document
+    .querySelector('streamline-container')
+    ?.shadowRoot.querySelector('streamline-entries')
+    ?.shadowRoot?.querySelector('.inner')
+    ?.scrollTo(0, 0);
 }

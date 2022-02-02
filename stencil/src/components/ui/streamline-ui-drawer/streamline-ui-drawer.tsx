@@ -22,8 +22,7 @@ export class StreamlineUiDrawer {
       ...state.drawer,
       active: false,
     };
-
-    setTimeout(() => {
+    const save = () => {
       state.drawer = {
         active: false,
         items: [],
@@ -35,7 +34,13 @@ export class StreamlineUiDrawer {
         values: {},
       };
       this.canSave = true;
-    }, 500);
+    };
+
+    if (state.test) {
+      save();
+    } else {
+      setTimeout(save, 500);
+    }
   };
 
   private save = () => {
@@ -44,11 +49,16 @@ export class StreamlineUiDrawer {
   };
 
   private onInput = () => {
-    setTimeout(() => {
+    const save = () => {
       this.canSave =
         this.el.shadowRoot.querySelectorAll('streamline-ui-input[invalid]')
           .length === 0;
-    }, 50);
+    };
+    if (state.test) {
+      save();
+    } else {
+      setTimeout(save, 50);
+    }
 
     state.drawer = {
       ...state.drawer,

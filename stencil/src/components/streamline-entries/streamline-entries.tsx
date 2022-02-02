@@ -123,6 +123,8 @@ export class StreamlineEntries {
   };
 
   private getHeader(item, mb = false) {
+    const isTestNav = state.test && stateLocal.active === 'post';
+
     const isQuery = item.type === 'post' || item.type === 'site';
     const isQueryMode =
       stateLocal.active === 'site' || stateLocal.active === 'post';
@@ -137,12 +139,16 @@ export class StreamlineEntries {
       !state.isHelp;
 
     const hasPages =
-      isQueryWithClose &&
-      stateLocal.active === 'post' &&
-      state[`entries${capitalizeFirstLetter(stateLocal.active)}Total`] >
-        state.entriesSettingsLoad.queryAmount.default;
+      (state.test && stateLocal.active === 'post') ||
+      (isQueryWithClose &&
+        stateLocal.active === 'post' &&
+        state[`entries${capitalizeFirstLetter(stateLocal.active)}Total`] >
+          state.entriesSettingsLoad.queryAmount.default);
     const totalPages = Math.ceil(
-      state[`entries${capitalizeFirstLetter(stateLocal.active)}Total`] /
+      (state.test && stateLocal.active === 'post'
+        ? state.entriesPost?.[0]?.children &&
+          Object.values(Object.values(state.entriesPost?.[0]?.children)).length
+        : state[`entries${capitalizeFirstLetter(stateLocal.active)}Total`]) /
         state.entriesSettingsLoad.queryAmount.default
     );
 
@@ -163,7 +169,7 @@ export class StreamlineEntries {
         ? `result`
         : `results`
     }${
-      hasPages
+      hasPages || isTestNav
         ? ` (page ${
             state[
               `entries${capitalizeFirstLetter(stateLocal.active)}CurrentPage`
@@ -304,11 +310,22 @@ export class StreamlineEntries {
               text: 'Save',
               condition: stateLocal.active === 'settings' && isNotDotMenu,
               onClick: () => {
+                state.entriesPostCurrentPage = 1;
+
                 if (!state.test) {
                   fetchAjax({
                     type: 'settings',
                     query: state.entriesSettingsSave,
                     callback: () => {
+                      if (
+                        state.entriesSettingsLoad.queryAmount !==
+                          // @ts-ignore
+                          state.entriesSettingsSave.queryAmount &&
+                        !state.test
+                      ) {
+                        state.entriesPost = [];
+                        state.entriesPostQuery = '';
+                      }
                       // @ts-ignore
                       state.entriesSettingsLoad = state.entriesSettingsSave;
                     },
@@ -332,7 +349,10 @@ export class StreamlineEntries {
               )
             );
           })}
-          {hasPages && stateLocal.active === 'post' && state.entriesPostQuery && (
+          {(isTestNav ||
+            (hasPages &&
+              stateLocal.active === 'post' &&
+              state.entriesPostQuery)) && (
             <div class={`grid grid-cols-2 gap-2`}>
               {[
                 {
@@ -385,16 +405,20 @@ export class StreamlineEntries {
                               )}CurrentPage`
                             ] - 1;
 
-                      doQuery({
-                        type: stateLocal.active,
-                        callback: stateLocal.active + 's',
-                        search:
-                          state[
-                            `entries${capitalizeFirstLetter(
-                              stateLocal.active
-                            )}Query`
-                          ],
-                      });
+                      if (!state.test) {
+                        doQuery({
+                          type: stateLocal.active,
+                          callback: stateLocal.active + 's',
+                          search:
+                            state[
+                              `entries${capitalizeFirstLetter(
+                                stateLocal.active
+                              )}Query`
+                            ],
+                        });
+                      } else {
+                        setEntries();
+                      }
                     }}
                   />
                 );
@@ -452,7 +476,7 @@ export class StreamlineEntries {
               return (
                 <span
                   class={{
-                    'px-2.5 py-1 text-xs uppercase font-semibold': true,
+                    'px-2.5 py-1.5 text-xs uppercase font-semibold': true,
                     'bg-green-100 text-green-600': isPublish,
                     'bg-purple-100 text-purple-600': isFuture,
                     'bg-yellow-100 text-yellow-600': isDraft,
@@ -856,28 +880,26 @@ export class StreamlineEntries {
             }
             class="overflow-x-auto"
           >
-            {Object.values(item.children as unknown).map(
-              (itemInner, indexInner) => {
-                return itemInner.children ? (
-                  <li key={indexInner}>
-                    <h2
-                      class={`${this.mx} ${this.borderB} text-base pb-2 pt-3.5 text-slate-900 font-medium sm:text-lg sm:pt-5 sm:pb-2.5`}
-                    >
-                      {itemInner.name}
-                    </h2>
-                    <ul>
-                      {Object.values(itemInner.children as unknown).map(
-                        (itemSub) => {
-                          return this.row(itemSub, table);
-                        }
-                      )}
-                    </ul>
-                  </li>
-                ) : (
-                  this.row(itemInner, table)
-                );
-              }
-            )}
+            {Object.values(item.children).map((itemInner, indexInner) => {
+              return itemInner['children'] ? (
+                <li key={indexInner}>
+                  <h2
+                    class={`${this.mx} ${this.borderB} text-base pb-2 pt-3.5 text-slate-900 font-medium sm:text-lg sm:pt-5 sm:pb-2.5`}
+                  >
+                    {itemInner['name']}
+                  </h2>
+                  <ul>
+                    {Object.values(itemInner['children'] as unknown).map(
+                      (itemSub) => {
+                        return this.row(itemSub, table);
+                      }
+                    )}
+                  </ul>
+                </li>
+              ) : (
+                this.row(itemInner, table)
+              );
+            })}
           </ul>
         </div>
       );
@@ -917,7 +939,7 @@ export class StreamlineEntries {
     const Key = (props) => (
       <div
         style={{ boxShadow: '0 3px 0 0 #E2E8F0' }}
-        class={`h-[max-content] px-2 leading-0 py-0.5 text-[11px] uppercase font-medium text-slate-800 border bg-slate-50 border-slate-200`}
+        class={`h-[max-content] px-2 leading-0 py-1 text-[11px] uppercase font-medium text-slate-800 border bg-slate-50 border-slate-200`}
       >
         {props.key}
       </div>

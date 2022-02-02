@@ -18,6 +18,7 @@ Do things faster.
 = 1.1.1 =
 * Enhancement: use WP_Query for Rest call
 * Enhancement: use same loading state for all operations
+* Enhancement: add set line-height to container
 * Fix: minor UI bugs
 * Fix: show the correct search history order
 * New: setting for maximum number of displayed posts per page

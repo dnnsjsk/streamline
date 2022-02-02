@@ -304,7 +304,18 @@ describe('Render entries with', () => {
       });
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
       const lengthRow = el.querySelectorAll('[data-row]').length;
-      expect(lengthRow).toBe(9);
+      expect(lengthRow).toBe(505);
+    });
+    it('and all elements shown in test mode', async () => {
+      stateLocal.active = 'post';
+      state.test = true;
+      const page = await newSpecPage({
+        components: [StreamlineEntries],
+        html: `<streamline-entries></streamline-entries>`,
+      });
+      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const lengthRow = el.querySelectorAll('[data-row]').length;
+      expect(lengthRow).toBe(20);
     });
     it("and search is 'me'", async () => {
       stateLocal.active = 'post';
@@ -316,8 +327,22 @@ describe('Render entries with', () => {
       const el = page.doc.querySelector('streamline-entries').shadowRoot;
       const lengthRow = el.querySelectorAll('[data-row]').length;
       const results = el.querySelector('.results-amount').innerHTML.trim();
-      expect(lengthRow).toBe(1);
-      expect(results).toBe('Showing 1 result');
+      expect(lengthRow).toBe(35);
+      expect(results).toBe('Showing 35 results');
+    });
+    it("and search is 'me' in test mode", async () => {
+      stateLocal.active = 'post';
+      state.searchValue = 'me';
+      state.test = true;
+      const page = await newSpecPage({
+        components: [StreamlineEntries],
+        html: `<streamline-entries></streamline-entries>`,
+      });
+      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const lengthRow = el.querySelectorAll('[data-row]').length;
+      const results = el.querySelector('.results-amount').innerHTML.trim();
+      expect(lengthRow).toBe(2);
+      expect(results).toBe('Showing 2 results (page 1 of 26)');
     });
     it("and search is 'Hello world'", async () => {
       stateLocal.active = 'post';
@@ -346,6 +371,7 @@ describe('Render entries with', () => {
     });
     it('and an element is being edited, saved, edited, cancelled, edited in drawer and saved', async () => {
       matchMediaPolyfill(window);
+      state.test = true;
       stateLocal.active = 'post';
       const page = await newSpecPage({
         components: [
@@ -377,7 +403,7 @@ describe('Render entries with', () => {
 
       // List.
       const editInline = entries
-        .querySelector('[data-row="1000"] streamline-ui-dropdown')
+        .querySelector('[data-row="1"] streamline-ui-dropdown')
         .shadowRoot.querySelector('a:nth-of-type(2)');
       expect(editInline.innerHTML).toBe('Edit Inline');
       editInline.dispatchEvent(click);
@@ -408,7 +434,7 @@ describe('Render entries with', () => {
 
       // Drawer.
       window.resizeTo(375, 700);
-      const row = entries.querySelector('[data-row="1000"] > a');
+      const row = entries.querySelector('[data-row="1"] > a');
       row.dispatchEvent(dblClick);
       await page.waitForChanges();
       expect(state.drawer.active).toBe(true);
@@ -429,6 +455,119 @@ describe('Render entries with', () => {
       expect(
         JSON.stringify(state.entriesPost).includes('"name":"super_string_1"')
       ).toBe(true);
+    });
+    it('paginating through pages works correctly', async () => {
+      stateLocal.active = 'post';
+      state.test = true;
+      const page = await newSpecPage({
+        components: [StreamlineEntries],
+        html: `<streamline-entries></streamline-entries>`,
+      });
+      const click = new KeyboardEvent('click');
+      const prev = page.doc
+        .querySelector('streamline-entries')
+        .shadowRoot.querySelector('[type="secondary"]:nth-of-type(1)');
+      const next = page.doc
+        .querySelector('streamline-entries')
+        .shadowRoot.querySelector('[type="secondary"]:nth-of-type(2)');
+      expect(prev.hasAttribute('disabled')).toBe(true);
+      expect(state.entriesPostCurrentPage).toBe(1);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(prev.hasAttribute('disabled')).toBe(false);
+      expect(state.entriesPostCurrentPage).toBe(2);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(3);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(4);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(5);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(6);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(7);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(8);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(9);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(10);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(11);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(12);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(13);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(14);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(15);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(16);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(17);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(18);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(19);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(20);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(21);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(22);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(23);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(24);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(25);
+      next.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(state.entriesPostCurrentPage).toBe(26);
+      expect(next.hasAttribute('disabled')).toBe(true);
+      stateLocal.active = 'settings';
+      state.entriesSettingsLoad = {
+        ...state.entriesSettingsLoad,
+        ...{
+          queryAmount: {
+            default: 30,
+          },
+        },
+      };
+      await page.waitForChanges();
+      state.entriesPostCurrentPage = 1;
+      stateLocal.active = 'post';
+      await page.waitForChanges();
+      expect(
+        page.doc
+          .querySelector('streamline-entries')
+          .shadowRoot.querySelector('.results-amount')
+          .innerHTML.trim()
+      ).toBe('Showing 30 results (page 1 of 17)');
     });
   });
 

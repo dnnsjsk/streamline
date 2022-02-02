@@ -155,7 +155,7 @@ const { state, dispose, onChange } = createStore({
               id: 'queryAmount',
               name: 'Post amount',
               nameParent: 'Queries',
-              label: `Maximum number of displayed posts per page`,
+              label: 'Maximum number of displayed posts per page',
             },
           ],
           name: 'Queries',

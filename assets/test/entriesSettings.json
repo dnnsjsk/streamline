@@ -9,10 +9,7 @@
             "nameParent": "Key shortcuts",
             "label": "Navigate between entry items",
             "metaKey": false,
-            "keys": [
-              "↑",
-              "↓"
-            ]
+            "keys": ["↑", "↓"]
           },
           {
             "id": "keyNavigationTabs",
@@ -20,10 +17,7 @@
             "nameParent": "Key shortcuts",
             "label": "Navigate between top-level tab items",
             "metaKey": true,
-            "keys": [
-              "↑",
-              "↓"
-            ]
+            "keys": ["↑", "↓"]
           },
           {
             "id": "keySearch",
@@ -31,9 +25,7 @@
             "nameParent": "Key shortcuts",
             "label": "Focus the search bar",
             "metaKey": true,
-            "keys": [
-              "s"
-            ]
+            "keys": ["s"]
           },
           {
             "id": "keyExit",
@@ -41,9 +33,7 @@
             "nameParent": "Key shortcuts",
             "label": "Exit the app",
             "metaKey": false,
-            "keys": [
-              "esc"
-            ]
+            "keys": ["esc"]
           }
         ],
         "name": "Key shortcuts"
@@ -95,6 +85,17 @@
           }
         ],
         "name": "Appearance"
+      },
+      {
+        "children": [
+          {
+            "id": "queryAmount",
+            "name": "Post amount",
+            "nameParent": "Queries",
+            "label": "Maximum number of displayed posts per page"
+          }
+        ],
+        "name": "Queries"
       }
     ],
     "type": "settings"
