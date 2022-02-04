@@ -15,12 +15,16 @@ Do things faster.
 
 == Changelog ==
 
+= 1.1.2 =
+* Fix: prevent input being cut off in drawer
+
 = 1.1.1 =
 * Enhancement: add set line-height to container
 * Enhancement: use WP_Query for Rest call
 * Enhancement: use same loading state for all operations
 * Fix: minor UI bugs
 * Fix: show the correct search history order
+* New: pagination for posts
 * New: setting for maximum number of displayed posts per page
 
 = 1.1.0 =

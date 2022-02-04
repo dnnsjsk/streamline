@@ -4,6 +4,7 @@ import { resetView } from '../utils/general/resetView';
 
 const { state, dispose, onChange } = createLocalStore('streamline', {
   active: 'menu',
+  sort: {},
 });
 
 onChange('active', () => {

@@ -22,7 +22,7 @@ import { someDeep } from 'deepdash-es/standalone';
 import { setFavourite } from '../../utils/set/setFavourite';
 import { Button } from '../../elements/Button';
 import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
-import { isString, camelCase, debounce, isBoolean, isNumber } from 'lodash-es';
+import { debounce, isBoolean, isNumber } from 'lodash-es';
 import { savePost } from '../../utils/query/savePost';
 
 /**
@@ -101,6 +101,31 @@ export class StreamlineEntries {
       state.entriesEditing = {};
     });
   }
+
+  componentDidRender() {
+    this.sorter();
+  }
+
+  private sorter = () => {
+    this.el.shadowRoot
+      .querySelectorAll('[data-sort-active]')
+      .forEach((item) => {
+        const id = item.getAttribute('data-sort-active');
+        const type = item.getAttribute('data-sort-type');
+
+        if (stateLocal?.sort?.[type]?.id === id) {
+          this.sort(
+            item,
+            {
+              id: id,
+              type: type,
+            },
+            stateLocal.sort[type].direction,
+            true
+          );
+        }
+      });
+  };
 
   private cycleEntries = (mode) => {
     const focusEls = this.el.shadowRoot.querySelectorAll('[data-focus]');
@@ -418,6 +443,7 @@ export class StreamlineEntries {
                         });
                       } else {
                         setEntries();
+                        this.sorter();
                       }
                     }}
                   />
@@ -438,7 +464,7 @@ export class StreamlineEntries {
     );
   };
 
-  private row = (item, outerTable) => {
+  private row = (item, table) => {
     let isFav = false;
 
     const isEdit = state.entriesEditing?.[item.ID]?.active;
@@ -451,56 +477,6 @@ export class StreamlineEntries {
     const isCurrentSite =
       parseInt(item.siteId) === parseInt(state.currentSite.id);
     const isTable = isSite || isPost;
-
-    const table = isSite
-      ? [
-          {
-            text: item.domain,
-          },
-          {
-            text: item.path,
-          },
-          {
-            text: item.siteId,
-          },
-        ]
-      : isPost
-      ? [
-          {
-            text: () => {
-              const isPublish = item.post_status === 'publish';
-              const isFuture = item.post_status === 'future';
-              const isDraft = item.post_status === 'draft';
-              const isPending = item.post_status === 'pending';
-              const isPrivate = item.post_status === 'private';
-              return (
-                <span
-                  class={{
-                    'px-2.5 py-1.5 text-xs uppercase font-semibold': true,
-                    'bg-green-100 text-green-600': isPublish,
-                    'bg-purple-100 text-purple-600': isFuture,
-                    'bg-yellow-100 text-yellow-600': isDraft,
-                    'bg-lime-100 text-lime-600': isPending,
-                    'bg-blue-100 text-blue-600': isPrivate,
-                    'bg-slate-100 text-slate-600':
-                      !isPublish &&
-                      !isFuture &&
-                      !isDraft &&
-                      !isPending &&
-                      !isPrivate,
-                  }}
-                >
-                  {item.post_status}
-                </span>
-              );
-            },
-            value: item.post_status,
-          },
-          { text: item.post_title, id: 'post_title' },
-          { text: item.post_name, id: 'post_name' },
-          { text: item.post_type },
-        ]
-      : [];
 
     const checkIfFavourite = () => {
       isFav =
@@ -679,30 +655,20 @@ export class StreamlineEntries {
     const onDblClick = (e) => {
       if (isPost && window.innerWidth <= 639) {
         e.preventDefault();
-        const obj = {} as any;
-        Object.values(table).forEach((item, index) => {
-          obj[camelCase(outerTable[index])] = {
-            value: item.value || item.text,
-            id: item.id,
-          };
-        });
         state.drawer = {
           ...state.drawer,
           active: true,
-          title: `Editing: ${obj.title.value}`,
+          title: `Editing: ${item.post_title}`,
           onSave: () => {
             savePost(item, state.drawer.values);
           },
-          postId: item.ID,
-          postType: obj.postType.value,
-          status: obj.postType.status,
-          items: Object.entries(obj as unknown)
-            .map(([key, value]) => {
+          items: Object.values(table as unknown)
+            .map((itemInner) => {
               return (
-                value.id && {
-                  id: value.id,
-                  value: item[value.id],
-                  label: key,
+                itemInner.edit && {
+                  id: itemInner.id,
+                  value: item[itemInner.id],
+                  label: itemInner.name,
                 }
               );
             })
@@ -730,8 +696,15 @@ export class StreamlineEntries {
 
     const rowClass = 'text-sm font-medium text-slate-600 h-[42px]';
 
+    const sortData = {};
+    table.forEach((itemInner) => {
+      if (itemInner.sort) {
+        sortData[`data-sort-${itemInner.id}`] = item[itemInner.id];
+      }
+    });
+
     return (
-      <li class={`relative`} data-entry={true} data-row={item.ID}>
+      <li class={`relative`} data-entry={true} data-row={item.ID} {...sortData}>
         <a
           data-focus={true}
           tabindex={isEdit ? -1 : 0}
@@ -769,30 +742,30 @@ export class StreamlineEntries {
         </a>
         {isTable && (
           <div
-            class={`${this.px} grid auto-cols-[minmax(150px,_1fr)] grid-flow-col gap-2 w-full absolute top-0 pointer-events-none text-slate-700 sm:peer-hover:text-blue-600`}
+            class={`${this.px} grid auto-cols-[minmax(150px,1fr)] grid-flow-col gap-2 w-full absolute top-0 pointer-events-none text-slate-700 sm:peer-hover:text-blue-600`}
           >
             {table.map((itemNested) => {
               return (
                 <div class={`h-[42px] flex items-center relative`}>
-                  {isString(itemNested.text) ? (
+                  {itemNested.text ? (
+                    itemNested.text?.(item)
+                  ) : (
                     <input
-                      title={itemNested.text}
+                      title={item[itemNested.id]}
                       data-id={itemNested.id}
                       type="text"
-                      tabindex={itemNested.id && isEdit ? 0 : -1}
-                      disabled={!itemNested.id && isEdit}
+                      tabindex={itemNested.edit && isEdit ? 0 : -1}
+                      disabled={!itemNested.edit && isEdit}
                       class={{
                         'truncate text-sm font-medium h-[42px] pointer-events-none leading-none select-text absolute -top-px left-0 focus-none w-4/5 bg-transparent':
                           true,
                         // @ts-ignore
                         'text-green-600 !pointer-events-auto placeholder-rose-600':
-                          isEdit && itemNested.id,
+                          isEdit && itemNested.edit,
                       }}
-                      value={itemNested.text}
+                      value={item[itemNested.id]}
                       placeholder="No value"
                     />
-                  ) : (
-                    itemNested.text?.()
                   )}
                 </div>
               );
@@ -808,6 +781,39 @@ export class StreamlineEntries {
         )}
       </li>
     );
+  };
+
+  private sort = (e, item, direction = 'ascending', force = false) => {
+    const attr = `data-sort-${item.id}`;
+    const categoryItems = this.el.shadowRoot.querySelectorAll(`[${attr}]`);
+    const categoryItemsArray = Array.from(categoryItems);
+
+    const sorted = categoryItemsArray.sort(sorter);
+
+    function sorter(a, b) {
+      const first = direction === 'ascending' ? a : b;
+      const second = direction === 'ascending' ? b : a;
+      if (first.getAttribute(attr) < second.getAttribute(attr)) return -1;
+      if (first.getAttribute(attr) > second.getAttribute(attr)) return 1;
+      return 0;
+    }
+
+    sorted.forEach((el) =>
+      (force ? e : e.target)
+        .closest(`[data-entry-section="${item.type}"]`)
+        .querySelector('[data-sort]')
+        .appendChild(el)
+    );
+
+    if (!force) {
+      stateLocal.sort = {
+        ...stateLocal.sort,
+        [item.type]: {
+          id: item.id,
+          direction: direction,
+        },
+      };
+    }
   };
 
   private rows = () => {
@@ -842,30 +848,121 @@ export class StreamlineEntries {
 
       const table =
         stateLocal.active === 'site'
-          ? ['Domain', 'Path', 'ID']
+          ? [
+              {
+                id: 'domain',
+                name: 'Domain',
+                sort: true,
+              },
+              { id: 'path', name: 'Path', sort: true },
+              { id: 'siteId', name: 'ID', sort: true },
+            ]
           : item.type === 'post'
-          ? ['Status', 'Title', 'Slug', 'Post type']
+          ? [
+              {
+                id: 'post_status',
+                text: (itemInner) => {
+                  const isPublish = itemInner.post_status === 'publish';
+                  const isFuture = itemInner.post_status === 'future';
+                  const isDraft = itemInner.post_status === 'draft';
+                  const isPending = itemInner.post_status === 'pending';
+                  const isPrivate = itemInner.post_status === 'private';
+                  return (
+                    <span
+                      class={{
+                        'px-2.5 py-1.5 text-xs uppercase font-semibold': true,
+                        'bg-green-100 text-green-600': isPublish,
+                        'bg-purple-100 text-purple-600': isFuture,
+                        'bg-yellow-100 text-yellow-600': isDraft,
+                        'bg-lime-100 text-lime-600': isPending,
+                        'bg-blue-100 text-blue-600': isPrivate,
+                        'bg-slate-100 text-slate-600':
+                          !isPublish &&
+                          !isFuture &&
+                          !isDraft &&
+                          !isPending &&
+                          !isPrivate,
+                      }}
+                    >
+                      {itemInner.post_status}
+                    </span>
+                  );
+                },
+                name: 'Status',
+                sort: true,
+              },
+              { id: 'post_title', name: 'Title', edit: true, sort: true },
+              { id: 'post_name', name: 'Slug', edit: true, sort: true },
+              { id: 'post_type', name: 'Post type', sort: true },
+            ]
           : [];
 
       return (
-        <div>
+        <div data-entry-section={item.type}>
           {this.getHeader(item, true)}
           {(item.type === 'post' || item.type === 'site') && (
             <div
               data-uid={uid}
-              class={`${this.borderB} overflow-x-auto scrollbar-none pointer-events-none sticky top-[62px] z-10 bg-white sm:top-[72px]`}
+              class={`overflow-x-auto scrollbar-none sticky top-[62px] z-10 bg-white sm:top-[72px]`}
             >
               <div
-                class={`${this.px} grid grid-flow-col auto-cols-[minmax(150px,_1fr)] gap-2`}
+                class={`${this.px} grid grid-flow-col auto-cols-[minmax(150px,1fr)] gap-2`}
               >
-                {table.map((item) => {
+                {table.map((itemInner) => {
                   return (
-                    <span
-                      key={item}
-                      class="py-1.5 text-xs uppercase font-semibold font-slate-500 whitespace-nowrap"
+                    <div
+                      data-sort-type={item.type}
+                      data-sort-active={
+                        stateLocal.sort[item.type]?.id === itemInner.id &&
+                        itemInner.id
+                      }
+                      tabindex="0"
+                      role="button"
+                      key={itemInner.id}
+                      class={{
+                        [this.borderB]: true,
+                        'group grid grid-cols-[1fr,auto] items-center py-1.5 text-xs uppercase font-semibold font-slate-500 whitespace-nowrap hover:border-slate-900 focus:border-blue-500 focus:outline-none':
+                          true,
+                        'pointer-events-none': !itemInner.sort,
+                      }}
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={(e) =>
+                        this.sort(
+                          e,
+                          {
+                            ...itemInner,
+                            type: item.type,
+                          },
+                          stateLocal.sort[item.type]?.id !== itemInner.id
+                            ? 'ascending'
+                            : stateLocal.sort[item.type].direction ===
+                              'ascending'
+                            ? 'descending'
+                            : 'ascending'
+                        )
+                      }
                     >
-                      {item}
-                    </span>
+                      {itemInner.name}
+                      <svg
+                        class={{
+                          'hidden w-[8px] mr-2 group-hover:block group-focus:block group-focus:text-blue-600':
+                            true,
+                          '!block':
+                            stateLocal.sort[item.type]?.id === itemInner.id,
+                          'rotate-180':
+                            stateLocal.sort[item.type]?.direction ===
+                            'descending',
+                        }}
+                        xmlns="http://www.w3.org/2000/svg"
+                        role="img"
+                        viewBox="0 0 320 512"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M151.5 347.8L3.5 201c-4.7-4.7-4.7-12.3 0-17l19.8-19.8c4.7-4.7 12.3-4.7 17 0L160 282.7l119.7-118.5c4.7-4.7 12.3-4.7 17 0l19.8 19.8c4.7 4.7 4.7 12.3 0 17l-148 146.8c-4.7 4.7-12.3 4.7-17 0z"
+                        />
+                      </svg>
+                    </div>
                   );
                 })}
               </div>
@@ -873,6 +970,7 @@ export class StreamlineEntries {
           )}
           <ul
             data-uid={uid}
+            data-sort={true}
             onScroll={
               item.type === 'post' || item.type === 'site'
                 ? (e) => onScroll(e)

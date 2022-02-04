@@ -27,9 +27,6 @@ export class StreamlineUiDrawer {
         active: false,
         items: [],
         onSave: null,
-        postType: '',
-        postId: 0,
-        status: '',
         title: '',
         values: {},
       };
@@ -107,7 +104,7 @@ export class StreamlineUiDrawer {
               {state.drawer.title}
             </h1>
           )}
-          <div class="p-4 pt-0 overflow-y-auto space-y-8">
+          <div class="p-4 overflow-y-auto space-y-8">
             {state.drawer.items.map((item) => {
               return (
                 <streamline-ui-input
