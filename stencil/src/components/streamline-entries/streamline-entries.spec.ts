@@ -12,6 +12,10 @@ const menu = require('../../../../assets/test/entriesMenu.json');
 const fav = require('../../../../assets/test/entriesFav.json');
 const post = require('../../../../assets/test/entriesPost.json');
 
+const e = (page) => {
+  return page.doc.querySelector('streamline-entries').shadowRoot;
+};
+
 beforeEach(async () => {
   dispose();
   disposeLocal();
@@ -30,7 +34,7 @@ describe('Render entries with', () => {
       });
       state.isHelp = true;
       await page.waitForChanges();
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const el = e(page);
       const length = el.querySelectorAll('p').length;
       expect(length).toBe(2);
     });
@@ -42,7 +46,7 @@ describe('Render entries with', () => {
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const el = e(page);
       const lengthLi = el.querySelectorAll('li').length;
       expect(lengthLi).toBe(18);
     });
@@ -53,9 +57,26 @@ describe('Render entries with', () => {
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const el = e(page);
       const lengthLi = el.querySelectorAll('[data-entry]').length;
       expect(lengthLi).toBe(3);
+    });
+    it('and favourite is added', async () => {
+      stateLocal.active = 'post';
+      const page = await newSpecPage({
+        components: [StreamlineEntries, StreamlineUiDropdown],
+        html: `<streamline-entries></streamline-entries>`,
+      });
+      const el = e(page);
+      const fav = el
+        .querySelector('streamline-ui-dropdown')
+        .shadowRoot.querySelector('a');
+      const click = new MouseEvent('click');
+      fav.dispatchEvent(click);
+      stateLocal.active = 'fav';
+      await page.waitForChanges();
+      const lengthEntry = el.querySelectorAll('[data-entry]').length;
+      expect(lengthEntry).toBe(13);
     });
     it('and all favourites are removed until there is none left', async () => {
       stateLocal.active = 'fav';
@@ -63,14 +84,14 @@ describe('Render entries with', () => {
         components: [StreamlineEntries, StreamlineUiDropdown],
         html: `<streamline-entries></streamline-entries>`,
       });
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const el = e(page);
       const rows = el.querySelectorAll('[data-entry]');
-      for (const item of Array.from(rows).reverse()) {
+      for (const item of Array.from(rows).reverse() as any) {
         const index = Array.from(rows).reverse().indexOf(item);
         const unfavouriteButton = item
           .querySelector('streamline-ui-dropdown')
           .shadowRoot.querySelector('a');
-        const click = new KeyboardEvent('click');
+        const click = new MouseEvent('click');
         unfavouriteButton.dispatchEvent(click);
         await page.waitForChanges();
         const lengthEntry = el.querySelectorAll('[data-entry]').length;
@@ -78,58 +99,63 @@ describe('Render entries with', () => {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(state.entriesFav.length).toBe(2);
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(lengthEntry).toBe(11);
+          expect(lengthEntry).toBe(12);
         } else if (index === 1) {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(state.entriesFav.length).toBe(2);
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(lengthEntry).toBe(10);
+          expect(lengthEntry).toBe(11);
         } else if (index === 2) {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(state.entriesFav.length).toBe(2);
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(lengthEntry).toBe(9);
+          expect(lengthEntry).toBe(10);
         } else if (index === 3) {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(state.entriesFav.length).toBe(2);
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(lengthEntry).toBe(8);
+          expect(lengthEntry).toBe(9);
         } else if (index === 4) {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(state.entriesFav.length).toBe(2);
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(lengthEntry).toBe(7);
+          expect(lengthEntry).toBe(8);
         } else if (index === 5) {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(state.entriesFav.length).toBe(2);
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(lengthEntry).toBe(6);
+          expect(lengthEntry).toBe(7);
         } else if (index === 6) {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(state.entriesFav.length).toBe(2);
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(lengthEntry).toBe(5);
+          expect(lengthEntry).toBe(6);
         } else if (index === 7) {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(state.entriesFav.length).toBe(2);
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(lengthEntry).toBe(4);
+          expect(lengthEntry).toBe(5);
         } else if (index === 8) {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(state.entriesFav.length).toBe(1);
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(lengthEntry).toBe(3);
+          expect(lengthEntry).toBe(4);
         } else if (index === 9) {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(state.entriesFav.length).toBe(1);
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(lengthEntry).toBe(2);
+          expect(lengthEntry).toBe(3);
         } else if (index === 10) {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(state.entriesFav.length).toBe(1);
           // eslint-disable-next-line jest/no-conditional-expect
-          expect(lengthEntry).toBe(1);
+          expect(lengthEntry).toBe(2);
         } else if (index === 11) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(state.entriesFav.length).toBe(1);
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(lengthEntry).toBe(1);
+        } else if (index === 12) {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(state.entriesFav.length).toBe(0);
           // eslint-disable-next-line jest/no-conditional-expect
@@ -144,14 +170,14 @@ describe('Render entries with', () => {
         components: [StreamlineEntries, StreamlineUiDropdown],
         html: `<streamline-entries></streamline-entries>`,
       });
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const el = e(page);
       const rows = el.querySelectorAll('[data-entry]');
-      for (const item of Array.from(rows).reverse()) {
+      for (const item of Array.from(rows).reverse() as any) {
         const index = Array.from(rows).reverse().indexOf(item);
         const unfavouriteButton = item
           .querySelector('streamline-ui-dropdown')
           .shadowRoot.querySelector('a');
-        const click = new KeyboardEvent('click');
+        const click = new MouseEvent('click');
         unfavouriteButton.dispatchEvent(click);
         await page.waitForChanges();
         const lengthEntry = el.querySelectorAll('[data-entry]').length;
@@ -237,7 +263,7 @@ describe('Render entries with', () => {
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const el = e(page);
       const lengthLi = el.querySelectorAll('li').length;
       const results = el.querySelector('.results-amount').innerHTML.trim();
       expect(lengthLi).toBe(77);
@@ -250,7 +276,7 @@ describe('Render entries with', () => {
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const el = e(page);
       const lengthLi = el.querySelectorAll('li').length;
       const results = el.querySelector('.results-amount').innerHTML.trim();
       expect(lengthLi).toBe(5);
@@ -263,7 +289,7 @@ describe('Render entries with', () => {
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const el = e(page);
       const lengthLi = el.querySelectorAll('li').length;
       const results = el.querySelector('.results-amount').innerHTML.trim();
       expect(lengthLi).toBe(2);
@@ -276,7 +302,7 @@ describe('Render entries with', () => {
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const el = e(page);
       const lengthLi = el.querySelectorAll('li').length;
       const results = el.querySelector('.results-amount').innerHTML.trim();
       expect(lengthLi).toBe(0);
@@ -289,7 +315,7 @@ describe('Render entries with', () => {
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const el = e(page);
       const favs = el.querySelectorAll('.text-rose-500');
       expect(favs.length).toBe(9);
     });
@@ -302,7 +328,7 @@ describe('Render entries with', () => {
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const el = e(page);
       const lengthRow = el.querySelectorAll('[data-row]').length;
       expect(lengthRow).toBe(505);
     });
@@ -313,7 +339,7 @@ describe('Render entries with', () => {
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const el = e(page);
       const lengthRow = el.querySelectorAll('[data-row]').length;
       expect(lengthRow).toBe(20);
     });
@@ -324,7 +350,7 @@ describe('Render entries with', () => {
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const el = e(page);
       const lengthRow = el.querySelectorAll('[data-row]').length;
       const results = el.querySelector('.results-amount').innerHTML.trim();
       expect(lengthRow).toBe(35);
@@ -338,7 +364,7 @@ describe('Render entries with', () => {
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const el = e(page);
       const lengthRow = el.querySelectorAll('[data-row]').length;
       const results = el.querySelector('.results-amount').innerHTML.trim();
       expect(lengthRow).toBe(2);
@@ -351,7 +377,7 @@ describe('Render entries with', () => {
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const el = e(page);
       const lengthRow = el.querySelectorAll('[data-row]').length;
       const results = el.querySelector('.results-amount').innerHTML.trim();
       expect(lengthRow).toBe(0);
@@ -365,7 +391,7 @@ describe('Render entries with', () => {
         html: `<streamline-entries></streamline-entries>`,
       });
       await page.waitForChanges();
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const el = e(page);
       const favs = el.querySelectorAll('.text-rose-500');
       expect(favs.length).toBe(3);
     });
@@ -391,7 +417,7 @@ describe('Render entries with', () => {
           outerHeight: height,
         }).dispatchEvent(new this.Event('resize'));
       };
-      const click = new KeyboardEvent('click');
+      const click = new MouseEvent('click');
       const dblClick = new KeyboardEvent('dblclick');
       const input = new KeyboardEvent('input');
 
@@ -456,14 +482,14 @@ describe('Render entries with', () => {
         JSON.stringify(state.entriesPost).includes('"name":"super_string_1"')
       ).toBe(true);
     });
-    it('paginating through pages works correctly', async () => {
+    it('and paginate to the last page', async () => {
       stateLocal.active = 'post';
       state.test = true;
       const page = await newSpecPage({
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
-      const click = new KeyboardEvent('click');
+      const click = new MouseEvent('click');
       const prev = page.doc
         .querySelector('streamline-entries')
         .shadowRoot.querySelector('[type="secondary"]:nth-of-type(1)');
@@ -569,6 +595,38 @@ describe('Render entries with', () => {
           .innerHTML.trim()
       ).toBe('Showing 30 results (page 1 of 17)');
     });
+    it('sort entries by post title, check favourites and reset it afterwards', async () => {
+      stateLocal.active = 'post';
+      state.entriesFav = fav;
+      state.test = true;
+      const page = await newSpecPage({
+        components: [StreamlineEntries],
+        html: `<streamline-entries></streamline-entries>`,
+      });
+      const el = e(page);
+      const click = new MouseEvent('click');
+      const sort = el.querySelector(
+        'div[data-uid] div[role="button"]:nth-of-type(2)'
+      );
+      sort.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(stateLocal.sort['post'].id).toBe('post_title');
+      const firstInput = el.querySelector(
+        '[data-entry] [data-id="post_title"]'
+      );
+      expect(firstInput.value).toBe(
+        'Amet adipisci voluptas sed aspernatur iure animi'
+      );
+      sort.dispatchEvent(click);
+      await page.waitForChanges();
+      expect(firstInput.value).toBe('super_string_1');
+      stateLocal.active = 'fav';
+      await page.waitForChanges();
+      expect(firstInput.value).toBe('Time to log out');
+      el.querySelector('[type="transparent"]').dispatchEvent(click);
+      await page.waitForChanges();
+      expect(firstInput.value).toBe('Streamline 2.0');
+    });
   });
 
   describe("mode set to 'settings'", () => {
@@ -578,7 +636,7 @@ describe('Render entries with', () => {
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const el = e(page);
       const checkboxes = el.querySelectorAll('input[type="checkbox"]').length;
       const select = el.querySelectorAll('select').length;
       expect(checkboxes).toBe(7);
@@ -590,7 +648,7 @@ describe('Render entries with', () => {
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
-      const el = page.doc.querySelector('streamline-entries').shadowRoot;
+      const el = e(page);
       const button = el.querySelector('button[type="primary"]');
       expect(button.getAttribute('disabled')).toBe(null);
       const checkbox = el.querySelector(

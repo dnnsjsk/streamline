@@ -17,6 +17,7 @@ Do things faster.
 
 = 1.1.2 =
 * Fix: prevent input being cut off in drawer
+* New: possibility to sort post/site queries
 
 = 1.1.1 =
 * Enhancement: add set line-height to container

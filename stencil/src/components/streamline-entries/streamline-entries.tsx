@@ -7,6 +7,7 @@ import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter'
 import {
   IconArrowLeft,
   IconCheck,
+  IconFilterSlash,
   IconHeart,
   IconMenu,
   IconNetwork,
@@ -24,6 +25,7 @@ import { Button } from '../../elements/Button';
 import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
 import { debounce, isBoolean, isNumber } from 'lodash-es';
 import { savePost } from '../../utils/query/savePost';
+import { sort } from '../../utils/sort/sort';
 
 /**
  * Entries.
@@ -39,6 +41,7 @@ export class StreamlineEntries {
   private h2 = 'text-sm text-slate-900 font-medium sm:text-base';
   private px = 'px-4 sm:px-8 lg:px-12';
   private mx = 'mx-4 sm:mx-8 lg:mx-12';
+  private grid = 'grid grid-flow-col auto-cols-[minmax(150px,1fr)] gap-2';
 
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineEntriesElement;
@@ -102,30 +105,9 @@ export class StreamlineEntries {
     });
   }
 
-  componentDidRender() {
-    this.sorter();
+  componentDidLoad() {
+    // sorter(this.el);
   }
-
-  private sorter = () => {
-    this.el.shadowRoot
-      .querySelectorAll('[data-sort-active]')
-      .forEach((item) => {
-        const id = item.getAttribute('data-sort-active');
-        const type = item.getAttribute('data-sort-type');
-
-        if (stateLocal?.sort?.[type]?.id === id) {
-          this.sort(
-            item,
-            {
-              id: id,
-              type: type,
-            },
-            stateLocal.sort[type].direction,
-            true
-          );
-        }
-      });
-  };
 
   private cycleEntries = (mode) => {
     const focusEls = this.el.shadowRoot.querySelectorAll('[data-focus]');
@@ -361,96 +343,116 @@ export class StreamlineEntries {
                 }
               },
             },
-          ].map((item) => {
+          ].map((itemInner) => {
             return (
-              item.condition && (
+              itemInner.condition && (
                 <Button
-                  onClick={state.entriesSettingsHaveChanged && item.onClick}
+                  onClick={
+                    state.entriesSettingsHaveChanged && itemInner.onClick
+                  }
                   tabindex={state.entriesSettingsHaveChanged ? 0 : -1}
                   disabled={!state.entriesSettingsHaveChanged}
                   type="primary"
-                  text={item.text}
+                  text={itemInner.text}
                 />
               )
             );
           })}
-          {(isTestNav ||
-            (hasPages &&
-              stateLocal.active === 'post' &&
-              state.entriesPostQuery)) && (
-            <div class={`grid grid-cols-2 gap-2`}>
-              {[
-                {
-                  type: 'secondary',
-                  icon: <IconArrowLeft />,
-                  disabled:
-                    state[
-                      `entries${capitalizeFirstLetter(
-                        stateLocal.active
-                      )}CurrentPage`
-                    ] === 1,
-                  action: 'prev',
-                },
-                {
-                  type: 'secondary',
-                  icon: (
-                    <span class={`rotate-180 inline-block`}>
-                      <IconArrowLeft />
-                    </span>
-                  ),
-                  disabled:
-                    state[
-                      `entries${capitalizeFirstLetter(
-                        stateLocal.active
-                      )}CurrentPage`
-                    ] === totalPages,
-                  action: 'next',
-                },
-              ].map((item) => {
-                return (
+          <div class={`grid auto-cols-max grid-flow-col gap-2 empty:hidden`}>
+            {[
+              {
+                condition: stateLocal?.sort?.[item.type],
+                type: 'transparent',
+                icon: <IconFilterSlash />,
+                onClick: () => setEntries(item.type),
+              },
+              {
+                condition:
+                  isTestNav ||
+                  (hasPages &&
+                    stateLocal.active === 'post' &&
+                    state.entriesPostQuery),
+                type: 'secondary',
+                icon: <IconArrowLeft />,
+                disabled:
+                  state[
+                    `entries${capitalizeFirstLetter(
+                      stateLocal.active
+                    )}CurrentPage`
+                  ] === 1,
+                action: 'prev',
+                onClick: false,
+              },
+              {
+                condition:
+                  isTestNav ||
+                  (hasPages &&
+                    stateLocal.active === 'post' &&
+                    state.entriesPostQuery),
+                type: 'secondary',
+                icon: (
+                  <span class={`rotate-180 inline-block`}>
+                    <IconArrowLeft />
+                  </span>
+                ),
+                disabled:
+                  state[
+                    `entries${capitalizeFirstLetter(
+                      stateLocal.active
+                    )}CurrentPage`
+                  ] === totalPages,
+                action: 'next',
+                onClick: false,
+              },
+            ].map((itemInner) => {
+              return (
+                itemInner.condition && (
                   <Button
-                    type={item.type}
-                    icon={item.icon}
-                    disabled={item.disabled}
-                    onClick={() => {
-                      state[
-                        `entries${capitalizeFirstLetter(
-                          stateLocal.active
-                        )}CurrentPage`
-                      ] =
-                        item.action === 'next'
-                          ? state[
-                              `entries${capitalizeFirstLetter(
-                                stateLocal.active
-                              )}CurrentPage`
-                            ] + 1
-                          : state[
-                              `entries${capitalizeFirstLetter(
-                                stateLocal.active
-                              )}CurrentPage`
-                            ] - 1;
-
-                      if (!state.test) {
-                        doQuery({
-                          type: stateLocal.active,
-                          callback: stateLocal.active + 's',
-                          search:
+                    type={itemInner.type}
+                    icon={itemInner.icon}
+                    disabled={itemInner.disabled}
+                    onClick={
+                      itemInner.action === 'prev' || itemInner.action === 'next'
+                        ? () => {
                             state[
                               `entries${capitalizeFirstLetter(
                                 stateLocal.active
-                              )}Query`
-                            ],
-                        });
-                      } else {
-                        setEntries();
-                        this.sorter();
-                      }
-                    }}
+                              )}CurrentPage`
+                            ] =
+                              itemInner.action === 'next'
+                                ? state[
+                                    `entries${capitalizeFirstLetter(
+                                      stateLocal.active
+                                    )}CurrentPage`
+                                  ] + 1
+                                : state[
+                                    `entries${capitalizeFirstLetter(
+                                      stateLocal.active
+                                    )}CurrentPage`
+                                  ] - 1;
+
+                            if (!state.test) {
+                              doQuery({
+                                type: stateLocal.active,
+                                callback: stateLocal.active + 's',
+                                search:
+                                  state[
+                                    `entries${capitalizeFirstLetter(
+                                      stateLocal.active
+                                    )}Query`
+                                  ],
+                              });
+                            } else {
+                              setEntries();
+                            }
+                          }
+                        : itemInner.onClick
+                    }
                   />
-                );
-              })}
-            </div>
-          )}
+                )
+              );
+            })}
+          </div>
         </div>
       </div>
     );
@@ -696,15 +698,8 @@ export class StreamlineEntries {
 
     const rowClass = 'text-sm font-medium text-slate-600 h-[42px]';
 
-    const sortData = {};
-    table.forEach((itemInner) => {
-      if (itemInner.sort) {
-        sortData[`data-sort-${itemInner.id}`] = item[itemInner.id];
-      }
-    });
-
     return (
-      <li class={`relative`} data-entry={true} data-row={item.ID} {...sortData}>
+      <li class={`relative`} data-entry={true} data-row={item.ID}>
         <a
           data-focus={true}
           tabindex={isEdit ? -1 : 0}
@@ -742,7 +737,7 @@ export class StreamlineEntries {
         </a>
         {isTable && (
           <div
-            class={`${this.px} grid auto-cols-[minmax(150px,1fr)] grid-flow-col gap-2 w-full absolute top-0 pointer-events-none text-slate-700 sm:peer-hover:text-blue-600`}
+            class={`${this.px} ${this.grid} w-full absolute top-0 pointer-events-none text-slate-700 sm:peer-hover:text-blue-600`}
           >
             {table.map((itemNested) => {
               return (
@@ -781,39 +776,6 @@ export class StreamlineEntries {
         )}
       </li>
     );
-  };
-
-  private sort = (e, item, direction = 'ascending', force = false) => {
-    const attr = `data-sort-${item.id}`;
-    const categoryItems = this.el.shadowRoot.querySelectorAll(`[${attr}]`);
-    const categoryItemsArray = Array.from(categoryItems);
-
-    const sorted = categoryItemsArray.sort(sorter);
-
-    function sorter(a, b) {
-      const first = direction === 'ascending' ? a : b;
-      const second = direction === 'ascending' ? b : a;
-      if (first.getAttribute(attr) < second.getAttribute(attr)) return -1;
-      if (first.getAttribute(attr) > second.getAttribute(attr)) return 1;
-      return 0;
-    }
-
-    sorted.forEach((el) =>
-      (force ? e : e.target)
-        .closest(`[data-entry-section="${item.type}"]`)
-        .querySelector('[data-sort]')
-        .appendChild(el)
-    );
-
-    if (!force) {
-      stateLocal.sort = {
-        ...stateLocal.sort,
-        [item.type]: {
-          id: item.id,
-          direction: direction,
-        },
-      };
-    }
   };
 
   private rows = () => {
@@ -903,19 +865,12 @@ export class StreamlineEntries {
           {(item.type === 'post' || item.type === 'site') && (
             <div
               data-uid={uid}
-              class={`overflow-x-auto scrollbar-none sticky top-[62px] z-10 bg-white sm:top-[72px]`}
+              class={`overflow-x-auto scrollbar-none sticky top-[62px] z-10 bg-white sm:top-[74px]`}
             >
-              <div
-                class={`${this.px} grid grid-flow-col auto-cols-[minmax(150px,1fr)] gap-2`}
-              >
+              <div class={`${this.px} ${this.grid}`}>
                 {table.map((itemInner) => {
                   return (
                     <div
-                      data-sort-type={item.type}
-                      data-sort-active={
-                        stateLocal.sort[item.type]?.id === itemInner.id &&
-                        itemInner.id
-                      }
                       tabindex="0"
                       role="button"
                       key={itemInner.id}
@@ -926,16 +881,15 @@ export class StreamlineEntries {
                         'pointer-events-none': !itemInner.sort,
                       }}
                       onMouseDown={(e) => e.preventDefault()}
-                      onClick={(e) =>
-                        this.sort(
-                          e,
+                      onClick={() =>
+                        sort(
                           {
                             ...itemInner,
                             type: item.type,
                           },
-                          stateLocal.sort[item.type]?.id !== itemInner.id
+                          stateLocal?.sort?.[item.type]?.id !== itemInner.id
                             ? 'ascending'
-                            : stateLocal.sort[item.type].direction ===
+                            : stateLocal?.sort?.[item.type]?.direction ===
                               'ascending'
                             ? 'descending'
                             : 'ascending'
@@ -948,9 +902,9 @@ export class StreamlineEntries {
                           'hidden w-[8px] mr-2 group-hover:block group-focus:block group-focus:text-blue-600':
                             true,
                           '!block':
-                            stateLocal.sort[item.type]?.id === itemInner.id,
+                            stateLocal?.sort?.[item.type]?.id === itemInner.id,
                           'rotate-180':
-                            stateLocal.sort[item.type]?.direction ===
+                            stateLocal?.sort?.[item.type]?.direction ===
                             'descending',
                         }}
                         xmlns="http://www.w3.org/2000/svg"
@@ -970,7 +924,6 @@ export class StreamlineEntries {
           )}
           <ul
             data-uid={uid}
-            data-sort={true}
             onScroll={
               item.type === 'post' || item.type === 'site'
                 ? (e) => onScroll(e)

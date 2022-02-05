@@ -3,8 +3,9 @@ import { stateLocal } from '../../store/local';
 import { filterDeep } from 'deepdash-es/standalone';
 import { capitalizeFirstLetter } from '../string/capitalizeFirstLetter';
 import { getEntriesSliced } from '../get/getEntriesSliced';
+import { sortEntries } from '../sort/sortEntries';
 
-export function setEntries() {
+export function setEntries(removeSort = '') {
   const result = filterDeep(
     state.test && stateLocal.active === 'post'
       ? [
@@ -41,6 +42,15 @@ export function setEntries() {
                 : state.entriesPostCurrentPath,
           },
         ];
+
+  if (removeSort === '') {
+    sortEntries();
+  } else {
+    stateLocal.sort = {
+      ...stateLocal.sort,
+      [removeSort]: false,
+    };
+  }
 
   // console.log(state[`entries${capitalizeFirstLetter(stateLocal.active)}Active`]);
 }

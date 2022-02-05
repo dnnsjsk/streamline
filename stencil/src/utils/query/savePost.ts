@@ -2,6 +2,7 @@ import { state } from '../../store/internal';
 import { findDeep } from 'deepdash-es/standalone';
 import { fetchAjax } from './fetchAjax';
 import { set } from 'lodash-es';
+import { setEntries } from '../set/setEntries';
 
 export function savePost(item, values) {
   const obj = {
@@ -10,38 +11,44 @@ export function savePost(item, values) {
     values: values,
   };
 
-  [
-    'entriesFav',
-    'entriesFavActive',
-    'entriesPost',
-    'entriesPostActive',
-  ].forEach((itemNested) => {
-    state[itemNested].forEach(() => {
-      const newFavs = [...state[itemNested]];
-      const path = findDeep(
-        newFavs,
-        (o) => {
-          return o.siteId === item.siteId && o.ID === item.ID;
-        },
-        {
-          childrenPath: ['children'],
-        }
-      );
-      if (path) {
-        const currentPath = path.context['_item'].strPath;
-        set(newFavs, `${currentPath}.name`, obj.values['post_title']);
-        set(newFavs, `${currentPath}.post_title`, obj.values['post_title']);
-        set(newFavs, `${currentPath}.post_name`, obj.values['post_name']);
+  const update = () => {
+    [
+      'entriesFav',
+      'entriesFavActive',
+      'entriesPost',
+      'entriesPostActive',
+    ].forEach((itemNested) => {
+      state[itemNested].forEach(() => {
+        const newFavs = [...state[itemNested]];
+        const path = findDeep(
+          newFavs,
+          (o) => {
+            return o.siteId === item.siteId && o.ID === item.ID;
+          },
+          {
+            childrenPath: ['children'],
+          }
+        );
+        if (path) {
+          const currentPath = path.context['_item'].strPath;
+          set(newFavs, `${currentPath}.name`, obj.values['post_title']);
+          set(newFavs, `${currentPath}.post_title`, obj.values['post_title']);
+          set(newFavs, `${currentPath}.post_name`, obj.values['post_name']);
 
-        state[itemNested] = newFavs;
-      }
+          state[itemNested] = newFavs;
+        }
+      });
     });
-  });
+    setEntries();
+  };
 
   if (!state.test) {
     fetchAjax({
       type: 'post',
       query: obj,
+      callback: update,
     });
+  } else {
+    update();
   }
 }
