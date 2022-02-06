@@ -105,10 +105,6 @@ export class StreamlineEntries {
     });
   }
 
-  componentDidLoad() {
-    // sorter(this.el);
-  }
-
   private cycleEntries = (mode) => {
     const focusEls = this.el.shadowRoot.querySelectorAll('[data-focus]');
     const focusElsLength = focusEls.length;
@@ -358,13 +354,27 @@ export class StreamlineEntries {
               )
             );
           })}
-          <div class={`grid auto-cols-max grid-flow-col gap-2 empty:hidden`}>
+          <div
+            class={`pagination grid auto-cols-max grid-flow-col gap-2 empty:hidden`}
+          >
             {[
               {
                 condition: stateLocal?.sort?.[item.type],
                 type: 'transparent',
                 icon: <IconFilterSlash />,
-                onClick: () => setEntries(item.type),
+                onClick: () => {
+                  this.el.shadowRoot
+                    .querySelector('.pagination')
+                    .classList.add('unset-hover');
+                  setEntries(item.type);
+                  if (!state.test) {
+                    setTimeout(() => {
+                      this.el.shadowRoot
+                        .querySelector('.pagination')
+                        .classList.remove('unset-hover');
+                    }, 500);
+                  }
+                },
               },
               {
                 condition:

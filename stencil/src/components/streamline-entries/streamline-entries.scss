@@ -29,3 +29,8 @@ select {
   background-repeat: no-repeat;
   background-size: 20px 20px;
 }
+
+.unset-hover *:hover {
+  background-color: #e2e8f0 !important;
+  color: #475569 !important;
+}

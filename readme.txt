@@ -15,6 +15,9 @@ Do things faster.
 
 == Changelog ==
 
+= 1.1.3 =
+* Fix: pagination button resetting color after clearing sort
+
 = 1.1.2 =
 * Fix: prevent input being cut off in drawer
 * New: possibility to sort post/site queries
