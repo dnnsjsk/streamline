@@ -15,6 +15,10 @@ Do things faster.
 
 == Changelog ==
 
+= 1.1.4 =
+* Fix: potential JS error when opening app
+* New: add possibility to reset Streamline to factory settings through Admin Bar
+
 = 1.1.3 =
 * Fix: pagination button resetting color after clearing sort
 

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Query handler
+ * Query handler.
  *
  * @date    08/10/2021
  * @since   1.0.0
@@ -36,7 +36,7 @@ function streamlineQuery()
 }
 
 /**
- * Menu handler
+ * Menu handler.
  *
  * @date    21/10/2021
  * @since   1.0.0
@@ -58,7 +58,29 @@ function streamlineMenu()
     die();
 }
 
+/**
+ * Reset settings.
+ *
+ * @date    08/02/2022
+ * @since   1.1.4
+ */
+function streamlineReset()
+{
+    if (wp_verify_nonce($_POST["nonce"], "ajax-nonce")) {
+        $id = wp_get_current_user()->ID;
+
+        delete_user_meta($id, "streamline_favourites");
+        delete_user_meta($id, "streamline_settings");
+        delete_user_meta($id, "streamline_search_history_sites");
+        delete_user_meta($id, "streamline_search_history_posts");
+
+		wp_send_json_success();
+    }
+    die();
+}
+
 add_action("plugins_loaded", function () {
     add_action("wp_ajax_streamlineQuery", "streamlineQuery");
     add_action("wp_ajax_streamlineMenu", "streamlineMenu");
+    add_action("wp_ajax_streamlineReset", "streamlineReset");
 });

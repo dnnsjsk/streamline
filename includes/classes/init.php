@@ -333,6 +333,27 @@ class Init
                     }
                 }
 			</style>
+      <script>
+          function streamlineResetSettings() {
+            fetch(streamline.ajax, {
+              method: 'POST',
+              credentials: 'same-origin',
+              headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded',
+              }),
+              body: `action=streamlineReset&nonce=${streamline.nonce}`,
+            })
+              .then((response) => response && response.json())
+              .then((data) => {
+                const el = document.querySelector('#wp-admin-bar-streamline-reset a');
+
+                if (data.success) {
+                 el.innerHTML = 'Settings were reset!';
+                 window.location.reload();
+                }
+              })
+          }
+      </script>
 			<?php
         });
 
@@ -340,11 +361,21 @@ class Init
             $bar->add_menu([
                 "id" => "streamline",
                 "parent" => "top-secondary",
+                "href" => "#0",
                 "title" =>
                     "<span class='ab-icon streamline-icon'></span><span class='ab-label'>Streamline</span>",
                 "meta" => [
                     "onclick" =>
                         'document.querySelector("streamline-container").toggle();',
+                ],
+            ]);
+            $bar->add_menu([
+                "id" => "streamline-reset",
+                "parent" => "streamline",
+                "href" => "#0",
+                "title" => "Reset settings",
+                "meta" => [
+                    "onclick" => "streamlineResetSettings();",
                 ],
             ]);
         });

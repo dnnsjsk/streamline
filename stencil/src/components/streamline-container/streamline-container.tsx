@@ -32,17 +32,23 @@ export class StreamlineContainer {
 
     state.entriesSettingsActive = state.entriesSettings;
 
-    state.entriesSettings[0].children.forEach((item) => {
-      item.children.forEach((itemInner) => {
-        state.entriesSettingsLoad[itemInner.id] = {
-          default:
-            (state.test
-              ? state.entriesSettings
-              : JSON.parse(state.data.settings))[itemInner.id]?.default ??
-            state.entriesSettingsLoad[itemInner.id].default,
-        };
+    if (
+      state.data?.settings &&
+      Object.values(JSON.parse(state.data?.settings)).length !== 0
+    ) {
+      state.entriesSettings[0].children.forEach((item) => {
+        item.children.forEach((itemInner) => {
+          state.entriesSettingsLoad[itemInner.id] = {
+            default:
+              (state.test
+                ? state.entriesSettings
+                : JSON.parse(state.data.settings))[itemInner.id]?.default ??
+              state.entriesSettingsLoad[itemInner.id].default,
+          };
+        });
       });
-    });
+    }
+
     state.entriesSettingsSave = state.entriesSettingsLoad;
 
     document.addEventListener('keydown', (e) => {
