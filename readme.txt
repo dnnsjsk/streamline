@@ -15,6 +15,9 @@ Do things faster.
 
 == Changelog ==
 
+= 1.1.5 =
+* Fix: JS errors caused by missing sorting state
+
 = 1.1.4 =
 * Fix: potential JS error when opening app
 * New: add possibility to reset Streamline to factory settings through Admin Bar
