@@ -1,7 +1,7 @@
 === spx ===
 Contributors: dnnsjsk
 Requires at least: 5.0
-Tested up to: 5.8.2
+Tested up to: 5.9.2
 Requires PHP: 7.0
 Stable tag: 2.0
 License: GPLv2 or later
@@ -14,6 +14,13 @@ Do things faster.
 Do things faster.
 
 == Changelog ==
+
+= 1.1.6 =
+* Enhancements: UI fixes
+* Enhancements: replace all AJAX queries with REST calls
+
+= 1.1.5 =
+* Fix: JS errors caused by missing sorting state
 
 = 1.1.5 =
 * Fix: JS errors caused by missing sorting state

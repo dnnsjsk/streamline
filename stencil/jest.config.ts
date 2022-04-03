@@ -30,6 +30,11 @@ global.parser.parseFromString = jest.fn(() => {
 }) as jest.Mock;
 
 // @ts-ignore
+window.streamline = {
+  rest: null,
+};
+
+// @ts-ignore
 window.streamlineData = {
   settings: JSON.stringify(entriesSettings),
   favourites: JSON.stringify(entriesFav),

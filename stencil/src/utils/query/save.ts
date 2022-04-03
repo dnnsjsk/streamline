@@ -1,10 +1,10 @@
 import { state } from '../../store/internal';
 import { findDeep } from 'deepdash-es/standalone';
-import { fetchAjax } from './fetchAjax';
+import { post } from './post';
 import { set } from 'lodash-es';
 import { setEntries } from '../set/setEntries';
 
-export function savePost(item, values) {
+export function save(item, values) {
   const obj = {
     postId: item.ID,
     siteId: item.siteId,
@@ -43,9 +43,9 @@ export function savePost(item, values) {
   };
 
   if (!state.test) {
-    fetchAjax({
-      type: 'post',
-      query: obj,
+    post({
+      route: 'update/post',
+      values: obj,
       callback: update,
     });
   } else {

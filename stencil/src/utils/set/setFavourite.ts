@@ -3,7 +3,7 @@ import { state } from '../../store/internal';
 import { setEntries } from './setEntries';
 import { merge, unset, get, compact } from 'lodash-es';
 import { capitalizeFirstLetter } from '../string/capitalizeFirstLetter';
-import { fetchAjax } from '../query/fetchAjax';
+import { post } from '../query/post';
 
 export function setFavourite(obj) {
   const arr = [...state.entriesFav];
@@ -79,9 +79,10 @@ export function setFavourite(obj) {
   }
 
   if (!state.test) {
-    fetchAjax({
+    post({
+      route: 'update/settings',
       type: 'favourites',
-      query: state.entriesFav,
+      values: state.entriesFav,
     });
   }
 

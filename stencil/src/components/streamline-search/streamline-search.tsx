@@ -5,7 +5,7 @@ import { state } from '../../store/internal';
 import { setEntries } from '../../utils/set/setEntries';
 import { checkIfStringStartsWith } from '../../utils/string/checkIfStringStartsWith';
 import { stateLocal } from '../../store/local';
-import { doQuery } from '../../utils/query/doQuery';
+import { get } from '../../utils/query/get';
 import { Button } from '../../elements/Button';
 
 /**
@@ -100,8 +100,8 @@ export class StreamlineSearch {
         this.callback = `${stateLocal.active}s`;
       }
 
-      doQuery({
-        callback: this.callback,
+      get({
+        route: `get/${this.callback}`,
         type: this.command,
         search: this.value,
       });

@@ -3,29 +3,21 @@ import { setSearchPlaceholder } from '../set/setSearchPlaceholder';
 import { resetView } from '../general/resetView';
 import { capitalizeFirstLetter } from '../string/capitalizeFirstLetter';
 import { stateLocal } from '../../store/local';
+import { data } from './data';
 
-export function doQuery(obj) {
+export function get(obj) {
   const current = capitalizeFirstLetter(stateLocal.active);
 
   state.isLoading = true;
   fetch(
     // @ts-ignore
     // eslint-disable-next-line no-undef
-    `${streamline.rest}streamline/v1/${obj.callback}?siteId=${
+    `${window.streamline.rest}streamline/v1/${obj.route}?siteId=${
       state.currentSite.id
     }&userId=${state.data.userId}&value=${obj.search}&amount=${
       state.entriesSettingsLoad.queryAmount.default
     }&page=${state[`entries${current}CurrentPage`]}`,
-    {
-      method: 'GET',
-      credentials: 'same-origin',
-      headers: {
-        // @ts-ignore
-        // eslint-disable-next-line no-undef
-        'X-WP-Nonce': streamline.nonceRest,
-        'Content-Type': 'application/json',
-      },
-    }
+    data() as any
   )
     .then((response) => response.json())
     .then((data) => {
@@ -53,13 +45,13 @@ export function doQuery(obj) {
         ];
       }
 
-      if (obj.callback === 'posts' || obj.callback === 'sites') {
+      if (obj.route === 'get/posts' || obj.route === 'get/sites') {
         resetView();
       }
 
-      state.isLoading = false;
-
       state[`entries${current}Query`] = obj.search;
       state[`entries${current}Total`] = data.total;
+      obj.callback && obj.callback();
+      state.isLoading = false;
     });
 }

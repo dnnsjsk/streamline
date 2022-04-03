@@ -38,7 +38,6 @@ if (!defined("ABSPATH")) {
  */
 require_once plugin_dir_path(__FILE__) . "includes/classes/init.php";
 require_once plugin_dir_path(__FILE__) . "includes/classes/rest.php";
-require_once plugin_dir_path(__FILE__) . "includes/functions/ajax-query.php";
 
 if (!class_exists("EDD_SL_Plugin_Updater")) {
     include plugin_dir_path(__FILE__) . "includes/admin/edd-sl-updater.php";

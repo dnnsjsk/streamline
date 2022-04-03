@@ -14,17 +14,17 @@ import {
   IconPost,
   IconTimes,
 } from '../../icons';
-import { fetchAjax } from '../../utils/query/fetchAjax';
+import { post } from '../../utils/query/post';
 import { getMenus } from '../../utils/get/getMenus';
 import { getMenu } from '../../utils/get/getMenu';
 import { getMetaKey } from '../../utils/get/getMetaKey';
-import { doQuery } from '../../utils/query/doQuery';
+import { get } from '../../utils/query/get';
 import { someDeep } from 'deepdash-es/standalone';
 import { setFavourite } from '../../utils/set/setFavourite';
 import { Button } from '../../elements/Button';
 import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
 import { debounce, isBoolean, isNumber } from 'lodash-es';
-import { savePost } from '../../utils/query/savePost';
+import { save } from '../../utils/query/save';
 import { sort } from '../../utils/sort/sort';
 
 /**
@@ -316,9 +316,10 @@ export class StreamlineEntries {
                 state.entriesPostCurrentPage = 1;
 
                 if (!state.test) {
-                  fetchAjax({
+                  post({
+                    route: 'update/settings',
                     type: 'settings',
-                    query: state.entriesSettingsSave,
+                    values: state.entriesSettingsSave,
                     callback: () => {
                       if (
                         state.entriesSettingsLoad.queryAmount !==
@@ -442,9 +443,9 @@ export class StreamlineEntries {
                                   ] - 1;
 
                             if (!state.test) {
-                              doQuery({
+                              get({
+                                route: `get/${stateLocal.active}s`,
                                 type: stateLocal.active,
-                                callback: stateLocal.active + 's',
                                 search:
                                   state[
                                     `entries${capitalizeFirstLetter(
@@ -534,8 +535,8 @@ export class StreamlineEntries {
       });
 
     const onClickHistory = () => {
-      doQuery({
-        callback: `${stateLocal.active}s`,
+      get({
+        route: `get/${stateLocal.active}s`,
         type: stateLocal.active,
         search: item.name,
         id: item.siteId,
@@ -615,7 +616,7 @@ export class StreamlineEntries {
             values[key] = (itemNested as HTMLInputElement).value;
           });
 
-        savePost(item, values);
+        save(item, values);
       }
 
       this.el.shadowRoot
@@ -672,7 +673,7 @@ export class StreamlineEntries {
           active: true,
           title: `Editing: ${item.post_title}`,
           onSave: () => {
-            savePost(item, state.drawer.values);
+            save(item, state.drawer.values);
           },
           items: Object.values(table as unknown)
             .map((itemInner) => {
@@ -842,7 +843,8 @@ export class StreamlineEntries {
                   return (
                     <span
                       class={{
-                        'px-2.5 py-1.5 text-xs uppercase font-semibold rounded-md': true,
+                        'px-2.5 py-1.5 text-xs uppercase font-semibold rounded-md':
+                          true,
                         'bg-green-100 text-green-600': isPublish,
                         'bg-purple-100 text-purple-600': isFuture,
                         'bg-yellow-100 text-yellow-600': isDraft,
