@@ -233,7 +233,7 @@ export class StreamlineEntries {
             )}
             <h1
               class={{
-                'text-slate-900 font-medium text-lg mr-6 whitespace-nowrap truncate leading-tight sm:text-xl':
+                'text-slate-900 font-semibold text-lg mr-6 whitespace-nowrap truncate leading-tight sm:text-xl':
                   true,
                 'ml-8': isQueryWithClose,
               }}
@@ -842,7 +842,7 @@ export class StreamlineEntries {
                   return (
                     <span
                       class={{
-                        'px-2.5 py-1.5 text-xs uppercase font-semibold': true,
+                        'px-2.5 py-1.5 text-xs uppercase font-semibold rounded-md': true,
                         'bg-green-100 text-green-600': isPublish,
                         'bg-purple-100 text-purple-600': isFuture,
                         'bg-yellow-100 text-yellow-600': isDraft,
@@ -1000,7 +1000,7 @@ export class StreamlineEntries {
     const Key = (props) => (
       <div
         style={{ boxShadow: '0 3px 0 0 #E2E8F0' }}
-        class={`h-[max-content] px-2 leading-0 py-1 text-[11px] uppercase font-medium text-slate-800 border bg-slate-50 border-slate-200`}
+        class={`h-[max-content] rounded px-2 leading-0 py-1 text-[11px] uppercase font-medium text-slate-800 border bg-slate-50 border-slate-200`}
       >
         {props.key}
       </div>
@@ -1043,11 +1043,11 @@ export class StreamlineEntries {
                                     class={{
                                       'relative mt-0.5 inline-block h-[max-content] focus-in-white-out':
                                         true,
-                                      'w-[max-content]': isBoolean(
+                                      'w-[max-content] rounded-full': isBoolean(
                                         state.entriesSettingsLoad[itemSub.id]
                                           .default
                                       ),
-                                      'w-full': !isBoolean(
+                                      'w-full rounded-md': !isBoolean(
                                         state.entriesSettingsLoad[itemSub.id]
                                           .default
                                       ),
@@ -1056,7 +1056,7 @@ export class StreamlineEntries {
                                     {itemSub.choices ? (
                                       <select
                                         data-focus={true}
-                                        class="text-sm focus-none cursor-pointer w-[100px]"
+                                        class="text-sm focus-none cursor-pointer w-[100px] rounded-md"
                                         onInput={(e) =>
                                           this.settingsOnChange(
                                             itemSub.id,
@@ -1093,7 +1093,7 @@ export class StreamlineEntries {
                                         data-focus={true}
                                         id={`setting-${itemSub.id}`}
                                         type="number"
-                                        class="text-sm focus-none max-w-[100px]"
+                                        class="text-sm focus-none max-w-[100px] rounded-md"
                                         min={10}
                                         value={
                                           state.entriesSettingsLoad[itemSub.id]
@@ -1116,7 +1116,7 @@ export class StreamlineEntries {
                                           data-focus={true}
                                           type="checkbox"
                                           id={`setting-${itemSub.id}`}
-                                          class="sr-only peer"
+                                          class="sr-only peer rounded-full"
                                           checked={
                                             state.entriesSettingsLoad[
                                               itemSub.id
@@ -1132,10 +1132,10 @@ export class StreamlineEntries {
                                           }
                                         />,
                                         <div
-                                          class={`block bg-slate-300 w-14 h-5 transition ease-in-out duration-200 group-hover:bg-slate-400 peer-checked:bg-blue-600`}
+                                          class={`block bg-slate-300 w-14 h-5 transition ease-in-out duration-200 rounded-full group-hover:bg-slate-400 peer-checked:bg-blue-600`}
                                         />,
                                         <div
-                                          class={`dot absolute left-1 top-1 bg-white w-3 h-3 transition ease-in-out duration-200`}
+                                          class={`dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition ease-in-out duration-200`}
                                         />,
                                       ]
                                     )}
@@ -1195,11 +1195,11 @@ export class StreamlineEntries {
 
     return (
       <div
-        class={`${
-          isMultisite
-            ? 'h-[calc(100%-24px)] lg:h-[calc(100%+56px)]'
-            : 'h-full lg:h-[calc(100%+80px)]'
-        } relative`}
+        class={{
+          'relative bg-white': true,
+          'h-[calc(100%-24px)] lg:h-[calc(100%+56px)]': isMultisite,
+          'h-full lg:h-[calc(100%+80px)]': !isMultisite,
+        }}
       >
         <div
           tabindex={-1}

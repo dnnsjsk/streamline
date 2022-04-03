@@ -178,7 +178,7 @@ export class StreamlineContainer {
             }`}
             onClick={() => (state.visible = false)}
           />
-          <div class="inner w-full h-full absolute max-w-[1024px] max-h-[700px] bg-white overflow-hidden grid">
+          <div class="inner w-full h-full absolute max-w-[1024px] max-h-[700px] overflow-hidden grid bg-slate-900 lg:rounded-2xl">
             <streamline-sidebar />
             <div class="h-full w-full absolute bottom-[var(--sl-side-w)] h-[calc(100%-var(--sl-side-w))] sm:bottom-0 sm:left-[var(--sl-side-w)] sm:w-[calc(100%-var(--sl-side-w))] sm:top-0 sm:h-full">
               <div

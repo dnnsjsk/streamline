@@ -91,6 +91,17 @@ const tailwindConfig = {
       80: '320px',
       96: '384px',
     },
+    borderRadius: {
+      none: '0px',
+      sm: '2px',
+      DEFAULT: '4px',
+      md: '6px',
+      lg: '8px',
+      xl: '12px',
+      '2xl': '16px',
+      '3xl': '24px',
+      full: '9999px',
+    },
     extend: {
       lineHeight: {
         3: '12px',

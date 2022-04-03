@@ -7,9 +7,9 @@ export function Button(props) {
       {...props}
       class={{
         [props.class]: props.class,
-        'focus-out inline-flex items-center justify-center font-semibold text-sm':
+        'focus-out inline-flex items-center rounded-md justify-center font-semibold text-sm':
           true,
-        'px-3 py-2 sm:px-4':
+        'px-3 py-2.5 sm:px-4':
           props.type === 'primary' ||
           props.type === 'secondary' ||
           props.type === 'transparent',

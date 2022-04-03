@@ -258,7 +258,7 @@ class Init
      */
     private function addContainer()
     {
-        $container = "<streamline-container></streamline-container>";
+        $container = "<streamline-container visible></streamline-container>";
 
         add_action("admin_footer", function () use ($container) {
             if (self::isAllowed()) {

@@ -73,10 +73,10 @@ export class StreamlineUiDropdown {
         <div
           ref={(el) => (this.dropdown = el as HTMLElement)}
           class={{
-            'flex flex-col border border-slate-400 shadow-md fixed transform opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus:opacity-100 group-focus:pointer-events-auto focus-within:opacity-100 focus-within:pointer-events-auto':
+            'overflow-hidden flex flex-col border border-slate-400 shadow-md fixed transform opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus:opacity-100 group-focus:pointer-events-auto focus-within:opacity-100 focus-within:pointer-events-auto':
               true,
-            'z-50': this.type === 'main',
-            'z-30': this.type !== 'main',
+            'z-50 rounded-bl-md': this.type === 'main',
+            'z-30 rounded-md': this.type !== 'main',
             'mt-[2px]': this.placement === 'top' && this.type !== 'main',
           }}
         >

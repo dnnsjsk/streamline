@@ -167,7 +167,7 @@ class Rest
             $newArr[$post->ID] = $postData;
         }
 
-	    wp_reset_postdata();
+        wp_reset_postdata();
 
         if (is_multisite() && function_exists("restore_current_blog")) {
             restore_current_blog();
