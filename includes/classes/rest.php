@@ -298,3 +298,5 @@ class Rest
         wp_send_json_success();
     }
 }
+
+new Rest();

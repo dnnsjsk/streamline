@@ -17,9 +17,6 @@ const STREAMLINE_ITEM_ID = 45;
 const STREAMLINE_ITEM_NAME = "Streamline";
 const STREAMLINE_LICENSE_PAGE = "streamline";
 
-use Streamline\Init;
-use Streamline\Rest;
-
 /**
  * Exit if accessed directly.
  *
@@ -38,6 +35,7 @@ if (!defined("ABSPATH")) {
  */
 require_once plugin_dir_path(__FILE__) . "includes/classes/init.php";
 require_once plugin_dir_path(__FILE__) . "includes/classes/rest.php";
+require_once plugin_dir_path(__FILE__) . "includes/classes/json.php";
 
 if (!class_exists("EDD_SL_Plugin_Updater")) {
     include plugin_dir_path(__FILE__) . "includes/admin/edd-sl-updater.php";
@@ -60,12 +58,3 @@ StreamlinePlugin::init(
     STREAMLINE_LICENSE_PAGE,
     STREAMLINE
 );
-
-/**
- * Init Streamline.
- *
- * @date    03/05/2021
- * @since   1.0.0
- */
-new Init();
-new Rest();

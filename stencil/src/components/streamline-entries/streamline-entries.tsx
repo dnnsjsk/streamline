@@ -1036,7 +1036,7 @@ export class StreamlineEntries {
                                 <label
                                   htmlFor={`setting-${itemSub.id}`}
                                   class={{
-                                    'cursor-pointer w-full grid gap-2 select-none group sm:grid-cols-[100px,1fr] sm:gap-6':
+                                    'cursor-pointer w-full grid gap-2 select-none group sm:grid-cols-[125px,1fr] sm:gap-6':
                                       true,
                                     'cursor-pointer': !itemSub.choices,
                                   }}
@@ -1058,7 +1058,7 @@ export class StreamlineEntries {
                                     {itemSub.choices ? (
                                       <select
                                         data-focus={true}
-                                        class="text-sm focus-none cursor-pointer w-[100px] rounded-md"
+                                        class="text-sm focus-none cursor-pointer w-[125px] rounded-md"
                                         onInput={(e) =>
                                           this.settingsOnChange(
                                             itemSub.id,
@@ -1070,7 +1070,8 @@ export class StreamlineEntries {
                                         {Object.entries(itemSub.choices).map(
                                           ([key, value]) => {
                                             return (
-                                              (key === 'last' ||
+                                              (itemSub.id === 'mode' ||
+                                                key === 'last' ||
                                                 state.menu[key].condition) && (
                                                 <option
                                                   selected={

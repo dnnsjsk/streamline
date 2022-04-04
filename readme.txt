@@ -18,6 +18,7 @@ Do things faster.
 = 1.1.6 =
 * Enhancements: UI fixes
 * Enhancements: replace all AJAX queries with REST calls
+* New: possibility to set features via local JSON
 
 = 1.1.5 =
 * Fix: JS errors caused by missing sorting state

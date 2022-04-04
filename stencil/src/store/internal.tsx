@@ -63,6 +63,21 @@ const { state, dispose, onChange } = createStore({
         {
           children: [
             {
+              id: 'mode',
+              name: 'View mode',
+              nameParent: 'Mode',
+              label: 'Choose between different views',
+              choices: {
+                default: 'Default',
+                dashboard: 'Dashboard',
+              },
+            },
+          ],
+          name: 'Mode',
+        },
+        {
+          children: [
+            {
               id: 'keyNavigation',
               name: 'Entry navigation',
               nameParent: 'Key shortcuts',
@@ -163,6 +178,9 @@ const { state, dispose, onChange } = createStore({
   ],
   entriesSettingsActive: [],
   entriesSettingsLoad: {
+    mode: {
+      default: 'default',
+    },
     keyNavigation: {
       default: true,
     },
