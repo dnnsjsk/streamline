@@ -13,6 +13,8 @@ import {
   IconNetwork,
   IconPost,
   IconTimes,
+  IconSettings,
+  IconSites,
 } from '../../icons';
 import { post } from '../../utils/query/post';
 import { getMenus } from '../../utils/get/getMenus';
@@ -26,6 +28,7 @@ import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
 import { debounce, isBoolean, isNumber } from 'lodash-es';
 import { save } from '../../utils/query/save';
 import { sort } from '../../utils/sort/sort';
+import { getAll } from '../../utils/get/getAll';
 
 /**
  * Entries.
@@ -39,17 +42,22 @@ export class StreamlineEntries {
   private border = 'border-t border-slate-100 first-of-type:border-none';
   private borderB = 'border-b border-slate-200 border-dotted';
   private h2 = 'text-sm text-slate-900 font-medium sm:text-base';
-  private px = 'px-4 sm:px-8 lg:px-12';
-  private mx = 'mx-4 sm:mx-8 lg:mx-12';
+  private px = 'px-4 sm:px-8 lg:px-10';
+  private mx = 'mx-4 sm:mx-8 lg:mx-10';
   private grid = 'grid grid-flow-col auto-cols-[minmax(150px,1fr)] gap-2';
 
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineEntriesElement;
 
+  @State() amount: string;
   @State() editing: object;
+  @State() pages: string;
 
   connectedCallback() {
     getMenus();
+    if (stateLocal.active === 'search') {
+      getAll();
+    }
     setEntries();
 
     window.addEventListener(
@@ -164,32 +172,37 @@ export class StreamlineEntries {
       });
     }
 
-    const results = `Showing ${
-      isQuery ? Object.values(item.children).length : isMenu ? menuNumber : '0'
-    } ${
+    const result = isQuery
+      ? Object.values(item.children).length
+      : isMenu
+      ? menuNumber
+      : '0';
+
+    this.amount = ` ∙ Showing ${result} ${
       (isQuery && Object.values(item.children).length === 1) ||
       (isMenu && menuNumber === 1)
         ? `result`
         : `results`
-    }${
+    }`;
+
+    this.pages =
       hasPages || isTestNav
-        ? ` (page ${
+        ? ` ∙ Page ${
             state[
               `entries${capitalizeFirstLetter(stateLocal.active)}CurrentPage`
             ]
-          } of ${totalPages})`
-        : ''
-    }`;
+          } of ${totalPages}`
+        : '';
 
     const path =
       item.isMultisite && !state.test && stateLocal.active !== 'site'
-        ? ` (subsite: ${item.path})`
+        ? ` <span class="text-slate-300">∙</span> subsite: ${item.path}`
         : '';
 
     return (
       <div
         class={{
-          'mb-2 grid grid-cols-[minmax(0,1fr),auto] justify-between items-center relative min-h-[60px] pt-5 flex pb-1.5 sticky -top-2 bg-white z-20 border-b border-slate-300 sm:min-h-[75px] sm:pt-6 sm:pb-2 sm:-top-2 sm:mb-3':
+          'mb-2 grid grid-cols-[minmax(0,1fr),auto] justify-between items-center relative min-h-[60px] pt-5 flex pb-1.5 sticky -top-2 bg-white z-20 sm:min-h-[75px] sm:pt-6 sm:pb-2 sm:-top-2 sm:mb-3':
             true,
           [this.px]: true,
           '!mb-0': mb,
@@ -198,17 +211,24 @@ export class StreamlineEntries {
         <div>
           <div class={`absolute -left-full top-0 h-full bg-white z-[-1]`} />
           <div class={`flex items-center flex-row max-w-full`}>
-            {stateLocal.active === 'fav' &&
-              state.entriesFavActive[0].children.length !== 0 &&
-              !state.isHelp && (
-                <div
-                  class={`flex-shrink-0 text-blue-600 flex items-center justify-center mr-3`}
-                >
-                  {item.type === 'menu' && <IconMenu />}
-                  {item.type === 'networkMenu' && <IconNetwork />}
-                  {item.type === 'post' && <IconPost />}
-                </div>
-              )}
+            {!state.isHelp && (
+              <div
+                class={{
+                  'relative flex-shrink-0 text-blue-600 flex items-center justify-center mr-3 h-8 w-8 p-2 bg-blue-50 rounded-full':
+                    true,
+                  'ml-8': isQueryWithClose,
+                }}
+              >
+                {item.type === 'menu' && <IconMenu />}
+                {item.type === 'networkMenu' && <IconNetwork />}
+                {item.type === 'post' && <IconPost />}
+                {item.type === 'settings' && <IconSettings />}
+                {item.type === 'site' && <IconSites />}
+                {item.type === undefined && (
+                  <span class={`h-2.5 w-2.5 rounded-full bg-blue-400`} />
+                )}
+              </div>
+            )}
             {isQueryWithClose && (
               <Button
                 type="back"
@@ -232,11 +252,9 @@ export class StreamlineEntries {
               />
             )}
             <h1
-              class={{
-                'text-slate-900 font-semibold text-lg mr-6 whitespace-nowrap truncate leading-tight sm:text-xl':
-                  true,
-                'ml-8': isQueryWithClose,
-              }}
+              class={
+                'text-slate-900 font-bold text-lg mr-6 whitespace-nowrap truncate leading-tight sm:text-xl'
+              }
               innerHTML={`${
                 state.isSlash || isDotMenu
                   ? item.title
@@ -285,25 +303,6 @@ export class StreamlineEntries {
                   : 'No results'
               }`}
             />
-          </div>
-          <div class={`mt-0.5 sm:mt-1`}>
-            {[
-              {
-                type: 'text',
-                text: results,
-                condition: stateLocal.active !== 'settings' && isNotDotMenu,
-              },
-            ].map((item) => {
-              return (
-                item.condition && (
-                  <span
-                    class={`results-amount text-xs font-medium leading-tight text-slate-700 text-xs`}
-                  >
-                    {item.text}
-                  </span>
-                )
-              );
-            })}
           </div>
         </div>
         <div>
@@ -947,7 +946,7 @@ export class StreamlineEntries {
               return itemInner['children'] ? (
                 <li key={indexInner}>
                   <h2
-                    class={`${this.mx} ${this.borderB} text-base pb-2 pt-3.5 text-slate-900 font-medium sm:text-lg sm:pt-5 sm:pb-2.5`}
+                    class={`${this.mx} text-base pb-2 pt-2.5 text-slate-700 font-semibold sm:text-lg`}
                   >
                     {itemInner['name']}
                   </h2>
@@ -976,7 +975,7 @@ export class StreamlineEntries {
           title: `${state.menu[stateLocal.active].text} mode help`,
         })}
         <div
-          class={`${this.px} mt-6 text-base space-y-2 leading-relaxed md:w-3/4`}
+          class={`${this.px} text-base space-y-2 leading-relaxed md:w-3/4`}
           innerHTML={state.menu[stateLocal.active].help}
         />
       </div>
@@ -1023,7 +1022,7 @@ export class StreamlineEntries {
                     } flex flex-col`}
                   >
                     <h2
-                      class={`${this.h2} ${this.borderB} !text-lg mt-4 space-y-2 mb-3 inline-block leading-none pb-2 sm:mb-6`}
+                      class={`${this.h2} !text-lg mt-4 space-y-2 mb-3 text-slate-700 font-semibold inline-block leading-none pb-2`}
                     >
                       {itemInner.name}
                     </h2>
@@ -1096,7 +1095,7 @@ export class StreamlineEntries {
                                         data-focus={true}
                                         id={`setting-${itemSub.id}`}
                                         type="number"
-                                        class="text-sm focus-none max-w-[100px] rounded-md"
+                                        class="text-sm focus-none max-w-[125px] rounded-md"
                                         min={10}
                                         value={
                                           state.entriesSettingsLoad[itemSub.id]
@@ -1216,20 +1215,28 @@ export class StreamlineEntries {
             ? this.settings()
             : this.rows()}
         </div>
-        {isMultisite && (
-          <div
-            class={`mt-auto px-4 h-6 bg-slate-50 border-t border-slate-200 flex items-center text-slate-900`}
-          >
-            <span class={`flex whitespace-no-wrap`}>
-              <span class={`text-[11px]`}>
-                <span class={`font-semibold`}>Current site:</span>{' '}
-                {state.currentSite.path} ∙{' '}
-                <span class={`font-semibold`}>ID:</span>
-                {state.currentSite.id}
-              </span>
+        <div
+          class={`mt-auto px-4 h-6 bg-slate-50 border-t border-slate-200 flex items-center text-slate-900`}
+        >
+          <span class={`flex whitespace-no-wrap`}>
+            <span class={`text-[11px]`}>
+              {isMultisite && (
+                <span>
+                  <span class={`font-semibold`}>Current site: </span>
+                  <span>{state.currentSite.path} ∙ </span>
+                  <span class={`font-semibold`}>ID: </span>
+                  <span>{state.currentSite.id}</span>
+                </span>
+              )}
+              {((stateLocal.active === 'post' && state.entriesPostQuery) ||
+                (stateLocal.active === 'site' && state.entriesSiteQuery)) &&
+                this.amount}
+              {((stateLocal.active === 'post' && state.entriesPostQuery) ||
+                (stateLocal.active === 'site' && state.entriesSiteQuery)) &&
+                this.pages}
             </span>
-          </div>
-        )}
+          </span>
+        </div>
       </div>
     );
   }

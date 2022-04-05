@@ -13,10 +13,12 @@ import {
   IconMenu,
   IconNetwork,
   IconPost,
+  IconSearch,
   IconSettings,
   IconSites,
   IconWordPress,
 } from '../../icons';
+import { getAll } from '../../utils/get/getAll';
 
 /**
  * Sidebar.
@@ -32,7 +34,9 @@ export class StreamlineSidebar {
 
   private button = (type) => {
     const icon =
-      type === 'wordpress' ? (
+      type === 'search' ? (
+        <IconSearch />
+      ) : type === 'wordpress' ? (
         <IconWordPress />
       ) : type === 'site' ? (
         <IconSites />
@@ -57,7 +61,11 @@ export class StreamlineSidebar {
     const handleClick = () => {
       if (type !== 'wordpress') {
         stateLocal.active = type;
-        getMenus();
+        if (stateLocal.active === 'search') {
+          getAll();
+        } else {
+          getMenus();
+        }
       } else {
         state.visible = false;
       }
@@ -77,7 +85,7 @@ export class StreamlineSidebar {
             type !== 'wordpress',
           'sm:!grid-rows-[20px,20px] lg:!grid-rows-1 lg:grid-cols-[32px,1fr] lg:px-5':
             type !== 'settings' && type !== 'wordpress',
-          'mb-3': type === 'networkMenu',
+          'mb-3': type === 'networkMenu' || type === 'search',
           'sm:mt-auto': type === 'settings',
           'bg-slate-800 pointer-events-none': type === stateLocal.active,
         }}

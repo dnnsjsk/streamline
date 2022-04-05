@@ -83,6 +83,7 @@ export function getMenu(obj = {} as any) {
       state.entriesMenuActive = data;
       state.entriesMenuCurrentPath = obj.path || state.currentSite.path;
     }
+    state.entriesSearch = [...state.entriesSearch, ...data];
 
     setEntries();
   }

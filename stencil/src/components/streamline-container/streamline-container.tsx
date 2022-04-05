@@ -66,7 +66,8 @@ export class StreamlineContainer {
         if (
           e.key === 'ArrowUp' &&
           getMetaKey(e) &&
-          state.entriesSettingsLoad.keyNavigationTabs.default
+          state.entriesSettingsLoad.keyNavigationTabs.default &&
+          state.entriesSettingsLoad.mode.default === 'dashboard'
         ) {
           e.preventDefault();
           this.cycleTabs('up');
@@ -75,7 +76,8 @@ export class StreamlineContainer {
         if (
           e.key === 'ArrowDown' &&
           getMetaKey(e) &&
-          state.entriesSettingsLoad.keyNavigationTabs.default
+          state.entriesSettingsLoad.keyNavigationTabs.default &&
+          state.entriesSettingsLoad.mode.default === 'dashboard'
         ) {
           e.preventDefault();
           this.cycleTabs('down');
@@ -212,6 +214,13 @@ export class StreamlineContainer {
                         state.isHelp = !state.isHelp;
                         state.isSearch = !state.isSearch;
                       },
+                    },
+                    state.entriesSettingsLoad.mode.default === 'default' && {
+                      text: 'Settings',
+                      onClick: () =>
+                        stateLocal.active === 'settings'
+                          ? (stateLocal.active = 'search')
+                          : (stateLocal.active = 'settings'),
                     },
                   ]}
                 />

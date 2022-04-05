@@ -176,6 +176,8 @@ const { state, dispose, onChange } = createStore({
       type: 'settings',
     },
   ],
+  entriesSearch: [],
+  entriesSearchActive: [],
   entriesSettingsActive: [],
   entriesSettingsLoad: {
     mode: {
@@ -232,8 +234,18 @@ const { state, dispose, onChange } = createStore({
   isSearchFocus: true,
   isSlash: false,
   focusIndex: -1,
-  menus: ['site', 'networkMenu', 'fav', 'menu', 'post', 'settings'],
+  menus: ['search', 'site', 'networkMenu', 'fav', 'menu', 'post', 'settings'],
   menu: {
+    search: {
+      name: 'search',
+      // @ts-ignore
+      condition: true,
+      text: 'Search',
+      help: `
+      <p>The search tab is at the core and center of Streamline. It combines all the other modes (when in dashboard view) into one single screen.</p>
+      <p>Instead of searching for a single entry, the search tab allows you to search for all entries (menu, post, favourites) at once.</p>
+      `,
+    },
     site: {
       name: 'site',
       // @ts-ignore
@@ -280,11 +292,6 @@ const { state, dispose, onChange } = createStore({
       <p>Posts are an essential part of WordPress and the posts tab allows you to search for any posts on your site.</p>
       `,
     },
-    /*
-    custom: {
-      name: 'custom',
-    },
-     */
     settings: {
       name: 'settings',
       condition: true,
