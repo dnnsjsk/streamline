@@ -1,9 +1,7 @@
-// import { isLocalCommands } from '../../utils/isLocalCommands';
 // eslint-disable-next-line no-unused-vars
 import { Component, Element, h } from '@stencil/core';
 import { state } from '../../store/internal';
 import { setEntries } from '../../utils/set/setEntries';
-import { checkIfStringStartsWith } from '../../utils/string/checkIfStringStartsWith';
 import { stateLocal } from '../../store/local';
 import { get } from '../../utils/query/get';
 import { Button } from '../../elements/Button';
@@ -17,59 +15,26 @@ import { Button } from '../../elements/Button';
   styleUrl: 'streamline-search.scss',
 })
 export class StreamlineSearch {
-  private callback: string;
-  private command: string;
-  private commands: Array<string>;
+  private route: string;
   private value;
 
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineSearchElement;
 
-  connectedCallback() {
-    const arr = [];
-    Object.keys(state.commands.local).forEach((item) => {
-      arr.push(`/${item} `);
-    });
-    this.commands = arr;
-  }
-
   private handleChange = (e) => {
     state.searchValue = e.target.value;
-    if (!e.target.value.startsWith('/')) {
-      state.isLoading = false;
-      state.isSlash = false;
-      state.isEnter = false;
-      setEntries();
+    state.isLoading = false;
+    state.isSlash = false;
+    state.isEnter = false;
+    setEntries();
 
-      if (
-        (stateLocal.active === 'post' || stateLocal.active === 'site') &&
-        state.searchValue.trim().length >= 1 &&
-        !state.test
-      ) {
-        state.isEnter = true;
-        this.command = stateLocal.active;
-      }
-    }
-    /*
     if (
-      // (e.target.value.startsWith('/') && isLocalCommands()) ||
-      e.target.value.startsWith('/')
+      (stateLocal.active === 'post' || stateLocal.active === 'site') &&
+      state.searchValue.trim().length >= 1 &&
+      !state.test
     ) {
-      state.isSlash = true;
-      if (
-        checkIfStringStartsWith(
-          state.searchValue,
-          state.menu[stateLocal.active].commands
-        )
-      ) {
-        state.isEnter = true;
-        this.command = state.searchValue.split(' ')[0].slice(1);
-      } else {
-        state.isLoading = false;
-        state.isEnter = false;
-      }
+      state.isEnter = true;
     }
-     */
   };
 
   private handleKeydown = (e) => {
@@ -83,26 +48,13 @@ export class StreamlineSearch {
   };
 
   private startQuery = () => {
-    this.callback = state.commands.local[this.command]?.callback || false;
-
-    if (
-      this.callback ||
-      stateLocal.active === 'post' ||
-      stateLocal.active === 'site'
-    ) {
-      if (
-        checkIfStringStartsWith(state.searchValue, this.commands) &&
-        this.callback
-      ) {
-        this.value = state.searchValue.replace(`/${this.command}`, '').trim();
-      } else if (stateLocal.active === 'post' || stateLocal.active === 'site') {
-        this.value = state.searchValue;
-        this.callback = `${stateLocal.active}s`;
-      }
+    if (stateLocal.active === 'post' || stateLocal.active === 'site') {
+      this.value = state.searchValue;
+      this.route = `${stateLocal.active}s`;
 
       get({
-        route: `get/${this.callback}`,
-        type: this.command,
+        route: `get/${this.route}`,
+        type: stateLocal.active,
         search: this.value,
       });
     }

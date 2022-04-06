@@ -335,13 +335,15 @@ class Init
 			</style>
       <script>
           function streamlineResetSettings() {
-            fetch(streamline.ajax, {
+            fetch(window.streamline.rest + 'streamline/v1/reset/settings?userId=' + <?php echo get_current_user_id(); ?>, {
               method: 'POST',
               credentials: 'same-origin',
-              headers: new Headers({
-                'Content-Type': 'application/x-www-form-urlencoded',
-              }),
-              body: `action=streamlineReset&nonce=${streamline.nonce}`,
+              headers: {
+                // @ts-ignore
+                // eslint-disable-next-line no-undef
+                'X-WP-Nonce': window.streamline.nonceRest,
+                'Content-Type': 'application/json',
+              },
             })
               .then((response) => response && response.json())
               .then((data) => {

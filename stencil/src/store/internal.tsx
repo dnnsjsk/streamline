@@ -3,6 +3,7 @@ import equal from 'fast-deep-equal/es6';
 import { focusSearch } from '../utils/search/focusSearch';
 import { blurSearch } from '../utils/search/blurSearch';
 import { stateLocal } from './local';
+import { getAll } from '../utils/get/getAll';
 
 const isTest = document
   .querySelector('streamline-container')
@@ -11,19 +12,6 @@ const isTest = document
 const { state, dispose, onChange } = createStore({
   class: {
     tag: 'px-2.5 py-1.5 bg-slate-200 text-slate-500 inline-block h-[max-content] leading-1',
-  },
-  commands: {
-    local: {
-      /*
-      site: {
-        // @ts-ignore
-        condition: window.streamlineData.network && !isTest,
-        name: '/site [name]',
-        description: `Display entries from a different site in the network.`,
-        callback: 'sites',
-      },
-      */
-    },
   },
   currentSite: {
     // @ts-ignore
@@ -329,7 +317,10 @@ onChange('searchValue', (value) => {
 });
 
 onChange('visible', (value) => {
-  if (!state.menus.includes(stateLocal.active)) {
+  if (state.entriesSettingsLoad.mode.default === 'default') {
+    getAll();
+    stateLocal.active = 'search';
+  } else if (!state.menus.includes(stateLocal.active)) {
     stateLocal.active = 'menu';
   } else if (state.entriesSettingsLoad.behaviourDefaultTab.default !== 'last') {
     stateLocal.active = state.entriesSettingsLoad.behaviourDefaultTab.default;

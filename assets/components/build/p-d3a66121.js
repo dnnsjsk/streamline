@@ -1,0 +1,1 @@
+import{s as n,a as r,g as a}from"./p-52b52f17.js";function o(){n.test||("menu"===r.active&&0===n.entriesMenu.length&&a({network:!1,adminUrl:n.data.adminUrl}),"networkMenu"===r.active&&0===n.entriesNetworkMenu.length&&a({network:!0}))}function t(r){return n.isMac?r.metaKey:r.ctrlKey}export{t as a,o as g}

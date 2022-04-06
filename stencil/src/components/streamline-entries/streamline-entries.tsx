@@ -15,6 +15,8 @@ import {
   IconTimes,
   IconSettings,
   IconSites,
+  IconHistory,
+  IconSmileyTear,
 } from '../../icons';
 import { post } from '../../utils/query/post';
 import { getMenus } from '../../utils/get/getMenus';
@@ -28,7 +30,6 @@ import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
 import { debounce, isBoolean, isNumber } from 'lodash-es';
 import { save } from '../../utils/query/save';
 import { sort } from '../../utils/sort/sort';
-import { getAll } from '../../utils/get/getAll';
 
 /**
  * Entries.
@@ -55,9 +56,6 @@ export class StreamlineEntries {
 
   connectedCallback() {
     getMenus();
-    if (stateLocal.active === 'search') {
-      getAll();
-    }
     setEntries();
 
     window.addEventListener(
@@ -224,8 +222,10 @@ export class StreamlineEntries {
                 {item.type === 'post' && <IconPost />}
                 {item.type === 'settings' && <IconSettings />}
                 {item.type === 'site' && <IconSites />}
-                {item.type === undefined && (
-                  <span class={`h-2.5 w-2.5 rounded-full bg-blue-400`} />
+                {isQueryWithClose !== false && isQueryWithClose !== true ? (
+                  <IconHistory />
+                ) : (
+                  item.type === undefined && <IconSmileyTear />
                 )}
               </div>
             )}
@@ -942,9 +942,9 @@ export class StreamlineEntries {
             }
             class="overflow-x-auto"
           >
-            {Object.values(item.children).map((itemInner, indexInner) => {
+            {Object.values(item.children).map((itemInner) => {
               return itemInner['children'] ? (
-                <li key={indexInner}>
+                <li key={itemInner['name']}>
                   <h2
                     class={`${this.mx} text-base pb-2 pt-2.5 text-slate-700 font-semibold sm:text-lg`}
                   >
@@ -1007,6 +1007,15 @@ export class StreamlineEntries {
       </div>
     );
 
+    const conditionMapNames = ['Behaviour', 'Searchbar'];
+
+    const conditionMap = [
+      'keyNavigationTabs',
+      'behaviourDefaultTab',
+      'searchResetInput',
+      'searchFocus',
+    ];
+
     return Object.values(state.entriesSettingsActive).map((item) => {
       return (
         <div>
@@ -1015,173 +1024,195 @@ export class StreamlineEntries {
             {Object.values(item.children as unknown).map(
               (itemInner, indexInner) => {
                 return (
-                  <li
-                    key={indexInner}
-                    class={`${
-                      indexInner === 0 ? this.border : ''
-                    } flex flex-col`}
-                  >
-                    <h2
-                      class={`${this.h2} !text-lg mt-4 space-y-2 mb-3 text-slate-700 font-semibold inline-block leading-none pb-2`}
+                  (state.entriesSettingsLoad.mode.default === 'dashboard' ||
+                    (state.entriesSettingsLoad.mode.default === 'default' &&
+                      !conditionMapNames.includes(itemInner.name))) && (
+                    <li
+                      key={itemInner.name}
+                      class={`${
+                        indexInner === 0 ? this.border : ''
+                      } flex flex-col`}
                     >
-                      {itemInner.name}
-                    </h2>
-                    {itemInner.children && (
-                      <ul class={`flex flex-col space-y-5`}>
-                        {Object.values(itemInner.children as unknown).map(
-                          (itemSub, indexSub) => {
-                            return (
-                              <li key={indexSub} class={`flex items-center`}>
-                                <label
-                                  htmlFor={`setting-${itemSub.id}`}
-                                  class={{
-                                    'cursor-pointer w-full grid gap-2 select-none group sm:grid-cols-[125px,1fr] sm:gap-6':
-                                      true,
-                                    'cursor-pointer': !itemSub.choices,
-                                  }}
-                                >
-                                  <div
-                                    class={{
-                                      'relative mt-0.5 inline-block h-[max-content] focus-in-white-out':
-                                        true,
-                                      'w-[max-content] rounded-full': isBoolean(
-                                        state.entriesSettingsLoad[itemSub.id]
-                                          .default
-                                      ),
-                                      'w-full rounded-md': !isBoolean(
-                                        state.entriesSettingsLoad[itemSub.id]
-                                          .default
-                                      ),
-                                    }}
+                      <h2
+                        class={`${this.h2} !text-lg mt-4 space-y-2 mb-3 text-slate-700 font-semibold inline-block leading-none pb-2`}
+                      >
+                        {itemInner.name}
+                      </h2>
+                      {itemInner.children && (
+                        <ul class={`flex flex-col space-y-5`}>
+                          {Object.values(itemInner.children as unknown).map(
+                            (itemSub) => {
+                              return (
+                                (state.entriesSettingsLoad.mode.default ===
+                                  'dashboard' ||
+                                  (state.entriesSettingsLoad.mode.default ===
+                                    'default' &&
+                                    !conditionMap.includes(itemSub.id))) && (
+                                  <li
+                                    key={itemSub.id}
+                                    class={`flex items-center`}
                                   >
-                                    {itemSub.choices ? (
-                                      <select
-                                        data-focus={true}
-                                        class="text-sm focus-none cursor-pointer w-[125px] rounded-md"
-                                        onInput={(e) =>
-                                          this.settingsOnChange(
-                                            itemSub.id,
-                                            'default',
-                                            (e.target as HTMLInputElement).value
-                                          )
-                                        }
+                                    <label
+                                      htmlFor={`setting-${itemSub.id}`}
+                                      class={{
+                                        'cursor-pointer w-full grid gap-2 select-none group sm:grid-cols-[125px,1fr] sm:gap-6':
+                                          true,
+                                        'cursor-pointer': !itemSub.choices,
+                                      }}
+                                    >
+                                      <div
+                                        class={{
+                                          'relative mt-0.5 inline-block h-[max-content] focus-in-white-out':
+                                            true,
+                                          'w-[max-content] rounded-full':
+                                            isBoolean(
+                                              state.entriesSettingsLoad[
+                                                itemSub.id
+                                              ].default
+                                            ),
+                                          'w-full rounded-md': !isBoolean(
+                                            state.entriesSettingsLoad[
+                                              itemSub.id
+                                            ].default
+                                          ),
+                                        }}
                                       >
-                                        {Object.entries(itemSub.choices).map(
-                                          ([key, value]) => {
-                                            return (
-                                              (itemSub.id === 'mode' ||
-                                                key === 'last' ||
-                                                state.menu[key].condition) && (
-                                                <option
-                                                  selected={
-                                                    state.entriesSettingsLoad[
-                                                      itemSub.id
-                                                    ].default === key
-                                                  }
-                                                  value={key}
-                                                >
-                                                  {value}
-                                                </option>
+                                        {itemSub.choices ? (
+                                          <select
+                                            data-focus={true}
+                                            class="text-sm focus-none cursor-pointer w-[125px] rounded-md"
+                                            onInput={(e) =>
+                                              this.settingsOnChange(
+                                                itemSub.id,
+                                                'default',
+                                                (e.target as HTMLInputElement)
+                                                  .value
                                               )
-                                            );
-                                          }
+                                            }
+                                          >
+                                            {Object.entries(
+                                              itemSub.choices
+                                            ).map(([key, value]) => {
+                                              return (
+                                                (itemSub.id === 'mode' ||
+                                                  key === 'last' ||
+                                                  state.menu[key]
+                                                    .condition) && (
+                                                  <option
+                                                    selected={
+                                                      state.entriesSettingsLoad[
+                                                        itemSub.id
+                                                      ].default === key
+                                                    }
+                                                    value={key}
+                                                  >
+                                                    {value}
+                                                  </option>
+                                                )
+                                              );
+                                            })}
+                                          </select>
+                                        ) : isNumber(
+                                            state.entriesSettingsLoad[
+                                              itemSub.id
+                                            ].default
+                                          ) ? (
+                                          <input
+                                            data-focus={true}
+                                            id={`setting-${itemSub.id}`}
+                                            type="number"
+                                            class="text-sm focus-none max-w-[125px] rounded-md"
+                                            min={10}
+                                            value={
+                                              state.entriesSettingsLoad[
+                                                itemSub.id
+                                              ].default
+                                            }
+                                            onInput={(e) =>
+                                              this.settingsOnChange(
+                                                itemSub.id,
+                                                'default',
+                                                parseInt(
+                                                  (e.target as HTMLInputElement)
+                                                    .value
+                                                )
+                                              )
+                                            }
+                                          />
+                                        ) : (
+                                          [
+                                            <input
+                                              data-focus={true}
+                                              type="checkbox"
+                                              id={`setting-${itemSub.id}`}
+                                              class="sr-only peer rounded-full"
+                                              checked={
+                                                state.entriesSettingsLoad[
+                                                  itemSub.id
+                                                ].default
+                                              }
+                                              onInput={(e) =>
+                                                this.settingsOnChange(
+                                                  itemSub.id,
+                                                  'default',
+                                                  (e.target as HTMLInputElement)
+                                                    .checked
+                                                )
+                                              }
+                                            />,
+                                            <div
+                                              class={`block bg-slate-300 w-14 h-5 transition ease-in-out duration-200 rounded-full group-hover:bg-slate-400 peer-checked:bg-blue-600`}
+                                            />,
+                                            <div
+                                              class={`dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition ease-in-out duration-200`}
+                                            />,
+                                          ]
                                         )}
-                                      </select>
-                                    ) : isNumber(
-                                        state.entriesSettingsLoad[itemSub.id]
-                                          .default
-                                      ) ? (
-                                      <input
-                                        data-focus={true}
-                                        id={`setting-${itemSub.id}`}
-                                        type="number"
-                                        class="text-sm focus-none max-w-[125px] rounded-md"
-                                        min={10}
-                                        value={
-                                          state.entriesSettingsLoad[itemSub.id]
-                                            .default
-                                        }
-                                        onInput={(e) =>
-                                          this.settingsOnChange(
-                                            itemSub.id,
-                                            'default',
-                                            parseInt(
-                                              (e.target as HTMLInputElement)
-                                                .value
-                                            )
-                                          )
-                                        }
-                                      />
-                                    ) : (
-                                      [
-                                        <input
-                                          data-focus={true}
-                                          type="checkbox"
-                                          id={`setting-${itemSub.id}`}
-                                          class="sr-only peer rounded-full"
-                                          checked={
-                                            state.entriesSettingsLoad[
-                                              itemSub.id
-                                            ].default
-                                          }
-                                          onInput={(e) =>
-                                            this.settingsOnChange(
-                                              itemSub.id,
-                                              'default',
-                                              (e.target as HTMLInputElement)
-                                                .checked
-                                            )
-                                          }
-                                        />,
+                                      </div>
+                                      <div class={`w-full mt-0.5 sm:mt-0`}>
                                         <div
-                                          class={`block bg-slate-300 w-14 h-5 transition ease-in-out duration-200 rounded-full group-hover:bg-slate-400 peer-checked:bg-blue-600`}
-                                        />,
-                                        <div
-                                          class={`dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition ease-in-out duration-200`}
-                                        />,
-                                      ]
-                                    )}
-                                  </div>
-                                  <div class={`w-full mt-0.5 sm:mt-0`}>
-                                    <div
-                                      class={`text-base text-slate-900 font-medium flex justify-between`}
-                                    >
-                                      {itemSub.name}
-                                      {itemSub.keys && (
-                                        <div
-                                          class={`hidden space-x-2 mt-[-6px] md:flex ${
-                                            state.entriesSettingsLoad[
-                                              itemSub.id
-                                            ].default
-                                              ? ''
-                                              : 'opacity-50'
-                                          }`}
+                                          class={`text-base text-slate-900 font-medium flex justify-between`}
                                         >
-                                          {itemSub.metaKey && (
-                                            <Key
-                                              key={state.isMac ? 'cmd' : 'ctrl'}
-                                            />
+                                          {itemSub.name}
+                                          {itemSub.keys && (
+                                            <div
+                                              class={`hidden space-x-2 mt-[-6px] md:flex ${
+                                                state.entriesSettingsLoad[
+                                                  itemSub.id
+                                                ].default
+                                                  ? ''
+                                                  : 'opacity-50'
+                                              }`}
+                                            >
+                                              {itemSub.metaKey && (
+                                                <Key
+                                                  key={
+                                                    state.isMac ? 'cmd' : 'ctrl'
+                                                  }
+                                                />
+                                              )}
+                                              {itemSub.keys.map((item) => {
+                                                return <Key key={item} />;
+                                              })}
+                                            </div>
                                           )}
-                                          {itemSub.keys.map((item) => {
-                                            return <Key key={item} />;
-                                          })}
                                         </div>
-                                      )}
-                                    </div>
-                                    <div
-                                      class={`mt-0.5 text-xs text-slate-500`}
-                                    >
-                                      {itemSub.label}
-                                    </div>
-                                  </div>
-                                </label>
-                              </li>
-                            );
-                          }
-                        )}
-                      </ul>
-                    )}
-                  </li>
+                                        <div
+                                          class={`mt-0.5 text-xs text-slate-500`}
+                                        >
+                                          {itemSub.label}
+                                        </div>
+                                      </div>
+                                    </label>
+                                  </li>
+                                )
+                              );
+                            }
+                          )}
+                        </ul>
+                      )}
+                    </li>
+                  )
                 );
               }
             )}

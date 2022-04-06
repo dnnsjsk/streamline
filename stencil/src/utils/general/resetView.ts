@@ -8,7 +8,10 @@ export function resetView() {
   state.isSlash = false;
   state.isHelp = false;
   state.isSearch = true;
-  if (state.entriesSettingsLoad.searchResetInput.default) {
+  if (
+    state.entriesSettingsLoad.searchResetInput.default ||
+    state.entriesSettingsLoad.mode.default === 'default'
+  ) {
     state.searchValue = '';
   }
   if (stateLocal.active === 'site' || stateLocal.active === 'post') {
@@ -17,7 +20,10 @@ export function resetView() {
     state.isEnter = false;
   }
   setEntries();
-  if (state.entriesSettingsLoad.searchFocus.default) {
+  if (
+    state.entriesSettingsLoad.searchFocus.default ||
+    state.entriesSettingsLoad.mode.default === 'default'
+  ) {
     focusSearch();
   }
   document

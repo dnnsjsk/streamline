@@ -208,6 +208,16 @@ export class StreamlineContainer {
                 <streamline-ui-dropdown
                   type="main"
                   items={[
+                    state.entriesSettingsLoad.mode.default === 'default' && {
+                      text:
+                        stateLocal.active === 'settings'
+                          ? 'Search'
+                          : 'Settings',
+                      onClick: () =>
+                        stateLocal.active === 'settings'
+                          ? (stateLocal.active = 'search')
+                          : (stateLocal.active = 'settings'),
+                    },
                     {
                       text: state.isHelp ? 'Close help' : 'Show help',
                       onClick: () => {
@@ -216,11 +226,8 @@ export class StreamlineContainer {
                       },
                     },
                     state.entriesSettingsLoad.mode.default === 'default' && {
-                      text: 'Settings',
-                      onClick: () =>
-                        stateLocal.active === 'settings'
-                          ? (stateLocal.active = 'search')
-                          : (stateLocal.active = 'settings'),
+                      text: 'Exit',
+                      onClick: () => (state.visible = false),
                     },
                   ]}
                 />
