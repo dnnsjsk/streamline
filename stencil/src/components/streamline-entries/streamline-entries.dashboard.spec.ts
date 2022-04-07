@@ -16,18 +16,26 @@ const e = (page) => {
   return page.doc.querySelector('streamline-entries').shadowRoot;
 };
 
-beforeEach(async () => {
+beforeEach(() => {
   dispose();
   disposeLocal();
   state.entriesMenu = menu;
   state.entriesPost = post;
   state.entriesPostQuery = 'test';
+  state.entriesSettingsLoad = {
+    ...state.entriesSettingsLoad,
+    ...{
+      mode: {
+        default: 'dashboard',
+      },
+    },
+  };
 });
 
 describe('Render entries with', () => {
   describe('dot menu', () => {
     it("mode set to 'help'", async () => {
-      stateLocal.active = 'fav';
+      state.active = 'fav';
       const page = await newSpecPage({
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
@@ -41,7 +49,7 @@ describe('Render entries with', () => {
   });
   describe("mode set to 'favourites'", () => {
     it('and all elements shown', async () => {
-      stateLocal.active = 'fav';
+      state.active = 'fav';
       const page = await newSpecPage({
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
@@ -51,7 +59,7 @@ describe('Render entries with', () => {
       expect(lengthLi).toBe(18);
     });
     it("and search is 'me'", async () => {
-      stateLocal.active = 'fav';
+      state.active = 'fav';
       state.searchValue = 'me';
       const page = await newSpecPage({
         components: [StreamlineEntries],
@@ -62,7 +70,7 @@ describe('Render entries with', () => {
       expect(lengthLi).toBe(3);
     });
     it('and favourite is added', async () => {
-      stateLocal.active = 'post';
+      state.active = 'post';
       const page = await newSpecPage({
         components: [StreamlineEntries, StreamlineUiDropdown],
         html: `<streamline-entries></streamline-entries>`,
@@ -73,13 +81,13 @@ describe('Render entries with', () => {
         .shadowRoot.querySelector('a');
       const click = new MouseEvent('click');
       fav.dispatchEvent(click);
-      stateLocal.active = 'fav';
+      state.active = 'fav';
       await page.waitForChanges();
       const lengthEntry = el.querySelectorAll('[data-entry]').length;
       expect(lengthEntry).toBe(13);
     });
     it('and all favourites are removed until there is none left', async () => {
-      stateLocal.active = 'fav';
+      state.active = 'fav';
       const page = await newSpecPage({
         components: [StreamlineEntries, StreamlineUiDropdown],
         html: `<streamline-entries></streamline-entries>`,
@@ -164,7 +172,7 @@ describe('Render entries with', () => {
       }
     });
     it('and all favourites are removed until there is none left on multisite', async () => {
-      stateLocal.active = 'fav';
+      state.active = 'fav';
       state.entriesFav = networkFav;
       const page = await newSpecPage({
         components: [StreamlineEntries, StreamlineUiDropdown],
@@ -258,19 +266,17 @@ describe('Render entries with', () => {
 
   describe("mode set to 'menu'", () => {
     it('and all elements shown', async () => {
-      stateLocal.active = 'menu';
+      state.active = 'menu';
       const page = await newSpecPage({
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
       });
       const el = e(page);
       const lengthLi = el.querySelectorAll('li').length;
-      const results = el.querySelector('.results-amount').innerHTML.trim();
       expect(lengthLi).toBe(77);
-      expect(results).toBe('Showing 63 results');
     });
     it("and search is 'med'", async () => {
-      stateLocal.active = 'menu';
+      state.active = 'menu';
       state.searchValue = 'med';
       const page = await newSpecPage({
         components: [StreamlineEntries],
@@ -278,12 +284,10 @@ describe('Render entries with', () => {
       });
       const el = e(page);
       const lengthLi = el.querySelectorAll('li').length;
-      const results = el.querySelector('.results-amount').innerHTML.trim();
       expect(lengthLi).toBe(5);
-      expect(results).toBe('Showing 3 results');
     });
     it("and search is 'All pages'", async () => {
-      stateLocal.active = 'menu';
+      state.active = 'menu';
       state.searchValue = 'All pages';
       const page = await newSpecPage({
         components: [StreamlineEntries],
@@ -291,12 +295,10 @@ describe('Render entries with', () => {
       });
       const el = e(page);
       const lengthLi = el.querySelectorAll('li').length;
-      const results = el.querySelector('.results-amount').innerHTML.trim();
       expect(lengthLi).toBe(2);
-      expect(results).toBe('Showing 1 result');
     });
     it("and search is 'xlsbvhaysgf'", async () => {
-      stateLocal.active = 'menu';
+      state.active = 'menu';
       state.searchValue = 'xlsbvhaysgf';
       const page = await newSpecPage({
         components: [StreamlineEntries],
@@ -304,13 +306,11 @@ describe('Render entries with', () => {
       });
       const el = e(page);
       const lengthLi = el.querySelectorAll('li').length;
-      const results = el.querySelector('.results-amount').innerHTML.trim();
       expect(lengthLi).toBe(0);
-      expect(results).toBe('Showing 0 results');
     });
     it('and nine elements are favourites', async () => {
       state.entriesFav = fav;
-      stateLocal.active = 'menu';
+      state.active = 'menu';
       const page = await newSpecPage({
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
@@ -323,7 +323,7 @@ describe('Render entries with', () => {
 
   describe("mode set to 'post'", () => {
     it('and all elements shown', async () => {
-      stateLocal.active = 'post';
+      state.active = 'post';
       const page = await newSpecPage({
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
@@ -333,7 +333,7 @@ describe('Render entries with', () => {
       expect(lengthRow).toBe(505);
     });
     it('and all elements shown in test mode', async () => {
-      stateLocal.active = 'post';
+      state.active = 'post';
       state.test = true;
       const page = await newSpecPage({
         components: [StreamlineEntries],
@@ -344,7 +344,7 @@ describe('Render entries with', () => {
       expect(lengthRow).toBe(20);
     });
     it("and search is 'me'", async () => {
-      stateLocal.active = 'post';
+      state.active = 'post';
       state.searchValue = 'me';
       const page = await newSpecPage({
         components: [StreamlineEntries],
@@ -352,12 +352,12 @@ describe('Render entries with', () => {
       });
       const el = e(page);
       const lengthRow = el.querySelectorAll('[data-row]').length;
-      const results = el.querySelector('.results-amount').innerHTML.trim();
+      const results = el.querySelector('#amount').innerHTML.trim();
       expect(lengthRow).toBe(35);
-      expect(results).toBe('Showing 35 results');
+      expect(results).toBe('∙ Showing 35 results');
     });
     it("and search is 'me' in test mode", async () => {
-      stateLocal.active = 'post';
+      state.active = 'post';
       state.searchValue = 'me';
       state.test = true;
       const page = await newSpecPage({
@@ -366,12 +366,12 @@ describe('Render entries with', () => {
       });
       const el = e(page);
       const lengthRow = el.querySelectorAll('[data-row]').length;
-      const results = el.querySelector('.results-amount').innerHTML.trim();
+      const results = el.querySelector('#amount').innerHTML.trim();
       expect(lengthRow).toBe(2);
-      expect(results).toBe('Showing 2 results (page 1 of 26)');
+      expect(results).toBe('∙ Showing 2 results');
     });
     it("and search is 'Hello world'", async () => {
-      stateLocal.active = 'post';
+      state.active = 'post';
       state.searchValue = 'Hello world';
       const page = await newSpecPage({
         components: [StreamlineEntries],
@@ -379,13 +379,13 @@ describe('Render entries with', () => {
       });
       const el = e(page);
       const lengthRow = el.querySelectorAll('[data-row]').length;
-      const results = el.querySelector('.results-amount').innerHTML.trim();
+      const results = el.querySelector('#amount').innerHTML.trim();
       expect(lengthRow).toBe(0);
-      expect(results).toBe('Showing 0 results');
+      expect(results).toBe('∙ Showing 0 results');
     });
     it('and three elements are favourites', async () => {
       state.entriesFav = fav;
-      stateLocal.active = 'post';
+      state.active = 'post';
       const page = await newSpecPage({
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
@@ -398,7 +398,7 @@ describe('Render entries with', () => {
     it('and an element is being edited, saved, edited, cancelled, edited in drawer and saved', async () => {
       matchMediaPolyfill(window);
       state.test = true;
-      stateLocal.active = 'post';
+      state.active = 'post';
       const page = await newSpecPage({
         components: [
           StreamlineContainer,
@@ -483,7 +483,7 @@ describe('Render entries with', () => {
       ).toBe(true);
     });
     it('and paginate to the last page', async () => {
-      stateLocal.active = 'post';
+      state.active = 'post';
       state.test = true;
       const page = await newSpecPage({
         components: [StreamlineEntries],
@@ -575,7 +575,7 @@ describe('Render entries with', () => {
       await page.waitForChanges();
       expect(state.entriesPostCurrentPage).toBe(26);
       expect(next.hasAttribute('disabled')).toBe(true);
-      stateLocal.active = 'settings';
+      state.active = 'settings';
       state.entriesSettingsLoad = {
         ...state.entriesSettingsLoad,
         ...{
@@ -586,17 +586,23 @@ describe('Render entries with', () => {
       };
       await page.waitForChanges();
       state.entriesPostCurrentPage = 1;
-      stateLocal.active = 'post';
+      state.active = 'post';
       await page.waitForChanges();
       expect(
         page.doc
           .querySelector('streamline-entries')
-          .shadowRoot.querySelector('.results-amount')
+          .shadowRoot.querySelector('#amount')
           .innerHTML.trim()
-      ).toBe('Showing 30 results (page 1 of 17)');
+      ).toBe('∙ Showing 30 results');
+      expect(
+        page.doc
+          .querySelector('streamline-entries')
+          .shadowRoot.querySelector('#pages')
+          .innerHTML.trim()
+      ).toBe('∙ Page 1 of 17');
     });
     it('sort entries by post title, check favourites and reset it afterwards', async () => {
-      stateLocal.active = 'post';
+      state.active = 'post';
       state.entriesFav = fav;
       state.test = true;
       const page = await newSpecPage({
@@ -620,7 +626,7 @@ describe('Render entries with', () => {
       sort.dispatchEvent(click);
       await page.waitForChanges();
       expect(firstInput.value).toBe('super_string_1');
-      stateLocal.active = 'fav';
+      state.active = 'fav';
       await page.waitForChanges();
       expect(firstInput.value).toBe('Time to log out');
       el.querySelector('[type="transparent"]').dispatchEvent(click);
@@ -631,7 +637,7 @@ describe('Render entries with', () => {
 
   describe("mode set to 'settings'", () => {
     it('and all elements shown', async () => {
-      stateLocal.active = 'settings';
+      state.active = 'settings';
       const page = await newSpecPage({
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
@@ -640,10 +646,10 @@ describe('Render entries with', () => {
       const checkboxes = el.querySelectorAll('input[type="checkbox"]').length;
       const select = el.querySelectorAll('select').length;
       expect(checkboxes).toBe(7);
-      expect(select).toBe(1);
+      expect(select).toBe(2);
     });
     it('and save button activating after changing a setting', async () => {
-      stateLocal.active = 'settings';
+      state.active = 'settings';
       const page = await newSpecPage({
         components: [StreamlineEntries],
         html: `<streamline-entries></streamline-entries>`,
@@ -664,6 +670,7 @@ describe('Render entries with', () => {
 describe('Key press', () => {
   it('should cycle through all entries', async () => {
     state.visible = true;
+    state.active = 'menu';
     const page = await newSpecPage({
       components: [StreamlineEntries],
       html: `<streamline-entries></streamline-entries>`,

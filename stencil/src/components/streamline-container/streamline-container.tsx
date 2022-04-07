@@ -2,11 +2,12 @@
 import { Component, h, Prop, Method, Host, Element } from '@stencil/core';
 import { state } from '../../store/internal';
 import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
-import { stateLocal } from '../../store/local';
 import { getMenus } from '../../utils/get/getMenus';
 import { getMetaKey } from '../../utils/get/getMetaKey';
 import { setEntries } from '../../utils/set/setEntries';
 import { focusSearch } from '../../utils/search/focusSearch';
+import { getAll } from '../../utils/get/getAll';
+import { Loader } from '../../elements/Loader';
 
 /**
  * Container.
@@ -17,6 +18,9 @@ import { focusSearch } from '../../utils/search/focusSearch';
   styleUrl: 'streamline-container.scss',
 })
 export class StreamlineContainer {
+  // @ts-ignore
+  private tw = 'h-6 w-6 sm:h-7 sm:w-7';
+
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineContainerElement;
 
@@ -54,9 +58,11 @@ export class StreamlineContainer {
     document.addEventListener('keydown', (e) => {
       if (e.key === 'k' && getMetaKey(e)) {
         e.preventDefault();
-        if (state.entriesSettingsLoad.behaviourDefaultTab.default !== 'last') {
-          stateLocal.active =
-            state.entriesSettingsLoad.behaviourDefaultTab.default;
+        if (
+          state.entriesSettingsLoad.behaviourDefaultTab.default !== 'last' &&
+          state.entriesSettingsLoad.mode.default === 'dashboard'
+        ) {
+          state.active = state.entriesSettingsLoad.behaviourDefaultTab.default;
           getMenus();
         }
         state.visible = !state.visible;
@@ -104,25 +110,30 @@ export class StreamlineContainer {
     setSearchPlaceholder();
 
     state.visible = this.visible || false;
+
+    if (state.entriesSettingsLoad.mode.default === 'default') {
+      getAll();
+      state.active = 'search';
+    }
   }
 
   private cycleTabs = (mode) => {
-    const index = state.menus.indexOf(stateLocal.active);
+    const index = state.menus.indexOf(state.active);
     const length = state.menus.length;
 
     if (mode === 'up') {
       if (index === 0) {
-        stateLocal.active = state.menus[length - 1];
+        state.active = state.menus[length - 1];
       } else {
-        stateLocal.active = state.menus[index - 1];
+        state.active = state.menus[index - 1];
       }
     }
 
     if (mode === 'down') {
       if (index + 1 === length) {
-        stateLocal.active = state.menus[0];
+        state.active = state.menus[0];
       } else {
-        stateLocal.active = state.menus[index + 1];
+        state.active = state.menus[index + 1];
       }
     }
 
@@ -182,11 +193,11 @@ export class StreamlineContainer {
           />
           <div
             class={{
-              'inner w-full h-full absolute max-h-[700px] overflow-hidden grid bg-slate-900 lg:rounded-xl':
+              'inner w-full h-full absolute max-h-[600px] overflow-hidden grid bg-slate-900 md:rounded-xl':
                 true,
-              'max-w-[1024px]':
+              'max-w-[calc(768px+var(--sl-side-w))]':
                 state.entriesSettingsLoad.mode.default === 'dashboard',
-              'max-w-[calc(1024px-var(--sl-side-w))]':
+              'max-w-screen-md':
                 state.entriesSettingsLoad.mode.default === 'default',
             }}
           >
@@ -202,21 +213,36 @@ export class StreamlineContainer {
               }}
             >
               <div
-                class={`bg-slate-50 grid grid-cols-[1fr,var(--sl-side-w)] lg:grid-cols-[1fr,64px]`}
+                class={{
+                  'bg-slate-50 grid': true,
+                  'grid-cols-[1fr,var(--sl-side-w)] lg:grid-cols-[1fr,64px]':
+                    state.entriesSettingsLoad.mode.default === 'dashboard',
+                  'grid-cols-[1fr,var(--sl-side-w),var(--sl-side-w)] lg:grid-cols-[1fr,64px,64px]':
+                    state.entriesSettingsLoad.mode.default === 'default',
+                }}
               >
                 <streamline-search class="h-[var(--sl-side-w)] w-full lg:h-[64px]" />
+                {state.entriesSettingsLoad.mode.default === 'default' && (
+                  <div
+                    class={{
+                      'text-black self-center justify-self-center': true,
+                      invisible:
+                        !state.isLoading &&
+                        state.entriesSettingsLoad.mode.default === 'default',
+                    }}
+                  >
+                    <Loader />
+                  </div>
+                )}
                 <streamline-ui-dropdown
                   type="main"
                   items={[
                     state.entriesSettingsLoad.mode.default === 'default' && {
-                      text:
-                        stateLocal.active === 'settings'
-                          ? 'Search'
-                          : 'Settings',
+                      text: state.active === 'settings' ? 'Search' : 'Settings',
                       onClick: () =>
-                        stateLocal.active === 'settings'
-                          ? (stateLocal.active = 'search')
-                          : (stateLocal.active = 'settings'),
+                        state.active === 'settings'
+                          ? (state.active = 'search')
+                          : (state.active = 'settings'),
                     },
                     {
                       text: state.isHelp ? 'Close help' : 'Show help',

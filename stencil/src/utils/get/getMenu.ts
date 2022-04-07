@@ -78,12 +78,17 @@ export function getMenu(obj = {} as any) {
     if (isNetwork) {
       state.entriesNetworkMenu = data;
       state.entriesNetworkMenuActive = data;
+      if (!state.entriesSearch.some((e) => e.type === 'networkMenu')) {
+        state.entriesSearch = [...state.entriesSearch, ...data];
+      }
     } else {
       state.entriesMenu = data;
       state.entriesMenuActive = data;
       state.entriesMenuCurrentPath = obj.path || state.currentSite.path;
+      if (!state.entriesSearch.some((e) => e.type === 'menu')) {
+        state.entriesSearch = [...state.entriesSearch, ...data];
+      }
     }
-    state.entriesSearch = [...state.entriesSearch, ...data];
 
     setEntries();
   }

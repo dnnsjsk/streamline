@@ -2,7 +2,6 @@
 import { Component, Element, h } from '@stencil/core';
 import { state } from '../../store/internal';
 import { setEntries } from '../../utils/set/setEntries';
-import { stateLocal } from '../../store/local';
 import { get } from '../../utils/query/get';
 import { Button } from '../../elements/Button';
 
@@ -29,7 +28,7 @@ export class StreamlineSearch {
     setEntries();
 
     if (
-      (stateLocal.active === 'post' || stateLocal.active === 'site') &&
+      (state.active === 'post' || state.active === 'site') &&
       state.searchValue.trim().length >= 1 &&
       !state.test
     ) {
@@ -48,13 +47,13 @@ export class StreamlineSearch {
   };
 
   private startQuery = () => {
-    if (stateLocal.active === 'post' || stateLocal.active === 'site') {
+    if (state.active === 'post' || state.active === 'site') {
       this.value = state.searchValue;
-      this.route = `${stateLocal.active}s`;
+      this.route = `${state.active}s`;
 
       get({
         route: `get/${this.route}`,
-        type: stateLocal.active,
+        type: state.active,
         search: this.value,
       });
     }

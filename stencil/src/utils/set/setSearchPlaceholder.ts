@@ -1,18 +1,19 @@
 import { state } from '../../store/internal';
-import { stateLocal } from '../../store/local';
 import { capitalizeFirstLetter } from '../string/capitalizeFirstLetter';
 
 export function setSearchPlaceholder() {
   state.searchPlaceholder =
-    stateLocal.active === 'post' || stateLocal.active === 'site'
+    state.active === 'post' || state.active === 'site'
       ? `${
           state.test
             ? 'Filter entries'
             : Object.values(
-                state[`entries${capitalizeFirstLetter(stateLocal.active)}`]
+                state[`entries${capitalizeFirstLetter(state.active)}`]
               ).length >= 1
-            ? `Search for a ${stateLocal.active} or filter entries`
-            : `Search for a ${stateLocal.active}`
+            ? `Search for a ${state.active} or filter entries`
+            : `Search for a ${state.active}`
         }`
+      : state.active === 'search'
+      ? `Search or filter entries`
       : `Filter entries`;
 }

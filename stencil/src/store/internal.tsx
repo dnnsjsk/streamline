@@ -1,8 +1,9 @@
 import { createStore } from '@stencil/store';
 import equal from 'fast-deep-equal/es6';
-import { focusSearch } from '../utils/search/focusSearch';
 import { blurSearch } from '../utils/search/blurSearch';
-import { stateLocal } from './local';
+import { resetScroll } from '../utils/general/resetScroll';
+import { resetView } from '../utils/general/resetView';
+import { setSearchPlaceholder } from '../utils/set/setSearchPlaceholder';
 import { getAll } from '../utils/get/getAll';
 
 const isTest = document
@@ -10,6 +11,21 @@ const isTest = document
   ?.hasAttribute('test');
 
 const { state, dispose, onChange } = createStore({
+  actions: {
+    post: {
+      id: 'post',
+      name: 'Search for a post',
+      type: 'query',
+      query: {},
+    },
+    site: {
+      id: 'site',
+      name: 'Search for a site',
+      type: 'query',
+      query: {},
+    },
+  },
+  active: 'menu',
   class: {
     tag: 'px-2.5 py-1.5 bg-slate-200 text-slate-500 inline-block h-[max-content] leading-1',
   },
@@ -29,6 +45,7 @@ const { state, dispose, onChange } = createStore({
     title: '',
     values: {},
   },
+  entriesActions: {},
   entriesEditing: {},
   // @ts-ignore
   entriesFav: JSON.parse(window.streamlineData.favourites),
@@ -216,6 +233,8 @@ const { state, dispose, onChange } = createStore({
   ).reverse(),
   isEnter: false,
   isHelp: false,
+  infoBarAmount: '',
+  infoBarPages: '',
   isMac: false,
   isLoading: false,
   isSearch: true,
@@ -298,6 +317,16 @@ const { state, dispose, onChange } = createStore({
   visible: false,
 });
 
+onChange('active', (value) => {
+  state.entriesEditing = {};
+  if (
+    value === 'search' &&
+    state.entriesSettingsLoad.mode.default === 'default'
+  ) {
+    getAll();
+  }
+});
+
 onChange('drawer', () => {
   blurSearch();
 });
@@ -316,63 +345,27 @@ onChange('searchValue', (value) => {
   }
 });
 
-onChange('visible', (value) => {
-  if (state.entriesSettingsLoad.mode.default === 'default') {
+onChange('active', () => {
+  resetView();
+  setSearchPlaceholder();
+
+  if (state.active === 'search') {
     getAll();
-    stateLocal.active = 'search';
-  } else if (!state.menus.includes(stateLocal.active)) {
-    stateLocal.active = 'menu';
-  } else if (state.entriesSettingsLoad.behaviourDefaultTab.default !== 'last') {
-    stateLocal.active = state.entriesSettingsLoad.behaviourDefaultTab.default;
-  }
-
-  const el = document
-    ?.querySelector('streamline-container')
-    ?.shadowRoot?.querySelector('streamline-entries')
-    ?.shadowRoot?.querySelector('div > div');
-
-  if (el) {
-    const values = ['position', 'overflow', 'left', 'top', 'width'];
-
-    if (value === true) {
-      values.forEach((item) => {
-        const style = document.body.style[item];
-        if (style) {
-          state.bodyStyle = {
-            ...state.bodyStyle,
-            [item]: style,
-          };
-        }
-      });
-      state.scroll = window.scrollY;
-      // document.body.style.position = 'fixed';
-      document.body.style.overflow = 'hidden';
-      document.body.style.left = '0';
-      document.body.style.top = '0';
-      document.body.style.width = '100%';
-    } else {
-      values.forEach((item) => {
-        if (state.bodyStyle[item]) {
-          document.body.style[item] = state.bodyStyle[item];
-        } else {
-          document.body.style.removeProperty(item);
-        }
-      });
-      window.scrollTo(0, state.scroll);
-    }
-  }
-
-  if (value === true) {
-    setTimeout(() => {
-      focusSearch();
-    }, 20);
-    setTimeout(() => {
-      focusSearch();
-    }, 50);
-    setTimeout(() => {
-      focusSearch();
-    }, 100);
   }
 });
+
+onChange('visible', (value) => {
+  if (state.entriesSettingsLoad.mode.default !== 'dashboard') {
+    state.active = 'search';
+  } else if (!state.menus.includes(state.active)) {
+    state.active = 'menu';
+  } else if (state.entriesSettingsLoad.behaviourDefaultTab.default !== 'last') {
+    state.active = state.entriesSettingsLoad.behaviourDefaultTab.default;
+  }
+
+  resetScroll(value);
+});
+
+onChange('visible', () => {});
 
 export { state, dispose, onChange };

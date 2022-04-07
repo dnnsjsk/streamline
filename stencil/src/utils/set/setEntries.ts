@@ -7,7 +7,7 @@ import { sortEntries } from '../sort/sortEntries';
 
 export function setEntries(removeSort = '') {
   const result = filterDeep(
-    state.test && stateLocal.active === 'post'
+    state.test && state.active === 'post'
       ? [
           {
             ...state.entriesPost[0],
@@ -16,19 +16,22 @@ export function setEntries(removeSort = '') {
               getEntriesSliced(state.entriesPost[0].children),
           },
         ]
-      : state[`entries${capitalizeFirstLetter(stateLocal.active)}`],
+      : state[`entries${capitalizeFirstLetter(state.active)}`],
     (o) => {
       return (
         (o.name &&
           o.name.toLowerCase().includes(state.searchValue.toLowerCase())) ||
         (o.nameParent &&
-          o.nameParent.toLowerCase().includes(state.searchValue.toLowerCase()))
+          o.nameParent
+            .toLowerCase()
+            .includes(state.searchValue.toLowerCase())) ||
+        o.type === 'action'
       );
     },
     { childrenPath: ['children'] }
   );
 
-  state[`entries${capitalizeFirstLetter(stateLocal.active)}Active`] =
+  state[`entries${capitalizeFirstLetter(state.active)}Active`] =
     result?.length >= 1
       ? result
       : [
@@ -37,7 +40,7 @@ export function setEntries(removeSort = '') {
             children: [],
             isMultisite: state.data.network,
             path:
-              stateLocal.active === 'menu'
+              state.active === 'menu'
                 ? state.entriesMenuCurrentPath
                 : state.entriesPostCurrentPath,
           },
@@ -52,5 +55,5 @@ export function setEntries(removeSort = '') {
     };
   }
 
-  // console.log(state[`entries${capitalizeFirstLetter(stateLocal.active)}Active`]);
+  // console.log(state[`entries${capitalizeFirstLetter(state.active)}Active`]);
 }

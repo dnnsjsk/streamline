@@ -2,11 +2,10 @@ import { state } from '../../store/internal';
 import { setSearchPlaceholder } from '../set/setSearchPlaceholder';
 import { resetView } from '../general/resetView';
 import { capitalizeFirstLetter } from '../string/capitalizeFirstLetter';
-import { stateLocal } from '../../store/local';
 import { data } from './data';
 
 export function get(obj) {
-  const current = capitalizeFirstLetter(stateLocal.active);
+  const current = capitalizeFirstLetter(state.active);
 
   state.isLoading = true;
   fetch(

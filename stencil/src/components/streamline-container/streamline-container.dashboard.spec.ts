@@ -2,10 +2,9 @@ import { newSpecPage } from '@stencil/core/testing';
 import { StreamlineContainer } from './streamline-container';
 import { state, dispose } from '../../store/internal';
 import { StreamlineSearch } from '../streamline-search/streamline-search';
-import { stateLocal, disposeLocal } from '../../store/local';
 
 const cycle = async (page, key) => {
-  stateLocal.active = 'menu';
+  state.active = 'menu';
   state.visible = true;
   const eventUp = new KeyboardEvent('keydown', {
     [key]: true,
@@ -17,47 +16,54 @@ const cycle = async (page, key) => {
   });
   page.doc.dispatchEvent(eventUp);
   await page.waitForChanges();
-  expect(stateLocal.active).toBe('fav');
+  expect(state.active).toBe('fav');
   page.doc.dispatchEvent(eventUp);
   await page.waitForChanges();
-  expect(stateLocal.active).toBe('networkMenu');
+  expect(state.active).toBe('networkMenu');
   page.doc.dispatchEvent(eventUp);
   await page.waitForChanges();
-  expect(stateLocal.active).toBe('site');
+  expect(state.active).toBe('site');
   page.doc.dispatchEvent(eventDown);
   await page.waitForChanges();
-  expect(stateLocal.active).toBe('networkMenu');
+  expect(state.active).toBe('networkMenu');
   page.doc.dispatchEvent(eventDown);
   await page.waitForChanges();
-  expect(stateLocal.active).toBe('fav');
+  expect(state.active).toBe('fav');
   page.doc.dispatchEvent(eventDown);
   await page.waitForChanges();
-  expect(stateLocal.active).toBe('menu');
+  expect(state.active).toBe('menu');
   page.doc.dispatchEvent(eventDown);
   await page.waitForChanges();
-  expect(stateLocal.active).toBe('post');
+  expect(state.active).toBe('post');
   page.doc.dispatchEvent(eventDown);
   await page.waitForChanges();
-  expect(stateLocal.active).toBe('settings');
+  expect(state.active).toBe('settings');
   page.doc.dispatchEvent(eventDown);
   await page.waitForChanges();
-  expect(stateLocal.active).toBe('site');
+  expect(state.active).toBe('search');
 };
 
-beforeEach(async () => {
+beforeEach(() => {
   dispose();
-  disposeLocal();
+  state.entriesSettingsLoad = {
+    ...state.entriesSettingsLoad,
+    ...{
+      mode: {
+        default: 'dashboard',
+      },
+    },
+  };
 });
 
 describe('App should', () => {
   it('open correct default tab', async () => {
-    stateLocal.active = 'fav';
+    state.active = 'fav';
     const page = await newSpecPage({
       components: [StreamlineContainer],
       html: `<streamline-container></streamline-container>`,
     });
     state.visible = true;
-    expect(stateLocal.active).toBe('fav');
+    expect(state.active).toBe('fav');
     state.entriesSettingsLoad = {
       ...state.entriesSettingsLoad,
       ...{
@@ -71,7 +77,7 @@ describe('App should', () => {
     await page.waitForChanges();
     state.visible = true;
     await page.waitForChanges();
-    expect(stateLocal.active).toBe('menu');
+    expect(state.active).toBe('menu');
   });
 });
 
@@ -186,7 +192,7 @@ describe('Key press should', () => {
     await cycle(page, 'ctrlKey');
   });
   it('not cycle through modes', async () => {
-    stateLocal.active = 'menu';
+    state.active = 'menu';
     const page = await newSpecPage({
       components: [StreamlineContainer],
       html: `<streamline-container></streamline-container>`,
@@ -205,7 +211,7 @@ describe('Key press should', () => {
     });
     page.doc.dispatchEvent(eventUp);
     await page.waitForChanges();
-    expect(stateLocal.active).toBe('menu');
+    expect(state.active).toBe('menu');
   });
 });
 
@@ -218,6 +224,6 @@ describe('In test mode', () => {
     });
     await page.waitForChanges();
     const placeholder = state.searchPlaceholder;
-    expect(placeholder).toBe('Filter entries');
+    expect(placeholder).toBe('Search or filter entries');
   });
 });

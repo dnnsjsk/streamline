@@ -1,5 +1,4 @@
 import { state } from '../../store/internal';
-import { stateLocal } from '../../store/local';
 
 export function setTestData() {
   const site = [
@@ -1484,7 +1483,7 @@ export function setTestData() {
     },
   ];
 
-  stateLocal.active = 'menu';
+  state.active = 'menu';
   state.entriesSite = site;
   state.entriesSiteActive = site;
   state.entriesNetworkMenu = network;

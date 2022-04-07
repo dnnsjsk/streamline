@@ -1,11 +1,17 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { StreamlineSearch } from './streamline-search';
 import { dispose, state } from '../../store/internal';
-import { disposeLocal, stateLocal } from '../../store/local';
 
-beforeEach(async () => {
+beforeEach(() => {
   dispose();
-  disposeLocal();
+  state.entriesSettingsLoad = {
+    ...state.entriesSettingsLoad,
+    ...{
+      mode: {
+        default: 'dashboard',
+      },
+    },
+  };
 });
 
 describe('Render search', () => {
@@ -49,7 +55,7 @@ describe('Search value between different modes should', () => {
       components: [StreamlineSearch],
       html: `<streamline-search></streamline-search>`,
     });
-    stateLocal.active = 'fav';
+    state.active = 'fav';
     expect(state.searchValue).toBe('test');
   });
   it("not persist'", async () => {
@@ -58,7 +64,7 @@ describe('Search value between different modes should', () => {
       components: [StreamlineSearch],
       html: `<streamline-search></streamline-search>`,
     });
-    stateLocal.active = 'fav';
+    state.active = 'fav';
     expect(state.searchValue).toBe('');
   });
 });

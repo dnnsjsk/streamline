@@ -2,7 +2,6 @@
 import { Component, h } from '@stencil/core';
 import { state } from '../../store/internal';
 import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter';
-import { stateLocal } from '../../store/local';
 import { Loader } from '../../elements/Loader';
 import { getMenus } from '../../utils/get/getMenus';
 import {
@@ -18,7 +17,6 @@ import {
   IconSites,
   IconWordPress,
 } from '../../icons';
-import { getAll } from '../../utils/get/getAll';
 
 /**
  * Sidebar.
@@ -60,12 +58,8 @@ export class StreamlineSidebar {
 
     const handleClick = () => {
       if (type !== 'wordpress') {
-        stateLocal.active = type;
-        if (stateLocal.active === 'search') {
-          getAll();
-        } else {
-          getMenus();
-        }
+        state.active = type;
+        getMenus();
       } else {
         state.visible = false;
       }
@@ -75,7 +69,7 @@ export class StreamlineSidebar {
       <button
         onClick={handleClick}
         onMouseDown={(e) => e.preventDefault()}
-        tabIndex={stateLocal.active === type ? -1 : 0}
+        tabIndex={state.active === type ? -1 : 0}
         class={{
           'text-left h-[var(--sl-side-w)] min-w-[var(--sl-side-w)] flex flex-col items-center justify-center p-0 text-white bg-transparent':
             true,
@@ -87,18 +81,10 @@ export class StreamlineSidebar {
             type !== 'settings' && type !== 'wordpress',
           'mb-3': type === 'networkMenu' || type === 'search',
           'sm:mt-auto': type === 'settings',
-          'bg-slate-800 pointer-events-none': type === stateLocal.active,
+          'bg-slate-800 pointer-events-none': type === state.active,
         }}
       >
-        {type === 'wordpress' ? (
-          state.isLoading ? (
-            <Loader sm={true} />
-          ) : (
-            icon
-          )
-        ) : (
-          icon
-        )}
+        {type === 'wordpress' ? state.isLoading ? <Loader /> : icon : icon}
         {type === 'settings' || type === 'wordpress' ? (
           ''
         ) : (

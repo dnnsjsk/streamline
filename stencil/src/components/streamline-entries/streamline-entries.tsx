@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, Element, h, State } from '@stencil/core';
 import { state } from '../../store/internal';
-import { onChangeLocal, stateLocal } from '../../store/local';
+import { stateLocal } from '../../store/local';
 import { setEntries } from '../../utils/set/setEntries';
 import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter';
 import {
@@ -17,6 +17,7 @@ import {
   IconSites,
   IconHistory,
   IconSmileyTear,
+  IconAction,
 } from '../../icons';
 import { post } from '../../utils/query/post';
 import { getMenus } from '../../utils/get/getMenus';
@@ -50,13 +51,13 @@ export class StreamlineEntries {
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineEntriesElement;
 
-  @State() amount: string;
   @State() editing: object;
-  @State() pages: string;
 
   connectedCallback() {
-    getMenus();
-    setEntries();
+    if (state.entriesSettingsLoad.mode.default === 'dashboard') {
+      getMenus();
+      setEntries();
+    }
 
     window.addEventListener(
       'resize',
@@ -105,10 +106,6 @@ export class StreamlineEntries {
         }
       }
     });
-
-    onChangeLocal('active', () => {
-      state.entriesEditing = {};
-    });
   }
 
   private cycleEntries = (mode) => {
@@ -132,32 +129,31 @@ export class StreamlineEntries {
   };
 
   private getHeader(item, mb = false) {
-    const isTestNav = state.test && stateLocal.active === 'post';
+    const isTestNav = state.test && state.active === 'post';
 
     const isQuery = item.type === 'post' || item.type === 'site';
-    const isQueryMode =
-      stateLocal.active === 'site' || stateLocal.active === 'post';
+    const isQueryMode = state.active === 'site' || state.active === 'post';
     const isMenu = item.type === 'menu' || item.type === 'networkMenu';
     const isDotMenu = state.isHelp;
     const isNotDotMenu = !state.isHelp;
     const isQueryWithClose =
       isQueryMode &&
-      state[`entries${capitalizeFirstLetter(stateLocal.active)}Query`] &&
-      state[`historySearches${capitalizeFirstLetter(stateLocal.active)}`]
-        ?.length > 0 &&
+      state[`entries${capitalizeFirstLetter(state.active)}Query`] &&
+      state[`historySearches${capitalizeFirstLetter(state.active)}`]?.length >
+        0 &&
       !state.isHelp;
 
     const hasPages =
-      (state.test && stateLocal.active === 'post') ||
+      (state.test && state.active === 'post') ||
       (isQueryWithClose &&
-        stateLocal.active === 'post' &&
-        state[`entries${capitalizeFirstLetter(stateLocal.active)}Total`] >
+        state.active === 'post' &&
+        state[`entries${capitalizeFirstLetter(state.active)}Total`] >
           state.entriesSettingsLoad.queryAmount.default);
     const totalPages = Math.ceil(
-      (state.test && stateLocal.active === 'post'
+      (state.test && state.active === 'post'
         ? state.entriesPost?.[0]?.children &&
           Object.values(Object.values(state.entriesPost?.[0]?.children)).length
-        : state[`entries${capitalizeFirstLetter(stateLocal.active)}Total`]) /
+        : state[`entries${capitalizeFirstLetter(state.active)}Total`]) /
         state.entriesSettingsLoad.queryAmount.default
     );
 
@@ -176,24 +172,22 @@ export class StreamlineEntries {
       ? menuNumber
       : '0';
 
-    this.amount = ` ∙ Showing ${result} ${
+    state.infoBarAmount = ` ∙ Showing ${result} ${
       (isQuery && Object.values(item.children).length === 1) ||
       (isMenu && menuNumber === 1)
         ? `result`
         : `results`
     }`;
 
-    this.pages =
+    state.infoBarPages =
       hasPages || isTestNav
         ? ` ∙ Page ${
-            state[
-              `entries${capitalizeFirstLetter(stateLocal.active)}CurrentPage`
-            ]
+            state[`entries${capitalizeFirstLetter(state.active)}CurrentPage`]
           } of ${totalPages}`
         : '';
 
     const path =
-      item.isMultisite && !state.test && stateLocal.active !== 'site'
+      item.isMultisite && !state.test && state.active !== 'site'
         ? ` <span class="text-slate-300">∙</span> subsite: ${item.path}`
         : '';
 
@@ -212,7 +206,7 @@ export class StreamlineEntries {
             {!state.isHelp && (
               <div
                 class={{
-                  'relative flex-shrink-0 text-blue-600 flex items-center justify-center mr-3 h-8 w-8 p-2 bg-blue-50 rounded-full':
+                  'relative flex-shrink-0 text-blue-600 flex items-center justify-center mr-3 h-8 w-8 p-2 bg-blue-50 rounded-lg':
                     true,
                   'ml-8': isQueryWithClose,
                 }}
@@ -222,6 +216,7 @@ export class StreamlineEntries {
                 {item.type === 'post' && <IconPost />}
                 {item.type === 'settings' && <IconSettings />}
                 {item.type === 'site' && <IconSites />}
+                {item.type === 'action' && <IconAction />}
                 {isQueryWithClose !== false && isQueryWithClose !== true ? (
                   <IconHistory />
                 ) : (
@@ -235,18 +230,13 @@ export class StreamlineEntries {
                 icon={<IconTimes />}
                 onClick={() => {
                   state[
-                    `entries${capitalizeFirstLetter(
-                      stateLocal.active
-                    )}CurrentPage`
+                    `entries${capitalizeFirstLetter(state.active)}CurrentPage`
                   ] = 1;
-                  state[
-                    `entries${capitalizeFirstLetter(stateLocal.active)}Query`
-                  ] = '';
-                  state[`entries${capitalizeFirstLetter(stateLocal.active)}`] =
+                  state[`entries${capitalizeFirstLetter(state.active)}Query`] =
+                    '';
+                  state[`entries${capitalizeFirstLetter(state.active)}`] = [];
+                  state[`entries${capitalizeFirstLetter(state.active)}Active`] =
                     [];
-                  state[
-                    `entries${capitalizeFirstLetter(stateLocal.active)}Active`
-                  ] = [];
                   setSearchPlaceholder();
                 }}
               />
@@ -262,44 +252,38 @@ export class StreamlineEntries {
                   ? 'Network admin'
                   : isMenu
                   ? 'Admin menu' + path
-                  : (stateLocal.active === 'post' ||
-                      stateLocal.active === 'site') &&
-                    state[
-                      `entries${capitalizeFirstLetter(stateLocal.active)}`
-                    ][0]?.queryValue
-                  ? `${capitalizeFirstLetter(stateLocal.active)}s for: ` +
+                  : (state.active === 'post' || state.active === 'site') &&
+                    state[`entries${capitalizeFirstLetter(state.active)}`][0]
+                      ?.queryValue
+                  ? `${capitalizeFirstLetter(state.active)}s for: ` +
                     `<span class="text-slate-400 italic">${
                       state[
-                        `entries${
-                          stateLocal.active === 'post' ? 'Post' : 'Site'
-                        }`
+                        `entries${state.active === 'post' ? 'Post' : 'Site'}`
                       ][0]?.queryValue
                     }</span>` +
                     path
-                  : isQuery && stateLocal.active === 'fav'
+                  : isQuery && state.active === 'fav'
                   ? `${capitalizeFirstLetter(item.type)}s` + path
                   : isQueryMode &&
                     !state[
-                      `entries${capitalizeFirstLetter(stateLocal.active)}Query`
+                      `entries${capitalizeFirstLetter(state.active)}Query`
                     ] &&
                     state[
-                      `historySearches${capitalizeFirstLetter(
-                        stateLocal.active
-                      )}`
+                      `historySearches${capitalizeFirstLetter(state.active)}`
                     ]?.length === 0
-                  ? `No query, search for a ${stateLocal.active} in the search bar`
+                  ? `No query, search for a ${state.active} in the search bar`
                   : isQueryMode &&
                     !state[
-                      `entries${capitalizeFirstLetter(stateLocal.active)}Query`
+                      `entries${capitalizeFirstLetter(state.active)}Query`
                     ] &&
                     state[
-                      `historySearches${capitalizeFirstLetter(
-                        stateLocal.active
-                      )}`
+                      `historySearches${capitalizeFirstLetter(state.active)}`
                     ]?.length > 0
                   ? `Search history`
-                  : stateLocal.active === 'settings'
+                  : state.active === 'settings'
                   ? 'Settings'
+                  : item.type === 'action'
+                  ? 'Actions'
                   : 'No results'
               }`}
             />
@@ -310,7 +294,7 @@ export class StreamlineEntries {
             {
               type: 'button',
               text: 'Save',
-              condition: stateLocal.active === 'settings' && isNotDotMenu,
+              condition: state.active === 'settings' && isNotDotMenu,
               onClick: () => {
                 state.entriesPostCurrentPage = 1;
 
@@ -380,15 +364,13 @@ export class StreamlineEntries {
                 condition:
                   isTestNav ||
                   (hasPages &&
-                    stateLocal.active === 'post' &&
+                    state.active === 'post' &&
                     state.entriesPostQuery),
                 type: 'secondary',
                 icon: <IconArrowLeft />,
                 disabled:
                   state[
-                    `entries${capitalizeFirstLetter(
-                      stateLocal.active
-                    )}CurrentPage`
+                    `entries${capitalizeFirstLetter(state.active)}CurrentPage`
                   ] === 1,
                 action: 'prev',
                 onClick: false,
@@ -397,7 +379,7 @@ export class StreamlineEntries {
                 condition:
                   isTestNav ||
                   (hasPages &&
-                    stateLocal.active === 'post' &&
+                    state.active === 'post' &&
                     state.entriesPostQuery),
                 type: 'secondary',
                 icon: (
@@ -407,9 +389,7 @@ export class StreamlineEntries {
                 ),
                 disabled:
                   state[
-                    `entries${capitalizeFirstLetter(
-                      stateLocal.active
-                    )}CurrentPage`
+                    `entries${capitalizeFirstLetter(state.active)}CurrentPage`
                   ] === totalPages,
                 action: 'next',
                 onClick: false,
@@ -426,29 +406,29 @@ export class StreamlineEntries {
                         ? () => {
                             state[
                               `entries${capitalizeFirstLetter(
-                                stateLocal.active
+                                state.active
                               )}CurrentPage`
                             ] =
                               itemInner.action === 'next'
                                 ? state[
                                     `entries${capitalizeFirstLetter(
-                                      stateLocal.active
+                                      state.active
                                     )}CurrentPage`
                                   ] + 1
                                 : state[
                                     `entries${capitalizeFirstLetter(
-                                      stateLocal.active
+                                      state.active
                                     )}CurrentPage`
                                   ] - 1;
 
                             if (!state.test) {
                               get({
-                                route: `get/${stateLocal.active}s`,
-                                type: stateLocal.active,
+                                route: `get/${state.active}s`,
+                                type: state.active,
                                 search:
                                   state[
                                     `entries${capitalizeFirstLetter(
-                                      stateLocal.active
+                                      state.active
                                     )}Query`
                                   ],
                               });
@@ -481,6 +461,8 @@ export class StreamlineEntries {
 
     const isEdit = state.entriesEditing?.[item.ID]?.active;
 
+    const isAction = item.type === 'action';
+    const isActionInactive = isAction && state.searchValue === '';
     const isSite = item.type === 'site';
     const isHistory = item.type === 'history';
     const isPost = item.type === 'post';
@@ -535,8 +517,8 @@ export class StreamlineEntries {
 
     const onClickHistory = () => {
       get({
-        route: `get/${stateLocal.active}s`,
-        type: stateLocal.active,
+        route: `get/${state.active}s`,
+        type: state.active,
         search: item.name,
         id: item.siteId,
       });
@@ -711,22 +693,24 @@ export class StreamlineEntries {
     return (
       <li class={`relative`} data-entry={true} data-row={item.ID}>
         <a
-          data-focus={true}
-          tabindex={isEdit ? -1 : 0}
+          data-focus={!isActionInactive && true}
+          tabindex={isEdit || isActionInactive ? -1 : 0}
           href={state.test ? '#0' : item.href || item.guid}
           class={{
             [this.px]: true,
             [rowClass]: true,
             'relative focus-white flex items-center flex-wrap cursor-pointer w-full inline-block peer sm:hover:text-blue-600 sm:hover:bg-slate-50':
               true,
-            'pointer-events-none': (isCurrentSite && isSite) || isEdit,
+            'pointer-events-none':
+              (isCurrentSite && isSite) || isEdit || isActionInactive,
+            'opacity-50': isActionInactive,
           }}
           onClick={onClick}
           onDblClick={onDblClick}
           onMouseDown={(e) => e.preventDefault()}
         >
-          {((isFav && stateLocal.active !== 'fav') ||
-            (isCurrentSite && stateLocal.active === 'site')) && (
+          {((isFav && state.active !== 'fav') ||
+            (isCurrentSite && state.active === 'site')) && (
             <span
               class={`mr-2 flex absolute left-px top-1/2 -translate-y-1/2 sm:left-2 lg:left-4`}
             >
@@ -791,23 +775,23 @@ export class StreamlineEntries {
   private rows = () => {
     const isHistory =
       !state.test &&
-      (stateLocal.active === 'post' || stateLocal.active === 'site') &&
-      !state[`entries${capitalizeFirstLetter(stateLocal.active)}Query`] &&
-      state[`historySearches${capitalizeFirstLetter(stateLocal.active)}`]
-        ?.length > 0;
+      (state.active === 'post' || state.active === 'site') &&
+      !state[`entries${capitalizeFirstLetter(state.active)}Query`] &&
+      state[`historySearches${capitalizeFirstLetter(state.active)}`]?.length >
+        0;
 
     const array = isHistory
       ? [
           {
             children: state[
-              `historySearches${capitalizeFirstLetter(stateLocal.active)}`
+              `historySearches${capitalizeFirstLetter(state.active)}`
             ].map((item) => ({
               name: item,
               type: 'history',
             })),
           },
         ]
-      : this.getArr(stateLocal.active);
+      : this.getArr(state.active);
 
     return Object.values(array as unknown).map((item) => {
       const onScroll = (e) => {
@@ -819,7 +803,7 @@ export class StreamlineEntries {
         Date.now().toString(36) + Math.random().toString(36).substr(2);
 
       const table =
-        stateLocal.active === 'site'
+        state.active === 'site'
           ? [
               {
                 id: 'domain',
@@ -972,11 +956,11 @@ export class StreamlineEntries {
     return (
       <div>
         {this.getHeader({
-          title: `${state.menu[stateLocal.active].text} mode help`,
+          title: `${state.menu[state.active].text} mode help`,
         })}
         <div
           class={`${this.px} text-base space-y-2 leading-relaxed md:w-3/4`}
-          innerHTML={state.menu[stateLocal.active].help}
+          innerHTML={state.menu[state.active].help}
         />
       </div>
     );
@@ -1242,7 +1226,7 @@ export class StreamlineEntries {
         >
           {state.isHelp
             ? this.help()
-            : stateLocal.active === 'settings'
+            : state.active === 'settings'
             ? this.settings()
             : this.rows()}
         </div>
@@ -1259,12 +1243,14 @@ export class StreamlineEntries {
                   <span>{state.currentSite.id}</span>
                 </span>
               )}
-              {((stateLocal.active === 'post' && state.entriesPostQuery) ||
-                (stateLocal.active === 'site' && state.entriesSiteQuery)) &&
-                this.amount}
-              {((stateLocal.active === 'post' && state.entriesPostQuery) ||
-                (stateLocal.active === 'site' && state.entriesSiteQuery)) &&
-                this.pages}
+              {((state.active === 'post' && state.entriesPostQuery) ||
+                (state.active === 'site' && state.entriesSiteQuery)) && (
+                <span id="amount">{state.infoBarAmount}</span>
+              )}
+              {((state.active === 'post' && state.entriesPostQuery) ||
+                (state.active === 'site' && state.entriesSiteQuery)) && (
+                <span id="pages">{state.infoBarPages}</span>
+              )}
             </span>
           </span>
         </div>

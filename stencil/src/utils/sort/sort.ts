@@ -12,7 +12,7 @@ export function sort(item, direction = 'ascending', force = false) {
   }
 
   const newArr = [
-    ...state[`entries${capitalizeFirstLetter(stateLocal.active)}Active`],
+    ...state[`entries${capitalizeFirstLetter(state.active)}Active`],
   ];
 
   newArr.forEach((obj) => {
@@ -24,7 +24,7 @@ export function sort(item, direction = 'ascending', force = false) {
     }
   });
 
-  state[`entries${capitalizeFirstLetter(stateLocal.active)}Active`] = newArr;
+  state[`entries${capitalizeFirstLetter(state.active)}Active`] = newArr;
 
   if (!force) {
     stateLocal.sort = {

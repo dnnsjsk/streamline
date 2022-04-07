@@ -1,11 +1,17 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { StreamlineSidebar } from './streamline-sidebar';
 import { dispose, state } from '../../store/internal';
-import { disposeLocal, stateLocal } from '../../store/local';
 
-beforeEach(async () => {
+beforeEach(() => {
   dispose();
-  disposeLocal();
+  state.entriesSettingsLoad = {
+    ...state.entriesSettingsLoad,
+    ...{
+      mode: {
+        default: 'dashboard',
+      },
+    },
+  };
 });
 
 describe('Render sidebar', () => {
@@ -15,7 +21,7 @@ describe('Render sidebar', () => {
       html: `<streamline-sidebar></streamline-sidebar>`,
     });
     const el = page.doc.querySelector('streamline-sidebar').shadowRoot;
-    expect(el.querySelectorAll('button').length).toBe(5);
+    expect(el.querySelectorAll('button').length).toBe(6);
   });
   it('as multisite', async () => {
     state.menu = {
@@ -36,7 +42,7 @@ describe('Render sidebar', () => {
       html: `<streamline-sidebar></streamline-sidebar>`,
     });
     const el = page.doc.querySelector('streamline-sidebar').shadowRoot;
-    expect(el.querySelectorAll('button').length).toBe(7);
+    expect(el.querySelectorAll('button').length).toBe(8);
   });
   it("with default tab set to 'last'", async () => {
     await newSpecPage({
@@ -44,11 +50,11 @@ describe('Render sidebar', () => {
       html: `<streamline-sidebar></streamline-sidebar>`,
     });
     state.visible = true;
-    expect(stateLocal.active).toBe('menu');
+    expect(state.active).toBe('search');
     state.visible = false;
-    stateLocal.active = 'post';
+    state.active = 'post';
     state.visible = true;
-    expect(stateLocal.active).toBe('post');
+    expect(state.active).toBe('post');
   });
   it("with default tab set to 'post'", async () => {
     state.entriesSettingsLoad = {
@@ -64,10 +70,10 @@ describe('Render sidebar', () => {
       html: `<streamline-sidebar></streamline-sidebar>`,
     });
     state.visible = true;
-    expect(stateLocal.active).toBe('post');
+    expect(state.active).toBe('post');
     state.visible = false;
-    stateLocal.active = 'menu';
+    state.active = 'menu';
     state.visible = true;
-    expect(stateLocal.active).toBe('post');
+    expect(state.active).toBe('post');
   });
 });

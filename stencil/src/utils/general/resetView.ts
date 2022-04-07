@@ -1,7 +1,6 @@
 import { state } from '../../store/internal';
 import { focusSearch } from '../search/focusSearch';
 import { setEntries } from '../set/setEntries';
-import { stateLocal } from '../../store/local';
 
 export function resetView() {
   state.isLoading = false;
@@ -14,7 +13,7 @@ export function resetView() {
   ) {
     state.searchValue = '';
   }
-  if (stateLocal.active === 'site' || stateLocal.active === 'post') {
+  if (state.active === 'site' || state.active === 'post') {
     state.isEnter = state.searchValue !== '';
   } else {
     state.isEnter = false;

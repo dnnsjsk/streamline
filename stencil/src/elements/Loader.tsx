@@ -1,15 +1,19 @@
 // eslint-disable-next-line no-unused-vars
 import { h } from '@stencil/core';
 
-export function Loader(props) {
+export function Loader({ size = 'sm', className = '' }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
       focusable="false"
-      data-prefix="far"
-      data-icon="spinner-third"
-      class={`${props.sm ? `h-6 w-6 sm:h-7 sm:w-7` : 'w-10 h-10'} animate-spin`}
+      class={{
+        [className]: className !== '',
+        'animate-spin': true,
+        'h-4 w-4 sm:h-5 sm:w-5': size === 'xs',
+        'h-6 w-6 sm:h-7 sm:w-7': size === 'sm',
+        'w-10 h-10': size === 'md',
+      }}
       role="img"
       viewBox="0 0 512 512"
     >

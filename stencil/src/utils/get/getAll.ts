@@ -2,6 +2,25 @@ import { getMenu } from './getMenu';
 import { state } from '../../store/internal';
 
 export function getAll() {
+  if (Object.values(state.entriesMenu).length === 0) {
+    state.entriesActions = {
+      type: 'action',
+      children: Object.assign(
+        {},
+        ...Array.from(
+          Object.values(state.actions).map((item) => {
+            return Object.assign({
+              [item.id]: {
+                name: item.name,
+                type: 'action',
+              },
+            });
+          })
+        )
+      ),
+    };
+    state.entriesSearch = [...state.entriesSearch, state.entriesActions];
+  }
   if (state.entriesMenu.length === 0) {
     getMenu({ network: false, adminUrl: state.data.adminUrl });
   }
