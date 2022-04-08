@@ -4,6 +4,7 @@ import { state } from '../../store/internal';
 import { setEntries } from '../../utils/set/setEntries';
 import { get } from '../../utils/query/get';
 import { Button } from '../../elements/Button';
+import { isDefault } from '../../utils/is/isDefault';
 
 /**
  * Search.
@@ -14,13 +15,10 @@ import { Button } from '../../elements/Button';
   styleUrl: 'streamline-search.scss',
 })
 export class StreamlineSearch {
-  private route: string;
-  private value;
-
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineSearchElement;
 
-  private handleChange = (e) => {
+  private onInput = (e) => {
     state.searchValue = e.target.value;
     state.isLoading = false;
     state.isSlash = false;
@@ -36,25 +34,25 @@ export class StreamlineSearch {
     }
   };
 
-  private handleKeydown = (e) => {
+  private onKeyDown = (e) => {
     if (e.key === 'Enter' && state.isEnter && !state.test) {
       this.startQuery();
     }
+    if (isDefault() && state.searchValue === '' && e.key === 'Backspace') {
+      state.active = 'search';
+    }
   };
 
-  private handleBlur = () => {
+  private onBlur = () => {
     state.isSearchFocus = false;
   };
 
   private startQuery = () => {
     if (state.active === 'post' || state.active === 'site') {
-      this.value = state.searchValue;
-      this.route = `${state.active}s`;
-
       get({
-        route: `get/${this.route}`,
+        route: `get/${state.active}s`,
         type: state.active,
-        search: this.value,
+        value: state.searchValue,
       });
     }
   };
@@ -70,9 +68,9 @@ export class StreamlineSearch {
             type="text"
             placeholder={state.searchPlaceholder}
             value={state.searchValue}
-            onInput={this.handleChange}
-            onKeyDown={this.handleKeydown}
-            onBlur={this.handleBlur}
+            onInput={this.onInput}
+            onKeyDown={this.onKeyDown}
+            onBlur={this.onBlur}
           />,
           <div class="h-px w-screen left-0 absolute bottom-0 bg-slate-200 z-50 peer-focus:h-[2px] peer-focus:-bottom-px peer-focus:bg-blue-600" />,
           <svg

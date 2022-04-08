@@ -11,7 +11,7 @@ export function getAll() {
           Object.values(state.actions).map((item) => {
             return Object.assign({
               [item.id]: {
-                name: item.name,
+                ...state.actions[item.id],
                 type: 'action',
               },
             });

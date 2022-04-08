@@ -87,6 +87,16 @@ export function getMenu(obj = {} as any) {
       state.entriesMenuCurrentPath = obj.path || state.currentSite.path;
       if (!state.entriesSearch.some((e) => e.type === 'menu')) {
         state.entriesSearch = [...state.entriesSearch, ...data];
+      } else if (
+        !state.entriesSearch.some(
+          (e) => e.siteId === Number(state.currentSite.id)
+        )
+      ) {
+        state.entriesSearch = [
+          state.entriesActions,
+          ...data,
+          ...state.entriesNetworkMenu,
+        ];
       }
     }
 
@@ -95,6 +105,7 @@ export function getMenu(obj = {} as any) {
 
   if (isAdmin && !obj.fetch) {
     get(document);
+    obj.callback && obj.callback();
   } else {
     state.isLoading = true;
     fetch(adminUrl)
@@ -104,6 +115,7 @@ export function getMenu(obj = {} as any) {
         const html = parser.parseFromString(data, 'text/html');
         get(html);
         resetView();
+        obj.callback && obj.callback();
       })
       .catch(() => {});
   }

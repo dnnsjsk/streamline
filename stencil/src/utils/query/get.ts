@@ -13,7 +13,7 @@ export function get(obj) {
     // eslint-disable-next-line no-undef
     `${window.streamline.rest}streamline/v1/${obj.route}?siteId=${
       state.currentSite.id
-    }&userId=${state.data.userId}&value=${obj.search}&amount=${
+    }&userId=${state.data.userId}&value=${obj.value}&amount=${
       state.entriesSettingsLoad.queryAmount.default
     }&page=${state[`entries${current}CurrentPage`]}`,
     data() as any
@@ -26,7 +26,7 @@ export function get(obj) {
           children: data.children,
           isMultisite: data.isMultisite,
           path: state.currentSite.path,
-          queryValue: obj.search,
+          queryValue: obj.value,
           siteId: state.currentSite.id,
           type: obj.type,
         },
@@ -37,9 +37,9 @@ export function get(obj) {
       }
 
       setSearchPlaceholder();
-      if (obj.search !== state[`entries${current}Query`]) {
+      if (obj.value !== state[`entries${current}Query`]) {
         state[`historySearches${capitalizeFirstLetter(obj.type)}`] = [
-          obj.search,
+          obj.value,
           ...state[`historySearches${capitalizeFirstLetter(obj.type)}`],
         ];
       }
@@ -48,7 +48,7 @@ export function get(obj) {
         resetView();
       }
 
-      state[`entries${current}Query`] = obj.search;
+      state[`entries${current}Query`] = obj.value;
       state[`entries${current}Total`] = data.total;
       obj.callback && obj.callback();
       state.isLoading = false;

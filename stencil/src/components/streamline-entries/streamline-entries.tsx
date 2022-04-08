@@ -20,7 +20,6 @@ import {
   IconAction,
 } from '../../icons';
 import { post } from '../../utils/query/post';
-import { getMenus } from '../../utils/get/getMenus';
 import { getMenu } from '../../utils/get/getMenu';
 import { getMetaKey } from '../../utils/get/getMetaKey';
 import { get } from '../../utils/query/get';
@@ -31,6 +30,8 @@ import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
 import { debounce, isBoolean, isNumber } from 'lodash-es';
 import { save } from '../../utils/query/save';
 import { sort } from '../../utils/sort/sort';
+import { isDashboard } from '../../utils/is/isDashboard';
+import { isDefault } from '../../utils/is/isDefault';
 
 /**
  * Entries.
@@ -54,8 +55,7 @@ export class StreamlineEntries {
   @State() editing: object;
 
   connectedCallback() {
-    if (state.entriesSettingsLoad.mode.default === 'dashboard') {
-      getMenus();
+    if (isDashboard()) {
       setEntries();
     }
 
@@ -137,11 +137,12 @@ export class StreamlineEntries {
     const isDotMenu = state.isHelp;
     const isNotDotMenu = !state.isHelp;
     const isQueryWithClose =
-      isQueryMode &&
-      state[`entries${capitalizeFirstLetter(state.active)}Query`] &&
-      state[`historySearches${capitalizeFirstLetter(state.active)}`]?.length >
-        0 &&
-      !state.isHelp;
+      (isDefault() && isQueryMode) ||
+      (isQueryMode &&
+        state[`entries${capitalizeFirstLetter(state.active)}Query`] &&
+        state[`historySearches${capitalizeFirstLetter(state.active)}`]?.length >
+          0 &&
+        !state.isHelp);
 
     const hasPages =
       (state.test && state.active === 'post') ||
@@ -211,13 +212,22 @@ export class StreamlineEntries {
                   'ml-8': isQueryWithClose,
                 }}
               >
-                {item.type === 'menu' && <IconMenu />}
-                {item.type === 'networkMenu' && <IconNetwork />}
-                {item.type === 'post' && <IconPost />}
-                {item.type === 'settings' && <IconSettings />}
-                {item.type === 'site' && <IconSites />}
-                {item.type === 'action' && <IconAction />}
-                {isQueryWithClose !== false && isQueryWithClose !== true ? (
+                {item.type === 'menu' || state.active === 'menu' ? (
+                  <IconMenu />
+                ) : item.type === 'networkMenu' ||
+                  state.active === 'networkMenu' ? (
+                  <IconNetwork />
+                ) : item.type === 'post' || state.active === 'post' ? (
+                  <IconPost />
+                ) : item.type === 'settings' || state.active === 'settings' ? (
+                  <IconSettings />
+                ) : item.type === 'site' || state.active === 'site' ? (
+                  <IconSites />
+                ) : item.type === 'action' ? (
+                  <IconAction />
+                ) : isDefault() &&
+                  isQueryWithClose !== false &&
+                  isQueryWithClose !== true ? (
                   <IconHistory />
                 ) : (
                   item.type === undefined && <IconSmileyTear />
@@ -238,6 +248,9 @@ export class StreamlineEntries {
                   state[`entries${capitalizeFirstLetter(state.active)}Active`] =
                     [];
                   setSearchPlaceholder();
+                  if (isDefault()) {
+                    state.active = 'search';
+                  }
                 }}
               />
             )}
@@ -425,7 +438,7 @@ export class StreamlineEntries {
                               get({
                                 route: `get/${state.active}s`,
                                 type: state.active,
-                                search:
+                                value:
                                   state[
                                     `entries${capitalizeFirstLetter(
                                       state.active
@@ -515,16 +528,39 @@ export class StreamlineEntries {
         },
       });
 
+    const onKeyPress = (e) => {
+      if (e.key === 'Enter') {
+        if (isAction) {
+          onClickAction();
+        }
+        if (isHistory) {
+          onClickHistory();
+        }
+        if (isSite) {
+          onClickSite();
+        }
+      }
+    };
+
+    const onClickAction = () => {
+      get({
+        route: item.route,
+        type: item.tab,
+        value: state.searchValue,
+        callback: () => (state.active = item.tab),
+      });
+    };
+
     const onClickHistory = () => {
       get({
         route: `get/${state.active}s`,
         type: state.active,
-        search: item.name,
+        value: item.name,
         id: item.siteId,
       });
     };
 
-    const onClickSites = () => {
+    const onClickSite = () => {
       state.currentSite = {
         path: item.path,
         id: item.siteId,
@@ -534,11 +570,21 @@ export class StreamlineEntries {
       state.entriesPostActive = [];
       state.entriesPostQuery = '';
 
+      if (!state.data.isAdmin) {
+        state.isLoading = true;
+      }
+
       getMenu({
         adminUrl: item.adminUrl,
         fetch: true,
         siteId: item.siteId,
         path: item.path,
+        callback: () => {
+          if (isDefault()) {
+            state.active = 'search';
+            state.isLoading = false;
+          }
+        },
       });
     };
 
@@ -638,10 +684,12 @@ export class StreamlineEntries {
     };
 
     const onClick = (e) =>
-      isHistory
+      isAction
+        ? onClickAction()
+        : isHistory
         ? onClickHistory()
         : isSite
-        ? onClickSites()
+        ? onClickSite()
         : isPost && window.innerWidth <= 639
         ? e.preventDefault()
         : false;
@@ -708,6 +756,7 @@ export class StreamlineEntries {
           onClick={onClick}
           onDblClick={onDblClick}
           onMouseDown={(e) => e.preventDefault()}
+          onKeyPress={onKeyPress}
         >
           {((isFav && state.active !== 'fav') ||
             (isCurrentSite && state.active === 'site')) && (
@@ -775,6 +824,7 @@ export class StreamlineEntries {
   private rows = () => {
     const isHistory =
       !state.test &&
+      isDashboard() &&
       (state.active === 'post' || state.active === 'site') &&
       !state[`entries${capitalizeFirstLetter(state.active)}Query`] &&
       state[`historySearches${capitalizeFirstLetter(state.active)}`]?.length >
@@ -959,7 +1009,7 @@ export class StreamlineEntries {
           title: `${state.menu[state.active].text} mode help`,
         })}
         <div
-          class={`${this.px} text-base space-y-2 leading-relaxed md:w-3/4`}
+          class={`${this.px} text-base space-y-2 leading-relaxed md:w-5/6`}
           innerHTML={state.menu[state.active].help}
         />
       </div>
@@ -1008,8 +1058,8 @@ export class StreamlineEntries {
             {Object.values(item.children as unknown).map(
               (itemInner, indexInner) => {
                 return (
-                  (state.entriesSettingsLoad.mode.default === 'dashboard' ||
-                    (state.entriesSettingsLoad.mode.default === 'default' &&
+                  (isDashboard() ||
+                    (isDefault() &&
                       !conditionMapNames.includes(itemInner.name))) && (
                     <li
                       key={itemInner.name}
@@ -1027,10 +1077,8 @@ export class StreamlineEntries {
                           {Object.values(itemInner.children as unknown).map(
                             (itemSub) => {
                               return (
-                                (state.entriesSettingsLoad.mode.default ===
-                                  'dashboard' ||
-                                  (state.entriesSettingsLoad.mode.default ===
-                                    'default' &&
+                                (isDashboard() ||
+                                  (isDefault() &&
                                     !conditionMap.includes(itemSub.id))) && (
                                   <li
                                     key={itemSub.id}

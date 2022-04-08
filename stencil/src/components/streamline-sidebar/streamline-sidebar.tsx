@@ -3,7 +3,6 @@ import { Component, h } from '@stencil/core';
 import { state } from '../../store/internal';
 import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter';
 import { Loader } from '../../elements/Loader';
-import { getMenus } from '../../utils/get/getMenus';
 import {
   IconCustom,
   IconDots,
@@ -59,7 +58,6 @@ export class StreamlineSidebar {
     const handleClick = () => {
       if (type !== 'wordpress') {
         state.active = type;
-        getMenus();
       } else {
         state.visible = false;
       }

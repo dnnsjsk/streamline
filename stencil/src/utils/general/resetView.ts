@@ -1,16 +1,14 @@
 import { state } from '../../store/internal';
 import { focusSearch } from '../search/focusSearch';
 import { setEntries } from '../set/setEntries';
+import { isDefault } from '../is/isDefault';
 
 export function resetView() {
   state.isLoading = false;
   state.isSlash = false;
   state.isHelp = false;
   state.isSearch = true;
-  if (
-    state.entriesSettingsLoad.searchResetInput.default ||
-    state.entriesSettingsLoad.mode.default === 'default'
-  ) {
+  if (state.entriesSettingsLoad.searchResetInput.default || isDefault()) {
     state.searchValue = '';
   }
   if (state.active === 'site' || state.active === 'post') {
@@ -19,10 +17,7 @@ export function resetView() {
     state.isEnter = false;
   }
   setEntries();
-  if (
-    state.entriesSettingsLoad.searchFocus.default ||
-    state.entriesSettingsLoad.mode.default === 'default'
-  ) {
+  if (state.entriesSettingsLoad.searchFocus.default || isDefault()) {
     focusSearch();
   }
   document

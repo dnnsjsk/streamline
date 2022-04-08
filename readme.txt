@@ -15,9 +15,13 @@ Do things faster.
 
 == Changelog ==
 
-= 1.1.6 =
-* Enhancements: UI fixes
-* Enhancements: replace all AJAX queries with REST calls
+= 1.2.0 =
+* Enhancement: UI fixes
+* Enhancement: replace all AJAX queries with REST calls
+* Enhancement: trigger history entry search on pressing Enter
+* New: dashboard mode that bring back the classic view and usage
+* New: default mode that hides the sidebar and brings productivity focused enhancements
+* New: enhanced look with less visual noise
 
 = 1.1.5 =
 * Fix: JS errors caused by missing sorting state

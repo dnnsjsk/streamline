@@ -5,6 +5,7 @@ import { resetScroll } from '../utils/general/resetScroll';
 import { resetView } from '../utils/general/resetView';
 import { setSearchPlaceholder } from '../utils/set/setSearchPlaceholder';
 import { getAll } from '../utils/get/getAll';
+import { isDefault } from '../utils/is/isDefault';
 
 const isTest = document
   .querySelector('streamline-container')
@@ -15,17 +16,17 @@ const { state, dispose, onChange } = createStore({
     post: {
       id: 'post',
       name: 'Search for a post',
-      type: 'query',
-      query: {},
+      tab: 'post',
+      route: 'get/posts',
     },
     site: {
       id: 'site',
       name: 'Search for a site',
-      type: 'query',
-      query: {},
+      tab: 'site',
+      route: 'get/sites',
     },
   },
-  active: 'menu',
+  active: localStorage.getItem('streamlineActive') || 'menu',
   class: {
     tag: 'px-2.5 py-1.5 bg-slate-200 text-slate-500 inline-block h-[max-content] leading-1',
   },
@@ -64,8 +65,10 @@ const { state, dispose, onChange } = createStore({
   entriesPostTotal: 0,
   entriesSettings: [
     {
+      type: 'settings',
       children: [
         {
+          name: 'Mode',
           children: [
             {
               id: 'mode',
@@ -78,9 +81,9 @@ const { state, dispose, onChange } = createStore({
               },
             },
           ],
-          name: 'Mode',
         },
         {
+          name: 'Key shortcuts',
           children: [
             {
               id: 'keyNavigation',
@@ -115,9 +118,9 @@ const { state, dispose, onChange } = createStore({
               keys: ['esc'],
             },
           ],
-          name: 'Key shortcuts',
         },
         {
+          name: 'Behaviour',
           children: [
             {
               id: 'behaviourDefaultTab',
@@ -135,9 +138,9 @@ const { state, dispose, onChange } = createStore({
               },
             },
           ],
-          name: 'Behaviour',
         },
         {
+          name: 'Searchbar',
           children: [
             {
               id: 'searchResetInput',
@@ -152,10 +155,16 @@ const { state, dispose, onChange } = createStore({
               label: 'Focus searchbar after switching tabs',
             },
           ],
-          name: 'Searchbar',
         },
         {
+          name: 'Appearance',
           children: [
+            {
+              id: 'appearanceAnimation',
+              name: 'Enable animations',
+              nameParent: 'Appearance',
+              label: 'Enables micro animations throughout the app',
+            },
             {
               id: 'appearanceBlur',
               name: 'Enable background blur',
@@ -164,9 +173,9 @@ const { state, dispose, onChange } = createStore({
                 'Enabling the overlay blur can decrease performance on slower machines',
             },
           ],
-          name: 'Appearance',
         },
         {
+          name: 'Queries',
           children: [
             {
               id: 'queryAmount',
@@ -175,10 +184,8 @@ const { state, dispose, onChange } = createStore({
               label: 'Maximum number of displayed posts per page',
             },
           ],
-          name: 'Queries',
         },
       ],
-      type: 'settings',
     },
   ],
   entriesSearch: [],
@@ -207,6 +214,9 @@ const { state, dispose, onChange } = createStore({
       default: true,
     },
     searchFocus: {
+      default: true,
+    },
+    appearanceAnimation: {
       default: true,
     },
     appearanceBlur: {
@@ -319,10 +329,7 @@ const { state, dispose, onChange } = createStore({
 
 onChange('active', (value) => {
   state.entriesEditing = {};
-  if (
-    value === 'search' &&
-    state.entriesSettingsLoad.mode.default === 'default'
-  ) {
+  if (value === 'search') {
     getAll();
   }
 });
@@ -345,9 +352,10 @@ onChange('searchValue', (value) => {
   }
 });
 
-onChange('active', () => {
+onChange('active', (value) => {
   resetView();
   setSearchPlaceholder();
+  localStorage.setItem('streamlineActive', value);
 
   if (state.active === 'search') {
     getAll();
@@ -355,7 +363,7 @@ onChange('active', () => {
 });
 
 onChange('visible', (value) => {
-  if (state.entriesSettingsLoad.mode.default !== 'dashboard') {
+  if (isDefault()) {
     state.active = 'search';
   } else if (!state.menus.includes(state.active)) {
     state.active = 'menu';
@@ -365,7 +373,5 @@ onChange('visible', (value) => {
 
   resetScroll(value);
 });
-
-onChange('visible', () => {});
 
 export { state, dispose, onChange };

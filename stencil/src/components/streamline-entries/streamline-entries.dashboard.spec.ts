@@ -645,7 +645,7 @@ describe('Render entries with', () => {
       const el = e(page);
       const checkboxes = el.querySelectorAll('input[type="checkbox"]').length;
       const select = el.querySelectorAll('select').length;
-      expect(checkboxes).toBe(7);
+      expect(checkboxes).toBe(8);
       expect(select).toBe(2);
     });
     it('and save button activating after changing a setting', async () => {
