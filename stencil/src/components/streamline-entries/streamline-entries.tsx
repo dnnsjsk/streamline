@@ -32,6 +32,7 @@ import { save } from '../../utils/query/save';
 import { sort } from '../../utils/sort/sort';
 import { isDashboard } from '../../utils/is/isDashboard';
 import { isDefault } from '../../utils/is/isDefault';
+import { isAnimation } from '../../utils/is/isAnimation';
 
 /**
  * Entries.
@@ -1193,10 +1194,20 @@ export class StreamlineEntries {
                                               }
                                             />,
                                             <div
-                                              class={`block bg-slate-300 w-14 h-5 transition ease-in-out duration-200 rounded-full group-hover:bg-slate-400 peer-checked:bg-blue-600`}
+                                              class={{
+                                                'block bg-slate-300 w-14 h-5 rounded-full group-hover:bg-slate-400 peer-checked:bg-blue-600':
+                                                  true,
+                                                'transition ease-in-out duration-200':
+                                                  isAnimation(),
+                                              }}
                                             />,
                                             <div
-                                              class={`dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition ease-in-out duration-200`}
+                                              class={{
+                                                'dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full':
+                                                  true,
+                                                'transition ease-in-out duration-200':
+                                                  isAnimation(),
+                                              }}
                                             />,
                                           ]
                                         )}

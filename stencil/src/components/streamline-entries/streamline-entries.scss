@@ -3,6 +3,10 @@
   @include host;
 }
 
+.inner {
+  scroll-padding-top: 75px;
+}
+
 input:checked {
   & ~ .dot {
     transform: translateX(36px);

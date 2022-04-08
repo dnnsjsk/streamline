@@ -5,6 +5,7 @@ import { setEntries } from '../../utils/set/setEntries';
 import { get } from '../../utils/query/get';
 import { Button } from '../../elements/Button';
 import { isDefault } from '../../utils/is/isDefault';
+import { isAnimation } from '../../utils/is/isAnimation';
 
 /**
  * Search.
@@ -39,6 +40,20 @@ export class StreamlineSearch {
       this.startQuery();
     }
     if (isDefault() && state.searchValue === '' && e.key === 'Backspace') {
+      if (isAnimation()) {
+        const container = document
+          .querySelector('streamline-container')
+          .shadowRoot.querySelector('.inner');
+
+        container.animate(
+          [{ transform: 'scale(0.98)' }, { transform: 'scale(1)' }],
+          {
+            duration: 200,
+            easing: 'cubic-bezier(0.4, 0, 1, 1)',
+          }
+        );
+      }
+
       state.active = 'search';
     }
   };

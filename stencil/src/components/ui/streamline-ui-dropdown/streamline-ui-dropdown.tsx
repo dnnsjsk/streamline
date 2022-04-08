@@ -2,6 +2,7 @@
 import { Component, h, Prop, Element, State } from '@stencil/core';
 import { IconDots, IconLink } from '../../../icons';
 import { computePosition, flip, shift } from '@floating-ui/dom';
+import { isAnimation } from '../../../utils/is/isAnimation';
 
 /**
  * Dropdown.
@@ -78,6 +79,7 @@ export class StreamlineUiDropdown {
             'z-50 rounded-bl-md': this.type === 'main',
             'z-30 rounded-md': this.type !== 'main',
             'mt-[2px]': this.placement === 'top' && this.type !== 'main',
+            'ease-in duration-100 transition': isAnimation(),
           }}
         >
           {this.items.map((item) => {

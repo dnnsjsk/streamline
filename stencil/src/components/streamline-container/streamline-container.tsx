@@ -9,6 +9,7 @@ import { getAll } from '../../utils/get/getAll';
 import { Loader } from '../../elements/Loader';
 import { isDashboard } from '../../utils/is/isDashboard';
 import { isDefault } from '../../utils/is/isDefault';
+import { isAnimation } from '../../utils/is/isAnimation';
 
 /**
  * Container.
@@ -177,17 +178,20 @@ export class StreamlineContainer {
         <div
           class={`fixed flex items-center justify-center top-0 left-0 w-full h-full z-[9999999999999999] ${
             state.visible
-              ? 'block pointer-events-auto'
-              : 'hidden pointer-events-none'
+              ? 'opacity-100 pointer-events-auto'
+              : 'opacity-0 pointer-events-none'
           }`}
         >
           <div
             tabIndex={-1}
-            class={`fixed top-0 left-0 w-full h-full bg-black/90 ${
-              state.entriesSettingsLoad.appearanceBlur.default
-                ? 'backdrop-blur-sm'
-                : ''
-            }`}
+            class={{
+              'fixed top-0 left-0 w-full h-full bg-black/90': true,
+              'backdrop-blur-sm':
+                state.entriesSettingsLoad.appearanceBlur.default,
+              'opacity-0': !state.visible,
+              'opacity-100': state.visible,
+              'ease-in duration-100 transition': isAnimation(),
+            }}
             onClick={() => (state.visible = false)}
           />
           <div
@@ -196,6 +200,9 @@ export class StreamlineContainer {
                 true,
               'max-w-[calc(768px+var(--sl-side-w))]': isDashboard(),
               'max-w-screen-md': isDefault(),
+              'opacity-0 translate-y-4': !state.visible,
+              'opacity-100': state.visible,
+              'ease-in duration-200 transition': isAnimation(),
             }}
           >
             {isDashboard() && <streamline-sidebar />}

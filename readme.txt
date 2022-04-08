@@ -17,14 +17,14 @@ Do things faster.
 
 = 1.2.0 =
 * Enhancement: UI fixes
+* Enhancement: prevent sticky header covering up focussed elements
 * Enhancement: replace all AJAX queries with REST calls
-* Enhancement: trigger history entry search on pressing Enter
-* New: dashboard mode that bring back the classic view and usage
+* Enhancement: trigger history entry on pressing Enter
+* New: dashboard mode that brings back the classic view and usage
 * New: default mode that hides the sidebar and brings productivity focused enhancements
 * New: enhanced look with less visual noise
-
-= 1.1.5 =
-* Fix: JS errors caused by missing sorting state
+* New: extendable search tab
+* New: micro animations (can be turned off in the settings)
 
 = 1.1.5 =
 * Fix: JS errors caused by missing sorting state
