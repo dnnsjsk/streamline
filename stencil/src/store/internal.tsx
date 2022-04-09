@@ -15,12 +15,15 @@ const { state, dispose, onChange } = createStore({
   actions: {
     post: {
       id: 'post',
+      condition: true,
       name: 'Search for a post',
       tab: 'post',
       route: 'get/posts',
     },
     site: {
       id: 'site',
+      // @ts-ignore
+      condition: window.streamlineData.network,
       name: 'Search for a site',
       tab: 'site',
       route: 'get/sites',
@@ -220,7 +223,7 @@ const { state, dispose, onChange } = createStore({
       default: true,
     },
     appearanceBlur: {
-      default: false,
+      default: true,
     },
     queryAmount: {
       default: 20,
@@ -251,12 +254,18 @@ const { state, dispose, onChange } = createStore({
   isSearchFocus: true,
   isSlash: false,
   focusIndex: -1,
-  menus: ['search', 'site', 'networkMenu', 'fav', 'menu', 'post', 'settings'],
+  menus:
+    // @ts-ignore
+    window.streamlineData.network && !isTest
+      ? ['search', 'site', 'networkMenu', 'fav', 'menu', 'post', 'settings']
+      : !isTest
+      ? ['search', 'fav', 'menu', 'post', 'settings']
+      : ['fav', 'menu', 'post', 'settings'],
   menu: {
     search: {
       name: 'search',
       // @ts-ignore
-      condition: true,
+      condition: !isTest,
       text: 'Search',
       help: `
       <p>The search tab is at the core and center of Streamline. It combines all the other modes (when in dashboard view) into one single screen.</p>
@@ -323,7 +332,6 @@ const { state, dispose, onChange } = createStore({
   searchPlaceholder: '',
   searchValue: '',
   test: isTest,
-  testFull: false,
   visible: false,
 });
 

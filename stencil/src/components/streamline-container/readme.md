@@ -13,7 +13,7 @@
 
 ## Methods
 
-### `setData(data: any) => Promise<void>`
+### `setState(data: any) => Promise<void>`
 
 
 
@@ -24,16 +24,6 @@ Type: `Promise<void>`
 
 
 ### `toggle() => Promise<void>`
-
-
-
-#### Returns
-
-Type: `Promise<void>`
-
-
-
-### `toggleTestFull(type: any) => Promise<void>`
 
 
 

@@ -9,17 +9,20 @@ export function getAll() {
         {},
         ...Array.from(
           Object.values(state.actions).map((item) => {
-            return Object.assign({
-              [item.id]: {
-                ...state.actions[item.id],
-                type: 'action',
-              },
-            });
+            return (
+              item.condition &&
+              Object.assign({
+                [item.id]: {
+                  ...state.actions[item.id],
+                  type: 'action',
+                },
+              })
+            );
           })
         )
       ),
     };
-    state.entriesSearch = [...state.entriesSearch, state.entriesActions];
+    state.entriesSearch = [state.entriesActions];
   }
   if (state.entriesMenu.length === 0) {
     getMenu({ network: false, adminUrl: state.data.adminUrl });

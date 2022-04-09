@@ -354,7 +354,7 @@ describe('Render entries with', () => {
       const lengthRow = el.querySelectorAll('[data-row]').length;
       const results = el.querySelector('#amount').innerHTML.trim();
       expect(lengthRow).toBe(35);
-      expect(results).toBe('∙ Showing 35 results');
+      expect(results).toBe('Showing 35 results');
     });
     it("and search is 'me' in test mode", async () => {
       state.active = 'post';
@@ -368,7 +368,7 @@ describe('Render entries with', () => {
       const lengthRow = el.querySelectorAll('[data-row]').length;
       const results = el.querySelector('#amount').innerHTML.trim();
       expect(lengthRow).toBe(2);
-      expect(results).toBe('∙ Showing 2 results');
+      expect(results).toBe('Showing 2 results');
     });
     it("and search is 'Hello world'", async () => {
       state.active = 'post';
@@ -381,7 +381,7 @@ describe('Render entries with', () => {
       const lengthRow = el.querySelectorAll('[data-row]').length;
       const results = el.querySelector('#amount').innerHTML.trim();
       expect(lengthRow).toBe(0);
-      expect(results).toBe('∙ Showing 0 results');
+      expect(results).toBe('Showing 0 results');
     });
     it('and three elements are favourites', async () => {
       state.entriesFav = fav;
@@ -593,7 +593,7 @@ describe('Render entries with', () => {
           .querySelector('streamline-entries')
           .shadowRoot.querySelector('#amount')
           .innerHTML.trim()
-      ).toBe('∙ Showing 30 results');
+      ).toBe('Showing 30 results');
       expect(
         page.doc
           .querySelector('streamline-entries')

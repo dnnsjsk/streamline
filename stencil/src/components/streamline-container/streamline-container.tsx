@@ -106,6 +106,10 @@ export class StreamlineContainer {
         }
       }
     });
+
+    if (state.test) {
+      state.entriesSettingsLoad.mode.default = 'dashboard';
+    }
   }
 
   componentDidLoad() {
@@ -141,10 +145,9 @@ export class StreamlineContainer {
   };
 
   @Method()
-  async setData(data) {
+  async setState(data) {
     Object.entries(data).forEach(([key, value]) => {
       state[key] = value;
-      state[`${key}Active`] = value;
     });
     setEntries();
   }
@@ -152,24 +155,6 @@ export class StreamlineContainer {
   @Method()
   async toggle() {
     state.visible = !state.visible;
-  }
-
-  @Method()
-  async toggleTestFull(type) {
-    state.testFull = type;
-    state.menu = {
-      ...state.menu,
-      ...{
-        site: {
-          ...state.menu.site,
-          condition: type,
-        },
-        networkMenu: {
-          ...state.menu.networkMenu,
-          condition: type,
-        },
-      },
-    };
   }
 
   render() {

@@ -19,13 +19,13 @@ const cycle = async (page, key) => {
   expect(state.active).toBe('fav');
   page.doc.dispatchEvent(eventUp);
   await page.waitForChanges();
-  expect(state.active).toBe('networkMenu');
+  expect(state.active).toBe('search');
   page.doc.dispatchEvent(eventUp);
   await page.waitForChanges();
-  expect(state.active).toBe('site');
+  expect(state.active).toBe('settings');
   page.doc.dispatchEvent(eventDown);
   await page.waitForChanges();
-  expect(state.active).toBe('networkMenu');
+  expect(state.active).toBe('search');
   page.doc.dispatchEvent(eventDown);
   await page.waitForChanges();
   expect(state.active).toBe('fav');

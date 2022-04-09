@@ -20,6 +20,7 @@ Do things faster.
 * Enhancement: prevent sticky header covering up focussed elements
 * Enhancement: replace all AJAX queries with REST calls
 * Enhancement: trigger history entry on pressing Enter
+* Enhancement: turn on background blur by default
 * New: dashboard mode that brings back the classic view and usage
 * New: default mode that hides the sidebar and brings productivity focused enhancements
 * New: enhanced look with less visual noise

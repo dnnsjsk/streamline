@@ -8,9 +8,8 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface StreamlineContainer {
         "mac": boolean;
-        "setData": (data: any) => Promise<void>;
+        "setState": (data: any) => Promise<void>;
         "toggle": () => Promise<void>;
-        "toggleTestFull": (type: any) => Promise<void>;
         "visible": boolean;
     }
     interface StreamlineEntries {

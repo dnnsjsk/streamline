@@ -138,8 +138,9 @@ export class StreamlineEntries {
     const isDotMenu = state.isHelp;
     const isNotDotMenu = !state.isHelp;
     const isQueryWithClose =
-      (isDefault() && isQueryMode) ||
-      (isQueryMode &&
+      (!state.test && isDefault() && isQueryMode) ||
+      (!state.test &&
+        isQueryMode &&
         state[`entries${capitalizeFirstLetter(state.active)}Query`] &&
         state[`historySearches${capitalizeFirstLetter(state.active)}`]?.length >
           0 &&
@@ -174,7 +175,7 @@ export class StreamlineEntries {
       ? menuNumber
       : '0';
 
-    state.infoBarAmount = ` ∙ Showing ${result} ${
+    state.infoBarAmount = `Showing ${result} ${
       (isQuery && Object.values(item.children).length === 1) ||
       (isMenu && menuNumber === 1)
         ? `result`
@@ -183,7 +184,7 @@ export class StreamlineEntries {
 
     state.infoBarPages =
       hasPages || isTestNav
-        ? ` ∙ Page ${
+        ? `Page ${
             state[`entries${capitalizeFirstLetter(state.active)}CurrentPage`]
           } of ${totalPages}`
         : '';
@@ -911,7 +912,7 @@ export class StreamlineEntries {
           {(item.type === 'post' || item.type === 'site') && (
             <div
               data-uid={uid}
-              class={`overflow-x-auto scrollbar-none sticky top-[62px] z-10 bg-white sm:top-[74px]`}
+              class={`overflow-x-auto scrollbar-none sticky top-[52px] z-10 bg-white sm:top-[67px]`}
             >
               <div class={`${this.px} ${this.grid}`}>
                 {table.map((itemInner) => {
@@ -1266,22 +1267,27 @@ export class StreamlineEntries {
   };
 
   render() {
-    const isMultisite =
-      (state.data.network && !state.test && !state.isLoading) || state.testFull;
+    const isMultisite = state.data.network && !state.test && !state.isLoading;
+    const isBottomBar =
+      (state.active === 'post' && state.entriesPostQuery !== '') ||
+      (state.active === 'site' && state.entriesSiteQuery !== '');
 
     return (
       <div
         class={{
           'relative bg-white': true,
-          'h-[calc(100%-24px)] lg:h-[calc(100%+56px)]': isMultisite,
-          'h-full lg:h-[calc(100%+80px)]': !isMultisite,
+          'h-[calc(100%-24px)] lg:h-[calc(100%+56px)]':
+            isMultisite || isBottomBar,
+          'h-full lg:h-[calc(100%+80px)]': !isMultisite && !isBottomBar,
         }}
       >
         <div
           tabindex={-1}
-          class={`focus-none inner pb-6 relative h-[calc(100%-var(--sl-side-w))] overflow-y-scroll w-full bg-white lg:pb-10 ${
-            state.isLoading ? 'pointer-events-none opacity-50' : ''
-          }`}
+          class={{
+            'focus-none inner pb-6 relative overflow-y-scroll w-full bg-white h-[calc(100%-var(--sl-side-w))] lg:pb-10':
+              true,
+            'pointer-events-none opacity-50': state.isLoading,
+          }}
         >
           {state.isHelp
             ? this.help()
@@ -1302,14 +1308,13 @@ export class StreamlineEntries {
                   <span>{state.currentSite.id}</span>
                 </span>
               )}
-              {((state.active === 'post' && state.entriesPostQuery) ||
-                (state.active === 'site' && state.entriesSiteQuery)) && (
-                <span id="amount">{state.infoBarAmount}</span>
+              {isBottomBar && (
+                <span id="amount">
+                  {isMultisite ? ' ∙ ' : ''}
+                  {state.infoBarAmount}
+                </span>
               )}
-              {((state.active === 'post' && state.entriesPostQuery) ||
-                (state.active === 'site' && state.entriesSiteQuery)) && (
-                <span id="pages">{state.infoBarPages}</span>
-              )}
+              {isBottomBar && <span id="pages"> ∙ {state.infoBarPages}</span>}
             </span>
           </span>
         </div>

@@ -40,7 +40,12 @@ export class StreamlineSearch {
       this.startQuery();
     }
     if (isDefault() && state.searchValue === '' && e.key === 'Backspace') {
-      if (isAnimation()) {
+      if (
+        isDefault() &&
+        isAnimation() &&
+        state.active !== 'search' &&
+        state.active !== 'settings'
+      ) {
         const container = document
           .querySelector('streamline-container')
           .shadowRoot.querySelector('.inner');
