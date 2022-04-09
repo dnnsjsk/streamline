@@ -6,7 +6,7 @@ namespace Streamline;
  * JSON class.
  *
  * @date    04/04/2022
- * @since   1.1.6
+ * @since   1.2.0
  */
 class JSON
 {
@@ -14,7 +14,7 @@ class JSON
      * Construct.
      *
      * @date    04/04/2022
-     * @since   1.1.6
+     * @since   1.2.0
      */
     function __construct()
     {
@@ -25,7 +25,7 @@ class JSON
      * Get data and rewrite URLs.
      *
      * @date    04/04/2022
-     * @since   1.1.6
+     * @since   1.2.0
      */
     function getData()
     {
@@ -53,7 +53,7 @@ class JSON
      * Inject data.
      *
      * @date    04/04/2022
-     * @since   1.1.6
+     * @since   1.2.0
      */
     private function injectData()
     {
