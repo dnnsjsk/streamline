@@ -2,7 +2,7 @@ import { stateLocal } from '../../store/local';
 import { state } from '../../store/internal';
 import { capitalizeFirstLetter } from '../string/capitalizeFirstLetter';
 
-export function sort(item, direction = 'ascending', force = false) {
+export const sort = (item, direction = 'ascending', force = false) => {
   function sorter(a, b) {
     const first = direction === 'ascending' ? a : b;
     const second = direction === 'ascending' ? b : a;
@@ -35,4 +35,4 @@ export function sort(item, direction = 'ascending', force = false) {
       },
     };
   }
-}
+};

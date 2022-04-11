@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { h } from '@stencil/core';
 
-export function Loader({ size = 'sm', className = '' }) {
+export const Loader = ({ size = 'sm', className = '' }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -23,4 +23,4 @@ export function Loader({ size = 'sm', className = '' }) {
       />
     </svg>
   );
-}
+};

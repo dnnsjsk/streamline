@@ -4,7 +4,7 @@ import { post } from './post';
 import { set } from 'lodash-es';
 import { setEntries } from '../set/setEntries';
 
-export function save(item, values) {
+export const save = (item, values) => {
   const obj = {
     postId: item.ID,
     siteId: item.siteId,
@@ -51,4 +51,4 @@ export function save(item, values) {
   } else {
     update();
   }
-}
+};

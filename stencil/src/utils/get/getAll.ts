@@ -1,7 +1,7 @@
 import { getMenu } from './getMenu';
 import { state } from '../../store/internal';
 
-export function getAll() {
+export const getAll = () => {
   if (Object.values(state.entriesMenu).length === 0) {
     state.entriesActions = {
       type: 'action',
@@ -30,4 +30,4 @@ export function getAll() {
   if (state.data.network && state.entriesNetworkMenu.length === 0) {
     getMenu({ network: true });
   }
-}
+};

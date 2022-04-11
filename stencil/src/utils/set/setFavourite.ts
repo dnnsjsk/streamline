@@ -5,7 +5,7 @@ import { merge, unset, get, compact } from 'lodash-es';
 import { capitalizeFirstLetter } from '../string/capitalizeFirstLetter';
 import { post } from '../query/post';
 
-export function setFavourite(obj) {
+export const setFavourite = (obj) => {
   const arr = [...state.entriesFav];
 
   const filter = filterDeep(
@@ -87,4 +87,4 @@ export function setFavourite(obj) {
   }
 
   obj.callback && obj.callback();
-}
+};

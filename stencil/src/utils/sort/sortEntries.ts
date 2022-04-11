@@ -1,7 +1,7 @@
 import { stateLocal } from '../../store/local';
 import { sort } from './sort';
 
-export function sortEntries() {
+export const sortEntries = () => {
   if (stateLocal?.sort?.['post'] || stateLocal?.sort?.['site']) {
     Object.entries(stateLocal?.sort as unknown).forEach(([key, value]) => {
       sort(
@@ -14,4 +14,4 @@ export function sortEntries() {
       );
     });
   }
-}
+};

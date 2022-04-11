@@ -1,6 +1,6 @@
 import { state } from '../../store/internal';
 
-export function reset() {
+export const reset = () => {
   state.entriesPost = [];
   state.entriesPostQuery = '';
-}
+};

@@ -1,7 +1,7 @@
 import { isMobile } from '../is/isMobile';
 import { state } from '../../store/internal';
 
-export function focusSearch() {
+export const focusSearch = () => {
   if (!isMobile()) {
     document
       ?.querySelector('streamline-container')
@@ -11,4 +11,4 @@ export function focusSearch() {
     state.isSearchFocus = true;
     state.focusIndex = -1;
   }
-}
+};

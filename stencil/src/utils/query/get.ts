@@ -4,8 +4,8 @@ import { resetView } from '../general/resetView';
 import { capitalizeFirstLetter } from '../string/capitalizeFirstLetter';
 import { data } from './data';
 
-export function get(obj) {
-  const current = capitalizeFirstLetter(state.active);
+export const get = (obj) => {
+  const current = capitalizeFirstLetter(obj.tab || state.active);
 
   state.isLoading = true;
   fetch(
@@ -53,4 +53,4 @@ export function get(obj) {
       obj.callback && obj.callback();
       state.isLoading = false;
     });
-}
+};

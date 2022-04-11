@@ -1,14 +1,16 @@
 {
   "rules": {
-    "dot-notation": 0,
-    "no-return-assign": 0,
-    "@stencil/required-jsdoc": 0,
-    "@stencil/strict-boolean-conditions": 0,
-    "@stencil/prefer-vdom-listener": 0,
     "@stencil/async-methods": 0,
     "@stencil/ban-prefix": 0,
     "@stencil/decorators-context": 0,
     "@stencil/dependency-suggestions": 0,
+    "@stencil/prefer-vdom-listener": 0,
+    "@stencil/required-jsdoc": 0,
+    "@stencil/strict-boolean-conditions": 0,
+    "dot-notation": 0,
+    "jest/no-done-callback": 0,
+    "jest/no-export": 0,
+    "no-return-assign": 0,
     "react/jsx-no-bind": 0
   },
   "env": {

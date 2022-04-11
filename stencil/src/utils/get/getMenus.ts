@@ -1,7 +1,7 @@
 import { state } from '../../store/internal';
 import { getMenu } from './getMenu';
 
-export function getMenus() {
+export const getMenus = () => {
   if (!state.test) {
     if (state.active === 'menu' && state.entriesMenu.length === 0) {
       getMenu({ network: false, adminUrl: state.data.adminUrl });
@@ -14,4 +14,4 @@ export function getMenus() {
       getMenu({ network: true });
     }
   }
-}
+};

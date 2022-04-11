@@ -1,5 +1,13 @@
 // eslint-disable-next-line no-unused-vars
-import { Component, h, Prop, Method, Host, Element } from '@stencil/core';
+import {
+  Component,
+  h,
+  Prop,
+  Method,
+  Host,
+  Element,
+  Watch,
+} from '@stencil/core';
 import { state } from '../../store/internal';
 import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
 import { getMetaKey } from '../../utils/get/getMetaKey';
@@ -30,6 +38,11 @@ export class StreamlineContainer {
 
   // eslint-disable-next-line @stencil/strict-mutable
   @Prop({ reflect: true, mutable: true }) visible: boolean;
+
+  @Watch('visible')
+  handleVisible(value) {
+    state.visible = value;
+  }
 
   connectedCallback() {
     getAll();
@@ -116,8 +129,6 @@ export class StreamlineContainer {
     setSearchPlaceholder();
 
     state.visible = this.visible || false;
-    getAll();
-
     if (isDefault()) {
       state.active = 'search';
     }

@@ -3,7 +3,7 @@ import { focusSearch } from '../search/focusSearch';
 import { setEntries } from '../set/setEntries';
 import { isDefault } from '../is/isDefault';
 
-export function resetView() {
+export const resetView = () => {
   state.isLoading = false;
   state.isSlash = false;
   state.isHelp = false;
@@ -25,4 +25,4 @@ export function resetView() {
     ?.shadowRoot.querySelector('streamline-entries')
     ?.shadowRoot?.querySelector('.inner')
     ?.scrollTo(0, 0);
-}
+};

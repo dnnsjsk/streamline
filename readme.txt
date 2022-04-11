@@ -17,10 +17,13 @@ Do things faster.
 
 = 1.2.0 =
 * Enhancement: UI fixes
+* Enhancement: don't load assets if user is not allowed to use app
 * Enhancement: prevent sticky header covering up focussed elements
+* Enhancement: render less initial markup
 * Enhancement: replace all AJAX queries with REST calls
 * Enhancement: trigger history entry on pressing Enter
 * Enhancement: turn on background blur by default
+* Fix: enable pagination for sites
 * New: dashboard mode that brings back the classic view and usage
 * New: default mode that hides the sidebar and brings productivity focused enhancements
 * New: enhanced look with less visual noise

@@ -1,5 +1,5 @@
 import { state } from '../../store/internal';
 
-export function isDashboard() {
+export const isDashboard = () => {
   return state.entriesSettingsLoad.mode.default === 'dashboard';
-}
+};

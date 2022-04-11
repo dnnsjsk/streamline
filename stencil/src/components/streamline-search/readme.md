@@ -3,13 +3,6 @@
 <!-- Auto Generated Below -->
 
 
-## Shadow Parts
-
-| Part       | Description |
-| ---------- | ----------- |
-| `"search"` |             |
-
-
 ## Dependencies
 
 ### Used by

@@ -1,6 +1,6 @@
 import { filterDeep } from 'deepdash-es/standalone';
 
-export function getFavourites(obj, type) {
+export const getFavourites = (obj, type) => {
   return filterDeep(
     obj.filter((val) => Object.keys(val).length !== 0),
     (o) => {
@@ -8,4 +8,4 @@ export function getFavourites(obj, type) {
     },
     { childrenPath: ['children'] }
   );
-}
+};

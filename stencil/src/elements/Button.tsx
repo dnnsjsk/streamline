@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { h } from '@stencil/core';
 
-export function Button(props) {
+export const Button = (props) => {
   return (
     <button
       {...props}
@@ -31,4 +31,4 @@ export function Button(props) {
       {props.text && props.text}
     </button>
   );
-}
+};

@@ -83,7 +83,7 @@ export class StreamlineSearch {
         <div class="h-px w-screen left-0 absolute bottom-0 bg-slate-200 z-50" />
         {state.isSearch && [
           <input
-            part="search"
+            id="search"
             class="peer bg-transparent focus:outline-none w-full h-[var(--sl-side-w)] text-[18px] h-full w-full m-0 p-0 font-normal placeholder-slate-500 text-slate-900 px-9 lg:h-[64px] lg:px-12"
             type="text"
             placeholder={state.searchPlaceholder}

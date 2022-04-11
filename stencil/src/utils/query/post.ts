@@ -1,7 +1,7 @@
 import { state } from '../../store/internal';
 import { data } from './data';
 
-export function post(obj) {
+export const post = (obj) => {
   state.isLoading = true;
   fetch(
     // @ts-ignore
@@ -21,4 +21,4 @@ export function post(obj) {
     .catch(() => {
       state.isLoading = false;
     });
-}
+};

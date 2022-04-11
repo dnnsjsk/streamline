@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { h } from '@stencil/core';
 
-export function Heart(props) {
+export const Heart = (props) => {
   return (
     <svg
       class={`${
@@ -20,4 +20,4 @@ export function Heart(props) {
       />
     </svg>
   );
-}
+};

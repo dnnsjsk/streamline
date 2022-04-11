@@ -5,7 +5,7 @@ import { capitalizeFirstLetter } from '../string/capitalizeFirstLetter';
 import { getEntriesSliced } from '../get/getEntriesSliced';
 import { sortEntries } from '../sort/sortEntries';
 
-export function setEntries(removeSort = '') {
+export const setEntries = (removeSort = '') => {
   const result = filterDeep(
     state.test && state.active === 'post'
       ? [
@@ -56,4 +56,4 @@ export function setEntries(removeSort = '') {
   }
 
   // console.log(state[`entries${capitalizeFirstLetter(state.active)}Active`]);
-}
+};

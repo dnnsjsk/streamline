@@ -36,27 +36,30 @@ class Init
      */
     function getScript()
     {
-        $localizeArray = [
-            "ajax" => admin_url("admin-ajax.php"),
-            "rest" => esc_url_raw(rest_url()),
-            "nonce" => wp_create_nonce("ajax-nonce"),
-            "nonceRest" => wp_create_nonce("wp_rest"),
-        ];
+        if (self::isAllowed()) {
+            $localizeArray = [
+                "ajax" => admin_url("admin-ajax.php"),
+                "rest" => esc_url_raw(rest_url()),
+                "nonce" => wp_create_nonce("ajax-nonce"),
+                "nonceRest" => wp_create_nonce("wp_rest"),
+            ];
 
-        wp_enqueue_script(
-            "streamline",
-            plugins_url(
-                "../assets/components/build/streamline.esm.js",
-                dirname(__FILE__)
-            ),
-            [],
-            filemtime(
-                STREAMLINE_DIR . "/assets/components/build/streamline.esm.js"
-            ),
-            true
-        );
+            wp_enqueue_script(
+                "streamline",
+                plugins_url(
+                    "../assets/components/build/streamline.esm.js",
+                    dirname(__FILE__)
+                ),
+                [],
+                filemtime(
+                    STREAMLINE_DIR .
+                        "/assets/components/build/streamline.esm.js"
+                ),
+                true
+            );
 
-        wp_localize_script("streamline", "streamline", $localizeArray);
+            wp_localize_script("streamline", "streamline", $localizeArray);
+        }
     }
 
     /**
@@ -67,14 +70,15 @@ class Init
      */
     public static function isAllowed(): bool
     {
-        return current_user_can(
+        return (current_user_can(
             get_option("streamline_settings") &&
             get_option("streamline_settings")->capability
                 ? get_option("streamline_settings")->capability
                 : "activate_plugins"
         ) &&
             apply_filters("streamline/enable", true) &&
-            !defined("OXYGEN_IFRAME");
+            !defined("OXYGEN_IFRAME")) ||
+            defined("STREAMLINE_TEST");
     }
 
     /**
@@ -258,7 +262,7 @@ class Init
      */
     private function addContainer()
     {
-        $container = "<streamline-container visible></streamline-container>";
+        $container = "<streamline-container></streamline-container>";
 
         add_action("admin_footer", function () use ($container) {
             if (self::isAllowed()) {

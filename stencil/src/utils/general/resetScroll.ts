@@ -1,7 +1,7 @@
 import { focusSearch } from '../search/focusSearch';
 import { state } from '../../store/internal';
 
-export function resetScroll(value) {
+export const resetScroll = (value) => {
   const el = document
     ?.querySelector('streamline-container')
     ?.shadowRoot?.querySelector('streamline-entries')
@@ -49,4 +49,4 @@ export function resetScroll(value) {
       focusSearch();
     }, 100);
   }
-}
+};

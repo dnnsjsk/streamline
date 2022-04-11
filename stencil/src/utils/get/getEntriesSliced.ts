@@ -1,7 +1,7 @@
 import { isArray, isObject } from 'lodash-es';
 import { state } from '../../store/internal';
 
-export function getEntriesSliced(item) {
+export const getEntriesSliced = (item) => {
   const min =
     (state.entriesPostCurrentPage - 1) *
     state.entriesSettingsLoad.queryAmount.default;
@@ -14,4 +14,4 @@ export function getEntriesSliced(item) {
     : isObject
     ? Object.fromEntries(Object.entries(item).slice(min, max))
     : '';
-}
+};

@@ -2,7 +2,7 @@ import { state } from '../../store/internal';
 import { setEntries } from '../set/setEntries';
 import { resetView } from '../general/resetView';
 
-export function getMenu(obj = {} as any) {
+export const getMenu = (obj = {} as any) => {
   let data = [];
   const menu = {};
 
@@ -119,4 +119,4 @@ export function getMenu(obj = {} as any) {
       })
       .catch(() => {});
   }
-}
+};
