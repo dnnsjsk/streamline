@@ -1,5 +1,5 @@
 const NAMESPACE = 'streamline';
-const BUILD = /* streamline */ { allRenderFn: true, appendChildSlotFix: false, asyncLoading: true, asyncQueue: false, attachStyles: true, cloneNodeFix: false, cmpDidLoad: false, cmpDidRender: false, cmpDidUnload: false, cmpDidUpdate: false, cmpShouldUpdate: false, cmpWillLoad: false, cmpWillRender: false, cmpWillUpdate: false, connectedCallback: false, constructableCSS: true, cssAnnotations: true, cssVarShim: false, devTools: false, disconnectedCallback: false, dynamicImportShim: false, element: false, event: false, hasRenderFn: true, hostListener: false, hostListenerTarget: false, hostListenerTargetBody: false, hostListenerTargetDocument: false, hostListenerTargetParent: false, hostListenerTargetWindow: false, hotModuleReplacement: false, hydrateClientSide: false, hydrateServerSide: false, hydratedAttribute: false, hydratedClass: true, initializeNextTick: false, invisiblePrehydration: true, isDebug: false, isDev: true, isTesting: true, lazyLoad: true, lifecycle: false, lifecycleDOMEvents: true, member: true, method: false, mode: false, observeAttribute: true, profile: false, prop: true, propBoolean: false, propMutable: false, propNumber: false, propString: true, reflect: false, safari10: false, scoped: false, scopedSlotTextContentFix: false, scriptDataOpts: false, shadowDelegatesFocus: false, shadowDom: true, shadowDomShim: false, slot: false, slotChildNodesFix: false, slotRelocation: false, state: false, style: true, svg: false, taskQueue: true, transformTagName: false, updatable: true, vdomAttribute: true, vdomClass: true, vdomFunctional: false, vdomKey: false, vdomListener: false, vdomPropOrAttr: false, vdomRef: false, vdomRender: true, vdomStyle: false, vdomText: true, vdomXlink: false, watchCallback: false };
+const BUILD = /* streamline */ { allRenderFn: true, appendChildSlotFix: false, asyncLoading: true, asyncQueue: false, attachStyles: true, cloneNodeFix: false, cmpDidLoad: false, cmpDidRender: false, cmpDidUnload: false, cmpDidUpdate: false, cmpShouldUpdate: false, cmpWillLoad: false, cmpWillRender: false, cmpWillUpdate: false, connectedCallback: false, constructableCSS: true, cssAnnotations: true, cssVarShim: false, devTools: true, disconnectedCallback: false, dynamicImportShim: false, element: false, event: false, hasRenderFn: true, hostListener: false, hostListenerTarget: false, hostListenerTargetBody: false, hostListenerTargetDocument: false, hostListenerTargetParent: false, hostListenerTargetWindow: false, hotModuleReplacement: false, hydrateClientSide: false, hydrateServerSide: false, hydratedAttribute: false, hydratedClass: true, initializeNextTick: false, invisiblePrehydration: true, isDebug: false, isDev: true, isTesting: false, lazyLoad: true, lifecycle: false, lifecycleDOMEvents: false, member: false, method: false, mode: false, observeAttribute: false, profile: true, prop: false, propBoolean: false, propMutable: false, propNumber: false, propString: false, reflect: false, safari10: false, scoped: false, scopedSlotTextContentFix: false, scriptDataOpts: false, shadowDelegatesFocus: false, shadowDom: true, shadowDomShim: false, slot: false, slotChildNodesFix: false, slotRelocation: false, state: false, style: true, svg: false, taskQueue: true, transformTagName: false, updatable: false, vdomAttribute: true, vdomClass: true, vdomFunctional: false, vdomKey: false, vdomListener: true, vdomPropOrAttr: true, vdomRef: false, vdomRender: true, vdomStyle: false, vdomText: false, vdomXlink: false, watchCallback: false };
 const Env = /* streamline */ {};
 
 let scopeId;
@@ -2126,7 +2126,7 @@ const initializeComponent = async (elm, hostRef, cmpMeta, hmrVersionId, Cstr) =>
                     BUILD.shadowDom &&
                     BUILD.shadowDomShim &&
                     cmpMeta.$flags$ & 8 /* needsShadowDomShim */) {
-                    style = await import('./shadow-css-4d56fa31.js').then((m) => m.scopeCss(style, scopeId, false));
+                    style = await import('./shadow-css-38a1326b.js').then((m) => m.scopeCss(style, scopeId, false));
                 }
                 registerStyle(scopeId, style, !!(cmpMeta.$flags$ & 1 /* shadowDomEncapsulation */));
                 endRegisterStyles();
@@ -3054,4 +3054,284 @@ const Build = {
     isTesting: BUILD.isTesting ? true : false,
 };
 
-export { BUILD as B, CSS as C, H, NAMESPACE as N, promiseResolve as a, bootstrapLazy as b, consoleDevInfo as c, doc as d, h, plt as p, registerInstance as r, win as w };
+const appendToMap = (map, propName, value) => {
+    const items = map.get(propName);
+    if (!items) {
+        map.set(propName, [value]);
+    }
+    else if (!items.includes(value)) {
+        items.push(value);
+    }
+};
+const debounce = (fn, ms) => {
+    let timeoutId;
+    return (...args) => {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+        timeoutId = setTimeout(() => {
+            timeoutId = 0;
+            fn(...args);
+        }, ms);
+    };
+};
+
+/**
+ * Check if a possible element isConnected.
+ * The property might not be there, so we check for it.
+ *
+ * We want it to return true if isConnected is not a property,
+ * otherwise we would remove these elements and would not update.
+ *
+ * Better leak in Edge than to be useless.
+ */
+const isConnected = (maybeElement) => !('isConnected' in maybeElement) || maybeElement.isConnected;
+const cleanupElements = debounce((map) => {
+    for (let key of map.keys()) {
+        map.set(key, map.get(key).filter(isConnected));
+    }
+}, 2000);
+const stencilSubscription = () => {
+    if (typeof getRenderingRef !== 'function') {
+        // If we are not in a stencil project, we do nothing.
+        // This function is not really exported by @stencil/core.
+        return {};
+    }
+    const elmsToUpdate = new Map();
+    return {
+        dispose: () => elmsToUpdate.clear(),
+        get: (propName) => {
+            const elm = getRenderingRef();
+            if (elm) {
+                appendToMap(elmsToUpdate, propName, elm);
+            }
+        },
+        set: (propName) => {
+            const elements = elmsToUpdate.get(propName);
+            if (elements) {
+                elmsToUpdate.set(propName, elements.filter(forceUpdate));
+            }
+            cleanupElements(elmsToUpdate);
+        },
+        reset: () => {
+            elmsToUpdate.forEach((elms) => elms.forEach(forceUpdate));
+            cleanupElements(elmsToUpdate);
+        },
+    };
+};
+
+const createObservableMap = (defaultState, shouldUpdate = (a, b) => a !== b) => {
+    let states = new Map(Object.entries(defaultState !== null && defaultState !== void 0 ? defaultState : {}));
+    const handlers = {
+        dispose: [],
+        get: [],
+        set: [],
+        reset: [],
+    };
+    const reset = () => {
+        states = new Map(Object.entries(defaultState !== null && defaultState !== void 0 ? defaultState : {}));
+        handlers.reset.forEach((cb) => cb());
+    };
+    const dispose = () => {
+        // Call first dispose as resetting the state would
+        // cause less updates ;)
+        handlers.dispose.forEach((cb) => cb());
+        reset();
+    };
+    const get = (propName) => {
+        handlers.get.forEach((cb) => cb(propName));
+        return states.get(propName);
+    };
+    const set = (propName, value) => {
+        const oldValue = states.get(propName);
+        if (shouldUpdate(value, oldValue, propName)) {
+            states.set(propName, value);
+            handlers.set.forEach((cb) => cb(propName, value, oldValue));
+        }
+    };
+    const state = (typeof Proxy === 'undefined'
+        ? {}
+        : new Proxy(defaultState, {
+            get(_, propName) {
+                return get(propName);
+            },
+            ownKeys(_) {
+                return Array.from(states.keys());
+            },
+            getOwnPropertyDescriptor() {
+                return {
+                    enumerable: true,
+                    configurable: true,
+                };
+            },
+            has(_, propName) {
+                return states.has(propName);
+            },
+            set(_, propName, value) {
+                set(propName, value);
+                return true;
+            },
+        }));
+    const on = (eventName, callback) => {
+        handlers[eventName].push(callback);
+        return () => {
+            removeFromArray(handlers[eventName], callback);
+        };
+    };
+    const onChange = (propName, cb) => {
+        const unSet = on('set', (key, newValue) => {
+            if (key === propName) {
+                cb(newValue);
+            }
+        });
+        const unReset = on('reset', () => cb(defaultState[propName]));
+        return () => {
+            unSet();
+            unReset();
+        };
+    };
+    const use = (...subscriptions) => {
+        const unsubs = subscriptions.reduce((unsubs, subscription) => {
+            if (subscription.set) {
+                unsubs.push(on('set', subscription.set));
+            }
+            if (subscription.get) {
+                unsubs.push(on('get', subscription.get));
+            }
+            if (subscription.reset) {
+                unsubs.push(on('reset', subscription.reset));
+            }
+            if (subscription.dispose) {
+                unsubs.push(on('dispose', subscription.dispose));
+            }
+            return unsubs;
+        }, []);
+        return () => unsubs.forEach((unsub) => unsub());
+    };
+    const forceUpdate = (key) => {
+        const oldValue = states.get(key);
+        handlers.set.forEach((cb) => cb(key, oldValue, oldValue));
+    };
+    return {
+        state,
+        get,
+        set,
+        on,
+        onChange,
+        use,
+        dispose,
+        reset,
+        forceUpdate,
+    };
+};
+const removeFromArray = (array, item) => {
+    const index = array.indexOf(item);
+    if (index >= 0) {
+        array[index] = array[array.length - 1];
+        array.length--;
+    }
+};
+
+const createStore = (defaultState, shouldUpdate) => {
+    const map = createObservableMap(defaultState, shouldUpdate);
+    map.use(stencilSubscription());
+    return map;
+};
+
+const { state, dispose, onChange } = createStore({
+  // @ts-ignore
+  data: window.streamlineData,
+  visible: false,
+  entriesSettings: [
+    {
+      type: 'settings',
+      children: [
+        {
+          name: 'Key shortcuts',
+          id: 'key',
+          children: [
+            {
+              id: 'navigation',
+              name: 'Entry navigation',
+              nameParent: 'Key shortcuts',
+              label: 'Navigate between entry items',
+              metaKey: false,
+              keys: ['↑', '↓']
+            },
+            {
+              id: 'navigationTabs',
+              name: 'Tab navigation',
+              nameParent: 'Key shortcuts',
+              label: 'Navigate between top-level tab items',
+              metaKey: true,
+              keys: ['→', '←']
+            },
+            {
+              id: 'search',
+              name: 'Focus search',
+              nameParent: 'Key shortcuts',
+              label: 'Focus the search bar',
+              metaKey: true,
+              keys: ['s']
+            },
+            {
+              id: 'exit',
+              name: 'Close',
+              nameParent: 'Key shortcuts',
+              label: 'Exit the app',
+              metaKey: false,
+              keys: ['esc']
+            }
+          ]
+        },
+        {
+          name: 'Appearance',
+          id: 'appearance',
+          children: [
+            {
+              id: 'animation',
+              name: 'Enable animations',
+              nameParent: 'Appearance',
+              label: 'Enables micro animations throughout the app'
+            }
+          ]
+        },
+        {
+          name: 'Queries',
+          id: 'queries',
+          children: [
+            {
+              id: 'amount',
+              name: 'Post amount',
+              nameParent: 'Queries',
+              label: 'Maximum number of displayed posts per page'
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  entriesSettingsActive: [],
+  entriesSettingsHaveChanged: false,
+  entriesSettingsLoad: {
+    keys: {
+      navigation: true,
+      navigationTabs: true,
+      search: true,
+      exit: true
+    },
+    appearance: {
+      animation: true
+    },
+    query: {
+      amount: 20
+    }
+  },
+  entriesSettingsSave: {},
+  isMac: navigator.userAgent.indexOf('Mac OS X') !== -1
+});
+onChange('visible', (value) => {
+  console.log(value);
+});
+
+export { BUILD as B, CSS as C, H, NAMESPACE as N, promiseResolve as a, bootstrapLazy as b, consoleDevInfo as c, doc as d, Host as e, h, plt as p, registerInstance as r, state as s, win as w };

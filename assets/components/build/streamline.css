@@ -2,10 +2,6 @@
   @apply focus:border-2 focus:border-blue-500;
 }
 
-div {
-  @apply border-2 border-red-500 border-solid;
-}
-
 streamline-container {
   position: absolute;
   pointer-events: none;

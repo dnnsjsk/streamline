@@ -7,9 +7,6 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface StreamlineContainer {
-        "first": string;
-        "last": string;
-        "middle": string;
     }
 }
 declare global {
@@ -25,9 +22,6 @@ declare global {
 }
 declare namespace LocalJSX {
     interface StreamlineContainer {
-        "first"?: string;
-        "last"?: string;
-        "middle"?: string;
     }
     interface IntrinsicElements {
         "streamline-container": StreamlineContainer;

@@ -1,8 +1,8 @@
-import { B as BUILD, c as consoleDevInfo, p as plt, w as win, H, d as doc, N as NAMESPACE, a as promiseResolve, b as bootstrapLazy } from './index-edb03f13.js';
-import { g as globalScripts } from './app-globals-0f993ce5.js';
+import { B as BUILD, c as consoleDevInfo, p as plt, w as win, H, d as doc, N as NAMESPACE, a as promiseResolve, b as bootstrapLazy } from './internal-cc2f381f.js';
+import { g as globalScripts } from './app-globals-2bff8472.js';
 
 /*
- Stencil Client Patch Browser v2.15.0 | MIT Licensed | https://stenciljs.com
+ Stencil Client Patch Browser v2.15.2 | MIT Licensed | https://stenciljs.com
  */
 const getDynamicImportFunction = (namespace) => `__sc_import_${namespace.replace(/\s|-/g, '_')}`;
 const patchBrowser = () => {
@@ -61,7 +61,7 @@ const patchBrowser = () => {
         if (BUILD.dynamicImportShim && !win.customElements) {
             // module support, but no custom elements support (Old Edge)
             // @ts-ignore
-            return import(/* webpackChunkName: "polyfills-dom" */ './dom-7fc649b0.js').then(() => opts);
+            return import(/* webpackChunkName: "polyfills-dom" */ './dom-7cd9cf71.js').then(() => opts);
         }
     }
     return promiseResolve(opts);
@@ -125,5 +125,5 @@ const patchCloneNodeFix = (HTMLElementPrototype) => {
 
 patchBrowser().then(options => {
   globalScripts();
-  return bootstrapLazy([["streamline-container",[[1,"streamline-container",{"first":[1],"middle":[1],"last":[1]}]]]], options);
+  return bootstrapLazy([["streamline-container",[[1,"streamline-container",{"visible":[32]}]]]], options);
 });

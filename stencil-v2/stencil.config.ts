@@ -23,6 +23,7 @@ export const config: Config = {
       empty: true
     }
   ],
+  globalScript: 'src/global/script.ts',
   plugins: [
     sass({
       injectGlobalPaths: ['./src/css/mixins.scss']
@@ -48,7 +49,7 @@ export const config: Config = {
           autoprefixer()
         ]
       }
-    })
-    // tailwindHMR(),
+    }),
+    tailwindHMR()
   ]
 }

@@ -1,7 +1,8 @@
 {
   "rules": {
     "@stencil/required-jsdoc": 0,
-    "@stencil/ban-prefix": 0
+    "@stencil/ban-prefix": 0,
+    "react/jsx-no-bind": 0
   },
   "env": {
     "jest": true,
