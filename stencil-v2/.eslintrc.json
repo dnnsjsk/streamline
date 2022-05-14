@@ -14,5 +14,5 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "extends": ["plugin:@stencil/recommended", "standard"]
+  "extends": ["plugin:@stencil/recommended", "standard", "prettier"]
 }

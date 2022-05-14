@@ -7,6 +7,13 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface StreamlineContainer {
+        "visible": boolean;
+    }
+    interface StreamlineDropdown {
+        "items": any[];
+        "type": string;
+    }
+    interface StreamlineSearch {
     }
 }
 declare global {
@@ -16,15 +23,38 @@ declare global {
         prototype: HTMLStreamlineContainerElement;
         new (): HTMLStreamlineContainerElement;
     };
+    interface HTMLStreamlineDropdownElement extends Components.StreamlineDropdown, HTMLStencilElement {
+    }
+    var HTMLStreamlineDropdownElement: {
+        prototype: HTMLStreamlineDropdownElement;
+        new (): HTMLStreamlineDropdownElement;
+    };
+    interface HTMLStreamlineSearchElement extends Components.StreamlineSearch, HTMLStencilElement {
+    }
+    var HTMLStreamlineSearchElement: {
+        prototype: HTMLStreamlineSearchElement;
+        new (): HTMLStreamlineSearchElement;
+    };
     interface HTMLElementTagNameMap {
         "streamline-container": HTMLStreamlineContainerElement;
+        "streamline-dropdown": HTMLStreamlineDropdownElement;
+        "streamline-search": HTMLStreamlineSearchElement;
     }
 }
 declare namespace LocalJSX {
     interface StreamlineContainer {
+        "visible"?: boolean;
+    }
+    interface StreamlineDropdown {
+        "items"?: any[];
+        "type"?: string;
+    }
+    interface StreamlineSearch {
     }
     interface IntrinsicElements {
         "streamline-container": StreamlineContainer;
+        "streamline-dropdown": StreamlineDropdown;
+        "streamline-search": StreamlineSearch;
     }
 }
 export { LocalJSX as JSX };
@@ -32,6 +62,8 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "streamline-container": LocalJSX.StreamlineContainer & JSXBase.HTMLAttributes<HTMLStreamlineContainerElement>;
+            "streamline-dropdown": LocalJSX.StreamlineDropdown & JSXBase.HTMLAttributes<HTMLStreamlineDropdownElement>;
+            "streamline-search": LocalJSX.StreamlineSearch & JSXBase.HTMLAttributes<HTMLStreamlineSearchElement>;
         }
     }
 }

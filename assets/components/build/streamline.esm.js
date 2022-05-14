@@ -1,5 +1,5 @@
-import { B as BUILD, c as consoleDevInfo, p as plt, w as win, H, d as doc, N as NAMESPACE, a as promiseResolve, b as bootstrapLazy } from './internal-cc2f381f.js';
-import { g as globalScripts } from './app-globals-2bff8472.js';
+import { B as BUILD, c as consoleDevInfo, p as plt, w as win, H, d as doc, N as NAMESPACE, a as promiseResolve, b as bootstrapLazy } from './internal-2dda299f.js';
+import { g as globalScripts } from './app-globals-00d03b81.js';
 
 /*
  Stencil Client Patch Browser v2.15.2 | MIT Licensed | https://stenciljs.com
@@ -125,5 +125,5 @@ const patchCloneNodeFix = (HTMLElementPrototype) => {
 
 patchBrowser().then(options => {
   globalScripts();
-  return bootstrapLazy([["streamline-container",[[1,"streamline-container",{"visible":[32]}]]]], options);
+  return bootstrapLazy([["streamline-dropdown",[[1,"streamline-dropdown",{"items":[16],"type":[1],"placement":[32]}]]],["streamline-search",[[1,"streamline-search"]]],["streamline-container",[[1,"streamline-container",{"visible":[4]}]]]], options);
 });

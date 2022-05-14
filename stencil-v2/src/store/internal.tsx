@@ -1,6 +1,8 @@
-import { createStore } from '@stencil/store'
+import { createStore } from '@stencil/store';
+import { setSearchPlaceholder } from '../utils/set/setSearchPlaceholder';
 
 const { state, dispose, onChange } = createStore({
+  active: 'search',
   // @ts-ignore
   data: window.streamlineData,
   visible: false,
@@ -18,7 +20,7 @@ const { state, dispose, onChange } = createStore({
               nameParent: 'Key shortcuts',
               label: 'Navigate between entry items',
               metaKey: false,
-              keys: ['↑', '↓']
+              keys: ['↑', '↓'],
             },
             {
               id: 'navigationTabs',
@@ -26,7 +28,7 @@ const { state, dispose, onChange } = createStore({
               nameParent: 'Key shortcuts',
               label: 'Navigate between top-level tab items',
               metaKey: true,
-              keys: ['→', '←']
+              keys: ['→', '←'],
             },
             {
               id: 'search',
@@ -34,7 +36,7 @@ const { state, dispose, onChange } = createStore({
               nameParent: 'Key shortcuts',
               label: 'Focus the search bar',
               metaKey: true,
-              keys: ['s']
+              keys: ['s'],
             },
             {
               id: 'exit',
@@ -42,9 +44,9 @@ const { state, dispose, onChange } = createStore({
               nameParent: 'Key shortcuts',
               label: 'Exit the app',
               metaKey: false,
-              keys: ['esc']
-            }
-          ]
+              keys: ['esc'],
+            },
+          ],
         },
         {
           name: 'Appearance',
@@ -54,9 +56,9 @@ const { state, dispose, onChange } = createStore({
               id: 'animation',
               name: 'Enable animations',
               nameParent: 'Appearance',
-              label: 'Enables micro animations throughout the app'
-            }
-          ]
+              label: 'Enables micro animations throughout the app',
+            },
+          ],
         },
         {
           name: 'Queries',
@@ -66,12 +68,12 @@ const { state, dispose, onChange } = createStore({
               id: 'amount',
               name: 'Post amount',
               nameParent: 'Queries',
-              label: 'Maximum number of displayed posts per page'
-            }
-          ]
-        }
-      ]
-    }
+              label: 'Maximum number of displayed posts per page',
+            },
+          ],
+        },
+      ],
+    },
   ],
   entriesSettingsActive: [],
   entriesSettingsHaveChanged: false,
@@ -80,21 +82,27 @@ const { state, dispose, onChange } = createStore({
       navigation: true,
       navigationTabs: true,
       search: true,
-      exit: true
+      exit: true,
     },
     appearance: {
-      animation: true
+      animation: true,
     },
     query: {
-      amount: 20
-    }
+      amount: 20,
+    },
   },
   entriesSettingsSave: {},
-  isMac: navigator.userAgent.indexOf('Mac OS X') !== -1
-})
+  isEnter: false,
+  isLoading: false,
+  isMac: navigator.userAgent.indexOf('Mac OS X') !== -1,
+  isSearchFocus: true,
+  searchPlaceholder: '',
+  searchValue: '',
+});
 
-onChange('visible', (value) => {
-  console.log(value)
-})
+state.entriesSettingsActive = state.entriesSettings;
+state.entriesSettingsSave = state.entriesSettingsLoad;
 
-export { state, dispose, onChange }
+setSearchPlaceholder();
+
+export { state, dispose, onChange };

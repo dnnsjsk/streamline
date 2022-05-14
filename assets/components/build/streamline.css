@@ -1,7 +1,3 @@
-.focus {
-  @apply focus:border-2 focus:border-blue-500;
-}
-
 streamline-container {
   position: absolute;
   pointer-events: none;

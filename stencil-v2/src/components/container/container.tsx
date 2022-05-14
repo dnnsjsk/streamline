@@ -1,53 +1,70 @@
 // eslint-disable-next-line no-unused-vars
-import { Component, h, Host, State } from '@stencil/core'
-import { state } from '../../store/internal'
-import { isAnimation } from '../../utils/is/isAnimation'
+import { Component, h, Host, Prop } from '@stencil/core';
+import { state } from '../../store/internal';
+import { isAnimation } from '../../utils/is/isAnimation';
 
 @Component({
   tag: 'streamline-container',
-  styleUrl: 'container.scss',
-  shadow: true
+  styleUrl: '../../css/tailwind.css',
+  shadow: true,
 })
-
 export class StreamlineContainer {
-  @State() visible: boolean
+  @Prop() visible: boolean;
 
-  render () {
+  connectedCallback() {
+    state.visible = this.visible;
+  }
+
+  render() {
     return (
       <Host>
         <div
           class={{
-            'fixed flex items-center justify-center top-0 left-0 w-full h-full z-[9999999999999999]': true,
-            'opacity-100 pointer-events-auto': state.visible,
-            'opacity-0 pointer-events-none': !state.visible
+            'fixed top-0 left-0 z-[9999999999999999] flex h-full w-full items-center justify-center':
+              true,
+            'pointer-events-auto opacity-100': state.visible,
+            'pointer-events-none opacity-0': !state.visible,
           }}
         >
           <div
             tabIndex={-1}
             class={{
-              'backdrop-blur-sm fixed top-0 left-0 w-full h-full bg-black/90': true,
+              'fixed top-0 left-0 h-full w-full bg-black/90 backdrop-blur-sm':
+                true,
               'opacity-0': !state.visible,
               'opacity-100': state.visible,
-              'ease-in duration-100 transition': isAnimation()
+              'transition duration-100 ease-in': isAnimation(),
             }}
             onClick={() => (state.visible = false)}
           />
           <div
             class={{
-              'max-w-screen-md inner w-full h-full absolute max-h-[600px] overflow-hidden grid bg-slate-900 md:rounded-xl':
+              'absolute grid h-full max-h-[600px] w-full max-w-screen-md overflow-hidden bg-white md:rounded-2xl':
                 true,
-              'opacity-0 translate-y-4': !state.visible,
+              'translate-y-4 opacity-0': !state.visible,
               'opacity-100': state.visible,
-              'ease-in duration-200 transition': isAnimation()
+              'transition duration-200 ease-in': isAnimation(),
             }}
           >
-            <div
-              class="'w-full h-full absolute sm:bottom-0 sm:top-0'"
-            >
-              <div
-                class="bg-slate-50 grid grid-cols-[1fr,var(--sl-side-w),var(--sl-side-w)] lg:grid-cols-[1fr,64px,64px]"
-              >
-                <streamline-search class="h-[var(--sl-side-w)] w-full lg:h-[64px]" />
+            <div class="relative">
+              <div class="relative grid grid-cols-[1fr,75px] bg-slate-50">
+                <div
+                  class={{
+                    'absolute left-0 bottom-0 z-50 h-px w-full': true,
+                    'bg-slate-200': !state.isSearchFocus,
+                    '-bottom-px h-[2px] bg-blue-500': state.isSearchFocus,
+                  }}
+                />
+                <streamline-search class="block h-16" />
+                <streamline-dropdown
+                  type="main"
+                  items={[
+                    {
+                      text: 'Settings',
+                      onClick: () => (state.active = 'settings'),
+                    },
+                  ]}
+                />
               </div>
               <streamline-entries />
             </div>
@@ -55,6 +72,6 @@ export class StreamlineContainer {
           </div>
         </div>
       </Host>
-    )
+    );
   }
 }

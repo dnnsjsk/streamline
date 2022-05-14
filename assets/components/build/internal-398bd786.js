@@ -1,5 +1,5 @@
 const NAMESPACE = 'streamline';
-const BUILD = /* streamline */ { allRenderFn: true, appendChildSlotFix: false, asyncLoading: true, asyncQueue: false, attachStyles: true, cloneNodeFix: false, cmpDidLoad: false, cmpDidRender: false, cmpDidUnload: false, cmpDidUpdate: false, cmpShouldUpdate: false, cmpWillLoad: false, cmpWillRender: false, cmpWillUpdate: false, connectedCallback: false, constructableCSS: true, cssAnnotations: true, cssVarShim: false, devTools: true, disconnectedCallback: false, dynamicImportShim: false, element: false, event: false, hasRenderFn: true, hostListener: false, hostListenerTarget: false, hostListenerTargetBody: false, hostListenerTargetDocument: false, hostListenerTargetParent: false, hostListenerTargetWindow: false, hotModuleReplacement: false, hydrateClientSide: false, hydrateServerSide: false, hydratedAttribute: false, hydratedClass: true, initializeNextTick: false, invisiblePrehydration: true, isDebug: false, isDev: true, isTesting: false, lazyLoad: true, lifecycle: false, lifecycleDOMEvents: false, member: false, method: false, mode: false, observeAttribute: false, profile: true, prop: false, propBoolean: false, propMutable: false, propNumber: false, propString: false, reflect: false, safari10: false, scoped: false, scopedSlotTextContentFix: false, scriptDataOpts: false, shadowDelegatesFocus: false, shadowDom: true, shadowDomShim: false, slot: false, slotChildNodesFix: false, slotRelocation: false, state: false, style: true, svg: false, taskQueue: true, transformTagName: false, updatable: false, vdomAttribute: true, vdomClass: true, vdomFunctional: false, vdomKey: false, vdomListener: true, vdomPropOrAttr: true, vdomRef: false, vdomRender: true, vdomStyle: false, vdomText: false, vdomXlink: false, watchCallback: false };
+const BUILD = /* streamline */ { allRenderFn: true, appendChildSlotFix: false, asyncLoading: true, asyncQueue: false, attachStyles: true, cloneNodeFix: false, cmpDidLoad: false, cmpDidRender: true, cmpDidUnload: false, cmpDidUpdate: true, cmpShouldUpdate: false, cmpWillLoad: false, cmpWillRender: false, cmpWillUpdate: false, connectedCallback: true, constructableCSS: true, cssAnnotations: true, cssVarShim: false, devTools: true, disconnectedCallback: false, dynamicImportShim: false, element: false, event: false, hasRenderFn: true, hostListener: false, hostListenerTarget: false, hostListenerTargetBody: false, hostListenerTargetDocument: false, hostListenerTargetParent: false, hostListenerTargetWindow: false, hotModuleReplacement: false, hydrateClientSide: false, hydrateServerSide: false, hydratedAttribute: false, hydratedClass: true, initializeNextTick: false, invisiblePrehydration: true, isDebug: false, isDev: true, isTesting: false, lazyLoad: true, lifecycle: true, lifecycleDOMEvents: false, member: true, method: false, mode: false, observeAttribute: true, profile: true, prop: true, propBoolean: true, propMutable: false, propNumber: false, propString: true, reflect: false, safari10: false, scoped: false, scopedSlotTextContentFix: false, scriptDataOpts: false, shadowDelegatesFocus: false, shadowDom: true, shadowDomShim: false, slot: false, slotChildNodesFix: false, slotRelocation: false, state: true, style: true, svg: true, taskQueue: true, transformTagName: false, updatable: true, vdomAttribute: true, vdomClass: true, vdomFunctional: true, vdomKey: true, vdomListener: true, vdomPropOrAttr: true, vdomRef: true, vdomRender: true, vdomStyle: true, vdomText: true, vdomXlink: true, watchCallback: false };
 const Env = /* streamline */ {};
 
 let scopeId;
@@ -3238,7 +3238,24 @@ const createStore = (defaultState, shouldUpdate) => {
     return map;
 };
 
+const capitalizeFirstLetter = (string) => {
+  return string[0].toUpperCase() + string.slice(1);
+};
+
+const setSearchPlaceholder = () => {
+  state.searchPlaceholder =
+    state.active === 'post' || state.active === 'site'
+      ? `${Object.values(state[`entries${capitalizeFirstLetter(state.active)}`])
+        .length >= 1
+        ? `Search for a ${state.active} or filter entries`
+        : `Search for a ${state.active}`}`
+      : state.active === 'search'
+        ? `Search or filter entries`
+        : `Filter entries`;
+};
+
 const { state, dispose, onChange } = createStore({
+  active: 'search',
   // @ts-ignore
   data: window.streamlineData,
   visible: false,
@@ -3256,7 +3273,7 @@ const { state, dispose, onChange } = createStore({
               nameParent: 'Key shortcuts',
               label: 'Navigate between entry items',
               metaKey: false,
-              keys: ['↑', '↓']
+              keys: ['↑', '↓'],
             },
             {
               id: 'navigationTabs',
@@ -3264,7 +3281,7 @@ const { state, dispose, onChange } = createStore({
               nameParent: 'Key shortcuts',
               label: 'Navigate between top-level tab items',
               metaKey: true,
-              keys: ['→', '←']
+              keys: ['→', '←'],
             },
             {
               id: 'search',
@@ -3272,7 +3289,7 @@ const { state, dispose, onChange } = createStore({
               nameParent: 'Key shortcuts',
               label: 'Focus the search bar',
               metaKey: true,
-              keys: ['s']
+              keys: ['s'],
             },
             {
               id: 'exit',
@@ -3280,9 +3297,9 @@ const { state, dispose, onChange } = createStore({
               nameParent: 'Key shortcuts',
               label: 'Exit the app',
               metaKey: false,
-              keys: ['esc']
-            }
-          ]
+              keys: ['esc'],
+            },
+          ],
         },
         {
           name: 'Appearance',
@@ -3292,9 +3309,9 @@ const { state, dispose, onChange } = createStore({
               id: 'animation',
               name: 'Enable animations',
               nameParent: 'Appearance',
-              label: 'Enables micro animations throughout the app'
-            }
-          ]
+              label: 'Enables micro animations throughout the app',
+            },
+          ],
         },
         {
           name: 'Queries',
@@ -3304,12 +3321,12 @@ const { state, dispose, onChange } = createStore({
               id: 'amount',
               name: 'Post amount',
               nameParent: 'Queries',
-              label: 'Maximum number of displayed posts per page'
-            }
-          ]
-        }
-      ]
-    }
+              label: 'Maximum number of displayed posts per page',
+            },
+          ],
+        },
+      ],
+    },
   ],
   entriesSettingsActive: [],
   entriesSettingsHaveChanged: false,
@@ -3318,20 +3335,25 @@ const { state, dispose, onChange } = createStore({
       navigation: true,
       navigationTabs: true,
       search: true,
-      exit: true
+      exit: true,
     },
     appearance: {
-      animation: true
+      animation: true,
     },
     query: {
-      amount: 20
-    }
+      amount: 20,
+    },
   },
   entriesSettingsSave: {},
-  isMac: navigator.userAgent.indexOf('Mac OS X') !== -1
+  isEnter: false,
+  isLoading: false,
+  isMac: navigator.userAgent.indexOf('Mac OS X') !== -1,
+  isSearchFocus: true,
+  searchPlaceholder: '',
+  searchValue: '',
 });
-onChange('visible', (value) => {
-  console.log(value);
-});
+state.entriesSettingsActive = state.entriesSettings;
+state.entriesSettingsSave = state.entriesSettingsLoad;
+setSearchPlaceholder();
 
-export { BUILD as B, CSS as C, H, NAMESPACE as N, promiseResolve as a, bootstrapLazy as b, consoleDevInfo as c, doc as d, Host as e, h, plt as p, registerInstance as r, state as s, win as w };
+export { BUILD as B, CSS as C, H, NAMESPACE as N, promiseResolve as a, bootstrapLazy as b, consoleDevInfo as c, doc as d, Host as e, getElement as g, h, onChange as o, plt as p, registerInstance as r, state as s, win as w };
