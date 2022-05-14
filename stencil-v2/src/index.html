@@ -1,17 +1,27 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
-    />
-    <title>Streamline development</title>
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
+  />
+  <title>Streamline development</title>
 
-    <script type="module" src="/build/streamline.esm.js"></script>
-    <script nomodule src="/build/streamline.js"></script>
-  </head>
-  <body>
-    <streamline-container visible></streamline-container>
-  </body>
+  <script type="module" src="/build/streamline.esm.js"></script>
+  <script nomodule src="/build/streamline.js"></script>
+</head>
+<body>
+<streamline-container visible></streamline-container>
+<script>
+  (async () => {
+    await customElements.whenDefined("streamline-container");
+    fetch("test/entriesMenu.json").then(data => data.json()).then(data => {
+      document.querySelector("streamline-container").setState({
+        entriesMenu: data
+      });
+    });
+  })();
+</script>
+</body>
 </html>

@@ -7,7 +7,7 @@ import IconDots from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/re
 
 @Component({
   tag: 'streamline-dropdown',
-  styleUrl: '../../css/tailwind.css',
+  styleUrl: '../../css/tailwind.scss',
   shadow: true,
 })
 export class StreamlineDropdown {
@@ -75,7 +75,7 @@ export class StreamlineDropdown {
             'pointer-events-none fixed flex transform flex-col overflow-hidden border border-slate-400 opacity-0 shadow-md focus-within:pointer-events-auto focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 group-focus:pointer-events-auto group-focus:opacity-100':
               true,
             'z-50': this.type === 'main',
-            'z-30 rounded-md': this.type !== 'main',
+            'z-30': this.type !== 'main',
             'mt-[2px]': this.placement === 'top' && this.type !== 'main',
             'transition duration-100 ease-in': isAnimation(),
           }}

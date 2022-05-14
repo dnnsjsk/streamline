@@ -1,10 +1,38 @@
 import { createStore } from '@stencil/store';
-import { setSearchPlaceholder } from '../utils/set/setSearchPlaceholder';
 
 const { state, dispose, onChange } = createStore({
+  actions: {
+    post: {
+      id: 'post',
+      condition: true,
+      name: 'Search for a post',
+      active: 'post',
+      route: 'get/posts',
+    },
+    site: {
+      id: 'site',
+      // @ts-ignore
+      condition: window?.streamlineData?.network,
+      name: 'Search for a site',
+      active: 'site',
+      route: 'get/sites',
+    },
+  },
   active: 'search',
+  bodyStyle: {},
+  currentSite: {
+    id: 1,
+    path: '/',
+  },
   // @ts-ignore
   data: window.streamlineData,
+  drawer: {
+    active: false,
+    items: [],
+    onSave: null,
+    title: '',
+    values: {},
+  },
   visible: false,
   entriesSettings: [
     {
@@ -75,6 +103,23 @@ const { state, dispose, onChange } = createStore({
       ],
     },
   ],
+  entriesActions: {},
+  entriesEditing: {},
+  // @ts-ignore
+  entriesFav: JSON.parse(window?.streamlineData?.favourites ?? '[]'),
+  // @ts-ignore
+  entriesFavActive: JSON.parse(window?.streamlineData?.favourites ?? '[]'),
+  entriesMenu: [],
+  entriesMenuCurrentPath: '',
+  entriesNetworkMenu: [],
+  entriesPost: [],
+  entriesPostActive: [],
+  entriesPostCurrentPage: 1,
+  entriesPostCurrentPath: '',
+  entriesPostQuery: '',
+  entriesPostTotal: 0,
+  entriesSearch: [],
+  entriesSearchActive: [],
   entriesSettingsActive: [],
   entriesSettingsHaveChanged: false,
   entriesSettingsLoad: {
@@ -92,17 +137,31 @@ const { state, dispose, onChange } = createStore({
     },
   },
   entriesSettingsSave: {},
+  entriesSite: [],
+  entriesSiteActive: [],
+  entriesSiteCurrentPage: 1,
+  entriesSiteQuery: '',
+  entriesSiteTotal: 0,
+  infoBar: {
+    pages: 1,
+    amount: 1,
+  },
   isEnter: false,
   isLoading: false,
   isMac: navigator.userAgent.indexOf('Mac OS X') !== -1,
   isSearchFocus: true,
+  scroll: 0,
   searchPlaceholder: '',
+  searchNoValue: 'No entries found',
   searchValue: '',
+  sort: {
+    post: {},
+    site: {},
+  },
+  test: false,
 });
 
 state.entriesSettingsActive = state.entriesSettings;
 state.entriesSettingsSave = state.entriesSettingsLoad;
-
-setSearchPlaceholder();
 
 export { state, dispose, onChange };

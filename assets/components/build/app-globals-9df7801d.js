@@ -1,4 +1,5 @@
-import { s as state } from './internal-398bd786.js';
+import { s as state } from './internal-1f00f851.js';
+import { s as setSearchPlaceholder } from './setSearchPlaceholder-794cddd3.js';
 
 const getMetaKey = (e) => {
   return state.isMac ? e.metaKey : e.ctrlKey;
@@ -29,6 +30,7 @@ function appGlobalScript () {
       }
     }
   });
+  setSearchPlaceholder();
 }
 
 const globalScripts = appGlobalScript;

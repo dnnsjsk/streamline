@@ -1,11 +1,12 @@
 // eslint-disable-next-line no-unused-vars
-import { Component, h, Host, Prop } from '@stencil/core';
+import { Component, h, Host, Prop, Method } from '@stencil/core';
 import { state } from '../../store/internal';
 import { isAnimation } from '../../utils/is/isAnimation';
+import { setupEntries } from '../../utils/entries/setupEntries';
 
 @Component({
   tag: 'streamline-container',
-  styleUrl: '../../css/tailwind.css',
+  styleUrl: '../../css/tailwind.scss',
   shadow: true,
 })
 export class StreamlineContainer {
@@ -13,6 +14,24 @@ export class StreamlineContainer {
 
   connectedCallback() {
     state.visible = this.visible;
+  }
+
+  componentDidLoad() {
+    setupEntries();
+  }
+
+  @Method()
+  async setState(data) {
+    return new Promise((resolve) => {
+      Object.entries(data).forEach(([key, value]) => {
+        if (state[key]) {
+          state[key] = value;
+        }
+      });
+
+      setupEntries();
+      return resolve;
+    });
   }
 
   render() {
@@ -27,7 +46,6 @@ export class StreamlineContainer {
           }}
         >
           <div
-            tabIndex={-1}
             class={{
               'fixed top-0 left-0 h-full w-full bg-black/90 backdrop-blur-sm':
                 true,
@@ -46,8 +64,8 @@ export class StreamlineContainer {
               'transition duration-200 ease-in': isAnimation(),
             }}
           >
-            <div class="relative">
-              <div class="relative grid grid-cols-[1fr,75px] bg-slate-50">
+            <div class="relative h-full">
+              <div class="absolute top-0 grid w-full grid-cols-[1fr,75px] bg-slate-50">
                 <div
                   class={{
                     'absolute left-0 bottom-0 z-50 h-px w-full': true,
@@ -55,7 +73,7 @@ export class StreamlineContainer {
                     '-bottom-px h-[2px] bg-blue-500': state.isSearchFocus,
                   }}
                 />
-                <streamline-search class="block h-16" />
+                <streamline-search class="block h-14" />
                 <streamline-dropdown
                   type="main"
                   items={[
@@ -66,9 +84,9 @@ export class StreamlineContainer {
                   ]}
                 />
               </div>
-              <streamline-entries />
+              <streamline-entries class="absolute top-14 h-[calc(100%-56px-24px)] w-full overflow-y-scroll" />
+              <streamline-bottom-bar class="absolute bottom-0 h-6 w-full" />
             </div>
-            <streamline-ui-drawer class="sm:hidden" />
           </div>
         </div>
       </Host>

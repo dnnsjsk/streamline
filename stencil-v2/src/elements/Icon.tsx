@@ -6,7 +6,7 @@ export const Icon = (props) => {
     <div
       innerHTML={props.icon}
       class={{
-        'fill-current h-3.5 w-3.5 lg:h-4 lg:w-4': true,
+        'icon fill-current h-3.5 w-3.5 lg:h-4 lg:w-4': true,
         [props.class]: props.class,
       }}
     />

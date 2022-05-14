@@ -2,6 +2,7 @@
   "rules": {
     "@stencil/required-jsdoc": 0,
     "@stencil/ban-prefix": 0,
+    "@stencil/async-methods": 0,
     "react/jsx-no-bind": 0
   },
   "env": {
@@ -14,5 +15,9 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "extends": ["plugin:@stencil/recommended", "standard", "prettier"]
+  "extends": [
+    "plugin:@stencil/recommended",
+    "standard",
+    "prettier"
+  ]
 }

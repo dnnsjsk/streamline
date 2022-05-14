@@ -1,5 +1,6 @@
 import { getMetaKey } from '../utils/get/getMetaKey';
 import { state } from '../store/internal';
+import { setSearchPlaceholder } from "../utils/set/setSearchPlaceholder";
 
 export default function () {
   document.addEventListener('keydown', (e) => {
@@ -33,4 +34,5 @@ export default function () {
       }
     }
   });
+  setSearchPlaceholder();
 }

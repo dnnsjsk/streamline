@@ -11,7 +11,6 @@ import { inlineSvg } from 'stencil-inline-svg';
 
 export const config: Config = {
   namespace: 'streamline',
-  globalStyle: 'src/css/global.scss',
   taskQueue: 'async',
   devServer: {
     reloadStrategy: 'pageReload',
@@ -22,16 +21,16 @@ export const config: Config = {
       serviceWorker: null,
       dir: '../assets/components',
       empty: true,
+      copy: [{ src: '../../assets/test', dest: 'test' }],
     },
   ],
+  globalStyle: 'src/css/global.scss',
   globalScript: 'src/global/script.ts',
   plugins: [
     inlineSvg(),
-    sass({
-      injectGlobalPaths: ['./src/css/mixins.scss'],
-    }),
+    sass(),
     tailwind({
-      tailwindCssPath: './src/css/tailwind.css',
+      tailwindCssPath: './src/css/tailwind.scss',
       tailwindConf: tailwindConfig,
       postcss: {
         plugins: [

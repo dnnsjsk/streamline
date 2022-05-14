@@ -4,10 +4,11 @@ import { onChange, state } from '../../store/internal';
 import { Button } from '../../elements/Button';
 import { Icon } from '../../elements/Icon';
 import IconSearch from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/magnifying-glass.svg';
+import { setEntries } from '../../utils/entries/setEntries';
 
 @Component({
   tag: 'streamline-search',
-  styleUrl: '../../css/tailwind.css',
+  styleUrl: '../../css/tailwind.scss',
   shadow: true,
 })
 export class StreamlineSearch {
@@ -20,10 +21,14 @@ export class StreamlineSearch {
     state.searchValue = e.target.value;
     state.isLoading = false;
     state.isEnter = false;
+    setEntries();
   };
 
   componentDidRender() {
     onChange('visible', (value) => {
+      value && this.input.focus();
+    });
+    onChange('isSearchFocus', (value) => {
       value && this.input.focus();
     });
 
@@ -36,7 +41,7 @@ export class StreamlineSearch {
         <input
           ref={(el) => (this.input = el as HTMLInputElement)}
           id="search"
-          class="m-0 h-full w-full w-full bg-transparent p-0 px-9 text-[18px] font-normal text-slate-900 placeholder-slate-500 focus:outline-none lg:px-12"
+          class="m-0 h-full w-full w-full bg-transparent p-0 px-9 text-base font-normal text-slate-900 placeholder-slate-500 focus:outline-none lg:px-12"
           type="text"
           autocomplete="off"
           placeholder={state.searchPlaceholder}

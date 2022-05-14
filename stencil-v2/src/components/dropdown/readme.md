@@ -18,11 +18,13 @@
 ### Used by
 
  - [streamline-container](../container)
+ - [streamline-row](../row)
 
 ### Graph
 ```mermaid
 graph TD;
   streamline-container --> streamline-dropdown
+  streamline-row --> streamline-dropdown
   style streamline-dropdown fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
