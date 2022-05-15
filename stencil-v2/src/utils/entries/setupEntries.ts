@@ -31,6 +31,5 @@ export const setupEntries = () => {
     ...state.entriesMenu,
     ...state.entriesNetworkMenu,
   ];
-  console.log(state.entriesSearch);
   setEntries();
 };

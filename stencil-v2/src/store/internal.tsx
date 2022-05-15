@@ -1,4 +1,5 @@
 import { createStore } from '@stencil/store';
+import { resetScroll } from '../utils/general/resetScroll';
 
 const { state, dispose, onChange } = createStore({
   actions: {
@@ -33,7 +34,6 @@ const { state, dispose, onChange } = createStore({
     title: '',
     values: {},
   },
-  visible: false,
   entriesSettings: [
     {
       type: 'settings',
@@ -150,6 +150,7 @@ const { state, dispose, onChange } = createStore({
   isLoading: false,
   isMac: navigator.userAgent.indexOf('Mac OS X') !== -1,
   isSearchFocus: true,
+  isVisible: false,
   scroll: 0,
   searchPlaceholder: '',
   searchNoValue: 'No entries found',
@@ -158,7 +159,13 @@ const { state, dispose, onChange } = createStore({
     post: {},
     site: {},
   },
-  test: false,
+  test:
+    document.querySelector('streamline-container')?.hasAttribute('test') ||
+    false,
+});
+
+onChange('isVisible', (value) => {
+  resetScroll(value);
 });
 
 state.entriesSettingsActive = state.entriesSettings;

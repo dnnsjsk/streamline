@@ -5,8 +5,8 @@ describe('streamline-container', () => {
     const page = await newE2EPage();
 
     await page.setContent('<streamline-container></streamline-container>');
-    const element = await page.find('streamline-container');
-    expect(element).toHaveClass('hydrated');
+    const el = await page.find('streamline-container');
+    expect(el).toHaveClass('hydrated');
   });
 
   it('is visible with prop', async () => {

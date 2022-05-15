@@ -9,6 +9,7 @@ export namespace Components {
     interface StreamlineBottomBar {
     }
     interface StreamlineContainer {
+        "network": boolean;
         "setState": (data: any) => Promise<unknown>;
         "visible": boolean;
     }
@@ -23,7 +24,7 @@ export namespace Components {
         "mb": any;
     }
     interface StreamlineRow {
-        "item": any;
+        "item": { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; type: string; };
         "mb": any;
         "table": any;
     }
@@ -105,6 +106,7 @@ declare namespace LocalJSX {
     interface StreamlineBottomBar {
     }
     interface StreamlineContainer {
+        "network"?: boolean;
         "visible"?: boolean;
     }
     interface StreamlineDropdown {
@@ -118,7 +120,7 @@ declare namespace LocalJSX {
         "mb"?: any;
     }
     interface StreamlineRow {
-        "item"?: any;
+        "item"?: { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; type: string; };
         "mb"?: any;
         "table"?: any;
     }

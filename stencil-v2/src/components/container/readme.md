@@ -7,6 +7,7 @@
 
 | Property  | Attribute | Description | Type      | Default     |
 | --------- | --------- | ----------- | --------- | ----------- |
+| `network` | `network` |             | `boolean` | `undefined` |
 | `visible` | `visible` |             | `boolean` | `undefined` |
 
 

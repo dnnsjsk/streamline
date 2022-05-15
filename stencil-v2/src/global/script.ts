@@ -1,15 +1,15 @@
 import { getMetaKey } from '../utils/get/getMetaKey';
 import { state } from '../store/internal';
-import { setSearchPlaceholder } from "../utils/set/setSearchPlaceholder";
+import { setSearchPlaceholder } from '../utils/set/setSearchPlaceholder';
 
 export default function () {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'k' && getMetaKey(e)) {
       e.preventDefault();
-      state.visible = !state.visible;
+      state.isVisible = !state.isVisible;
     }
 
-    if (state.visible) {
+    if (state.isVisible) {
       if (
         e.key === 'ArrowUp' &&
         getMetaKey(e) &&
@@ -30,7 +30,7 @@ export default function () {
 
       if (e.key === 'Escape' && state.entriesSettingsLoad.keys.exit) {
         e.preventDefault();
-        state.visible = false;
+        state.isVisible = false;
       }
     }
   });
