@@ -52,4 +52,14 @@ export const config: Config = {
     }),
     tailwindHMR(),
   ],
+  testing: {
+    transform: {
+      '^.+\\.(ts|tsx|js|jsx|css)$':
+        '<rootDir>/node_modules/@stencil/core/testing/jest-preprocessor.js',
+    },
+    moduleNameMapper: {
+      '^.+\\.svg$': 'jest-svg-transformer',
+    },
+    transformIgnorePatterns: ['/node_modules/(?!deepdash-es|lodash-es)'],
+  },
 };

@@ -12,7 +12,7 @@ import { setEntries } from '../../utils/entries/setEntries';
   shadow: true,
 })
 export class StreamlineSearch {
-  private input: HTMLElement;
+  private input: HTMLInputElement;
 
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineSearchElement;
@@ -32,7 +32,7 @@ export class StreamlineSearch {
       value && this.input.focus();
     });
 
-    this.input.focus();
+    this.input?.focus?.();
   }
 
   render() {

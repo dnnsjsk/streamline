@@ -13,5 +13,17 @@
 </head>
 <body>
 <streamline-container visible test></streamline-container>
+<script>
+  (async () => {
+    await customElements.whenDefined("streamline-container");
+    ["entriesMenu", "entriesFav"].forEach(item => {
+      fetch(`build/test/${item}.json`).then(data => data.json()).then(data => {
+        document.querySelector("streamline-container").setState({
+          [item]: data
+        });
+      });
+    });
+  })();
+</script>
 </body>
 </html>

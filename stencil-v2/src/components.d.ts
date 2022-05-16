@@ -21,7 +21,7 @@ export namespace Components {
     interface StreamlineEntries {
     }
     interface StreamlineHeader {
-        "item": any;
+        "item": { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; isMultisite: boolean; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; title: string; type: string; };
         "mb": any;
     }
     interface StreamlineRow {
@@ -119,7 +119,7 @@ declare namespace LocalJSX {
     interface StreamlineEntries {
     }
     interface StreamlineHeader {
-        "item"?: any;
+        "item"?: { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; isMultisite: boolean; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; title: string; type: string; };
         "mb"?: any;
     }
     interface StreamlineRow {

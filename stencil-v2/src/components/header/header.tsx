@@ -25,8 +25,23 @@ import { get } from '../../utils/query/get';
   styleUrl: '../../css/tailwind.scss',
   shadow: true,
 })
-export class StreamlineRows {
-  @Prop() item;
+export class StreamlineHeader {
+  @Prop() item = {
+    ID: 1,
+    adminUrl: '',
+    guid: '',
+    href: '',
+    hrefEdit: '',
+    isMultisite: false,
+    name: '',
+    path: '',
+    post_title: '',
+    route: '',
+    siteId: 1,
+    tab: '',
+    title: '',
+    type: '',
+  };
   @Prop() mb;
 
   render() {
@@ -56,7 +71,7 @@ export class StreamlineRows {
           <div class={`flex max-w-full flex-row items-center`}>
             <div
               class={{
-                'relative mr-3 w-4 flex flex-shrink-0 rounded-lg text-blue-600':
+                'relative mr-3 flex w-4 flex-shrink-0 rounded-lg text-blue-600':
                   true,
                 'ml-9': isQueryWithClose,
               }}

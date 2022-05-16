@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import { Component, h, Host, Prop, Method, getAssetPath } from '@stencil/core';
+import { Component, h, Host, Prop, Method } from '@stencil/core';
 import { state } from '../../store/internal';
 import { isAnimation } from '../../utils/is/isAnimation';
 import { setupEntries } from '../../utils/entries/setupEntries';
@@ -20,11 +20,6 @@ export class StreamlineContainer {
 
     if (this.test) {
       state.test = true;
-      ['entriesMenu', 'entriesFav'].forEach((item) => {
-        fetch(getAssetPath(`./test/${item}.json`))
-          .then((res) => res.json())
-          .then((data) => (state[item] = data));
-      });
     }
   }
 
