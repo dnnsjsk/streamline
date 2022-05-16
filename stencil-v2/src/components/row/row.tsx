@@ -35,6 +35,7 @@ export class StreamlineRow {
   };
   @Prop() table;
   @Prop() mb;
+  @Prop({ reflect: true, mutable: true }) isFav = false;
 
   @State() isEdit = state.entriesEditing?.[this.item.ID]?.active;
   @State() isAction = this.item.type === 'action';
@@ -47,7 +48,6 @@ export class StreamlineRow {
   @State() isCurrentSite =
     this.item.siteId === parseInt(String(state.currentSite.id));
   @State() isTable = this.isSite || this.isPost;
-  @State() isFav = false;
 
   componentWillLoad() {
     this.checkIfFavourite();

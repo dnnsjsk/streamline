@@ -26,7 +26,7 @@ export class StreamlineRows {
   render() {
     return (
       <div class="mt-6 space-y-4">
-        {Object.values(this.getArr() as unknown).map((item) => {
+        {this.getArr().map((item) => {
           const onScroll = (e) => {
             this.el.shadowRoot.querySelector(
               `div[data-uid="${uid}"]`

@@ -4,7 +4,8 @@
     "@stencil/ban-prefix": 0,
     "@stencil/async-methods": 0,
     "react/jsx-no-bind": 0,
-    "lines-between-class-members": 0
+    "lines-between-class-members": 0,
+    "no-eval": 0
   },
   "env": {
     "jest": true,

@@ -109,7 +109,8 @@ const { state, dispose, onChange } = createStore({
   entriesFav: JSON.parse(window?.streamlineData?.favourites ?? '[]'),
   // @ts-ignore
   entriesFavActive: JSON.parse(window?.streamlineData?.favourites ?? '[]'),
-  entriesMenu: [],
+  // @ts-ignore
+  entriesMenu: JSON.parse(window?.streamlineData?.menu ?? '[]'),
   entriesMenuCurrentPath: '',
   entriesNetworkMenu: [],
   entriesPost: [],
@@ -159,9 +160,7 @@ const { state, dispose, onChange } = createStore({
     post: {},
     site: {},
   },
-  test:
-    document.querySelector('streamline-container')?.hasAttribute('test') ||
-    false,
+  test: false,
 });
 
 onChange('isVisible', (value) => {

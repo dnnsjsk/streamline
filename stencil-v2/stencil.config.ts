@@ -21,7 +21,6 @@ export const config: Config = {
       serviceWorker: null,
       dir: '../assets/components',
       empty: true,
-      copy: [{ src: '../../assets/test', dest: 'test' }],
     },
   ],
   globalStyle: 'src/css/global.scss',

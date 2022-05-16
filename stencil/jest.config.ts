@@ -1,7 +1,7 @@
-const entriesFav = require('../assets/test/entriesFav.json');
-const entriesSettings = require('../assets/test/entriesSettings.json');
-const historySearchesPost = require('../assets/test/historySearchesPost.json');
-const historySearchesSite = require('../assets/test/historySearchesSite.json');
+const entriesFav = require('../stencil-v2/src/components/container/test/entriesFav.json');
+const entriesSettings = require('../stencil-v2/src/components/container/test/entriesSettings.json');
+const historySearchesPost = require('../stencil-v2/src/components/container/test/historySearchesPost.json');
+const historySearchesSite = require('../stencil-v2/src/components/container/test/historySearchesSite.json');
 
 global.fetch = jest.fn(() =>
   Promise.resolve({

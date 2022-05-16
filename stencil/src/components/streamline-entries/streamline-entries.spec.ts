@@ -7,10 +7,10 @@ import matchMediaPolyfill from 'mq-polyfill';
 import { StreamlineContainer } from '../streamline-container/streamline-container';
 import { StreamlineUiDrawer } from '../ui/streamline-ui-drawer/streamline-ui-drawer';
 import { StreamlineUiInput } from '../ui/streamline-ui-input/streamline-ui-input';
-const networkFav = require('../../../../assets/test/entriesNetworkFav.json');
-const menu = require('../../../../assets/test/entriesMenu.json');
-const fav = require('../../../../assets/test/entriesFav.json');
-const post = require('../../../../assets/test/entriesPost.json');
+const networkFav = require('../../../../stencil-v2/src/components/container/test/entriesNetworkFav.json');
+const menu = require('../../../../stencil-v2/src/components/container/test/entriesMenu.json');
+const fav = require('../../../../stencil-v2/src/components/container/test/entriesFav.json');
+const post = require('../../../../stencil-v2/src/components/container/test/entriesPost.json');
 
 const e = (page) => {
   return page.doc.querySelector('streamline-entries').shadowRoot;

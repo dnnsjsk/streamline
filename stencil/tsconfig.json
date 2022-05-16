@@ -14,6 +14,8 @@
     "jsxFactory": "h",
     "resolveJsonModule": true
   },
-  "include": ["src", "types/jsx.d.ts", "../assets/test/*.json"],
+  "include": ["src", "types/jsx.d.ts",
+    "../stencil-v2/src/components/container/test/*.json"
+  ],
   "exclude": ["node_modules"]
 }

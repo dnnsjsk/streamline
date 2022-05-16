@@ -12,18 +12,6 @@
   <script nomodule src="/build/streamline.js"></script>
 </head>
 <body>
-<streamline-container visible test multisite></streamline-container>
-<script>
-  (async () => {
-    await customElements.whenDefined("streamline-container");
-    ["entriesMenu", "entriesFav"].forEach(item => {
-      fetch(`test/${item}.json`).then(data => data.json()).then(data => {
-        document.querySelector("streamline-container").setState({
-          [item]: data
-        });
-      });
-    });
-  })();
-</script>
+<streamline-container visible test></streamline-container>
 </body>
 </html>
