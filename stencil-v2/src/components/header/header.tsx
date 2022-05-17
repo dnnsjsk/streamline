@@ -62,7 +62,7 @@ export class StreamlineHeader {
     return (
       <div
         class={{
-          'sl-px': true,
+          'sl-px flex items-center justify-between': true,
           '!mb-0': this.mb,
         }}
       >
@@ -112,6 +112,7 @@ export class StreamlineHeader {
                 'mr-6 truncate whitespace-nowrap text-base font-semibold text-slate-900'
               }
               innerHTML={`${
+                // eslint-disable-next-line @stencil/strict-boolean-conditions
                 this.item.title
                   ? this.item.title
                   : this.item.type === 'networkMenu'

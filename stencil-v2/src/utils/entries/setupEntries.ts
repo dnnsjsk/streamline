@@ -21,13 +21,14 @@ export const setupEntries = () => {
       )
     ),
   };
+  state.entriesFavActive = state.entriesFav;
   state.entriesSearch = [
-    state.entriesActions,
+    ...[state.entriesActions],
     ...state.entriesMenu,
     ...state.entriesNetworkMenu,
   ];
   state.entriesSearchActive = [
-    state.entriesActions,
+    ...[state.entriesActions],
     ...state.entriesMenu,
     ...state.entriesNetworkMenu,
   ];

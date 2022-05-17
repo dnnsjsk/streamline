@@ -280,7 +280,7 @@ export class StreamlineRow {
       this.isPost &&
         !this.isEdit && { text: 'View Post', href: this.item.guid },
       this.isPost &&
-        !this.isEdit && { text: 'Edit Post', href: atob(this.item.hrefEdit) },
+        !this.isEdit && { text: 'Edit Post', href: atob(this.item.hrefEdit || '') },
     ];
   }
 
@@ -296,7 +296,7 @@ export class StreamlineRow {
           tabindex={this.isEdit || this.isActionInactive ? -1 : 0}
           href={this.item.href || this.item.guid}
           class={{
-            'sl-px focus-inner focus-white peer relative inline-block flex h-4 h-10 w-full cursor-pointer flex-wrap items-center text-sm font-medium text-slate-900 sm:hover:bg-slate-50 sm:hover:text-blue-600':
+            'sl-px focus-inner focus-white peer relative inline-block flex h-10 w-full cursor-pointer flex-wrap items-center text-sm font-medium text-slate-900 sm:hover:bg-slate-50 sm:hover:text-blue-600':
               true,
             'pointer-events-none':
               (this.isCurrentSite && this.isSite) ||
@@ -333,7 +333,7 @@ export class StreamlineRow {
           <div class="sl-px sl-grid pointer-events-none absolute top-0 w-full text-slate-700 sm:peer-hover:text-blue-600">
             {this.table.map((itemNested) => {
               return (
-                <div class={`relative flex h-4 items-center`}>
+                <div class={`relative flex h-10 items-center`}>
                   {itemNested.text ? (
                     itemNested.text?.(this.item)
                   ) : (

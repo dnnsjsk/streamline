@@ -3,6 +3,7 @@ import { Component, h, Element } from '@stencil/core';
 import { state } from '../../store/internal';
 import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter';
 import { sort } from '../../utils/sort/sort';
+import { debounce } from 'lodash-es';
 
 @Component({
   tag: 'streamline-rows',
@@ -12,6 +13,34 @@ import { sort } from '../../utils/sort/sort';
 export class StreamlineRows {
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineRowsElement;
+
+  connectedCallback() {
+    window.addEventListener(
+      'resize',
+      debounce(() => {
+        if (window.innerWidth <= 639 && state.entriesEditing !== {}) {
+          this.el.shadowRoot
+            .querySelectorAll('streamline-ui-dropdown')
+            .forEach((item) => {
+              item.classList.remove('!opacity-100');
+            });
+          this.el.shadowRoot.querySelectorAll(`[data-row]`).forEach((item) => {
+            const id = item.getAttribute('data-row');
+            item.querySelectorAll('input[data-id]').forEach((itemNested) => {
+              if (state.entriesEditing?.[id]?.active) {
+                (itemNested as HTMLInputElement).value =
+                  state.entriesEditing[id].values[
+                    itemNested.getAttribute('data-id')
+                  ].defaultValue;
+                (itemNested as HTMLInputElement)?.blur?.();
+              }
+            });
+          });
+          state.entriesEditing = {};
+        }
+      }, 500)
+    );
+  }
 
   private getArr = () => {
     return (
@@ -60,7 +89,7 @@ export class StreamlineRows {
                       return (
                         <span
                           class={{
-                            'rounded-md px-2.5 py-1.5 text-xs font-semibold uppercase':
+                            'rounded-md px-2 py-1 text-xs font-semibold uppercase':
                               true,
                             'bg-green-100 text-green-600': isPublish,
                             'bg-purple-100 text-purple-600': isFuture,
@@ -94,9 +123,9 @@ export class StreamlineRows {
               {(item.type === 'post' || item.type === 'site') && (
                 <div
                   data-uid={uid}
-                  class={`scrollbar-none sticky top-[52px] z-10 overflow-x-auto bg-white sm:top-[67px]`}
+                  class={`scrollbar-none sticky top-[40px] z-10 overflow-x-auto bg-white`}
                 >
-                  <div class="sl-px sl-grid">
+                  <div class="sl-mx sl-grid border-t border-slate-200">
                     {table.map((itemInner) => {
                       return (
                         <div
@@ -157,9 +186,10 @@ export class StreamlineRows {
                     ? (e) => onScroll(e)
                     : undefined
                 }
-                class="overflow-x-auto"
+                class="overflow-x-auto overflow-y-hidden"
               >
                 {Object.values(item.children as unknown).map((itemInner) => {
+                  console.log(itemInner);
                   return itemInner.children ? (
                     <li key={itemInner.name}>
                       <h2 class="sl-mx pb-2 pt-4 text-sm font-medium text-slate-400">

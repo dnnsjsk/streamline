@@ -77,7 +77,7 @@ export class StreamlineContainer {
                   class={{
                     'absolute left-0 bottom-0 z-50 h-px w-full': true,
                     'bg-slate-200': !state.isSearchFocus,
-                    '-bottom-px h-[2px] bg-blue-500': state.isSearchFocus,
+                    '-bottom-px h-px bg-blue-500': state.isSearchFocus,
                   }}
                 />
                 <streamline-search class="block h-14" />
@@ -102,9 +102,29 @@ export class StreamlineContainer {
                     type="main"
                     items={[
                       {
+                        text: 'Search',
+                        onClick: () => (state.active = 'search'),
+                        keys: ['Meta', '1'],
+                      },
+                      {
+                        text: 'Favourites',
+                        onClick: () => (state.active = 'fav'),
+                        keys: ['Meta', '2'],
+                        active: 'fav',
+                      },
+                      {
                         text: 'Settings',
                         onClick: () => (state.active = 'settings'),
+                        keys: ['Meta', '3'],
                       },
+                      [
+                        {
+                          text: 'Exit',
+                          onClick: () => (state.active = 'settings'),
+                          keys: ['Escape'],
+                          large: true,
+                        },
+                      ],
                     ]}
                   />
                 )}

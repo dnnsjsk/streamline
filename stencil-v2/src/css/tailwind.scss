@@ -39,6 +39,10 @@
   @apply grid grid-flow-col auto-cols-[minmax(150px,1fr)] gap-2;
 }
 
+.focus {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
 .focus-inner {
   @apply focus:outline-none focus:ring-offset-2 focus:ring-2 focus:ring-inset focus:ring-blue-500;
 }

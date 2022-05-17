@@ -19,7 +19,7 @@ const { state, dispose, onChange } = createStore({
       route: 'get/sites',
     },
   },
-  active: 'search',
+  active: 'fav',
   bodyStyle: {},
   currentSite: {
     id: 1,
