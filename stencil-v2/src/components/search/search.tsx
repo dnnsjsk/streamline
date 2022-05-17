@@ -26,10 +26,10 @@ export class StreamlineSearch {
 
   componentDidRender() {
     onChange('isVisible', (value) => {
-      value && this.input.focus();
+      value && this.input?.focus?.();
     });
     onChange('isSearchFocus', (value) => {
-      value && this.input.focus();
+      value && this.input?.focus?.();
     });
 
     this.input?.focus?.();

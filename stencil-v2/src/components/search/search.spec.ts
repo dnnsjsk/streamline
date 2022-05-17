@@ -1,5 +1,5 @@
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
-import { dispose } from '../../store/internal';
+import { dispose, state } from '../../store/internal';
 import { StreamlineSearch } from './search';
 
 describe('streamline-search', () => {
@@ -16,5 +16,14 @@ describe('streamline-search', () => {
 
   it('renders', async () => {
     expect(e()).toBeTruthy();
+  });
+
+  it('types', async () => {
+    const input = e().querySelector('input');
+    input.value = 'MPH';
+    input.dispatchEvent(new Event('input'));
+    await page.waitForChanges();
+    expect(input.value).toBe('MPH');
+    expect(state.searchValue).toBe('MPH');
   });
 });
