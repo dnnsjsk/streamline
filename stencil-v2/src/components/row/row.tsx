@@ -37,21 +37,37 @@ export class StreamlineRow {
   @Prop() mb;
   @Prop({ reflect: true, mutable: true }) isFav = false;
 
-  @State() isEdit = state.entriesEditing?.[this.item.ID]?.active;
-  @State() isAction = this.item.type === 'action';
-  @State() isActionInactive = this.isAction && state.searchValue === '';
-  @State() isSite = this.item.type === 'site';
-  @State() isPost = this.item.type === 'post';
-  @State() isMenu =
-    this.item.type === 'menu' || this.item.type === 'networkMenu';
-  @State() isDropdown = this.isPost || this.isMenu;
-  @State() isCurrentSite =
-    this.item.siteId === parseInt(String(state.currentSite.id));
-  @State() isTable = this.isSite || this.isPost;
+  @State() isEdit;
+  @State() isAction;
+  @State() isActionInactive;
+  @State() isSite;
+  @State() isPost;
+  @State() isMenu;
+  @State() isDropdown;
+  @State() isCurrentSite;
+  @State() isTable;
 
   componentWillLoad() {
+    this.setState();
     this.checkIfFavourite();
   }
+
+  componentWillUpdate() {
+    this.setState();
+  }
+
+  private setState = () => {
+    this.isEdit = state.entriesEditing?.[this.item.ID]?.active;
+    this.isAction = this.item.type === 'action';
+    this.isActionInactive = this.isAction && state.searchValue === '';
+    this.isSite = this.item.type === 'site';
+    this.isPost = this.item.type === 'post';
+    this.isMenu = this.item.type === 'menu' || this.item.type === 'networkMenu';
+    this.isDropdown = this.isPost || this.isMenu;
+    this.isCurrentSite =
+      this.item.siteId === parseInt(String(state.currentSite.id));
+    this.isTable = this.isSite || this.isPost;
+  };
 
   private checkIfFavourite = () => {
     this.isFav = someDeep(
@@ -280,7 +296,10 @@ export class StreamlineRow {
       this.isPost &&
         !this.isEdit && { text: 'View Post', href: this.item.guid },
       this.isPost &&
-        !this.isEdit && { text: 'Edit Post', href: atob(this.item.hrefEdit || '') },
+        !this.isEdit && {
+          text: 'Edit Post',
+          href: atob(this.item.hrefEdit || ''),
+        },
     ];
   }
 

@@ -42,12 +42,12 @@ export class StreamlineRows {
     );
   }
 
-  private getArr = () => {
+  private getArr = (type) => {
     return (
-      (state[`entries${capitalizeFirstLetter(state.active)}Active`]?.length >=
+      (state[`entries${capitalizeFirstLetter(type)}Active`]?.length >=
         1 &&
-        (state[`entries${capitalizeFirstLetter(state.active)}Active`] ||
-          state[`entries${capitalizeFirstLetter(state.active)}`])) ||
+        (state[`entries${capitalizeFirstLetter(type)}Active`] ||
+          state[`entries${capitalizeFirstLetter(type)}`])) ||
       []
     );
   };
@@ -55,7 +55,7 @@ export class StreamlineRows {
   render() {
     return (
       <div class="mt-6 space-y-4">
-        {this.getArr().map((item) => {
+        {this.getArr(state.active).map((item) => {
           const onScroll = (e) => {
             this.el.shadowRoot.querySelector(
               `div[data-uid="${uid}"]`
@@ -188,8 +188,7 @@ export class StreamlineRows {
                 }
                 class="overflow-x-auto overflow-y-hidden"
               >
-                {Object.values(item.children as unknown).map((itemInner) => {
-                  console.log(itemInner);
+                {item.children && Object.values(item.children as unknown).map((itemInner) => {
                   return itemInner.children ? (
                     <li key={itemInner.name}>
                       <h2 class="sl-mx pb-2 pt-4 text-sm font-medium text-slate-400">

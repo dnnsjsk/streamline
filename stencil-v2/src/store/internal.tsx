@@ -1,5 +1,7 @@
 import { createStore } from '@stencil/store';
 import { resetScroll } from '../utils/general/resetScroll';
+import { setEntries } from '../utils/entries/setEntries';
+import { setActions } from '../utils/entries/setActions';
 
 const { state, dispose, onChange } = createStore({
   actions: {
@@ -19,7 +21,7 @@ const { state, dispose, onChange } = createStore({
       route: 'get/sites',
     },
   },
-  active: 'fav',
+  active: 'search',
   bodyStyle: {},
   currentSite: {
     id: 1,
@@ -103,7 +105,7 @@ const { state, dispose, onChange } = createStore({
       ],
     },
   ],
-  entriesActions: {},
+  entriesActions: [],
   entriesEditing: {},
   // @ts-ignore
   entriesFav: JSON.parse(window?.streamlineData?.favourites ?? '[]'),
@@ -166,6 +168,12 @@ const { state, dispose, onChange } = createStore({
 onChange('isVisible', (value) => {
   resetScroll(value);
 });
+
+onChange('searchValue', () => {
+  setEntries();
+});
+
+setActions();
 
 state.entriesSettingsActive = state.entriesSettings;
 state.entriesSettingsSave = state.entriesSettingsLoad;

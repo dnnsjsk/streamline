@@ -4,7 +4,6 @@ import { onChange, state } from '../../store/internal';
 import { Button } from '../../elements/Button';
 import { Icon } from '../../elements/Icon';
 import IconSearch from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/magnifying-glass.svg';
-import { setEntries } from '../../utils/entries/setEntries';
 
 @Component({
   tag: 'streamline-search',
@@ -21,7 +20,6 @@ export class StreamlineSearch {
     state.searchValue = e.target.value;
     state.isLoading = false;
     state.isEnter = false;
-    setEntries();
   };
 
   componentDidRender() {

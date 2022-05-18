@@ -1,5 +1,5 @@
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
-import { dispose } from '../../store/internal';
+import { dispose, state } from '../../store/internal';
 import { StreamlineDropdown } from './dropdown';
 
 describe('streamline-dropdown', () => {
@@ -10,11 +10,45 @@ describe('streamline-dropdown', () => {
     dispose();
     page = await newSpecPage({
       components: [StreamlineDropdown],
-      html: `<streamline-dropdown></streamline-dropdown>`,
+      html: `<streamline-dropdown type="main"></streamline-dropdown>`,
     });
   });
 
   it('renders', async () => {
     expect(e()).toBeTruthy();
+  });
+
+  describe('click', () => {
+    it('favourites', async () => {
+      await (
+        e().querySelector('ul > li:nth-of-type(2) a') as HTMLAnchorElement
+      ).click();
+      await page.waitForChanges();
+      expect(state.active).toBe('fav');
+    });
+
+    it('search', async () => {
+      await (
+        e().querySelector('ul > li:nth-of-type(1) a') as HTMLAnchorElement
+      ).click();
+      await page.waitForChanges();
+      expect(state.active).toBe('search');
+    });
+
+    it('settings', async () => {
+      await (
+        e().querySelector('ul > li:nth-of-type(3) a') as HTMLAnchorElement
+      ).click();
+      await page.waitForChanges();
+      expect(state.active).toBe('settings');
+    });
+
+    it('exit', async () => {
+      await (
+        e().querySelector('ul > li:nth-of-type(4) a') as HTMLAnchorElement
+      ).click();
+      await page.waitForChanges();
+      expect(state.isVisible).toBe(false);
+    });
   });
 });

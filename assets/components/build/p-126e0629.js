@@ -1,8 +1,7 @@
-import { B as BUILD, c as consoleDevInfo, p as plt, w as win, H, d as doc, N as NAMESPACE, a as promiseResolve, b as bootstrapLazy } from './index-cde5ae33.js';
-import { g as globalScripts } from './app-globals-eca12bfa.js';
-import './internal-4ab75a66.js';
-import './setSearchPlaceholder-823094ea.js';
-import './capitalizeFirstLetter-646b80d8.js';
+import { B as BUILD, c as consoleDevInfo, p as plt, w as win, H, d as doc, N as NAMESPACE, a as promiseResolve, b as bootstrapLazy } from './index-f686fff0.js';
+import { g as globalScripts } from './app-globals-95a4eccc.js';
+import './internal-7483ab48.js';
+import './setSearchPlaceholder-81014cc2.js';
 
 /*
  Stencil Client Patch Browser v2.15.2 | MIT Licensed | https://stenciljs.com
@@ -128,5 +127,5 @@ const patchCloneNodeFix = (HTMLElementPrototype) => {
 
 patchBrowser().then(options => {
   globalScripts();
-  return bootstrapLazy([["streamline-entries",[[1,"streamline-entries"]]],["streamline-bottom-bar",[[1,"streamline-bottom-bar"]]],["streamline-search",[[1,"streamline-search"]]],["streamline-row",[[1,"streamline-row",{"item":[16],"table":[8],"mb":[8],"isFav":[1540,"is-fav"],"isEdit":[32],"isAction":[32],"isActionInactive":[32],"isSite":[32],"isPost":[32],"isMenu":[32],"isDropdown":[32],"isCurrentSite":[32],"isTable":[32]}]]],["streamline-header",[[1,"streamline-header",{"item":[16],"mb":[8]}]]],["streamline-rows",[[1,"streamline-rows"]]],["streamline-settings",[[1,"streamline-settings"]]],["streamline-dropdown",[[1,"streamline-dropdown",{"items":[16],"type":[1],"placement":[32]}]]],["streamline-container",[[1,"streamline-container",{"visible":[4],"network":[4],"test":[4],"setState":[64]}]]]], options);
+  return bootstrapLazy([["streamline-entries",[[1,"streamline-entries"]]],["streamline-bottom-bar",[[1,"streamline-bottom-bar"]]],["streamline-search",[[1,"streamline-search"]]],["streamline-row",[[1,"streamline-row",{"item":[16],"table":[8],"mb":[8],"isFav":[1540,"is-fav"],"isEdit":[32],"isAction":[32],"isActionInactive":[32],"isSite":[32],"isPost":[32],"isMenu":[32],"isDropdown":[32],"isCurrentSite":[32],"isTable":[32]}]]],["streamline-header",[[1,"streamline-header",{"item":[16],"mb":[8]}]]],["streamline-rows",[[1,"streamline-rows"]]],["streamline-settings",[[1,"streamline-settings"]]],["streamline-dropdown",[[1,"streamline-dropdown",{"items":[1040],"type":[1],"placement":[32]}]]],["streamline-container",[[1,"streamline-container",{"visible":[4],"network":[4],"test":[4],"setState":[64]}]]]], options);
 });

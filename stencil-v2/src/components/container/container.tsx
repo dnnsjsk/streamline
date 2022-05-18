@@ -23,10 +23,6 @@ export class StreamlineContainer {
     }
   }
 
-  componentDidLoad() {
-    setupEntries();
-  }
-
   @Method()
   async setState(data) {
     return new Promise((resolve) => {
@@ -100,32 +96,6 @@ export class StreamlineContainer {
                 ) : (
                   <streamline-dropdown
                     type="main"
-                    items={[
-                      {
-                        text: 'Search',
-                        onClick: () => (state.active = 'search'),
-                        keys: ['Meta', '1'],
-                      },
-                      {
-                        text: 'Favourites',
-                        onClick: () => (state.active = 'fav'),
-                        keys: ['Meta', '2'],
-                        active: 'fav',
-                      },
-                      {
-                        text: 'Settings',
-                        onClick: () => (state.active = 'settings'),
-                        keys: ['Meta', '3'],
-                      },
-                      [
-                        {
-                          text: 'Exit',
-                          onClick: () => (state.active = 'settings'),
-                          keys: ['Escape'],
-                          large: true,
-                        },
-                      ],
-                    ]}
                   />
                 )}
               </div>

@@ -23,9 +23,40 @@ export class StreamlineDropdown {
 
   @State() placement: string;
 
-  @Prop() items = [];
+  @Prop({ mutable: true }) items = [];
 
   @Prop() type: string;
+
+  connectedCallback() {
+    if (this.type === 'main') {
+      this.items = [
+        {
+          text: 'Search',
+          onClick: () => (state.active = 'search'),
+          keys: ['Meta', '1'],
+        },
+        {
+          text: 'Favourites',
+          onClick: () => (state.active = 'fav'),
+          keys: ['Meta', '2'],
+          active: 'fav',
+        },
+        {
+          text: 'Settings',
+          onClick: () => (state.active = 'settings'),
+          keys: ['Meta', '3'],
+        },
+        [
+          {
+            text: 'Exit',
+            onClick: () => (state.active = 'settings'),
+            keys: ['Escape'],
+            large: true,
+          },
+        ],
+      ];
+    }
+  }
 
   componentDidUpdate() {
     this.setPosition();
@@ -99,7 +130,7 @@ export class StreamlineDropdown {
                     href={item.href && item.href}
                     onMouseDown={(e) => e.preventDefault()}
                     class={{
-                      'focus-inner space-between flex w-full flex-row items-center whitespace-nowrap bg-white px-2.5 text-left text-[12px] font-medium text-slate-900 hover:text-blue-600':
+                      'focus-inner space-between flex w-full flex-row items-center whitespace-nowrap bg-white px-2.5 text-left text-sm font-medium text-slate-900 hover:text-blue-600':
                         true,
                       'border-t border-slate-400': item.border || border,
                       'py-1.5': !item.large,
