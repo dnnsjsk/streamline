@@ -333,11 +333,11 @@ export class StreamlineRow {
             <span
               class={`absolute left-px top-1/2 mr-2 flex -translate-y-1/2 sm:left-2 lg:left-3.5`}
             >
-              {this.isFav ? (
+              {!this.isAction && this.isFav ? (
                 <span class={`inline-block scale-50 text-rose-500 sm:scale-75`}>
                   <Icon icon={IconHeart} />
                 </span>
-              ) : (
+              ) : !this.isAction && (
                 <span
                   class={`inline-block scale-50 text-green-600 sm:scale-100`}
                 >

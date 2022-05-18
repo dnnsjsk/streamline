@@ -154,6 +154,7 @@ const { state, dispose, onChange } = createStore({
   isMac: navigator.userAgent.indexOf('Mac OS X') !== -1,
   isSearchFocus: true,
   isVisible: false,
+  menus: ['search', 'fav', 'settings'],
   scroll: 0,
   searchPlaceholder: '',
   searchNoValue: 'No entries found',

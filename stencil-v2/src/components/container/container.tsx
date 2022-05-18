@@ -3,6 +3,8 @@ import { Component, h, Host, Prop, Method } from '@stencil/core';
 import { state } from '../../store/internal';
 import { isAnimation } from '../../utils/is/isAnimation';
 import { setupEntries } from '../../utils/entries/setupEntries';
+import { getMetaKey } from '../../utils/get/getMetaKey';
+import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
 
 @Component({
   tag: 'streamline-container',
@@ -21,7 +23,53 @@ export class StreamlineContainer {
     if (this.test) {
       state.test = true;
     }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'k' && getMetaKey(e)) {
+        e.preventDefault();
+        state.isVisible = !state.isVisible;
+      }
+
+      if (state.isVisible) {
+        if (e.key === 'ArrowUp' && getMetaKey(e)) {
+          e.preventDefault();
+          this.cycleActive('up');
+        }
+
+        if (e.key === 'ArrowDown' && getMetaKey(e)) {
+          e.preventDefault();
+          this.cycleActive('down');
+        }
+
+        if (e.key === 'Escape' && state.entriesSettingsLoad.keys.exit) {
+          e.preventDefault();
+          state.isVisible = false;
+        }
+      }
+    });
+    setSearchPlaceholder();
   }
+
+  private cycleActive = (mode) => {
+    const index = state.menus.indexOf(state.active);
+    const length = state.menus.length;
+
+    if (mode === 'up') {
+      if (index === 0) {
+        state.active = state.menus[length - 1];
+      } else {
+        state.active = state.menus[index - 1];
+      }
+    }
+
+    if (mode === 'down') {
+      if (index + 1 === length) {
+        state.active = state.menus[0];
+      } else {
+        state.active = state.menus[index + 1];
+      }
+    }
+  };
 
   @Method()
   async setState(data) {
@@ -94,9 +142,7 @@ export class StreamlineContainer {
                     </svg>
                   </div>
                 ) : (
-                  <streamline-dropdown
-                    type="main"
-                  />
+                  <streamline-dropdown type="main" />
                 )}
               </div>
               <streamline-entries class="absolute top-14 h-[calc(100%-56px-24px)] w-full overflow-y-scroll" />

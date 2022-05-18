@@ -24,7 +24,6 @@ export const config: Config = {
     },
   ],
   globalStyle: 'src/css/global.scss',
-  globalScript: 'src/global/script.ts',
   plugins: [
     inlineSvg(),
     sass(),

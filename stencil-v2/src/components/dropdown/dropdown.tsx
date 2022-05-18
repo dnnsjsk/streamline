@@ -27,37 +27,6 @@ export class StreamlineDropdown {
 
   @Prop() type: string;
 
-  connectedCallback() {
-    if (this.type === 'main') {
-      this.items = [
-        {
-          text: 'Search',
-          onClick: () => (state.active = 'search'),
-          keys: ['Meta', '1'],
-        },
-        {
-          text: 'Favourites',
-          onClick: () => (state.active = 'fav'),
-          keys: ['Meta', '2'],
-          active: 'fav',
-        },
-        {
-          text: 'Settings',
-          onClick: () => (state.active = 'settings'),
-          keys: ['Meta', '3'],
-        },
-        [
-          {
-            text: 'Exit',
-            onClick: () => (state.active = 'settings'),
-            keys: ['Escape'],
-            large: true,
-          },
-        ],
-      ];
-    }
-  }
-
   componentDidUpdate() {
     this.setPosition();
   }
@@ -88,6 +57,45 @@ export class StreamlineDropdown {
   };
 
   render() {
+    const items =
+      this.type !== 'main'
+        ? this.items
+        : [
+            {
+              text: 'Search',
+              onClick: () => (state.active = 'search'),
+              keys:
+                state.active === 'fav'
+                  ? ['Meta', '↑']
+                  : state.active === 'settings' && ['Meta', '↓'],
+            },
+            {
+              text: 'Favourites',
+              onClick: () => (state.active = 'fav'),
+              keys:
+                state.active === 'settings'
+                  ? ['Meta', '↑']
+                  : state.active === 'search' && ['Meta', '↓'],
+              active: 'fav',
+            },
+            {
+              text: 'Settings',
+              onClick: () => (state.active = 'settings'),
+              keys:
+                state.active === 'search'
+                  ? ['Meta', '↑']
+                  : state.active === 'fav' && ['Meta', '↓'],
+            },
+            [
+              {
+                text: 'Exit',
+                onClick: () => (state.active = 'settings'),
+                keys: ['Escape'],
+                large: true,
+              },
+            ],
+          ];
+
     return (
       <div
         role="button"
@@ -115,7 +123,7 @@ export class StreamlineDropdown {
             'transition duration-100 ease-in': isAnimation(),
           }}
         >
-          {this.items.map((item) => {
+          {items.map((item) => {
             const Item = ({ item, border = false }) => {
               const isActiveMenu =
                 this.type === 'main' &&
@@ -133,8 +141,8 @@ export class StreamlineDropdown {
                       'focus-inner space-between flex w-full flex-row items-center whitespace-nowrap bg-white px-2.5 text-left text-sm font-medium text-slate-900 hover:text-blue-600':
                         true,
                       'border-t border-slate-400': item.border || border,
-                      'py-1.5': !item.large,
-                      'py-2': item.large,
+                      'h-8': !item.large,
+                      'h-9': item.large,
                       '!pointer-events-none': isActiveMenu,
                     }}
                     onClick={() => {
