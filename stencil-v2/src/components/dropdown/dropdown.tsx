@@ -68,7 +68,7 @@ export class StreamlineDropdown {
         name: 'shiftByOnePixel',
         fn({ y }) {
           return {
-            y: y,
+            y: y - 1,
           };
         },
       };

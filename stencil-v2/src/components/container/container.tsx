@@ -73,7 +73,7 @@ export class StreamlineContainer {
                   class={{
                     'absolute left-0 bottom-0 z-50 h-px w-full': true,
                     'bg-slate-200': !state.isSearchFocus,
-                    '-bottom-px h-px bg-blue-500': state.isSearchFocus,
+                    'bottom-0 h-px bg-blue-500': state.isSearchFocus,
                   }}
                 />
                 <streamline-search class="block h-14" />
