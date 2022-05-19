@@ -9,7 +9,7 @@ export const Button = (props) => {
         [props.class]: props.class,
         'focus inline-flex items-center justify-center rounded-md text-sm font-semibold':
           true,
-        'px-3 py-2':
+        'px-3 py-1.5':
           props.type === 'primary' ||
           props.type === 'secondary' ||
           props.type === 'transparent',

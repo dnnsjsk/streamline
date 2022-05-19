@@ -66,5 +66,19 @@ describe('streamline-container', () => {
       await page.waitForChanges();
       expect(state.active).toBe('search');
     });
+
+    it('not cycle active', async () => {
+      state.entriesSettingsLoad.keys.navigation = false;
+      const eventUp = new KeyboardEvent('keydown', {
+        ctrlKey: true,
+        key: 'ArrowUp',
+      });
+      page.doc.dispatchEvent(eventUp);
+      await page.waitForChanges();
+      expect(state.active).toBe('search');
+      page.doc.dispatchEvent(eventUp);
+      await page.waitForChanges();
+      expect(state.active).toBe('search');
+    });
   });
 });

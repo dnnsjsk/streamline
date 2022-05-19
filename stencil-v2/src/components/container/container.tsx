@@ -31,17 +31,19 @@ export class StreamlineContainer {
       }
 
       if (state.isVisible) {
-        if (e.key === 'ArrowUp' && getMetaKey(e)) {
-          e.preventDefault();
-          this.cycleActive('up');
+        if (state.entriesSettingsLoad.keys.navigation) {
+          if (e.key === 'ArrowUp' && getMetaKey(e)) {
+            e.preventDefault();
+            this.cycleActive('up');
+          }
+
+          if (e.key === 'ArrowDown' && getMetaKey(e)) {
+            e.preventDefault();
+            this.cycleActive('down');
+          }
         }
 
-        if (e.key === 'ArrowDown' && getMetaKey(e)) {
-          e.preventDefault();
-          this.cycleActive('down');
-        }
-
-        if (e.key === 'Escape' && state.entriesSettingsLoad.keys.exit) {
+        if (e.key === 'Escape') {
           e.preventDefault();
           state.isVisible = false;
         }

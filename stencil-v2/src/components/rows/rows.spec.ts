@@ -28,7 +28,7 @@ describe('streamline-rows', () => {
     expect(e()).toBeTruthy();
   });
 
-  describe('menu entries', () => {
+  describe('entries', () => {
     describe('in search', () => {
       it('render', async () => {
         const rows = e().querySelectorAll('streamline-row').length;
@@ -76,6 +76,20 @@ describe('streamline-rows', () => {
         await page.waitForChanges();
         const rows = e().querySelectorAll('streamline-row').length;
         await expect(rows).toBe(6);
+      });
+    });
+
+    describe("when switching active with search value 'de'", () => {
+      it('without resetting', async () => {
+        let rows;
+        state.searchValue = 'de';
+        await page.waitForChanges();
+        rows = e().querySelectorAll('streamline-row').length;
+        await expect(rows).toBe(3);
+        state.active = 'fav';
+        await page.waitForChanges();
+        rows = e().querySelectorAll('streamline-row').length;
+        await expect(rows).toBe(1);
       });
     });
   });

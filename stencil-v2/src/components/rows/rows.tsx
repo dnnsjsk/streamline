@@ -54,7 +54,7 @@ export class StreamlineRows {
 
   render() {
     return (
-      <div class="mt-6 space-y-4">
+      <div class="space-y-4">
         {this.getArr(state.active).map((item) => {
           const onScroll = (e) => {
             this.el.shadowRoot.querySelector(
@@ -119,7 +119,7 @@ export class StreamlineRows {
 
           return (
             <div data-entry-section={item.type}>
-              <streamline-header item={item} mb={true}></streamline-header>
+              <streamline-header item={item}></streamline-header>
               {(item.type === 'post' || item.type === 'site') && (
                 <div
                   data-uid={uid}
@@ -191,7 +191,7 @@ export class StreamlineRows {
                 {item.children && Object.values(item.children as unknown).map((itemInner) => {
                   return itemInner.children ? (
                     <li key={itemInner.name}>
-                      <h2 class="sl-mx pb-2 pt-4 text-sm font-medium text-slate-400">
+                      <h2 class="sl-mx pb-2 pt-4 text-sm font-medium text-slate-500">
                         {itemInner.name}
                       </h2>
                       <ul>

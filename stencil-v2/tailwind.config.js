@@ -1,4 +1,4 @@
-const colors = require('tailwindcss/colors')
+const colors = require('tailwindcss/colors');
 
 module.exports = {
   theme: {
@@ -28,7 +28,7 @@ module.exports = {
       violet: colors.violet,
       white: colors.white,
       yellow: colors.yellow,
-      zinc: colors.zinc
+      zinc: colors.zinc,
     },
     fontSize: {
       xs: '12px',
@@ -41,7 +41,7 @@ module.exports = {
       '4xl': '36px',
       '5xl': '48px',
       '6xl': '60px',
-      '7xl': '72px'
+      '7xl': '72px',
     },
     spacing: {
       px: '1px',
@@ -78,7 +78,7 @@ module.exports = {
       64: '256px',
       72: '288px',
       80: '320px',
-      96: '384px'
+      96: '384px',
     },
     borderRadius: {
       none: '0px',
@@ -89,7 +89,7 @@ module.exports = {
       xl: '12px',
       '2xl': '16px',
       '3xl': '24px',
-      full: '9999px'
+      full: '9999px',
     },
     extend: {
       lineHeight: {
@@ -100,8 +100,13 @@ module.exports = {
         7: '28px',
         8: '32px',
         9: '36px',
-        10: '40px'
-      }
-    }
-  }
-}
+        10: '40px',
+      },
+    },
+  },
+  plugins: [
+    require('@tailwindcss/forms')({
+      strategy: 'class',
+    }),
+  ],
+};

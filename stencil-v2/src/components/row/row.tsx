@@ -321,7 +321,7 @@ export class StreamlineRow {
               (this.isCurrentSite && this.isSite) ||
               this.isEdit ||
               this.isActionInactive,
-            '!text-slate-400': this.isActionInactive,
+            '!text-slate-500': this.isActionInactive,
           }}
           onClick={this.onClick}
           onDblClick={this.onDblClick}

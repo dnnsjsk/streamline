@@ -16,7 +16,7 @@ export class StreamlineEntries {
           'pointer-events-none opacity-50': state.isLoading,
         }}
       >
-        <div class="pb-6 lg:pb-10">
+        <div class="mt-6 pb-6 lg:pb-10">
           {state.active === 'settings' ? (
             <streamline-settings />
           ) : (

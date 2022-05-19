@@ -89,7 +89,7 @@ export class StreamlineDropdown {
             [
               {
                 text: 'Exit',
-                onClick: () => (state.active = 'settings'),
+                onClick: () => (state.isVisible = false),
                 keys: ['Escape'],
                 large: true,
               },

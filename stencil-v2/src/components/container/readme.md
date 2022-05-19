@@ -43,6 +43,7 @@ graph TD;
   streamline-container --> streamline-bottom-bar
   streamline-entries --> streamline-settings
   streamline-entries --> streamline-rows
+  streamline-settings --> streamline-header
   streamline-rows --> streamline-header
   streamline-rows --> streamline-row
   streamline-row --> streamline-dropdown

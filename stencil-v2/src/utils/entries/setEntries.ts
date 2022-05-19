@@ -54,6 +54,4 @@ export const setEntries = (removeSort = '') => {
       [removeSort]: false,
     };
   }
-
-  // console.log(state[`entries${capitalizeFirstLetter(state.active)}Active`]);
 };

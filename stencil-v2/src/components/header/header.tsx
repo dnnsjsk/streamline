@@ -42,7 +42,6 @@ export class StreamlineHeader {
     title: '',
     type: '',
   };
-  @Prop() mb;
 
   render() {
     const active = capitalizeFirstLetter(state.active);
@@ -60,12 +59,7 @@ export class StreamlineHeader {
         : '';
 
     return (
-      <div
-        class={{
-          'sl-px flex items-center justify-between': true,
-          '!mb-0': this.mb,
-        }}
-      >
+      <div class="sl-px flex items-center justify-between">
         <div>
           <div class={`absolute -left-full top-0 z-[-1] h-full bg-white`} />
           <div class={`flex max-w-full flex-row items-center`}>
@@ -158,19 +152,16 @@ export class StreamlineHeader {
                     callback: () => {
                       if (
                         state.entriesSettingsLoad.query.amount !==
-                          // @ts-ignore
                           state.entriesSettingsSave.query.amount &&
                         !state.test
                       ) {
                         state.entriesPost = [];
                         state.entriesPostQuery = '';
                       }
-                      // @ts-ignore
                       state.entriesSettingsLoad = state.entriesSettingsSave;
                     },
                   });
                 } else {
-                  // @ts-ignore
                   state.entriesSettingsLoad = state.entriesSettingsSave;
                 }
               },

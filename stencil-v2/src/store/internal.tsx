@@ -2,6 +2,7 @@ import { createStore } from '@stencil/store';
 import { resetScroll } from '../utils/general/resetScroll';
 import { setEntries } from '../utils/entries/setEntries';
 import { setActions } from '../utils/entries/setActions';
+import equal from 'fast-deep-equal/es6';
 
 const { state, dispose, onChange } = createStore({
   actions: {
@@ -36,75 +37,6 @@ const { state, dispose, onChange } = createStore({
     title: '',
     values: {},
   },
-  entriesSettings: [
-    {
-      type: 'settings',
-      children: [
-        {
-          name: 'Key shortcuts',
-          id: 'key',
-          children: [
-            {
-              id: 'navigation',
-              name: 'Entry navigation',
-              nameParent: 'Key shortcuts',
-              label: 'Navigate between entry items',
-              metaKey: false,
-              keys: ['↑', '↓'],
-            },
-            {
-              id: 'navigationTabs',
-              name: 'Tab navigation',
-              nameParent: 'Key shortcuts',
-              label: 'Navigate between top-level tab items',
-              metaKey: true,
-              keys: ['→', '←'],
-            },
-            {
-              id: 'search',
-              name: 'Focus search',
-              nameParent: 'Key shortcuts',
-              label: 'Focus the search bar',
-              metaKey: true,
-              keys: ['s'],
-            },
-            {
-              id: 'exit',
-              name: 'Close',
-              nameParent: 'Key shortcuts',
-              label: 'Exit the app',
-              metaKey: false,
-              keys: ['esc'],
-            },
-          ],
-        },
-        {
-          name: 'Appearance',
-          id: 'appearance',
-          children: [
-            {
-              id: 'animation',
-              name: 'Enable animations',
-              nameParent: 'Appearance',
-              label: 'Enables micro animations throughout the app',
-            },
-          ],
-        },
-        {
-          name: 'Queries',
-          id: 'queries',
-          children: [
-            {
-              id: 'amount',
-              name: 'Post amount',
-              nameParent: 'Queries',
-              label: 'Maximum number of displayed posts per page',
-            },
-          ],
-        },
-      ],
-    },
-  ],
   entriesActions: [],
   entriesEditing: {},
   // @ts-ignore
@@ -123,14 +55,65 @@ const { state, dispose, onChange } = createStore({
   entriesPostTotal: 0,
   entriesSearch: [],
   entriesSearchActive: [],
+  entriesSettings: [
+    {
+      type: 'settings',
+      children: [
+        {
+          name: 'Key shortcuts',
+          id: 'keys',
+          children: [
+            {
+              id: 'navigation',
+              name: 'Entry navigation',
+              nameParent: 'Key shortcuts',
+              label: 'Navigate between entry items',
+              metaKey: false,
+              keys: ['Meta', '↑', '↓'],
+            },
+            {
+              id: 'navigationTabs',
+              name: 'Tab navigation',
+              nameParent: 'Key shortcuts',
+              label: 'Navigate between top-level tab items',
+              metaKey: true,
+              keys: ['→', '←'],
+            },
+          ],
+        },
+        {
+          name: 'Appearance',
+          id: 'appearance',
+          children: [
+            {
+              id: 'animation',
+              name: 'Enable animations',
+              nameParent: 'Appearance',
+              label: 'Enables micro animations throughout the app',
+            },
+          ],
+        },
+        {
+          name: 'Queries',
+          id: 'query',
+          children: [
+            {
+              id: 'amount',
+              name: 'Post amount',
+              nameParent: 'Queries',
+              label: 'Maximum number of displayed posts per page',
+            },
+          ],
+        },
+      ],
+    },
+  ],
   entriesSettingsActive: [],
   entriesSettingsHaveChanged: false,
   entriesSettingsLoad: {
     keys: {
       navigation: true,
       navigationTabs: true,
-      search: true,
-      exit: true,
     },
     appearance: {
       animation: true,
@@ -139,7 +122,7 @@ const { state, dispose, onChange } = createStore({
       amount: 20,
     },
   },
-  entriesSettingsSave: {},
+  entriesSettingsSave: {} as any,
   entriesSite: [],
   entriesSiteActive: [],
   entriesSiteCurrentPage: 1,
@@ -170,13 +153,17 @@ onChange('isVisible', (value) => {
   resetScroll(value);
 });
 
-onChange('searchValue', () => {
-  setEntries();
+onChange('searchValue', setEntries);
+onChange('active', setEntries);
+
+onChange('entriesSettingsSave', (value) => {
+  state.entriesSettingsHaveChanged = !equal(value, state.entriesSettingsLoad);
+});
+
+onChange('entriesSettingsLoad', (value) => {
+  state.entriesSettingsHaveChanged = !equal(value, state.entriesSettingsSave);
 });
 
 setActions();
-
-state.entriesSettingsActive = state.entriesSettings;
-state.entriesSettingsSave = state.entriesSettingsLoad;
 
 export { state, dispose, onChange };
