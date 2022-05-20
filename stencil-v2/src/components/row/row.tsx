@@ -52,7 +52,7 @@ export class StreamlineRow {
 
   @Watch('focussed')
   onChangeFocussed(value) {
-    value ? this.button?.focus?.() : this.button?.blur?.();
+    value ? this.button.focus?.() : this.button?.blur?.();
   }
 
   componentWillLoad() {

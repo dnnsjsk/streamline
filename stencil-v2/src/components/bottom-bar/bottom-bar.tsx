@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, h, Host } from '@stencil/core';
 import { state } from '../../store/internal';
+import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter';
 
 @Component({
   tag: 'streamline-bottom-bar',
@@ -8,35 +9,69 @@ import { state } from '../../store/internal';
   shadow: true,
 })
 export class StreamlineBottomBar {
+  private getItems = () => {
+    return [
+      {
+        condition: true,
+        text: 'Current',
+        value:
+          state.active === 'fav'
+            ? 'Favourites'
+            : capitalizeFirstLetter(state.active),
+      },
+      {
+        condition: true,
+        text: 'Entries',
+        value: () => {
+          let amount = 0;
+
+          state[`entries${capitalizeFirstLetter(state.active)}Active`].forEach(
+            (item) => {
+              if (item.type === 'post' || item.type === 'action') {
+                amount += Object.values(item.children).length;
+              }
+              if (item.type === 'menu' || item.type === 'settings') {
+                Object.values(item.children as unknown).forEach((itemInner) => {
+                  amount += Object.values(itemInner.children).length;
+                });
+              }
+            }
+          );
+
+          return amount;
+        },
+      },
+    ];
+  };
+
   render() {
-    const isMultisite = state?.data?.network;
-    const isBottomBar =
-      (state.active === 'post' && state.entriesPostQuery !== '') ||
-      (state.active === 'site' && state.entriesSiteQuery !== '');
+    // const isMultisite = state?.data?.network;
 
     return (
       <Host>
         <div
-          class={`flex h-full w-full items-center border-t border-slate-200 bg-slate-50 bg-slate-50 px-4 text-slate-900`}
+          class={`flex h-full w-full items-center border-t border-slate-200 bg-slate-50 px-4`}
         >
-          <span class={`whitespace-no-wrap flex`}>
-            <span class={`text-[11px]`}>
-              {isMultisite && (
-                <span>
-                  <span class={`font-semibold`}>Current site: </span>
-                  <span>{state.currentSite.path} ∙ </span>
-                  <span class={`font-semibold`}>ID: </span>
-                  <span>{state.currentSite.id}</span>
-                </span>
-              )}
-              {isBottomBar && (
-                <span id="amount">
-                  {isMultisite ? ' ∙ ' : ''}
-                  {state.infoBar.amount}
-                </span>
-              )}
-              {isBottomBar && <span id="pages"> ∙ {state.infoBar.pages}</span>}
-            </span>
+          <span
+            class={`whitespace-no-wrap relative -top-px flex items-center text-[11px]`}
+          >
+            {this.getItems().map((item, index) => {
+              return (
+                item.condition && (
+                  <span class="font-medium text-slate-500">
+                    {item.text}:{' '}
+                    <span class="font-semibold text-slate-700">
+                      {typeof item.value === 'string'
+                        ? item.value
+                        : item.value()}
+                    </span>
+                    {index + 1 !== this.getItems().length && (
+                      <span class="mx-1.5">•</span>
+                    )}
+                  </span>
+                )
+              );
+            })}
           </span>
         </div>
       </Host>

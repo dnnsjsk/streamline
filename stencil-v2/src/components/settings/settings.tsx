@@ -4,6 +4,7 @@ import { state } from '../../store/internal';
 import { isBoolean, isNumber } from 'lodash-es';
 import { isAnimation } from '../../utils/is/isAnimation';
 import { Keys } from '../../elements/Keys';
+import { setEntries } from "../../utils/entries/setEntries";
 
 @Component({
   tag: 'streamline-settings',
@@ -14,6 +15,7 @@ export class StreamlineSettings {
   componentWillLoad() {
     state.entriesSettingsActive = state.entriesSettings;
     state.entriesSettingsSave = state.entriesSettingsLoad;
+    setEntries();
   }
 
   private onChange = (idParent, id, value) => {

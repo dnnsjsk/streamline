@@ -26,25 +26,17 @@ export class StreamlineSearch {
           state.entriesSettingsLoad.keys.search
         ) {
           e.preventDefault();
-          state.isSearchFocus = true;
+          this.input?.focus?.();
         }
       }
+    });
+
+    onChange('isVisible', (value) => {
+      value && this.input?.focus?.();
     });
   }
 
   componentDidRender() {
-    onChange('isVisible', (value) => {
-      value && this.input?.focus?.();
-    });
-    onChange('isSearchFocus', (value) => {
-      if (value) {
-        this.input?.focus?.();
-        state.focusIndex = -1;
-      } else {
-        this.input?.blur?.();
-      }
-    });
-
     this.input?.focus?.();
   }
 
@@ -60,17 +52,18 @@ export class StreamlineSearch {
         <input
           ref={(el) => (this.input = el as HTMLInputElement)}
           id="search"
-          class="m-0 h-full w-full w-full bg-transparent p-0 px-9 text-base font-normal text-slate-900 placeholder-slate-500 focus:outline-none lg:px-12"
+          class="peer m-0 h-full w-full w-full bg-transparent p-0 px-9 text-base font-normal text-slate-900 placeholder-slate-500 focus:outline-none lg:px-12"
           type="text"
           autocomplete="off"
           placeholder={state.searchPlaceholder}
           value={state.searchValue}
           onInput={this.onInput}
-          onBlur={() => (state.isSearchFocus = false)}
-          onFocus={() => (state.isSearchFocus = true)}
         />
         <Icon
-          class="absolute left-3 top-1/2 -translate-y-1/2 fill-current text-slate-500 peer-focus:text-blue-600 lg:left-5"
+          class={{
+            'absolute left-3 top-1/2 -translate-y-1/2 fill-current text-slate-500 peer-focus:text-blue-600 lg:left-5':
+              true,
+          }}
           icon={IconSearch}
         />
         {state.isEnter && (

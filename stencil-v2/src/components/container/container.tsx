@@ -119,13 +119,7 @@ export class StreamlineContainer {
           >
             <div class="relative h-full">
               <div class="absolute top-0 grid w-full grid-cols-[1fr,75px] bg-slate-50">
-                <div
-                  class={{
-                    'absolute left-0 bottom-0 z-50 h-px w-full': true,
-                    'bg-slate-200': !state.isSearchFocus,
-                    'bottom-0 h-px bg-blue-500': state.isSearchFocus,
-                  }}
-                />
+                <div class="absolute left-0 bottom-0 z-50 h-px w-full bg-slate-200" />
                 <streamline-search class="block h-14" />
                 {state.isLoading ? (
                   <div class="flex items-center justify-center">

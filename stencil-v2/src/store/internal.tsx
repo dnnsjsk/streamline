@@ -143,7 +143,6 @@ const { state, dispose, onChange } = createStore({
   isEnter: false,
   isLoading: false,
   isMac: navigator.userAgent.indexOf('Mac OS X') !== -1,
-  isSearchFocus: true,
   isVisible: false,
   menus: ['search', 'fav', 'settings'],
   scroll: 0,
@@ -159,6 +158,7 @@ const { state, dispose, onChange } = createStore({
 
 onChange('isVisible', (value) => {
   resetScroll(value);
+  state.focusIndex = -1;
 });
 
 onChange('searchValue', (value) => {
@@ -170,7 +170,6 @@ onChange('searchValue', (value) => {
 
 onChange('active', () => {
   state.focusIndex = -1;
-  state.isSearchFocus = true;
   setEntries();
 });
 
