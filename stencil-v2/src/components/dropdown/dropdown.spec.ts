@@ -20,7 +20,7 @@ describe('streamline-dropdown', () => {
 
   describe('click', () => {
     it('favourites', async () => {
-      await (
+      (
         e().querySelector('ul > li:nth-of-type(2) a') as HTMLAnchorElement
       ).click();
       await page.waitForChanges();
@@ -28,7 +28,7 @@ describe('streamline-dropdown', () => {
     });
 
     it('search', async () => {
-      await (
+      (
         e().querySelector('ul > li:nth-of-type(1) a') as HTMLAnchorElement
       ).click();
       await page.waitForChanges();
@@ -36,7 +36,7 @@ describe('streamline-dropdown', () => {
     });
 
     it('settings', async () => {
-      await (
+      (
         e().querySelector('ul > li:nth-of-type(3) a') as HTMLAnchorElement
       ).click();
       await page.waitForChanges();
@@ -44,7 +44,7 @@ describe('streamline-dropdown', () => {
     });
 
     it('exit', async () => {
-      await (
+      (
         e().querySelector('ul > li:nth-of-type(4) a') as HTMLAnchorElement
       ).click();
       await page.waitForChanges();

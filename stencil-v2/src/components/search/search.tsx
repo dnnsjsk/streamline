@@ -4,6 +4,7 @@ import { onChange, state } from '../../store/internal';
 import { Button } from '../../elements/Button';
 import { Icon } from '../../elements/Icon';
 import IconSearch from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/magnifying-glass.svg';
+import { getMetaKey } from '../../utils/get/getMetaKey';
 
 @Component({
   tag: 'streamline-search',
@@ -16,22 +17,42 @@ export class StreamlineSearch {
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineSearchElement;
 
-  private onInput = (e) => {
-    state.searchValue = e.target.value;
-    state.isLoading = false;
-    state.isEnter = false;
-  };
+  componentWillLoad() {
+    document.addEventListener('keydown', (e) => {
+      if (state.isVisible) {
+        if (
+          e.key === 's' &&
+          getMetaKey(e) &&
+          state.entriesSettingsLoad.keys.search
+        ) {
+          e.preventDefault();
+          state.isSearchFocus = true;
+        }
+      }
+    });
+  }
 
   componentDidRender() {
     onChange('isVisible', (value) => {
       value && this.input?.focus?.();
     });
     onChange('isSearchFocus', (value) => {
-      value && this.input?.focus?.();
+      if (value) {
+        this.input?.focus?.();
+        state.focusIndex = -1;
+      } else {
+        this.input?.blur?.();
+      }
     });
 
     this.input?.focus?.();
   }
+
+  private onInput = (e) => {
+    state.searchValue = e.target.value;
+    state.isLoading = false;
+    state.isEnter = false;
+  };
 
   render() {
     return (

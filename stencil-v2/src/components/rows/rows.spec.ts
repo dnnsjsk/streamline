@@ -3,6 +3,7 @@ import { StreamlineRows } from './rows';
 import { StreamlineRow } from '../row/row';
 import { dispose, state } from '../../store/internal';
 import { setActions } from '../../utils/entries/setActions';
+import { StreamlineHeader } from '../header/header';
 
 const menu = require('../../../../stencil-v2/src/components/container/test/entriesMenu.json');
 const fav = require('../../../../stencil-v2/src/components/container/test/entriesFav.json');
@@ -19,7 +20,7 @@ describe('streamline-rows', () => {
     state.entriesFav = [...fav];
     state.entriesFavActive = [...fav];
     page = await newSpecPage({
-      components: [StreamlineRows, StreamlineRow],
+      components: [StreamlineRows, StreamlineHeader, StreamlineRow],
       html: `<streamline-rows></streamline-rows>`,
     });
   });
@@ -81,16 +82,85 @@ describe('streamline-rows', () => {
 
     describe("when switching active with search value 'de'", () => {
       it('without resetting', async () => {
-        let rows;
         state.searchValue = 'de';
         await page.waitForChanges();
-        rows = e().querySelectorAll('streamline-row').length;
+        let rows = e().querySelectorAll('streamline-row').length;
         await expect(rows).toBe(3);
         state.active = 'fav';
         await page.waitForChanges();
         rows = e().querySelectorAll('streamline-row').length;
         await expect(rows).toBe(1);
       });
+    });
+  });
+
+  describe('sort', () => {
+    beforeEach(async () => {
+      state.isVisible = true;
+      state.active = 'fav';
+      await page.waitForChanges();
+    });
+
+    it('in normal order', async () => {
+      const entries = Object.values(
+        state.entriesFav[0].children as unknown
+      ).map((item) => item.name);
+      expect(entries.length).toBe(3);
+      expect(entries).toStrictEqual([
+        'Streamline 2.0',
+        'Time to log out',
+        'Developing Streamline',
+      ]);
+    });
+
+    it('in ascending and descending order', async () => {
+      const clickStatus = async () => {
+        (e().querySelector('div[role="button"]') as HTMLButtonElement).click();
+        await page.waitForChanges();
+      };
+      const entriesStatus = () =>
+        Object.values(state.entriesFavActive[0].children as unknown).map(
+          (item) => item.post_status
+        );
+      const clickTitle = async () => {
+        (
+          e().querySelector(
+            'div[role="button"] + div[role="button"]'
+          ) as HTMLButtonElement
+        ).click();
+        await page.waitForChanges();
+      };
+      const entriesTitle = () =>
+        Object.values(state.entriesFavActive[0].children as unknown).map(
+          (item) => item.name
+        );
+      await clickTitle();
+      expect(entriesTitle()).toStrictEqual([
+        'Developing Streamline',
+        'Streamline 2.0',
+        'Time to log out',
+      ]);
+      await clickTitle();
+      expect(entriesTitle()).toStrictEqual([
+        'Time to log out',
+        'Streamline 2.0',
+        'Developing Streamline',
+      ]);
+      await clickStatus();
+      expect(entriesStatus()).toStrictEqual(['future', 'pending', 'private']);
+      await clickStatus();
+      expect(entriesStatus()).toStrictEqual(['private', 'pending', 'future']);
+      e()
+        .querySelector('streamline-header')
+        .shadowRoot.querySelector('button')
+        .click();
+      await page.waitForChanges();
+      expect(entriesTitle()).toStrictEqual([
+        'Streamline 2.0',
+        'Time to log out',
+        'Developing Streamline',
+      ]);
+      expect(entriesStatus()).toStrictEqual(['future', 'private', 'pending']);
     });
   });
 });

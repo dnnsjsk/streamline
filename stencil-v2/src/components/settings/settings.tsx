@@ -11,7 +11,7 @@ import { Keys } from '../../elements/Keys';
   shadow: true,
 })
 export class StreamlineSettings {
-  connectedCallback() {
+  componentWillLoad() {
     state.entriesSettingsActive = state.entriesSettings;
     state.entriesSettingsSave = state.entriesSettingsLoad;
   }

@@ -24,6 +24,8 @@ export namespace Components {
         "item": { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; isMultisite: boolean; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; title: string; type: string; };
     }
     interface StreamlineRow {
+        "disabled": boolean;
+        "focussed": boolean;
         "isFav": boolean;
         "item": { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; type: string; };
         "mb": any;
@@ -121,6 +123,8 @@ declare namespace LocalJSX {
         "item"?: { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; isMultisite: boolean; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; title: string; type: string; };
     }
     interface StreamlineRow {
+        "disabled"?: boolean;
+        "focussed"?: boolean;
         "isFav"?: boolean;
         "item"?: { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; type: string; };
         "mb"?: any;

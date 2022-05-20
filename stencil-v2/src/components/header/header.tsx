@@ -186,7 +186,9 @@ export class StreamlineHeader {
           >
             {[
               {
-                condition: state?.sort?.[this.item.type],
+                condition:
+                  state?.sort?.[this.item.type] &&
+                  Object.values(state?.sort?.[this.item.type]).length >= 1,
                 type: 'transparent',
                 icon: <Icon icon={IconFilterSlash} />,
                 onClick: () => {

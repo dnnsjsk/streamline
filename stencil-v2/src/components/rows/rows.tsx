@@ -14,7 +14,7 @@ export class StreamlineRows {
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineRowsElement;
 
-  connectedCallback() {
+  componentWillLoad() {
     window.addEventListener(
       'resize',
       debounce(() => {
@@ -44,8 +44,7 @@ export class StreamlineRows {
 
   private getArr = (type) => {
     return (
-      (state[`entries${capitalizeFirstLetter(type)}Active`]?.length >=
-        1 &&
+      (state[`entries${capitalizeFirstLetter(type)}Active`]?.length >= 1 &&
         (state[`entries${capitalizeFirstLetter(type)}Active`] ||
           state[`entries${capitalizeFirstLetter(type)}`])) ||
       []
@@ -118,7 +117,7 @@ export class StreamlineRows {
               : [];
 
           return (
-            <div data-entry-section={item.type}>
+            <div>
               <streamline-header item={item}></streamline-header>
               {(item.type === 'post' || item.type === 'site') && (
                 <div
@@ -127,6 +126,21 @@ export class StreamlineRows {
                 >
                   <div class="sl-mx sl-grid border-t border-slate-200">
                     {table.map((itemInner) => {
+                      const sorter = () => {
+                        sort(
+                          {
+                            ...itemInner,
+                            type: item.type,
+                          },
+                          state?.sort?.[item.type]?.id !== itemInner.id
+                            ? 'ascending'
+                            : state?.sort?.[item.type]?.direction ===
+                              'ascending'
+                            ? 'descending'
+                            : 'ascending'
+                        );
+                      };
+
                       return (
                         <div
                           tabindex="0"
@@ -138,20 +152,15 @@ export class StreamlineRows {
                             'pointer-events-none': !itemInner.sort,
                           }}
                           onMouseDown={(e) => e.preventDefault()}
-                          onClick={() =>
-                            sort(
-                              {
-                                ...itemInner,
-                                type: item.type,
-                              },
-                              state?.sort?.[item.type]?.id !== itemInner.id
-                                ? 'ascending'
-                                : state?.sort?.[item.type]?.direction ===
-                                  'ascending'
-                                ? 'descending'
-                                : 'ascending'
-                            )
-                          }
+                          onClick={sorter}
+                          onKeyDown={(e) => {
+                            if (
+                              e.target === this.el.shadowRoot.activeElement &&
+                              e.key === 'Enter'
+                            ) {
+                              sorter();
+                            }
+                          }}
                         >
                           {itemInner.name}
                           <svg
@@ -188,26 +197,27 @@ export class StreamlineRows {
                 }
                 class="overflow-x-auto overflow-y-hidden"
               >
-                {item.children && Object.values(item.children as unknown).map((itemInner) => {
-                  return itemInner.children ? (
-                    <li key={itemInner.name}>
-                      <h2 class="sl-mx pb-2 pt-4 text-sm font-medium text-slate-500">
-                        {itemInner.name}
-                      </h2>
-                      <ul>
-                        {Object.values(itemInner.children as unknown).map(
-                          (itemSub) => {
-                            return (
-                              <streamline-row item={itemSub} table={table} />
-                            );
-                          }
-                        )}
-                      </ul>
-                    </li>
-                  ) : (
-                    <streamline-row item={itemInner} table={table} />
-                  );
-                })}
+                {item.children &&
+                  Object.values(item.children as unknown).map((itemInner) => {
+                    return itemInner.children ? (
+                      <li key={itemInner.name}>
+                        <h2 class="sl-mx pb-2 pt-4 text-sm font-medium text-slate-500">
+                          {itemInner.name}
+                        </h2>
+                        <ul>
+                          {Object.values(itemInner.children as unknown).map(
+                            (itemSub) => {
+                              return (
+                                <streamline-row item={itemSub} table={table} />
+                              );
+                            }
+                          )}
+                        </ul>
+                      </li>
+                    ) : (
+                      <streamline-row item={itemInner} table={table} />
+                    );
+                  })}
               </ul>
             </div>
           );

@@ -68,16 +68,22 @@ const { state, dispose, onChange } = createStore({
               name: 'Entry navigation',
               nameParent: 'Key shortcuts',
               label: 'Navigate between entry items',
-              metaKey: false,
+              keys: ['↑', '↓'],
+            },
+            {
+              id: 'navigationActive',
+              name: 'Tab navigation',
+              nameParent: 'Key shortcuts',
+              label:
+                'Navigate between top-level items (search, favourites, settings)',
               keys: ['Meta', '↑', '↓'],
             },
             {
-              id: 'navigationTabs',
-              name: 'Tab navigation',
+              id: 'search',
+              name: 'Focus search',
               nameParent: 'Key shortcuts',
-              label: 'Navigate between top-level tab items',
-              metaKey: true,
-              keys: ['→', '←'],
+              label: 'Focus the search bar',
+              keys: ['Meta', 's'],
             },
           ],
         },
@@ -113,7 +119,8 @@ const { state, dispose, onChange } = createStore({
   entriesSettingsLoad: {
     keys: {
       navigation: true,
-      navigationTabs: true,
+      navigationActive: true,
+      search: true,
     },
     appearance: {
       animation: true,
@@ -128,6 +135,7 @@ const { state, dispose, onChange } = createStore({
   entriesSiteCurrentPage: 1,
   entriesSiteQuery: '',
   entriesSiteTotal: 0,
+  focusIndex: -1,
   infoBar: {
     pages: 1,
     amount: 1,
@@ -153,8 +161,18 @@ onChange('isVisible', (value) => {
   resetScroll(value);
 });
 
-onChange('searchValue', setEntries);
-onChange('active', setEntries);
+onChange('searchValue', (value) => {
+  if (value === '') {
+    state.focusIndex = -1;
+  }
+  setEntries();
+});
+
+onChange('active', () => {
+  state.focusIndex = -1;
+  state.isSearchFocus = true;
+  setEntries();
+});
 
 onChange('entriesSettingsSave', (value) => {
   state.entriesSettingsHaveChanged = !equal(value, state.entriesSettingsLoad);

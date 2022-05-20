@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import { Component, Element, h, Prop, State } from '@stencil/core';
+import { Component, Element, h, Prop, State, Watch } from '@stencil/core';
 import { state } from '../../store/internal';
 import someDeep from 'deepdash-es/someDeep';
 import { setFavourite } from '../../utils/set/setFavourite';
@@ -12,13 +12,16 @@ import { Icon } from '../../elements/Icon';
 
 @Component({
   tag: 'streamline-row',
-  styleUrl: '../../css/tailwind.scss',
+  styleUrls: ['../../css/tailwind.scss', '../../css/focus.scss'],
   shadow: true,
 })
 export class StreamlineRow {
+  private button: HTMLElement;
+
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineRowElement;
 
+  @Prop({ mutable: true, reflect: true }) disabled = false;
   @Prop() item = {
     ID: 1,
     adminUrl: '',
@@ -33,19 +36,24 @@ export class StreamlineRow {
     tab: '',
     type: '',
   };
-  @Prop() table;
+  @Prop({ mutable: true }) focussed = false;
   @Prop() mb;
+  @Prop() table;
   @Prop({ reflect: true, mutable: true }) isFav = false;
 
   @State() isEdit;
   @State() isAction;
-  @State() isActionInactive;
   @State() isSite;
   @State() isPost;
   @State() isMenu;
   @State() isDropdown;
   @State() isCurrentSite;
   @State() isTable;
+
+  @Watch('focussed')
+  onChangeFocussed(value) {
+    value ? this.button?.focus?.() : this.button?.blur?.();
+  }
 
   componentWillLoad() {
     this.setState();
@@ -59,7 +67,7 @@ export class StreamlineRow {
   private setState = () => {
     this.isEdit = state.entriesEditing?.[this.item.ID]?.active;
     this.isAction = this.item.type === 'action';
-    this.isActionInactive = this.isAction && state.searchValue === '';
+    this.disabled = this.isAction && state.searchValue === '';
     this.isSite = this.item.type === 'site';
     this.isPost = this.item.type === 'post';
     this.isMenu = this.item.type === 'menu' || this.item.type === 'networkMenu';
@@ -306,13 +314,12 @@ export class StreamlineRow {
   render() {
     return (
       <li
-        class={`relative`}
-        data-entry={true}
+        class={`pointer-events-auto relative select-all`}
         data-row={this.item.ID || this.item.guid}
       >
         <a
-          data-focus={!this.isActionInactive && true}
-          tabindex={this.isEdit || this.isActionInactive ? -1 : 0}
+          ref={(el) => (this.button = el as HTMLElement)}
+          tabindex={this.isEdit || this.disabled ? -1 : 0}
           href={this.item.href || this.item.guid}
           class={{
             'sl-px focus-inner focus-white peer relative inline-block flex h-10 w-full cursor-pointer flex-wrap items-center text-sm font-medium text-slate-900 sm:hover:bg-slate-50 sm:hover:text-blue-600':
@@ -320,8 +327,8 @@ export class StreamlineRow {
             'pointer-events-none':
               (this.isCurrentSite && this.isSite) ||
               this.isEdit ||
-              this.isActionInactive,
-            '!text-slate-500': this.isActionInactive,
+              this.disabled,
+            '!text-slate-500': this.disabled,
           }}
           onClick={this.onClick}
           onDblClick={this.onDblClick}
@@ -337,12 +344,14 @@ export class StreamlineRow {
                 <span class={`inline-block scale-50 text-rose-500 sm:scale-75`}>
                   <Icon icon={IconHeart} />
                 </span>
-              ) : !this.isAction && (
-                <span
-                  class={`inline-block scale-50 text-green-600 sm:scale-100`}
-                >
-                  <Icon icon={IconCheck} />
-                </span>
+              ) : (
+                !this.isAction && (
+                  <span
+                    class={`inline-block scale-50 text-green-600 sm:scale-100`}
+                  >
+                    <Icon icon={IconCheck} />
+                  </span>
+                )
               )}
             </span>
           )}

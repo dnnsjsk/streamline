@@ -17,7 +17,7 @@ export class StreamlineContainer {
   @Prop() network: false;
   @Prop() test: false;
 
-  connectedCallback() {
+  componentWillLoad() {
     state.isVisible = this.visible;
 
     if (this.test) {
@@ -31,7 +31,7 @@ export class StreamlineContainer {
       }
 
       if (state.isVisible) {
-        if (state.entriesSettingsLoad.keys.navigation) {
+        if (state.entriesSettingsLoad.keys.navigationActive) {
           if (e.key === 'ArrowUp' && getMetaKey(e)) {
             e.preventDefault();
             this.cycleActive('up');
@@ -147,8 +147,13 @@ export class StreamlineContainer {
                   <streamline-dropdown type="main" />
                 )}
               </div>
-              <streamline-entries class="absolute top-14 h-[calc(100%-56px-24px)] w-full overflow-y-scroll" />
-              <streamline-bottom-bar class="absolute bottom-0 h-6 w-full" />
+              <div
+                tabindex={-1}
+                class="absolute top-14 h-[calc(100%-56px-24px)] w-full overflow-y-scroll"
+              >
+                <streamline-entries />
+              </div>
+              <streamline-bottom-bar class="absolute bottom-0 block h-6 w-full" />
             </div>
           </div>
         </div>
