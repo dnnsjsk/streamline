@@ -13,7 +13,7 @@ export const save = (item, values) => {
 
   const update = () => {
     [
-      'entriesFavourite',
+      'entriesFav',
       'entriesFavActive',
       'entriesPost',
       'entriesPostActive',

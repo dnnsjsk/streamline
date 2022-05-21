@@ -37,6 +37,7 @@ describe('streamline-search', () => {
 
   beforeEach(async () => {
     dispose();
+    state.active = 'search';
     page = await newSpecPage({
       components: [StreamlineSearch],
       html: `<streamline-search></streamline-search>`,

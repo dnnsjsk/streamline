@@ -58,9 +58,9 @@ export class StreamlineEntries {
     }
 
     focusEls.forEach((item) => {
-      item.removeAttribute('focussed');
+      item.removeAttribute('is-focus');
     });
-    (focusEls[state.focusIndex] as HTMLElement).setAttribute('focussed', '');
+    (focusEls[state.focusIndex] as HTMLElement).setAttribute('is-focus', '');
   };
 
   render() {

@@ -15,6 +15,7 @@ describe('streamline-entries', () => {
   beforeEach(async () => {
     dispose();
     setActions();
+    state.active = 'search';
     state.entriesSearch = [...state.entriesActions, ...menu];
     state.entriesSearchActive = [...state.entriesActions, ...menu];
     state.entriesFav = [...fav];

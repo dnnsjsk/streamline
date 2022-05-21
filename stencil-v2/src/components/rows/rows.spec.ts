@@ -17,6 +17,7 @@ describe('streamline-rows', () => {
     dispose();
     setActions();
     state.test = true;
+    state.active = 'search';
     state.entriesSearch = [...menu, ...state.entriesActions];
     state.entriesSearchActive = [...menu, ...state.entriesActions];
     state.entriesFav = [...fav];

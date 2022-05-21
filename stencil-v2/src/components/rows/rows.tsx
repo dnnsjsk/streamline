@@ -18,25 +18,21 @@ export class StreamlineRows {
     window.addEventListener(
       'resize',
       debounce(() => {
-        if (window.innerWidth <= 639 && state.entriesEditing !== {}) {
+        if (window.innerWidth >= 640 && state.drawer.active) {
+          state.drawer = {
+            ...state.drawer,
+            active: false,
+          };
+        }
+        if (
+          window.innerWidth <= 639 &&
+          this.el.shadowRoot.querySelector('streamline-row[is-edit]')
+        ) {
           this.el.shadowRoot
-            .querySelectorAll('streamline-ui-dropdown')
+            .querySelectorAll('streamline-row')
             .forEach((item) => {
-              item.classList.remove('!opacity-100');
+              item.removeAttribute('is-edit');
             });
-          this.el.shadowRoot.querySelectorAll(`[data-row]`).forEach((item) => {
-            const id = item.getAttribute('data-row');
-            item.querySelectorAll('input[data-id]').forEach((itemNested) => {
-              if (state.entriesEditing?.[id]?.active) {
-                (itemNested as HTMLInputElement).value =
-                  state.entriesEditing[id].values[
-                    itemNested.getAttribute('data-id')
-                  ].defaultValue;
-                (itemNested as HTMLInputElement)?.blur?.();
-              }
-            });
-          });
-          state.entriesEditing = {};
         }
       }, 500)
     );

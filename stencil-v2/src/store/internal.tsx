@@ -22,7 +22,7 @@ const { state, dispose, onChange } = createStore({
       route: 'get/sites',
     },
   },
-  active: 'search',
+  active: 'fav',
   bodyStyle: {},
   currentSite: {
     id: 1,
@@ -38,7 +38,6 @@ const { state, dispose, onChange } = createStore({
     values: {},
   },
   entriesActions: [],
-  entriesEditing: {},
   // @ts-ignore
   entriesFav: JSON.parse(window?.streamlineData?.favourites ?? '[]'),
   // @ts-ignore

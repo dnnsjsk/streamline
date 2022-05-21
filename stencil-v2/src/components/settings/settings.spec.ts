@@ -12,6 +12,7 @@ describe('streamline-settings', () => {
   beforeEach(async () => {
     dispose();
     state.test = true;
+    state.active = 'search';
     state.entriesSettings = settings;
     state.entriesSettingsActive = settings;
     state.active = 'settings';

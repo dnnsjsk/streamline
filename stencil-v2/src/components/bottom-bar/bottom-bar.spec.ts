@@ -17,6 +17,7 @@ describe('streamline-bottom-bar', () => {
   beforeEach(async () => {
     dispose();
     setActions();
+    state.active = 'search';
     state.entriesSearch = [...menu, ...state.entriesActions];
     state.entriesSearchActive = [...menu, ...state.entriesActions];
     state.entriesFav = [...fav];

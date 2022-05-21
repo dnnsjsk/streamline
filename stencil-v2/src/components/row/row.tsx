@@ -36,12 +36,12 @@ export class StreamlineRow {
     tab: '',
     type: '',
   };
-  @Prop({ mutable: true }) focussed = false;
   @Prop() mb;
   @Prop() table;
   @Prop({ reflect: true, mutable: true }) isFav = false;
+  @Prop({ reflect: true, mutable: true }) isFocus = false;
+  @Prop({ reflect: true, mutable: true }) isEdit = false;
 
-  @State() isEdit;
   @State() isAction;
   @State() isSite;
   @State() isPost;
@@ -50,9 +50,18 @@ export class StreamlineRow {
   @State() isCurrentSite;
   @State() isTable;
 
-  @Watch('focussed')
-  onChangeFocussed(value) {
+  @State() previousValues;
+
+  @Watch('isFocus')
+  onChangeIsFocus(value) {
     value ? this.button.focus?.() : this.button?.blur?.();
+  }
+
+  @Watch('isEdit')
+  onChangeIsEdit(value) {
+    if (!value) {
+      this.onClickPostsCancel();
+    }
   }
 
   componentWillLoad() {
@@ -62,10 +71,10 @@ export class StreamlineRow {
 
   componentWillUpdate() {
     this.setState();
+    this.checkIfFavourite();
   }
 
   private setState = () => {
-    this.isEdit = state.entriesEditing?.[this.item.ID]?.active;
     this.isAction = this.item.type === 'action';
     this.disabled = this.isAction && state.searchValue === '';
     this.isSite = this.item.type === 'site';
@@ -160,13 +169,10 @@ export class StreamlineRow {
 
   private onClickPostsEditToggle = (edit) => {
     const isSaveable = () => {
-      const inputs = this.el.shadowRoot.querySelectorAll(
-        `[data-row="${this.item.ID}"] input`
-      );
+      const inputs = this.el.shadowRoot.querySelectorAll('input[data-edit]');
 
-      // @ts-ignore
       for (const input of inputs)
-        if ((input as HTMLInputElement).value !== '') return false;
+        if ((input as HTMLInputElement).value === '') return false;
 
       return true;
     };
@@ -175,29 +181,21 @@ export class StreamlineRow {
       return false;
     }
 
-    state.entriesEditing = {
-      ...state.entriesEditing,
-      [this.item.ID]: {
-        ...state.entriesEditing?.[this.item.ID],
-        values: Object.fromEntries(
-          [
-            // @ts-ignore
-            ...this.el.shadowRoot.querySelectorAll(
-              `[data-row="${this.item.ID}"] input[data-id]`
-            ),
-          ].map((item) => [
-            [item.getAttribute('data-id')],
-            {
-              defaultValue: (item as HTMLInputElement).value,
-            },
-          ])
-        ),
-        active: edit,
-      },
-    };
+    this.previousValues = Object.fromEntries(
+      [
+        // @ts-ignore
+        ...this.el.shadowRoot.querySelectorAll('input[data-edit]'),
+      ].map((item) => [
+        [item.getAttribute('data-id')],
+        {
+          defaultValue: (item as HTMLInputElement).value,
+        },
+      ])
+    );
+    this.isEdit = true;
 
     const dropdownButton = this.el.shadowRoot.querySelector(
-      `[data-row="${this.item.ID}"] streamline-ui-dropdown`
+      'streamline-dropdown'
     );
 
     if (edit) {
@@ -207,44 +205,36 @@ export class StreamlineRow {
 
       const values = {};
       this.el.shadowRoot
-        .querySelectorAll(`[data-row="${this.item.ID}"] input[data-id]`)
+        .querySelectorAll(`input[data-id]`)
         .forEach((itemNested) => {
           const key = itemNested.getAttribute('data-id');
           values[key] = (itemNested as HTMLInputElement).value;
         });
 
       save(this.item, values);
+      this.isEdit = false;
     }
 
     this.el.shadowRoot
-      .querySelectorAll(`[data-row="${this.item.ID}"] input`)
+      .querySelectorAll('input')
       .forEach((item) => (item as HTMLInputElement)?.blur?.());
   };
 
   private onClickPostsCancel = () => {
     const dropdownButton = this.el.shadowRoot.querySelector(
-      `[data-row="${this.item.ID}"] streamline-ui-dropdown`
+      'streamline-dropdown'
     );
 
-    state.entriesEditing = {
-      ...state.entriesEditing,
-      [this.item.ID]: {
-        ...state.entriesEditing?.[this.item.ID],
-        active: false,
-      },
-    };
-
     this.el.shadowRoot
-      .querySelectorAll(`[data-row="${this.item.ID}"] input[data-id]`)
+      .querySelectorAll('input[data-edit]')
       .forEach((itemNested) => {
         (itemNested as HTMLInputElement).value =
-          state.entriesEditing[this.item.ID].values[
-            itemNested.getAttribute('data-id')
-          ].defaultValue;
+          this.previousValues[itemNested.getAttribute('data-id')].defaultValue;
         (itemNested as HTMLInputElement)?.blur?.();
       });
 
     dropdownButton.classList.remove('!opacity-100');
+    this.isEdit = false;
   };
 
   private onClick = (e) =>
@@ -313,10 +303,7 @@ export class StreamlineRow {
 
   render() {
     return (
-      <li
-        class={`pointer-events-auto relative select-all`}
-        data-row={this.item.ID || this.item.guid}
-      >
+      <li class={`pointer-events-auto relative select-all`}>
         <a
           ref={(el) => (this.button = el as HTMLElement)}
           tabindex={this.isEdit || this.disabled ? -1 : 0}
@@ -368,6 +355,7 @@ export class StreamlineRow {
                     <input
                       title={this.item[itemNested.id]}
                       data-id={itemNested.id}
+                      data-edit={itemNested.edit}
                       type="text"
                       tabindex={itemNested.edit && this.isEdit ? 0 : -1}
                       disabled={!itemNested.edit && this.isEdit}
@@ -376,7 +364,7 @@ export class StreamlineRow {
                           true,
                         // @ts-ignore
                         '!pointer-events-auto text-green-600 placeholder-rose-600':
-                          this.isEdit && itemNested.edit,
+                          itemNested.edit && this.isEdit,
                       }}
                       value={this.item[itemNested.id]}
                       placeholder="No value"
