@@ -2,38 +2,38 @@ import { newSpecPage, SpecPage } from '@stencil/core/testing';
 import { dispose, state } from '../../store/internal';
 import { StreamlineSearch } from './search';
 
-const focusSearch = async (page, key) => {
-  state.isVisible = true;
-  const eventS = new KeyboardEvent('keydown', {
-    [key]: true,
-    key: 's',
-  });
-  page.doc.dispatchEvent(eventS);
-  await page.waitForChanges();
-  expect(true).toBeTruthy();
-};
-
-const focusSearchNot = async (page, key) => {
-  state.isVisible = true;
-  state.entriesSettingsLoad = {
-    ...state.entriesSettingsLoad,
-    keys: {
-      ...state.entriesSettingsLoad.keys,
-      search: false,
-    },
-  };
-  const eventS = new KeyboardEvent('keydown', {
-    [key]: true,
-    key: 's',
-  });
-  page.doc.dispatchEvent(eventS);
-  await page.waitForChanges();
-  expect(false).toBeFalsy();
-};
-
 describe('streamline-search', () => {
   let page: SpecPage;
   const e = () => page.doc.querySelector('streamline-search').shadowRoot;
+
+  const focusSearch = async (key) => {
+    state.isVisible = true;
+    const eventS = new KeyboardEvent('keydown', {
+      [key]: true,
+      key: 's',
+    });
+    page.doc.dispatchEvent(eventS);
+    await page.waitForChanges();
+    expect(true).toBeTruthy();
+  };
+
+  const focusSearchNot = async (key) => {
+    state.isVisible = true;
+    state.entriesSettingsLoad = {
+      ...state.entriesSettingsLoad,
+      keys: {
+        ...state.entriesSettingsLoad.keys,
+        search: false,
+      },
+    };
+    const eventS = new KeyboardEvent('keydown', {
+      [key]: true,
+      key: 's',
+    });
+    page.doc.dispatchEvent(eventS);
+    await page.waitForChanges();
+    expect(false).toBeFalsy();
+  };
 
   beforeEach(async () => {
     dispose();
@@ -59,11 +59,11 @@ describe('streamline-search', () => {
   describe('key command on', () => {
     describe('windows', () => {
       it('should be activated by key', async () => {
-        await focusSearch(page, 'ctrlKey');
+        await focusSearch('ctrlKey');
       });
 
       it('should not be activated by key', async () => {
-        await focusSearchNot(page, 'ctrlKey');
+        await focusSearchNot('ctrlKey');
       });
     });
 
@@ -74,11 +74,11 @@ describe('streamline-search', () => {
       });
 
       it('should be activated by key', async () => {
-        await focusSearch(page, 'metaKey');
+        await focusSearch('metaKey');
       });
 
       it('should not be activated by key', async () => {
-        await focusSearchNot(page, 'metaKey');
+        await focusSearchNot('metaKey');
       });
     });
   });

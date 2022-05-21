@@ -15,8 +15,8 @@ describe('streamline-entries', () => {
   beforeEach(async () => {
     dispose();
     setActions();
-    state.entriesSearch = [...menu, ...state.entriesActions];
-    state.entriesSearchActive = [...menu, ...state.entriesActions];
+    state.entriesSearch = [...state.entriesActions, ...menu];
+    state.entriesSearchActive = [...state.entriesActions, ...menu];
     state.entriesFav = [...fav];
     state.entriesFavActive = [...fav];
     page = await newSpecPage({

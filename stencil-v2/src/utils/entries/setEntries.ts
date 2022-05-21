@@ -6,8 +6,7 @@ import { sortEntries } from '../sort/sortEntries';
 
 export const setEntries = (removeSort = '') => {
   const result = filterDeep(
-    // eslint-disable-next-line no-self-compare
-    0 !== 0 && state.active === 'post'
+    state.test && state.active === 'post'
       ? [
           {
             ...state.entriesPost[0],

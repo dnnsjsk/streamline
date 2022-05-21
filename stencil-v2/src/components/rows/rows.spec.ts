@@ -4,6 +4,7 @@ import { StreamlineRow } from '../row/row';
 import { dispose, state } from '../../store/internal';
 import { setActions } from '../../utils/entries/setActions';
 import { StreamlineHeader } from '../header/header';
+import { StreamlineDropdown } from '../dropdown/dropdown';
 
 const menu = require('../../../../stencil-v2/src/components/container/test/entriesMenu.json');
 const fav = require('../../../../stencil-v2/src/components/container/test/entriesFav.json');
@@ -15,12 +16,18 @@ describe('streamline-rows', () => {
   beforeEach(async () => {
     dispose();
     setActions();
+    state.test = true;
     state.entriesSearch = [...menu, ...state.entriesActions];
     state.entriesSearchActive = [...menu, ...state.entriesActions];
     state.entriesFav = [...fav];
     state.entriesFavActive = [...fav];
     page = await newSpecPage({
-      components: [StreamlineRows, StreamlineHeader, StreamlineRow],
+      components: [
+        StreamlineRows,
+        StreamlineHeader,
+        StreamlineRow,
+        StreamlineDropdown,
+      ],
       html: `<streamline-rows></streamline-rows>`,
     });
   });
@@ -162,5 +169,71 @@ describe('streamline-rows', () => {
       ]);
       expect(entriesStatus()).toStrictEqual(['future', 'private', 'pending']);
     });
+  });
+
+  // @TODO: Figure out why this is not working properly
+  it('favourites are added in search and then all remove in favourites', async () => {
+    const rows = e().querySelectorAll('streamline-row');
+    let index = -1;
+    for (const item of Array.from(rows) as any) {
+      index++;
+      if (index === 1 || index === 2) {
+        item.shadowRoot
+          .querySelector('streamline-dropdown')
+          .shadowRoot.querySelector('a')
+          .click();
+        await page.waitForChanges();
+      }
+    }
+    state.active = 'fav';
+    await page.waitForChanges();
+    const newRows = e().querySelectorAll('streamline-row');
+    expect(newRows.length).toBe(12);
+    for (const item of Array.from(newRows).reverse() as any) {
+      const index = Array.from(newRows).reverse().indexOf(item);
+      item.shadowRoot
+        .querySelector('streamline-dropdown')
+        .shadowRoot.querySelector('a')
+        .click();
+      await page.waitForChanges();
+      const lengthEntry = e().querySelectorAll('streamline-row').length;
+      if (index === 0) {
+        expect(state.entriesFav.length).toBe(2);
+        expect(lengthEntry).toBe(11);
+      } else if (index === 1) {
+        expect(state.entriesFav.length).toBe(2);
+        expect(lengthEntry).toBe(10);
+      } else if (index === 2) {
+        expect(state.entriesFav.length).toBe(2);
+        expect(lengthEntry).toBe(9);
+      } else if (index === 3) {
+        expect(state.entriesFav.length).toBe(2);
+        expect(lengthEntry).toBe(8);
+      } else if (index === 4) {
+        expect(state.entriesFav.length).toBe(2);
+        expect(lengthEntry).toBe(7);
+      } else if (index === 5) {
+        expect(state.entriesFav.length).toBe(2);
+        expect(lengthEntry).toBe(6);
+      } else if (index === 6) {
+        expect(state.entriesFav.length).toBe(2);
+        expect(lengthEntry).toBe(5);
+      } else if (index === 7) {
+        expect(state.entriesFav.length).toBe(2);
+        expect(lengthEntry).toBe(4);
+      } else if (index === 8) {
+        expect(state.entriesFav.length).toBe(1);
+        expect(lengthEntry).toBe(3);
+      } else if (index === 9) {
+        expect(state.entriesFav.length).toBe(1);
+        expect(lengthEntry).toBe(2);
+      } else if (index === 10) {
+        expect(state.entriesFav.length).toBe(1);
+        expect(lengthEntry).toBe(1);
+      } else if (index === 11) {
+        expect(state.entriesFav.length).toBe(0);
+        expect(lengthEntry).toBe(0);
+      }
+    }
   });
 });
