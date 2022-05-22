@@ -4,6 +4,11 @@ import { StreamlineRow } from './row';
 import { StreamlineRows } from '../rows/rows';
 import { StreamlineHeader } from '../header/header';
 import { StreamlineDropdown } from '../dropdown/dropdown';
+import { StreamlineContainer } from '../container/container';
+import { StreamlineEntries } from '../entries/entries';
+import { StreamlineDrawer } from '../drawer/drawer';
+import { StreamlineInput } from '../input/input';
+import matchMediaPolyfill from 'mq-polyfill';
 
 const menu = require('../../../../stencil-v2/src/components/container/test/entriesMenu.json');
 const fav = require('../../../../stencil-v2/src/components/container/test/entriesFav.json');
@@ -88,6 +93,7 @@ describe('streamline-row', () => {
     });
 
     /*
+    @TODO: not working
     it("don't allow saving if empty inputs", async () => {
       edit().click();
       await page.waitForChanges();
@@ -120,6 +126,106 @@ describe('streamline-row', () => {
       await page.waitForChanges();
       expect(title().value).toBe('test');
       expect(slug().value).toBe('test');
+    });
+
+    describe('on mobile', () => {
+      const row = () =>
+        page.doc
+          .querySelector('streamline-container')
+          .shadowRoot.querySelector('streamline-entries')
+          .shadowRoot.querySelector('streamline-rows')
+          .shadowRoot.querySelector('streamline-row')
+          .shadowRoot.querySelector('a') as HTMLAnchorElement;
+
+      const mobileTitle = () =>
+        page.doc
+          .querySelector('streamline-container')
+          .shadowRoot.querySelector('streamline-drawer')
+          .shadowRoot.querySelector('streamline-input');
+
+      const mobileSlug = () =>
+        page.doc
+          .querySelector('streamline-container')
+          .shadowRoot.querySelector('streamline-drawer')
+          .shadowRoot.querySelector('streamline-input:nth-of-type(2)');
+
+      const drawer = () =>
+        page.doc
+          .querySelector('streamline-container')
+          .shadowRoot.querySelector('streamline-drawer').shadowRoot;
+
+      beforeEach(async () => {
+        page = await newSpecPage({
+          components: [
+            StreamlineContainer,
+            StreamlineDrawer,
+            StreamlineEntries,
+            StreamlineRows,
+            StreamlineHeader,
+            StreamlineRow,
+            StreamlineDropdown,
+            StreamlineInput,
+          ],
+          html: `<streamline-container></streamline-container>`,
+        });
+
+        matchMediaPolyfill(window);
+        window.resizeTo = function resizeTo(width, height) {
+          Object.assign(this, {
+            innerWidth: width,
+            innerHeight: height,
+            outerWidth: width,
+            outerHeight: height,
+          }).dispatchEvent(new this.Event('resize'));
+        };
+
+        window.resizeTo(375, 700);
+
+        row().dispatchEvent(new MouseEvent('dblclick'));
+        await page.waitForChanges();
+      });
+
+      it('opens drawer', async () => {
+        expect(
+          drawer().querySelector('div').classList.contains('opacity-100')
+        ).toBeTruthy();
+      });
+
+      it('shows correct content', async () => {
+        expect(mobileTitle().shadowRoot.querySelector('input').value).toBe(
+          'test'
+        );
+        expect(mobileSlug().shadowRoot.querySelector('input').value).toBe(
+          'test'
+        );
+      });
+
+      it('disables saving in drawer', async () => {
+        const input = mobileTitle().shadowRoot.querySelector('input');
+        input.value = '';
+        input.dispatchEvent(new Event('input'));
+        await page.waitForChanges();
+        expect(
+          drawer().querySelector('button').classList.contains('opacity-50')
+        ).toBeTruthy();
+      });
+
+      /*
+      @TODO: not working
+      it('saves content', async () => {
+        const inputTitle = mobileTitle().shadowRoot.querySelector('input');
+        inputTitle.value = 'drawer test';
+        inputTitle.dispatchEvent(new Event('input'));
+        const inputSlug = mobileSlug().shadowRoot.querySelector('input');
+        inputSlug.value = 'drawer test';
+        inputSlug.dispatchEvent(new Event('input'));
+        const button = drawer().querySelector('button');
+        button.click();
+        await page.waitForChanges();
+        expect(title().value).toBe('drawer test');
+        expect(slug().value).toBe('drawer test');
+      });
+       */
     });
   });
 });

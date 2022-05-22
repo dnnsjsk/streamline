@@ -17,13 +17,9 @@ export class StreamlineInput {
   @Element() el: HTMLStreamlineInputElement;
 
   @Prop() handleInput: Function;
-
   @Prop({ reflect: true, mutable: true }) invalid: boolean;
-
   @Prop() label: string;
-
   @Prop({ reflect: true }) uid: string;
-
   @Prop({ mutable: true }) value: string;
 
   componentDidLoad() {
@@ -54,14 +50,14 @@ export class StreamlineInput {
             placeholder="No value"
             onInput={this.onInput}
             class={{
-              'focus-border peer h-12 w-full truncate border border-slate-300 bg-white px-3 text-base font-medium text-slate-900 placeholder-rose-600 focus:outline-none':
+              'focus-border peer h-12 w-full truncate rounded border border-slate-300 bg-white px-3.5 text-base font-medium text-slate-900 placeholder-rose-600 focus:outline-none':
                 true,
               'border-invalid': this.invalid,
             }}
           />
           <label
             htmlFor={this.uid}
-            class={`pointer-events-none absolute left-1 -top-3 bg-white px-2 py-1 text-xs text-xs font-medium uppercase text-slate-500`}
+            class={`pointer-events-none absolute left-1.5 -top-3 bg-white px-2 py-1 text-xs text-xs font-medium uppercase text-slate-500`}
           >
             {this.label}
           </label>

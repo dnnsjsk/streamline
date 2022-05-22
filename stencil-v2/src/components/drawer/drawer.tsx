@@ -2,6 +2,7 @@
 import { Component, Element, h, Host, State } from '@stencil/core';
 import { Button } from '../../elements/Button';
 import { state } from '../../store/internal';
+import { isSaveable } from '../../utils/is/isSaveable';
 
 /**
  * Drawer.
@@ -46,22 +47,15 @@ export class StreamlineDrawer {
   };
 
   private onInput = () => {
-    const save = () => {
-      this.canSave =
-        this.el.shadowRoot.querySelectorAll('streamline-input[invalid]')
-          .length === 0;
-    };
-    if (state.test) {
-      save();
-    } else {
-      setTimeout(save, 50);
-    }
+    this.canSave = isSaveable(
+      this.el.shadowRoot.querySelectorAll('streamline-input')
+    );
 
     state.drawer = {
       ...state.drawer,
       values: Object.fromEntries(
-        [...this.el.shadowRoot.querySelectorAll(`streamline-input`)].map(
-          (itemNested) => [[itemNested.getAttribute('uid')], itemNested.value]
+        [...this.el.shadowRoot.querySelectorAll('streamline-input')].map(
+          (item) => [[item.getAttribute('uid')], item.value]
         )
       ),
     };
@@ -72,8 +66,8 @@ export class StreamlineDrawer {
       <Host
         class={{
           'absolute top-0 h-full w-full': true,
-          'pointer-events-auto opacity-100': state.drawer.active,
-          'pointer-events-none opacity-0': !state.drawer.active,
+          'pointer-events-auto': state.drawer.active,
+          'pointer-events-none': !state.drawer.active,
         }}
       >
         <div

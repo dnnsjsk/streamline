@@ -156,6 +156,12 @@ const { state, dispose, onChange } = createStore({
 });
 
 onChange('isVisible', (value) => {
+  if (!value) {
+    state.drawer = {
+      ...state.drawer,
+      active: false,
+    };
+  }
   resetScroll(value);
   state.focusIndex = -1;
 });

@@ -6,6 +6,7 @@ import { setFavourite } from '../../utils/set/setFavourite';
 import { get } from '../../utils/query/get';
 import { getMenu } from '../../utils/get/getMenu';
 import { save } from '../../utils/query/save';
+import { isSaveable } from '../../utils/is/isSaveable';
 import IconHeart from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/heart.svg';
 import IconCheck from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/check.svg';
 import { Icon } from '../../elements/Icon';
@@ -168,29 +169,22 @@ export class StreamlineRow {
   };
 
   private onClickPostsEditToggle = (edit) => {
-    const isSaveable = () => {
-      const inputs = this.el.shadowRoot.querySelectorAll('input[data-edit]');
-
-      for (const input of inputs)
-        if ((input as HTMLInputElement).value === '') return false;
-
-      return true;
-    };
-
-    if (!edit && !isSaveable()) {
+    if (
+      !edit &&
+      !isSaveable(this.el.shadowRoot.querySelectorAll('input[data-edit]'))
+    ) {
       return false;
     }
 
     this.previousValues = Object.fromEntries(
-      [
-        // @ts-ignore
-        ...this.el.shadowRoot.querySelectorAll('input[data-edit]'),
-      ].map((item) => [
-        [item.getAttribute('data-id')],
-        {
-          defaultValue: (item as HTMLInputElement).value,
-        },
-      ])
+      [...this.el.shadowRoot.querySelectorAll('input[data-edit]')].map(
+        (item) => [
+          [item.getAttribute('data-id')],
+          {
+            defaultValue: (item as HTMLInputElement).value,
+          },
+        ]
+      )
     );
     this.isEdit = true;
 
@@ -203,15 +197,7 @@ export class StreamlineRow {
     } else {
       dropdownButton.classList.remove('!opacity-100');
 
-      const values = {};
-      this.el.shadowRoot
-        .querySelectorAll(`input[data-id]`)
-        .forEach((itemNested) => {
-          const key = itemNested.getAttribute('data-id');
-          values[key] = (itemNested as HTMLInputElement).value;
-        });
-
-      save(this.item, values);
+      save(this.item, this.getInitialValues());
       this.isEdit = false;
     }
 
@@ -254,7 +240,10 @@ export class StreamlineRow {
         active: true,
         title: `Editing: ${this.item.post_title}`,
         onSave: () => {
-          save(this.item, state.drawer.values);
+          save(this.item, {
+            ...this.getInitialValues(),
+            ...state.drawer.values,
+          });
         },
         items: Object.values(this.table as unknown)
           .map((itemInner) => {
@@ -269,6 +258,17 @@ export class StreamlineRow {
           .filter((x) => x),
       };
     }
+  };
+
+  private getInitialValues = () => {
+    const values = {};
+    this.el.shadowRoot
+      .querySelectorAll(`input[data-id]`)
+      .forEach((itemNested) => {
+        const key = itemNested.getAttribute('data-id');
+        values[key] = (itemNested as HTMLInputElement).value;
+      });
+    return values;
   };
 
   private dropdown() {

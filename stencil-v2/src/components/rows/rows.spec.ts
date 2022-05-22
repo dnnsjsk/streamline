@@ -172,7 +172,9 @@ describe('streamline-rows', () => {
     });
   });
 
-  // @TODO: Figure out why this is not working properly
+  /*
+   @TODO: not working
+   */
   it('favourites are added in search and then all remove in favourites', async () => {
     const rows = e().querySelectorAll('streamline-row');
     let index = -1;
