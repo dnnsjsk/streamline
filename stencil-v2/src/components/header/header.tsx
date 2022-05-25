@@ -19,6 +19,7 @@ import IconArrowRight from '../../../node_modules/@fortawesome/fontawesome-pro/s
 import { post } from '../../utils/query/post';
 import { setEntries } from '../../utils/entries/setEntries';
 import { get } from '../../utils/query/get';
+import { setPages } from '../../utils/set/setPages';
 
 @Component({
   tag: 'streamline-header',
@@ -45,18 +46,28 @@ export class StreamlineHeader {
 
   render() {
     const active = capitalizeFirstLetter(state.active);
-
     const isQuery = this.item.type === 'post' || this.item.type === 'site';
     const isMenu =
       this.item.type === 'menu' || this.item.type === 'networkMenu';
     const isQueryMode = state.active === 'site' || state.active === 'post';
-
     const isQueryWithClose = isQueryMode && state[`entries${active}Query`];
 
     const path =
       this.item.isMultisite && state.active !== 'site'
         ? ` <span class="text-slate-300">∙</span> subsite: ${this.item.path}`
         : '';
+
+    const hasPages =
+      (state.test && isQueryMode) ||
+      (isQueryWithClose &&
+        isQueryMode &&
+        state[`entries${active}Total`] >
+          state.entriesSettingsLoad.query.amount);
+
+    const isTestNav =
+      state.test && (state.active === 'post' || state.active === 'site');
+    const isPagination =
+      isTestNav || (hasPages && isQueryMode && state[`entries${active}Query`]);
 
     return (
       <div class="sl-px flex items-center justify-between">
@@ -196,7 +207,7 @@ export class StreamlineHeader {
                 },
               },
               {
-                condition: false,
+                condition: isPagination,
                 type: 'secondary',
                 icon: <Icon icon={IconArrowLeft} />,
                 disabled: state[`entries${active}CurrentPage`] === 1,
@@ -204,10 +215,12 @@ export class StreamlineHeader {
                 onClick: false,
               },
               {
-                condition: false,
+                condition: isPagination,
                 type: 'secondary',
                 icon: <Icon icon={IconArrowRight} />,
-                disabled: state[`entries${active}CurrentPage`] === 1,
+                disabled:
+                  state[`entries${active}CurrentPage`] ===
+                  state.infoBar.pages.amount,
                 action: 'next',
                 onClick: false,
               },
@@ -234,6 +247,7 @@ export class StreamlineHeader {
                               });
                             } else {
                               setEntries();
+                              setPages();
                             }
                           }
                         : itemInner.onClick

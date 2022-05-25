@@ -3,6 +3,7 @@ import { resetScroll } from '../utils/general/resetScroll';
 import { setEntries } from '../utils/entries/setEntries';
 import { setActions } from '../utils/entries/setActions';
 import equal from 'fast-deep-equal/es6';
+import { setPages } from '../utils/set/setPages';
 
 const { state, dispose, onChange } = createStore({
   actions: {
@@ -22,7 +23,7 @@ const { state, dispose, onChange } = createStore({
       route: 'get/sites',
     },
   },
-  active: 'fav',
+  active: 'search',
   bodyStyle: {},
   currentSite: {
     id: 1,
@@ -136,8 +137,10 @@ const { state, dispose, onChange } = createStore({
   entriesSiteTotal: 0,
   focusIndex: -1,
   infoBar: {
-    pages: 1,
-    amount: 1,
+    pages: {
+      current: 1,
+      amount: 1,
+    },
   },
   isEnter: false,
   isLoading: false,
@@ -156,6 +159,7 @@ const { state, dispose, onChange } = createStore({
 });
 
 onChange('isVisible', (value) => {
+  state.focusIndex = -1;
   if (!value) {
     state.drawer = {
       ...state.drawer,
@@ -163,7 +167,7 @@ onChange('isVisible', (value) => {
     };
   }
   resetScroll(value);
-  state.focusIndex = -1;
+  setPages();
 });
 
 onChange('searchValue', (value) => {
@@ -173,9 +177,12 @@ onChange('searchValue', (value) => {
   setEntries();
 });
 
-onChange('active', () => {
+onChange('active', (value) => {
   state.focusIndex = -1;
   setEntries();
+  if (value === 'post' || value === 'site') {
+    setPages();
+  }
 });
 
 onChange('entriesSettingsSave', (value) => {

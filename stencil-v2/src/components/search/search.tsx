@@ -5,6 +5,7 @@ import { Button } from '../../elements/Button';
 import { Icon } from '../../elements/Icon';
 import IconSearch from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/magnifying-glass.svg';
 import { getMetaKey } from '../../utils/get/getMetaKey';
+import { isAnimation } from '../../utils/is/isAnimation';
 
 @Component({
   tag: 'streamline-search',
@@ -27,6 +28,31 @@ export class StreamlineSearch {
         ) {
           e.preventDefault();
           this.input?.focus?.();
+        }
+
+        if (e.key === 'Enter' && state.isEnter && !state.test) {
+          // this.startQuery();
+        }
+        if (state.searchValue === '' && e.key === 'Backspace') {
+          if (
+            isAnimation() &&
+            state.active !== 'search' &&
+            state.active !== 'settings'
+          ) {
+            const container = document
+              .querySelector('streamline-container')
+              .shadowRoot.querySelector('.inner');
+
+            container.animate(
+              [{ transform: 'scale(0.98)' }, { transform: 'scale(1)' }],
+              {
+                duration: 200,
+                easing: 'cubic-bezier(0.4, 0, 1, 1)',
+              }
+            );
+          }
+
+          state.active = 'search';
         }
       }
     });

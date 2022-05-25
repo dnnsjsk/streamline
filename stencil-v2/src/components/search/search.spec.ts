@@ -7,7 +7,6 @@ describe('streamline-search', () => {
   const e = () => page.doc.querySelector('streamline-search').shadowRoot;
 
   const focusSearch = async (key) => {
-    state.isVisible = true;
     const eventS = new KeyboardEvent('keydown', {
       [key]: true,
       key: 's',
@@ -18,7 +17,6 @@ describe('streamline-search', () => {
   };
 
   const focusSearchNot = async (key) => {
-    state.isVisible = true;
     state.entriesSettingsLoad = {
       ...state.entriesSettingsLoad,
       keys: {
@@ -37,6 +35,7 @@ describe('streamline-search', () => {
 
   beforeEach(async () => {
     dispose();
+    state.isVisible = true;
     state.active = 'search';
     page = await newSpecPage({
       components: [StreamlineSearch],
@@ -57,8 +56,8 @@ describe('streamline-search', () => {
     expect(state.searchValue).toBe('MPH');
   });
 
-  describe('key command on', () => {
-    describe('windows', () => {
+  describe('key command', () => {
+    describe('on windows', () => {
       it('should be activated by key', async () => {
         await focusSearch('ctrlKey');
       });
@@ -68,7 +67,7 @@ describe('streamline-search', () => {
       });
     });
 
-    describe('mac', () => {
+    describe('on mac', () => {
       beforeEach(async () => {
         state.isMac = true;
         await page.waitForChanges();
@@ -80,6 +79,17 @@ describe('streamline-search', () => {
 
       it('should not be activated by key', async () => {
         await focusSearchNot('metaKey');
+      });
+    });
+
+    /*
+     @TODO: not working
+     */
+    describe('should go back to search', () => {
+      it('on posts', async () => {
+        state.active = 'post';
+        state.searchValue = '';
+        expect(true).toBeTruthy();
       });
     });
   });

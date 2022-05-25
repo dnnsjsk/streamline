@@ -37,7 +37,7 @@ export namespace Components {
         "isEdit": boolean;
         "isFav": boolean;
         "isFocus": boolean;
-        "item": { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; type: string; };
+        "item": { active: string; ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; name: string; path: string; post_title: string; route: string; siteId: number; type: string; };
         "mb": any;
         "table": any;
     }
@@ -160,7 +160,7 @@ declare namespace LocalJSX {
         "isEdit"?: boolean;
         "isFav"?: boolean;
         "isFocus"?: boolean;
-        "item"?: { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; type: string; };
+        "item"?: { active: string; ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; name: string; path: string; post_title: string; route: string; siteId: number; type: string; };
         "mb"?: any;
         "table"?: any;
     }

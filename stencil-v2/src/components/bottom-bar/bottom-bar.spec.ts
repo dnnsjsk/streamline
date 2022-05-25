@@ -5,6 +5,7 @@ import { setActions } from '../../utils/entries/setActions';
 
 const menu = require('../../../../stencil-v2/src/components/container/test/entriesMenu.json');
 const fav = require('../../../../stencil-v2/src/components/container/test/entriesFav.json');
+const post = require('../../../../stencil-v2/src/components/container/test/entriesPost.json');
 
 describe('streamline-bottom-bar', () => {
   let page: SpecPage;
@@ -22,6 +23,8 @@ describe('streamline-bottom-bar', () => {
     state.entriesSearchActive = [...menu, ...state.entriesActions];
     state.entriesFav = [...fav];
     state.entriesFavActive = [...fav];
+    state.entriesPost = [...post];
+    state.entriesPostActive = [...post];
     page = await newSpecPage({
       components: [StreamlineBottomBar],
       html: `<streamline-bottom-bar></streamline-bottom-bar>`,
@@ -87,6 +90,21 @@ describe('streamline-bottom-bar', () => {
       state.searchValue = 'en';
       await page.waitForChanges();
       expect(find('2')).toBeTruthy();
+    });
+  });
+
+  describe('post', () => {
+    beforeEach(async () => {
+      state.active = 'post';
+      await page.waitForChanges();
+    });
+
+    it('active', async () => {
+      expect(find('Post')).toBeTruthy();
+    });
+
+    it('pages', async () => {
+      expect(find('1/0')).toBeTruthy();
     });
   });
 });

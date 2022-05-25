@@ -1,7 +1,7 @@
 <!doctype html><html dir="ltr" lang="en"><head> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"> <title>Streamline development</title> <link rel="modulepreload" href="/build/p-6a1f100a.js"><script type="module" src="/build/p-6a1f100a.js" data-stencil data-resources-url="/build/" data-stencil-namespace="streamline"></script> <script nomodule="" src="/build/streamline.js" data-stencil></script> </head> <body> <streamline-container visible="" test=""></streamline-container> <script>
   (async () => {
     await customElements.whenDefined("streamline-container");
-    ["entriesMenu", "entriesFav"].forEach(item => {
+    ["entriesMenu", "entriesFav", "entriesPost"].forEach(item => {
       fetch(`build/test/${item}.json`).then(data => data.json()).then(data => {
         document.querySelector("streamline-container").setState({
           [item]: data

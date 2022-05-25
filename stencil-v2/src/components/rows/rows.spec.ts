@@ -5,9 +5,12 @@ import { dispose, state } from '../../store/internal';
 import { setActions } from '../../utils/entries/setActions';
 import { StreamlineHeader } from '../header/header';
 import { StreamlineDropdown } from '../dropdown/dropdown';
+import { setEntries } from '../../utils/entries/setEntries';
+import { setPages } from '../../utils/set/setPages';
 
 const menu = require('../../../../stencil-v2/src/components/container/test/entriesMenu.json');
 const fav = require('../../../../stencil-v2/src/components/container/test/entriesFav.json');
+const post = require('../../../../stencil-v2/src/components/container/test/entriesPost.json');
 
 describe('streamline-rows', () => {
   let page: SpecPage;
@@ -22,6 +25,8 @@ describe('streamline-rows', () => {
     state.entriesSearchActive = [...menu, ...state.entriesActions];
     state.entriesFav = [...fav];
     state.entriesFavActive = [...fav];
+    state.entriesPost = [...post];
+    state.entriesPostActive = [...post];
     page = await newSpecPage({
       components: [
         StreamlineRows,
@@ -98,6 +103,165 @@ describe('streamline-rows', () => {
         await page.waitForChanges();
         rows = e().querySelectorAll('streamline-row').length;
         await expect(rows).toBe(1);
+      });
+    });
+
+    describe('in posts', () => {
+      const prev = () =>
+        e()
+          .querySelector('streamline-header')
+          .shadowRoot.querySelector('button') as HTMLButtonElement;
+      const next = () =>
+        e()
+          .querySelector('streamline-header')
+          .shadowRoot.querySelector('button + button') as HTMLButtonElement;
+
+      beforeEach(async () => {
+        state.active = 'post';
+        await page.waitForChanges();
+      });
+
+      describe('with amount set to 20', () => {
+        it('render', async () => {
+          const rows = e().querySelectorAll('streamline-row').length;
+          await expect(rows).toBe(20);
+        });
+
+        it('show correct page amount', async () => {
+          await expect(state.infoBar.pages.amount).toBe(26);
+        });
+
+        it("when search is 'd'", async () => {
+          state.searchValue = 'd';
+          await page.waitForChanges();
+          const rows = e().querySelectorAll('streamline-row').length;
+          await expect(rows).toBe(12);
+        });
+
+        it('navigating to end', async () => {
+          expect(prev().classList.contains('opacity-50')).toBe(true);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(2);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(3);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(4);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(5);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(6);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(7);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(8);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(9);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(10);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(11);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(12);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(13);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(14);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(15);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(16);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(17);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(18);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(19);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(20);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(21);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(22);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(23);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(24);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(25);
+          prev().click();
+          expect(state.infoBar.pages.current).toBe(24);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(25);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(26);
+          await page.waitForChanges();
+          expect(next().classList.contains('opacity-50')).toBe(true);
+          expect(prev().classList.contains('opacity-50')).toBe(false);
+        });
+      });
+
+      describe('with amount set to 20', () => {
+        beforeEach(async () => {
+          state.entriesSettingsLoad = {
+            ...state.entriesSettingsLoad,
+            ...{
+              query: {
+                ...state.entriesSettingsLoad.query,
+                amount: 40,
+              },
+            },
+          };
+          setEntries();
+          setPages();
+          await page.waitForChanges();
+        });
+
+        it('render', async () => {
+          const rows = e().querySelectorAll('streamline-row').length;
+          await expect(rows).toBe(40);
+        });
+
+        it('show correct page amount', async () => {
+          await expect(state.infoBar.pages.amount).toBe(13);
+        });
+
+        it("when search is 'd'", async () => {
+          state.searchValue = 'd';
+          await page.waitForChanges();
+          const rows = e().querySelectorAll('streamline-row').length;
+          await expect(rows).toBe(25);
+        });
+
+        it('navigating to end', async () => {
+          expect(prev().classList.contains('opacity-50')).toBe(true);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(2);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(3);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(4);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(5);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(6);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(7);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(8);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(9);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(10);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(11);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(12);
+          next().click();
+          expect(state.infoBar.pages.current).toBe(13);
+          await page.waitForChanges();
+          expect(next().classList.contains('opacity-50')).toBe(true);
+          expect(prev().classList.contains('opacity-50')).toBe(false);
+        });
       });
     });
   });

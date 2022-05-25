@@ -41,6 +41,14 @@ export class StreamlineBottomBar {
           return amount;
         },
       },
+      {
+        condition:
+          state.active !== 'search' &&
+          state.active !== 'fav' &&
+          state.active !== 'settings',
+        text: 'Pages',
+        value: `${state.infoBar.pages.current}/${state.infoBar.pages.amount}`,
+      },
     ];
   };
 
@@ -55,9 +63,10 @@ export class StreamlineBottomBar {
           <span
             class={`whitespace-no-wrap relative -top-px flex items-center text-[11px]`}
           >
-            {this.getItems().map((item, index) => {
-              return (
-                item.condition && (
+            {this.getItems()
+              .filter((e) => e.condition)
+              .map((item, index) => {
+                return (
                   <span class="font-medium text-slate-500">
                     {item.text}:{' '}
                     <span class="font-semibold text-slate-700">
@@ -65,13 +74,13 @@ export class StreamlineBottomBar {
                         ? item.value
                         : item.value()}
                     </span>
-                    {index + 1 !== this.getItems().length && (
+                    {index + 1 !==
+                      this.getItems().filter((e) => e.condition).length && (
                       <span class="mx-1.5">•</span>
                     )}
                   </span>
-                )
-              );
-            })}
+                );
+              })}
           </span>
         </div>
       </Host>

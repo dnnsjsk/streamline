@@ -24,6 +24,7 @@ export class StreamlineRow {
 
   @Prop({ mutable: true, reflect: true }) disabled = false;
   @Prop() item = {
+    active: '',
     ID: 1,
     adminUrl: '',
     guid: '',
@@ -34,7 +35,6 @@ export class StreamlineRow {
     post_title: '',
     route: '',
     siteId: 1,
-    tab: '',
     type: '',
   };
   @Prop() mb;
@@ -137,13 +137,18 @@ export class StreamlineRow {
   };
 
   private onClickAction = () => {
-    get({
-      route: this.item.route,
-      type: this.item.tab,
-      value: state.searchValue,
-      tab: this.item.tab,
-      callback: () => (state.active = this.item.tab),
-    });
+    if (state.test) {
+      state.active = 'post';
+      state.searchValue = '';
+    } else {
+      get({
+        route: this.item.route,
+        type: this.item.active,
+        value: state.searchValue,
+        tab: this.item.active,
+        callback: () => (state.active = this.item.active),
+      });
+    }
   };
 
   private onClickSite = () => {

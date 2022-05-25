@@ -9,6 +9,7 @@ import { StreamlineEntries } from '../entries/entries';
 import { StreamlineDrawer } from '../drawer/drawer';
 import { StreamlineInput } from '../input/input';
 import matchMediaPolyfill from 'mq-polyfill';
+import { setActions } from '../../utils/entries/setActions';
 
 const menu = require('../../../../stencil-v2/src/components/container/test/entriesMenu.json');
 const fav = require('../../../../stencil-v2/src/components/container/test/entriesFav.json');
@@ -22,10 +23,11 @@ describe('streamline-row', () => {
 
   beforeEach(async () => {
     dispose();
+    setActions();
     state.test = true;
     state.active = 'search';
-    state.entriesSearch = [...menu, ...state.entriesActions];
-    state.entriesSearchActive = [...menu, ...state.entriesActions];
+    state.entriesSearch = [...state.entriesActions, ...menu];
+    state.entriesSearchActive = [...state.entriesActions, ...menu];
     state.entriesFav = [...fav];
     state.entriesFavActive = [...fav];
     page = await newSpecPage({
@@ -41,6 +43,17 @@ describe('streamline-row', () => {
 
   it('renders', async () => {
     expect(e()).toBeTruthy();
+  });
+
+  describe('action', () => {
+    const action = () => e().querySelector('a');
+
+    it('fires for post', async () => {
+      state.searchValue = 'en';
+      action().click();
+      await page.waitForChanges();
+      expect(state.active).toBe('post');
+    });
   });
 
   describe('edit', () => {
