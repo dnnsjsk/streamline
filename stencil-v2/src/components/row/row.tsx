@@ -25,7 +25,7 @@ export class StreamlineRow {
   @Prop({ mutable: true, reflect: true }) disabled = false;
   @Prop() item = {
     active: '',
-    ID: 1,
+    ID: '1',
     adminUrl: '',
     guid: '',
     href: '',
@@ -34,11 +34,12 @@ export class StreamlineRow {
     path: '',
     post_title: '',
     route: '',
-    siteId: 1,
+    siteId: '1',
     type: '',
   };
   @Prop() mb;
   @Prop() table;
+  @Prop({ reflect: true, mutable: true }) isCurrentSite = false;
   @Prop({ reflect: true, mutable: true }) isFav = false;
   @Prop({ reflect: true, mutable: true }) isFocus = false;
   @Prop({ reflect: true, mutable: true }) isEdit = false;
@@ -48,7 +49,6 @@ export class StreamlineRow {
   @State() isPost;
   @State() isMenu;
   @State() isDropdown;
-  @State() isCurrentSite;
   @State() isTable;
 
   @State() previousValues;
@@ -82,8 +82,7 @@ export class StreamlineRow {
     this.isPost = this.item.type === 'post';
     this.isMenu = this.item.type === 'menu' || this.item.type === 'networkMenu';
     this.isDropdown = this.isPost || this.isMenu;
-    this.isCurrentSite =
-      this.item.siteId === parseInt(String(state.currentSite.id));
+    this.isCurrentSite = Number(this.item.siteId) === state.currentSite.id;
     this.isTable = this.isSite || this.isPost;
   };
 
@@ -138,7 +137,7 @@ export class StreamlineRow {
 
   private onClickAction = () => {
     if (state.test) {
-      state.active = 'post';
+      state.active = this.item.active;
       state.searchValue = '';
     } else {
       get({
@@ -154,7 +153,7 @@ export class StreamlineRow {
   private onClickSite = () => {
     state.currentSite = {
       path: this.item.path,
-      id: this.item.siteId,
+      id: Number(this.item.siteId),
     };
 
     state.entriesPost = [];
@@ -337,7 +336,7 @@ export class StreamlineRow {
                   <Icon icon={IconHeart} />
                 </span>
               ) : (
-                !this.isAction && (
+                this.isCurrentSite && (
                   <span
                     class={`inline-block scale-50 text-green-600 sm:scale-100`}
                   >

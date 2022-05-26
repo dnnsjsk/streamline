@@ -27,10 +27,18 @@ export class StreamlineBottomBar {
 
           state[`entries${capitalizeFirstLetter(state.active)}Active`].forEach(
             (item) => {
-              if (item.type === 'post' || item.type === 'action') {
+              if (
+                item.type === 'post' ||
+                item.type === 'site' ||
+                item.type === 'action'
+              ) {
                 amount += Object.values(item.children).length;
               }
-              if (item.type === 'menu' || item.type === 'settings') {
+              if (
+                item.type === 'menu' ||
+                item.type === 'networkMenu' ||
+                item.type === 'settings'
+              ) {
                 Object.values(item.children as unknown).forEach((itemInner) => {
                   amount += Object.values(itemInner.children).length;
                 });

@@ -9,7 +9,6 @@ export namespace Components {
     interface StreamlineBottomBar {
     }
     interface StreamlineContainer {
-        "network": false;
         "setState": (data: any) => Promise<unknown>;
         "test": false;
         "visible": false;
@@ -34,10 +33,11 @@ export namespace Components {
     }
     interface StreamlineRow {
         "disabled": boolean;
+        "isCurrentSite": boolean;
         "isEdit": boolean;
         "isFav": boolean;
         "isFocus": boolean;
-        "item": { active: string; ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; name: string; path: string; post_title: string; route: string; siteId: number; type: string; };
+        "item": { active: string; ID: string; adminUrl: string; guid: string; href: string; hrefEdit: string; name: string; path: string; post_title: string; route: string; siteId: string; type: string; };
         "mb": any;
         "table": any;
     }
@@ -133,7 +133,6 @@ declare namespace LocalJSX {
     interface StreamlineBottomBar {
     }
     interface StreamlineContainer {
-        "network"?: false;
         "test"?: false;
         "visible"?: false;
     }
@@ -157,10 +156,11 @@ declare namespace LocalJSX {
     }
     interface StreamlineRow {
         "disabled"?: boolean;
+        "isCurrentSite"?: boolean;
         "isEdit"?: boolean;
         "isFav"?: boolean;
         "isFocus"?: boolean;
-        "item"?: { active: string; ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; name: string; path: string; post_title: string; route: string; siteId: number; type: string; };
+        "item"?: { active: string; ID: string; adminUrl: string; guid: string; href: string; hrefEdit: string; name: string; path: string; post_title: string; route: string; siteId: string; type: string; };
         "mb"?: any;
         "table"?: any;
     }

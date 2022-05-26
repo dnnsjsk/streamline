@@ -145,6 +145,8 @@ const { state, dispose, onChange } = createStore({
   isEnter: false,
   isLoading: false,
   isMac: navigator.userAgent.indexOf('Mac OS X') !== -1,
+  // @ts-ignore
+  isMultisite: window?.streamlineData?.network,
   isVisible: false,
   menus: ['search', 'fav', 'settings'],
   scroll: 0,

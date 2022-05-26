@@ -2,7 +2,6 @@
 import { Component, h, Prop } from '@stencil/core';
 import { state } from '../../store/internal';
 import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter';
-import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
 import { Icon } from '../../elements/Icon';
 import { Button } from '../../elements/Button';
 import IconMenu from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/bars.svg';
@@ -67,18 +66,20 @@ export class StreamlineHeader {
     const isTestNav =
       state.test && (state.active === 'post' || state.active === 'site');
     const isPagination =
-      isTestNav || (hasPages && isQueryMode && state[`entries${active}Query`]);
+      (isTestNav ||
+        (hasPages && isQueryMode && state[`entries${active}Query`])) &&
+      state.infoBar.pages.amount !== 1;
 
     return (
-      <div class="sl-px flex items-center justify-between">
-        <div>
+      <div class="sl-px grid grid-cols-[minmax(0,1fr),minmax(0,auto)] items-center justify-between">
+        <div class="w-full">
           <div class={`absolute -left-full top-0 z-[-1] h-full bg-white`} />
           <div class={`flex max-w-full flex-row items-center`}>
             <div
               class={{
                 'relative mr-3 flex w-4 flex-shrink-0 rounded-lg text-blue-600':
                   true,
-                'ml-9': isQueryWithClose,
+                'ml-9': isQueryWithClose || isTestNav,
               }}
             >
               {this.item.type === 'menu' || state.active === 'menu' ? (
@@ -99,23 +100,23 @@ export class StreamlineHeader {
                 this.item.type === undefined && <Icon icon={IconTear} />
               )}
             </div>
-            {isQueryWithClose && (
+            {(isQueryWithClose || isTestNav) && (
               <Button
                 type="back"
                 icon={<Icon icon={IconTimes} />}
                 onClick={() => {
-                  state[`entries${active}CurrentPage`] = 1;
-                  state[`entries${active}Query`] = '';
-                  state[`entries${active}`] = [];
-                  state[`entries${active}Active`] = [];
-                  setSearchPlaceholder();
+                  if (!state.test) {
+                    state[`entries${active}CurrentPage`] = 1;
+                    state[`entries${active}Query`] = '';
+                    state[`entries${active}`] = [];
+                    state[`entries${active}Active`] = [];
+                  }
+                  state.active = 'search';
                 }}
               />
             )}
             <h1
-              class={
-                'mr-6 truncate whitespace-nowrap text-base font-semibold text-slate-900'
-              }
+              class="mr-6 truncate whitespace-nowrap text-base font-semibold text-slate-900"
               innerHTML={`${
                 // eslint-disable-next-line @stencil/strict-boolean-conditions
                 this.item.title

@@ -10,6 +10,7 @@ import { StreamlineDrawer } from '../drawer/drawer';
 import { StreamlineInput } from '../input/input';
 import matchMediaPolyfill from 'mq-polyfill';
 import { setActions } from '../../utils/entries/setActions';
+import { enableMultisite } from '../../utils/test/enableMultisite';
 
 const menu = require('../../../../stencil-v2/src/components/container/test/entriesMenu.json');
 const fav = require('../../../../stencil-v2/src/components/container/test/entriesFav.json');
@@ -46,13 +47,24 @@ describe('streamline-row', () => {
   });
 
   describe('action', () => {
-    const action = () => e().querySelector('a');
-
     it('fires for post', async () => {
       state.searchValue = 'en';
-      action().click();
+      e().querySelector('a').click();
       await page.waitForChanges();
       expect(state.active).toBe('post');
+    });
+
+    it('fires for site', async () => {
+      await enableMultisite(page);
+      state.searchValue = 'test';
+      await page.waitForChanges();
+      page.doc
+        .querySelector('streamline-rows')
+        .shadowRoot.querySelector('streamline-row + streamline-row')
+        .shadowRoot.querySelector('a')
+        .click();
+      await page.waitForChanges();
+      expect(state.active).toBe('site');
     });
   });
 

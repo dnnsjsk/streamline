@@ -12,11 +12,16 @@
   <script nomodule src="/build/streamline.js"></script>
 </head>
 <body>
-<streamline-container visible test></streamline-container>
+<script>
+  window.streamlineData = {
+    network: true,
+  };
+</script>
+<streamline-container visible test multisite></streamline-container>
 <script>
   (async () => {
     await customElements.whenDefined("streamline-container");
-    ["entriesMenu", "entriesFav", "entriesPost"].forEach(item => {
+    ["entriesMenu", "entriesFav", "entriesPost", "entriesSite"].forEach(item => {
       fetch(`build/test/${item}.json`).then(data => data.json()).then(data => {
         document.querySelector("streamline-container").setState({
           [item]: data

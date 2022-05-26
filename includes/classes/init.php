@@ -165,18 +165,6 @@ class Init
         );
         $settings = $settingsOption[0] ?? [];
 
-        $historySiteSearchesOption = get_user_meta(
-            get_current_user_id(),
-            "streamline_search_history_sites"
-        );
-        $historySiteSearches = $historySiteSearchesOption[0] ?? [];
-
-        $historyPostSearchesOption = get_user_meta(
-            get_current_user_id(),
-            "streamline_search_history_posts"
-        );
-        $historyPostSearches = $historyPostSearchesOption[0] ?? [];
-
         foreach ($favs as $fav) {
             if ($fav->type === "menu") {
                 $siteId = $fav->siteId;
@@ -226,8 +214,6 @@ class Init
         echo json_encode([
             "adminUrl" => admin_url(),
             "favourites" => json_encode($favs),
-            "historySearchesPost" => json_encode($historyPostSearches),
-            "historySearchesSite" => json_encode($historySiteSearches),
             "isAdmin" => is_admin(),
             "isNetwork" => is_network_admin(),
             "network" => !is_multisite() ? false : network_admin_url(),

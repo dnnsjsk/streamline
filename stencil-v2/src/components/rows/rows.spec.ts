@@ -7,10 +7,12 @@ import { StreamlineHeader } from '../header/header';
 import { StreamlineDropdown } from '../dropdown/dropdown';
 import { setEntries } from '../../utils/entries/setEntries';
 import { setPages } from '../../utils/set/setPages';
+import { enableMultisite } from '../../utils/test/enableMultisite';
 
 const menu = require('../../../../stencil-v2/src/components/container/test/entriesMenu.json');
 const fav = require('../../../../stencil-v2/src/components/container/test/entriesFav.json');
 const post = require('../../../../stencil-v2/src/components/container/test/entriesPost.json');
+const site = require('../../../../stencil-v2/src/components/container/test/entriesSite.json');
 
 describe('streamline-rows', () => {
   let page: SpecPage;
@@ -27,6 +29,8 @@ describe('streamline-rows', () => {
     state.entriesFavActive = [...fav];
     state.entriesPost = [...post];
     state.entriesPostActive = [...post];
+    state.entriesSite = [...site];
+    state.entriesSiteActive = [...site];
     page = await newSpecPage({
       components: [
         StreamlineRows,
@@ -37,6 +41,15 @@ describe('streamline-rows', () => {
       html: `<streamline-rows></streamline-rows>`,
     });
   });
+
+  const checkBackButton = async () => {
+    e()
+      .querySelector('streamline-header')
+      .shadowRoot.querySelector('button')
+      .click();
+    await page.waitForChanges();
+    await expect(state.active).toBe('search');
+  };
 
   it('renders', async () => {
     expect(e()).toBeTruthy();
@@ -71,6 +84,12 @@ describe('streamline-rows', () => {
           .shadowRoot.querySelector('a')
           .classList.contains('pointer-events-none');
         await expect(row).not.toBeTruthy();
+      });
+
+      it('with multisite', async () => {
+        await enableMultisite(page);
+        const rows = e().querySelectorAll('streamline-row').length;
+        await expect(rows).toBe(65);
       });
     });
 
@@ -110,11 +129,13 @@ describe('streamline-rows', () => {
       const prev = () =>
         e()
           .querySelector('streamline-header')
-          .shadowRoot.querySelector('button') as HTMLButtonElement;
+          .shadowRoot.querySelector('.pagination button') as HTMLButtonElement;
       const next = () =>
         e()
           .querySelector('streamline-header')
-          .shadowRoot.querySelector('button + button') as HTMLButtonElement;
+          .shadowRoot.querySelector(
+            '.pagination button + button'
+          ) as HTMLButtonElement;
 
       beforeEach(async () => {
         state.active = 'post';
@@ -262,6 +283,47 @@ describe('streamline-rows', () => {
           expect(next().classList.contains('opacity-50')).toBe(true);
           expect(prev().classList.contains('opacity-50')).toBe(false);
         });
+
+        it('go back with button', async () => {
+          await checkBackButton();
+        });
+      });
+    });
+
+    describe('in sites', () => {
+      beforeEach(async () => {
+        state.active = 'site';
+        await page.waitForChanges();
+      });
+
+      it('render', async () => {
+        const rows = e().querySelectorAll('streamline-row').length;
+        await expect(rows).toBe(8);
+      });
+
+      it('show current site', async () => {
+        const rows = e().querySelectorAll(
+          'streamline-row[is-current-site]'
+        ).length;
+        await expect(rows).toBe(1);
+      });
+
+      it("when search is 'd'", async () => {
+        state.searchValue = 'd';
+        await page.waitForChanges();
+        const rows = e().querySelectorAll('streamline-row').length;
+        await expect(rows).toBe(2);
+      });
+
+      it("don't show pagination buttons", async () => {
+        const buttons = e()
+          .querySelector('streamline-header')
+          .shadowRoot.querySelectorAll('button').length;
+        await expect(buttons).toBe(1);
+      });
+
+      it('go back with button', async () => {
+        await checkBackButton();
       });
     });
   });

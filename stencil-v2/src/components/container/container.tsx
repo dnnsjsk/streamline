@@ -13,16 +13,15 @@ import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
   assetsDirs: ['test'],
 })
 export class StreamlineContainer {
-  @Prop() visible: false;
-  @Prop() network: false;
   @Prop() test: false;
+  @Prop() visible: false;
 
   componentWillLoad() {
     state.isVisible = this.visible;
 
-    if (this.test) {
-      state.test = true;
-    }
+    ['test'].forEach((item) => {
+      if (this[item]) state[item] = true;
+    });
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'k' && getMetaKey(e)) {
@@ -55,6 +54,11 @@ export class StreamlineContainer {
   private cycleActive = (mode) => {
     const index = state.menus.indexOf(state.active);
     const length = state.menus.length;
+
+    if (index === -1) {
+      state.active = 'search';
+      return;
+    }
 
     if (mode === 'up') {
       if (index === 0) {

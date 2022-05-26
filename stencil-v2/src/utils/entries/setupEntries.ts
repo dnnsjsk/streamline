@@ -8,8 +8,9 @@ export const setupEntries = () => {
     ...state.entriesNetworkMenu,
   ];
 
-  state.entriesFavActive = state.entriesFav;
   state.entriesSearch = search;
   state.entriesSearchActive = search;
+  state.entriesFavActive = state.entriesFav;
+  state.entriesSiteActive = state.entriesSite;
   setEntries();
 };

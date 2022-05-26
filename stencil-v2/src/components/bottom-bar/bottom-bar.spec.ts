@@ -6,6 +6,7 @@ import { setActions } from '../../utils/entries/setActions';
 const menu = require('../../../../stencil-v2/src/components/container/test/entriesMenu.json');
 const fav = require('../../../../stencil-v2/src/components/container/test/entriesFav.json');
 const post = require('../../../../stencil-v2/src/components/container/test/entriesPost.json');
+const site = require('../../../../stencil-v2/src/components/container/test/entriesSite.json');
 
 describe('streamline-bottom-bar', () => {
   let page: SpecPage;
@@ -25,6 +26,8 @@ describe('streamline-bottom-bar', () => {
     state.entriesFavActive = [...fav];
     state.entriesPost = [...post];
     state.entriesPostActive = [...post];
+    state.entriesSite = [...site];
+    state.entriesSiteActive = [...site];
     page = await newSpecPage({
       components: [StreamlineBottomBar],
       html: `<streamline-bottom-bar></streamline-bottom-bar>`,
@@ -42,6 +45,10 @@ describe('streamline-bottom-bar', () => {
 
     it('entries', async () => {
       expect(find('64')).toBeTruthy();
+    });
+
+    it('pages', async () => {
+      expect(find('Pages')).toBeFalsy();
     });
 
     it("entries when search value 'home'", async () => {
@@ -65,6 +72,10 @@ describe('streamline-bottom-bar', () => {
       expect(find('12')).toBeTruthy();
     });
 
+    it('pages', async () => {
+      expect(find('Pages')).toBeFalsy();
+    });
+
     it("entries when search value 'str'", async () => {
       state.searchValue = 'str';
       await page.waitForChanges();
@@ -86,6 +97,10 @@ describe('streamline-bottom-bar', () => {
       expect(find('5')).toBeTruthy();
     });
 
+    it('pages', async () => {
+      expect(find('Pages')).toBeFalsy();
+    });
+
     it("entries when search value 'en'", async () => {
       state.searchValue = 'en';
       await page.waitForChanges();
@@ -104,7 +119,22 @@ describe('streamline-bottom-bar', () => {
     });
 
     it('pages', async () => {
-      expect(find('1/0')).toBeTruthy();
+      expect(find('Pages')).toBeTruthy();
+    });
+  });
+
+  describe('site', () => {
+    beforeEach(async () => {
+      state.active = 'site';
+      await page.waitForChanges();
+    });
+
+    it('active', async () => {
+      expect(find('Site')).toBeTruthy();
+    });
+
+    it('pages', async () => {
+      expect(find('Pages')).toBeTruthy();
     });
   });
 });
