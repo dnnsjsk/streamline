@@ -4,7 +4,7 @@ import { state } from '../../store/internal';
 import { isBoolean, isNumber } from 'lodash-es';
 import { isAnimation } from '../../utils/is/isAnimation';
 import { Keys } from '../../elements/Keys';
-import { setEntries } from "../../utils/entries/setEntries";
+import { setEntries } from '../../utils/entries/setEntries';
 
 @Component({
   tag: 'streamline-settings',

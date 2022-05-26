@@ -4,7 +4,7 @@ import { state } from '../../store/internal';
 import { isAnimation } from '../../utils/is/isAnimation';
 import { setupEntries } from '../../utils/entries/setupEntries';
 import { getMetaKey } from '../../utils/get/getMetaKey';
-import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
+import { getMenu } from '../../utils/get/getMenu';
 
 @Component({
   tag: 'streamline-container',
@@ -48,7 +48,16 @@ export class StreamlineContainer {
         }
       }
     });
-    setSearchPlaceholder();
+
+    if (!state.test) {
+      if (state.data.network && state.entriesNetworkMenu.length === 0) {
+        getMenu({ network: true });
+      }
+
+      if (state.entriesMenu.length === 0) {
+        getMenu({ network: false, adminUrl: state.data.adminUrl });
+      }
+    }
   }
 
   private cycleActive = (mode) => {

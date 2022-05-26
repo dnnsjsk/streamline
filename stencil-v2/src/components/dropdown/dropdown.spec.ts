@@ -8,6 +8,7 @@ describe('streamline-dropdown', () => {
 
   beforeEach(async () => {
     dispose();
+    state.test = true;
     state.active = 'search';
     page = await newSpecPage({
       components: [StreamlineDropdown],

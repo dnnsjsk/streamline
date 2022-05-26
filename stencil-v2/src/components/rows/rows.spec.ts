@@ -48,7 +48,7 @@ describe('streamline-rows', () => {
       .shadowRoot.querySelector('button')
       .click();
     await page.waitForChanges();
-    await expect(state.active).toBe('search');
+    expect(state.active).toBe('search');
   };
 
   it('renders', async () => {
@@ -59,37 +59,37 @@ describe('streamline-rows', () => {
     describe('in search', () => {
       it('render', async () => {
         const rows = e().querySelectorAll('streamline-row').length;
-        await expect(rows).toBe(64);
+        expect(rows).toBe(64);
       });
 
       it('render favourites', async () => {
         const rows = e().querySelectorAll('streamline-row[is-fav]').length;
-        await expect(rows).toBe(9);
+        expect(rows).toBe(9);
       });
 
       it("render when search is 'med'", async () => {
         state.searchValue = 'med';
         await page.waitForChanges();
         const rows = e().querySelectorAll('streamline-row').length;
-        await expect(rows).toBe(4);
+        expect(rows).toBe(4);
       });
 
       it("make post action clickable when search is 'post'", async () => {
         state.searchValue = 'post';
         await page.waitForChanges();
         const rows = e().querySelectorAll('streamline-row').length;
-        await expect(rows).toBe(5);
+        expect(rows).toBe(5);
         const row = e()
           .querySelector('streamline-row')
           .shadowRoot.querySelector('a')
           .classList.contains('pointer-events-none');
-        await expect(row).not.toBeTruthy();
+        expect(row).not.toBeTruthy();
       });
 
       it('with multisite', async () => {
         await enableMultisite(page);
         const rows = e().querySelectorAll('streamline-row').length;
-        await expect(rows).toBe(65);
+        expect(rows).toBe(65);
       });
     });
 
@@ -101,14 +101,14 @@ describe('streamline-rows', () => {
 
       it('render', async () => {
         const rows = e().querySelectorAll('streamline-row').length;
-        await expect(rows).toBe(12);
+        expect(rows).toBe(12);
       });
 
       it("when search is 'd'", async () => {
         state.searchValue = 'd';
         await page.waitForChanges();
         const rows = e().querySelectorAll('streamline-row').length;
-        await expect(rows).toBe(6);
+        expect(rows).toBe(6);
       });
     });
 
@@ -117,11 +117,11 @@ describe('streamline-rows', () => {
         state.searchValue = 'de';
         await page.waitForChanges();
         let rows = e().querySelectorAll('streamline-row').length;
-        await expect(rows).toBe(3);
+        expect(rows).toBe(3);
         state.active = 'fav';
         await page.waitForChanges();
         rows = e().querySelectorAll('streamline-row').length;
-        await expect(rows).toBe(1);
+        expect(rows).toBe(1);
       });
     });
 
@@ -145,18 +145,18 @@ describe('streamline-rows', () => {
       describe('with amount set to 20', () => {
         it('render', async () => {
           const rows = e().querySelectorAll('streamline-row').length;
-          await expect(rows).toBe(20);
+          expect(rows).toBe(20);
         });
 
         it('show correct page amount', async () => {
-          await expect(state.infoBar.pages.amount).toBe(26);
+          expect(state.infoBar.pages.amount).toBe(26);
         });
 
         it("when search is 'd'", async () => {
           state.searchValue = 'd';
           await page.waitForChanges();
           const rows = e().querySelectorAll('streamline-row').length;
-          await expect(rows).toBe(12);
+          expect(rows).toBe(12);
         });
 
         it('navigating to end', async () => {
@@ -239,18 +239,18 @@ describe('streamline-rows', () => {
 
         it('render', async () => {
           const rows = e().querySelectorAll('streamline-row').length;
-          await expect(rows).toBe(40);
+          expect(rows).toBe(40);
         });
 
         it('show correct page amount', async () => {
-          await expect(state.infoBar.pages.amount).toBe(13);
+          expect(state.infoBar.pages.amount).toBe(13);
         });
 
         it("when search is 'd'", async () => {
           state.searchValue = 'd';
           await page.waitForChanges();
           const rows = e().querySelectorAll('streamline-row').length;
-          await expect(rows).toBe(25);
+          expect(rows).toBe(25);
         });
 
         it('navigating to end', async () => {
@@ -298,28 +298,28 @@ describe('streamline-rows', () => {
 
       it('render', async () => {
         const rows = e().querySelectorAll('streamline-row').length;
-        await expect(rows).toBe(8);
+        expect(rows).toBe(8);
       });
 
       it('show current site', async () => {
         const rows = e().querySelectorAll(
           'streamline-row[is-current-site]'
         ).length;
-        await expect(rows).toBe(1);
+        expect(rows).toBe(1);
       });
 
       it("when search is 'd'", async () => {
         state.searchValue = 'd';
         await page.waitForChanges();
         const rows = e().querySelectorAll('streamline-row').length;
-        await expect(rows).toBe(2);
+        expect(rows).toBe(2);
       });
 
       it("don't show pagination buttons", async () => {
         const buttons = e()
           .querySelector('streamline-header')
           .shadowRoot.querySelectorAll('button').length;
-        await expect(buttons).toBe(1);
+        expect(buttons).toBe(1);
       });
 
       it('go back with button', async () => {

@@ -82,7 +82,8 @@ export class StreamlineRow {
     this.isPost = this.item.type === 'post';
     this.isMenu = this.item.type === 'menu' || this.item.type === 'networkMenu';
     this.isDropdown = this.isPost || this.isMenu;
-    this.isCurrentSite = Number(this.item.siteId) === state.currentSite.id;
+    this.isCurrentSite =
+      Number(this.item.siteId) === Number(state.currentSite.id);
     this.isTable = this.isSite || this.isPost;
   };
 
@@ -307,7 +308,12 @@ export class StreamlineRow {
 
   render() {
     return (
-      <li class={`pointer-events-auto relative select-all`}>
+      <li
+        class={{
+          'relative select-all': true,
+          'pointer-events-auto': !state.isLoading,
+        }}
+      >
         <a
           ref={(el) => (this.button = el as HTMLElement)}
           tabindex={this.isEdit || this.disabled ? -1 : 0}

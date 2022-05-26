@@ -8,7 +8,7 @@
 
 * {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-  Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+    Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
   line-height: 1.25;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -20,11 +20,11 @@
 }
 
 .sl-border-b {
-  @apply border-b border-slate-200 border-dotted;
+  @apply border-b border-dotted border-slate-200;
 }
 
 .sl-h2 {
-  @apply text-sm text-black font-medium sm:text-base;
+  @apply text-sm font-medium text-black sm:text-base;
 }
 
 .sl-px {
@@ -36,7 +36,7 @@
 }
 
 .sl-grid {
-  @apply grid grid-flow-col auto-cols-[minmax(150px,1fr)] gap-2;
+  @apply grid auto-cols-[minmax(150px,1fr)] grid-flow-col gap-2;
 }
 
 .focus-none {
@@ -49,7 +49,7 @@
 }
 
 .focus-offset {
-  @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
 }
 
 .focus-within {
@@ -57,16 +57,16 @@
 }
 
 .focus-within-offset {
-  @apply focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500;
+  @apply focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2;
 }
 
 .focus-inner {
-  @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-inset focus:ring-blue-500;
+  @apply focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 focus:ring-offset-2;
 }
 
 .icon {
   svg {
-    @apply w-full h-full;
+    @apply h-full w-full;
   }
 }
 

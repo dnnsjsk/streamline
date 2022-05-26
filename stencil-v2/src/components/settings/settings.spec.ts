@@ -29,16 +29,16 @@ describe('streamline-settings', () => {
   describe('entries', () => {
     it('render entries', async () => {
       const checkboxes = e().querySelectorAll('input[type="checkbox"]').length;
-      await expect(checkboxes).toBe(3);
+      expect(checkboxes).toBe(3);
       const number = e().querySelectorAll('input[type="number"]').length;
-      await expect(number).toBe(1);
+      expect(number).toBe(1);
     });
 
     it("when search is 'en'", async () => {
       state.searchValue = 'en';
       await page.waitForChanges();
       const checkboxes = e().querySelectorAll('input[type="checkbox"]').length;
-      await expect(checkboxes).toBe(2);
+      expect(checkboxes).toBe(2);
     });
   });
 
@@ -49,13 +49,13 @@ describe('streamline-settings', () => {
     input.checked = false;
     input.dispatchEvent(new Event('input'));
     await page.waitForChanges();
-    await expect(state.entriesSettingsHaveChanged).toBe(true);
+    expect(state.entriesSettingsHaveChanged).toBe(true);
   });
 
   it('keys to be visible', async () => {
-    await expect(
-      e().querySelector('.keys').classList.contains('opacity-50')
-    ).toBe(false);
+    expect(e().querySelector('.keys').classList.contains('opacity-50')).toBe(
+      false
+    );
   });
 
   describe('save', () => {
@@ -72,12 +72,12 @@ describe('streamline-settings', () => {
           .shadowRoot.querySelector('button');
       await button().click();
       await page.waitForChanges();
-      await expect(state.entriesSettingsHaveChanged).toBe(false);
-      await expect(state.entriesSettingsLoad.keys.navigation).toBe(false);
-      await expect(button().hasAttribute('disabled')).toBe(true);
-      await expect(
-        e().querySelector('.keys').classList.contains('opacity-50')
-      ).toBe(true);
+      expect(state.entriesSettingsHaveChanged).toBe(false);
+      expect(state.entriesSettingsLoad.keys.navigation).toBe(false);
+      expect(button().hasAttribute('disabled')).toBe(true);
+      expect(e().querySelector('.keys').classList.contains('opacity-50')).toBe(
+        true
+      );
     });
 
     it('number', async () => {
@@ -93,9 +93,9 @@ describe('streamline-settings', () => {
           .shadowRoot.querySelector('button');
       await button().click();
       await page.waitForChanges();
-      await expect(state.entriesSettingsHaveChanged).toBe(false);
-      await expect(state.entriesSettingsLoad.query.amount).toBe(21);
-      await expect(button().hasAttribute('disabled')).toBe(true);
+      expect(state.entriesSettingsHaveChanged).toBe(false);
+      expect(state.entriesSettingsLoad.query.amount).toBe(21);
+      expect(button().hasAttribute('disabled')).toBe(true);
     });
   });
 });

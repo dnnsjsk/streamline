@@ -67,7 +67,13 @@ export class StreamlineDropdown {
               keys:
                 state.active === 'fav'
                   ? ['Meta', '↑']
-                  : state.active === 'settings' && ['Meta', '↓'],
+                  : state.active === 'settings'
+                  ? ['Meta', '↓']
+                  : (state.active === 'post' || state.active === 'site') && [
+                      'Meta',
+                      '↓',
+                      '↑',
+                    ],
             },
             {
               text: 'Favourites',

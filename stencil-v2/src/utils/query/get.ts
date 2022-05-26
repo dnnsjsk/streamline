@@ -37,13 +37,6 @@ export const get = (obj) => {
       }
 
       setSearchPlaceholder();
-      if (obj.value !== state[`entries${current}Query`]) {
-        state[`historySearches${capitalizeFirstLetter(obj.type)}`] = [
-          obj.value,
-          ...state[`historySearches${capitalizeFirstLetter(obj.type)}`],
-        ];
-      }
-
       if (obj.route === 'get/posts' || obj.route === 'get/sites') {
         resetView();
       }

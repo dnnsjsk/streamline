@@ -12,6 +12,11 @@ export class StreamlineBottomBar {
   private getItems = () => {
     return [
       {
+        condition: state?.data?.network,
+        text: 'Site',
+        value: state.currentSite.path,
+      },
+      {
         condition: true,
         text: 'Current',
         value:

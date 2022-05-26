@@ -1,4 +1,4 @@
-import { state } from "../../store/internal";
+import { state } from '../../store/internal';
 
 export const setActions = () => {
   state.entriesActions = [
@@ -22,4 +22,4 @@ export const setActions = () => {
       ),
     },
   ];
-}
+};

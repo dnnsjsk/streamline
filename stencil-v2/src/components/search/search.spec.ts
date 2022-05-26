@@ -35,6 +35,7 @@ describe('streamline-search', () => {
 
   beforeEach(async () => {
     dispose();
+    state.test = true;
     state.isVisible = true;
     state.active = 'search';
     page = await newSpecPage({

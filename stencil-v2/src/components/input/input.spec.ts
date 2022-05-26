@@ -8,6 +8,7 @@ describe('streamline-input', () => {
 
   beforeEach(async () => {
     dispose();
+    state.test = true;
     state.active = 'search';
     page = await newSpecPage({
       components: [StreamlineInput],

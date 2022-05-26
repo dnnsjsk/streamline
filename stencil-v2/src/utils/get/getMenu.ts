@@ -77,11 +77,10 @@ export const getMenu = (obj = {} as any) => {
 
     if (isNetwork) {
       state.entriesNetworkMenu = data;
-      setupEntries();
     } else {
       state.entriesMenu = data;
-      setupEntries();
     }
+    setupEntries();
   }
 
   if (isAdmin && !obj.fetch) {

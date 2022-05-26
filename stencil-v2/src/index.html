@@ -1,34 +1,38 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
-  />
-  <title>Streamline development</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
+    />
+    <title>Streamline development</title>
 
-  <script type="module" src="/build/streamline.esm.js"></script>
-  <script nomodule src="/build/streamline.js"></script>
-</head>
-<body>
-<script>
-  window.streamlineData = {
-    network: true,
-  };
-</script>
-<streamline-container visible test multisite></streamline-container>
-<script>
-  (async () => {
-    await customElements.whenDefined("streamline-container");
-    ["entriesMenu", "entriesFav", "entriesPost", "entriesSite"].forEach(item => {
-      fetch(`build/test/${item}.json`).then(data => data.json()).then(data => {
-        document.querySelector("streamline-container").setState({
-          [item]: data
-        });
-      });
-    });
-  })();
-</script>
-</body>
+    <script type="module" src="/build/streamline.esm.js"></script>
+    <script nomodule src="/build/streamline.js"></script>
+  </head>
+  <body>
+    <script>
+      window.streamlineData = {
+        network: true,
+      };
+    </script>
+    <streamline-container visible test multisite></streamline-container>
+    <script>
+      (async () => {
+        await customElements.whenDefined('streamline-container');
+        ['entriesMenu', 'entriesFav', 'entriesPost', 'entriesSite'].forEach(
+          (item) => {
+            fetch(`build/test/${item}.json`)
+              .then((data) => data.json())
+              .then((data) => {
+                document.querySelector('streamline-container').setState({
+                  [item]: data,
+                });
+              });
+          }
+        );
+      })();
+    </script>
+  </body>
 </html>

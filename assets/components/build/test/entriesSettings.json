@@ -12,10 +12,7 @@
             "nameParent": "Key shortcuts",
             "label": "Navigate between entry items",
             "metaKey": false,
-            "keys": [
-              "↑",
-              "↓"
-            ]
+            "keys": ["↑", "↓"]
           },
           {
             "id": "navigationTabs",
@@ -23,10 +20,7 @@
             "nameParent": "Key shortcuts",
             "label": "Navigate between top-level tab items",
             "metaKey": true,
-            "keys": [
-              "→",
-              "←"
-            ]
+            "keys": ["→", "←"]
           }
         ]
       },

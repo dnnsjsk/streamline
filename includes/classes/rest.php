@@ -129,21 +129,6 @@ class Rest
     }
 
     /**
-     * Update latest searches.
-     *
-     * @date    04/01/2022
-     * @since   1.0.25
-     */
-    function updateSearches($userId, $type, $value)
-    {
-        $key = "streamline_search_history_" . $type;
-        $meta = array_slice(get_user_meta($userId, $key, true) ?: [], -50);
-        $meta[] = $value;
-        delete_user_meta($userId, $key);
-        update_user_meta($userId, $key, $meta);
-    }
-
-    /**
      * /get/sites Endpoint.
      *
      * @date    26/10/2021
@@ -175,9 +160,8 @@ class Rest
         }
 
         $get["children"] = $newArr;
+	    $get["total"] = count($newArr);
         $get["isMultisite"] = is_multisite();
-
-        self::updateSearches($data["userId"], "sites", $data["value"]);
 
         return $get;
     }
@@ -197,7 +181,6 @@ class Rest
             "paged" => $data["page"],
         ];
 
-        $index = -1;
         $newArr = [];
 
         if (is_multisite() && function_exists("switch_to_blog")) {
@@ -207,7 +190,6 @@ class Rest
         $query = new WP_Query($args);
 
         foreach ($query->get_posts() as $post) {
-            $index++;
             $postData = Init::getPostData($post);
             $postData->hrefEdit = base64_encode(get_edit_post_link($post->ID));
             $postData->siteId = $data["siteId"];
@@ -223,10 +205,7 @@ class Rest
         $get["children"] = $newArr;
         $get["isMultisite"] = is_multisite();
         $get["total"] = $query->found_posts;
-
         $get["path"] = $path;
-
-        self::updateSearches($data["userId"], "posts", $data["value"]);
 
         return $get;
     }
@@ -290,7 +269,7 @@ class Rest
     {
         $id = $data["userId"];
 
-        delete_user_meta($id, "streamline_favourites");
+	    delete_user_meta($id, "streamline_favourites");
         delete_user_meta($id, "streamline_settings");
         delete_user_meta($id, "streamline_search_history_sites");
         delete_user_meta($id, "streamline_search_history_posts");

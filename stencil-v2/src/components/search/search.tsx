@@ -6,6 +6,7 @@ import { Icon } from '../../elements/Icon';
 import IconSearch from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/magnifying-glass.svg';
 import { getMetaKey } from '../../utils/get/getMetaKey';
 import { isAnimation } from '../../utils/is/isAnimation';
+import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
 
 @Component({
   tag: 'streamline-search',
@@ -19,6 +20,8 @@ export class StreamlineSearch {
   @Element() el: HTMLStreamlineSearchElement;
 
   componentWillLoad() {
+    setSearchPlaceholder();
+
     document.addEventListener('keydown', (e) => {
       if (state.isVisible) {
         if (
@@ -33,12 +36,14 @@ export class StreamlineSearch {
         if (e.key === 'Enter' && state.isEnter && !state.test) {
           // this.startQuery();
         }
-        if (state.searchValue === '' && e.key === 'Backspace') {
-          if (
-            isAnimation() &&
-            state.active !== 'search' &&
-            state.active !== 'settings'
-          ) {
+        if (
+          e.key === 'Backspace' &&
+          state.searchValue === '' &&
+          state.active !== 'search' &&
+          state.active !== 'settings' &&
+          state.active !== 'fav'
+        ) {
+          if (isAnimation()) {
             const container = document
               .querySelector('streamline-container')
               .shadowRoot.querySelector('.inner');
@@ -77,7 +82,7 @@ export class StreamlineSearch {
       <div class="relative h-full w-full">
         <input
           ref={(el) => (this.input = el as HTMLInputElement)}
-          id="search"
+          id="streamline-search"
           class="peer m-0 h-full w-full w-full bg-transparent p-0 px-9 text-base font-normal text-slate-900 placeholder-slate-500 focus:outline-none lg:px-12"
           type="text"
           autocomplete="off"

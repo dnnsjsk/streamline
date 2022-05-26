@@ -1,5 +1,5 @@
 import { state } from '../../store/internal';
-import { setActions } from "../entries/setActions";
+import { setActions } from '../entries/setActions';
 
 const menu = require('../../../../stencil-v2/src/components/container/test/entriesMenu.json');
 

@@ -1,5 +1,5 @@
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
-import { dispose, state } from "../../store/internal";
+import { dispose, state } from '../../store/internal';
 import { StreamlineHeader } from './header';
 
 describe('streamline-header', () => {
@@ -8,6 +8,7 @@ describe('streamline-header', () => {
 
   beforeEach(async () => {
     dispose();
+    state.test = true;
     state.active = 'search';
     page = await newSpecPage({
       components: [StreamlineHeader],

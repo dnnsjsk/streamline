@@ -8,6 +8,7 @@ describe('streamline-drawer', () => {
 
   beforeEach(async () => {
     dispose();
+    state.test = true;
     state.active = 'search';
     page = await newSpecPage({
       components: [StreamlineDrawer],

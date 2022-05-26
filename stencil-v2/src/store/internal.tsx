@@ -4,6 +4,7 @@ import { setEntries } from '../utils/entries/setEntries';
 import { setActions } from '../utils/entries/setActions';
 import equal from 'fast-deep-equal/es6';
 import { setPages } from '../utils/set/setPages';
+import { setSearchPlaceholder } from '../utils/set/setSearchPlaceholder';
 
 const { state, dispose, onChange } = createStore({
   actions: {
@@ -26,8 +27,10 @@ const { state, dispose, onChange } = createStore({
   active: 'search',
   bodyStyle: {},
   currentSite: {
-    id: 1,
-    path: '/',
+    // @ts-ignore
+    id: window?.streamlineData?.siteId || 1,
+    // @ts-ignore
+    path: window?.streamlineData?.sitePath || '/',
   },
   // @ts-ignore
   data: window.streamlineData,
@@ -181,6 +184,7 @@ onChange('searchValue', (value) => {
 
 onChange('active', (value) => {
   state.focusIndex = -1;
+  setSearchPlaceholder();
   setEntries();
   if (value === 'post' || value === 'site') {
     setPages();
