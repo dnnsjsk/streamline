@@ -83,7 +83,7 @@ export class StreamlineRow {
     this.isMenu = this.item.type === 'menu' || this.item.type === 'networkMenu';
     this.isDropdown = this.isPost || this.isMenu;
     this.isCurrentSite =
-      Number(this.item.siteId) === Number(state.currentSite.id);
+      this.item.siteId === state.currentSite.id && this.isSite;
     this.isTable = this.isSite || this.isPost;
   };
 
@@ -154,7 +154,7 @@ export class StreamlineRow {
   private onClickSite = () => {
     state.currentSite = {
       path: this.item.path,
-      id: Number(this.item.siteId),
+      id: this.item.siteId,
     };
 
     state.entriesPost = [];
@@ -202,7 +202,7 @@ export class StreamlineRow {
     } else {
       dropdownButton.classList.remove('!opacity-100');
 
-      save(this.item, this.getInitialValues());
+      save(this.item, this.getValues());
       this.isEdit = false;
     }
 
@@ -246,7 +246,7 @@ export class StreamlineRow {
         title: `Editing: ${this.item.post_title}`,
         onSave: () => {
           save(this.item, {
-            ...this.getInitialValues(),
+            ...this.getValues(),
             ...state.drawer.values,
           });
         },
@@ -265,7 +265,7 @@ export class StreamlineRow {
     }
   };
 
-  private getInitialValues = () => {
+  private getValues = () => {
     const values = {};
     this.el.shadowRoot
       .querySelectorAll(`input[data-id]`)

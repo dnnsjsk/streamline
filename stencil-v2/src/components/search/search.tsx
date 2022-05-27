@@ -41,7 +41,8 @@ export class StreamlineSearch {
           state.searchValue === '' &&
           state.active !== 'search' &&
           state.active !== 'settings' &&
-          state.active !== 'fav'
+          state.active !== 'fav' &&
+          this.el.shadowRoot.querySelector('input:focus')
         ) {
           if (isAnimation()) {
             const container = document

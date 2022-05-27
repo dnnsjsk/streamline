@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test';
-import { t } from '../utils';
+import { focus, t } from '../utils';
 
+test.describe.configure({ mode: 'parallel' });
 t((item) => {
   test.describe(`${item} Post entries`, () => {
     test.beforeEach(async ({ page }) => {
-      await page.locator('#streamline-search').focus();
+      await focus(page);
     });
 
     test.describe('render with value', () => {

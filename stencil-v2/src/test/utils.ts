@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 
-export const t = (tests) => {
-  const env = ['/account', '/wp-admin'];
+export const t = (tests, adminOnly = false) => {
+  const env = adminOnly ? ['/wp-admin'] : ['/account', '/wp-admin'];
 
   env.forEach((item) => {
     test.beforeEach(async ({ page }) => {
@@ -22,4 +22,12 @@ export const t = (tests) => {
 
     tests(item);
   });
+};
+
+export const focus = async (page) => {
+  await page.click('#streamline-search', {
+    clickCount: 3,
+    delay: 100,
+  });
+  await page.locator('#streamline-search').focus();
 };

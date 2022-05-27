@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { t } from '../utils';
+import { focus, t } from '../utils';
 
+test.describe.configure({ mode: 'parallel' });
 t((item) => {
   test.describe(`${item} Search entries`, () => {
     test.describe('render', () => {
@@ -10,6 +11,7 @@ t((item) => {
       });
 
       test("when searching for 'post'", async ({ page }) => {
+        await focus(page);
         await page.type('#streamline-search', 'post', { delay: 100 });
         await expect(page.locator('streamline-row')).toHaveCount(7);
       });

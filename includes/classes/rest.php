@@ -153,14 +153,14 @@ class Rest
             $obj->domain = $site->domain;
             $obj->name = get_bloginfo("name");
             $obj->path = get_site($id)->path;
-            $obj->siteId = $id;
+            $obj->siteId = strval($id);
             $obj->type = "site";
             $newArr[$index] = $obj;
             restore_current_blog();
         }
 
         $get["children"] = $newArr;
-	    $get["total"] = count($newArr);
+        $get["total"] = count($newArr);
         $get["isMultisite"] = is_multisite();
 
         return $get;
@@ -192,7 +192,7 @@ class Rest
         foreach ($query->get_posts() as $post) {
             $postData = Init::getPostData($post);
             $postData->hrefEdit = base64_encode(get_edit_post_link($post->ID));
-            $postData->siteId = $data["siteId"];
+            $postData->siteId = strval($data["siteId"]);
             $newArr[$post->ID] = $postData;
         }
 
@@ -223,10 +223,10 @@ class Rest
         );
 
         if (is_multisite() && function_exists("switch_to_blog")) {
-            switch_to_blog($data["siteId"]);
+            switch_to_blog($values->siteId);
         }
         wp_update_post([
-            "ID" => $data["postId"],
+            "ID" => $values->postId,
             "post_title" => $values->post_title,
             "post_name" => $values->post_name,
         ]);
@@ -234,7 +234,7 @@ class Rest
             restore_current_blog();
         }
 
-        wp_send_json_success();
+        wp_send_json_success($values);
     }
 
     /**
@@ -269,7 +269,7 @@ class Rest
     {
         $id = $data["userId"];
 
-	    delete_user_meta($id, "streamline_favourites");
+        delete_user_meta($id, "streamline_favourites");
         delete_user_meta($id, "streamline_settings");
         delete_user_meta($id, "streamline_search_history_sites");
         delete_user_meta($id, "streamline_search_history_posts");

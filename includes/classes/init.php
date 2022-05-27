@@ -382,7 +382,7 @@ class Init
     public static function getPostData($post): stdClass
     {
         $obj = new stdClass();
-        $obj->ID = $post->ID;
+        $obj->ID = strval($post->ID);
         $obj->guid = $post->guid;
         $obj->post_name = $post->post_name;
         $obj->post_type = $post->post_type;

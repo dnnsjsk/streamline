@@ -28,7 +28,7 @@ const { state, dispose, onChange } = createStore({
   bodyStyle: {},
   currentSite: {
     // @ts-ignore
-    id: window?.streamlineData?.siteId || 1,
+    id: window?.streamlineData?.siteId || '1',
     // @ts-ignore
     path: window?.streamlineData?.sitePath || '/',
   },

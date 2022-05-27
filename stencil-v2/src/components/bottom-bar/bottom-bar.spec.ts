@@ -77,6 +77,10 @@ describe('streamline-bottom-bar', () => {
       expect(find('Pages')).toBeFalsy();
     });
 
+    it('site', async () => {
+      expect(find('Site:')).not.toBeTruthy();
+    });
+
     it("entries when search value 'str'", async () => {
       state.searchValue = 'str';
       await page.waitForChanges();
@@ -102,6 +106,10 @@ describe('streamline-bottom-bar', () => {
       expect(find('Pages')).toBeFalsy();
     });
 
+    it('site', async () => {
+      expect(find('Site:')).not.toBeTruthy();
+    });
+
     it("entries when search value 'en'", async () => {
       state.searchValue = 'en';
       await page.waitForChanges();
@@ -122,6 +130,10 @@ describe('streamline-bottom-bar', () => {
     it('pages', async () => {
       expect(find('Pages')).toBeTruthy();
     });
+
+    it('site', async () => {
+      expect(find('Site:')).not.toBeTruthy();
+    });
   });
 
   describe('site', () => {
@@ -136,6 +148,10 @@ describe('streamline-bottom-bar', () => {
 
     it('pages', async () => {
       expect(find('Pages')).toBeTruthy();
+    });
+
+    it('site', async () => {
+      expect(find('Site:')).not.toBeTruthy();
     });
   });
 });
