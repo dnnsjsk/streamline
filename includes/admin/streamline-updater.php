@@ -169,7 +169,7 @@ class StreamlinePlugin
      *
      * @since 1.0
      */
-    function sanitize($new)
+    static function sanitize($new)
     {
         $old = get_option(self::$prefix . "license_key");
         if ($old && $old != $new) {
@@ -184,7 +184,7 @@ class StreamlinePlugin
      *
      * @since 1.0
      */
-    function fabrikatLicenseQuery()
+    static function fabrikatLicenseQuery()
     {
         if (wp_verify_nonce($_POST["nonce"], "ajax-nonce")) {
             $license = $_POST["license"]

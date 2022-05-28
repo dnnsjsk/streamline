@@ -21,13 +21,11 @@ Do things faster.
 * Enhancement: prevent sticky header covering up focussed elements
 * Enhancement: render less initial markup
 * Enhancement: replace all AJAX queries with REST calls
-* Enhancement: trigger history entry on pressing Enter
 * Enhancement: turn on background blur by default
 * Fix: enable pagination for sites
-* New: dashboard mode that brings back the classic view and usage
-* New: default mode that hides the sidebar and brings productivity focused enhancements
+* Fix: license activation not working for PHP 8+
+* New: default mode that removes the sidebar and brings productivity focused enhancements
 * New: enhanced look with less visual noise
-* New: extendable search tab
 * New: micro animations (can be turned off in the settings)
 
 = 1.1.5 =
