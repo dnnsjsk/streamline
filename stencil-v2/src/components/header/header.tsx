@@ -18,7 +18,6 @@ import IconArrowRight from '../../../node_modules/@fortawesome/fontawesome-pro/s
 import { post } from '../../utils/query/post';
 import { setEntries } from '../../utils/entries/setEntries';
 import { get } from '../../utils/query/get';
-import { setPages } from '../../utils/set/setPages';
 
 @Component({
   tag: 'streamline-header',
@@ -155,6 +154,7 @@ export class StreamlineHeader {
               condition: state.active === 'settings',
               onClick: () => {
                 state.entriesPostCurrentPage = 1;
+                state.entriesSiteCurrentPage = 1;
 
                 if (!state.test) {
                   post({
@@ -169,6 +169,8 @@ export class StreamlineHeader {
                       ) {
                         state.entriesPost = [];
                         state.entriesPostQuery = '';
+                        state.entriesSite = [];
+                        state.entriesSiteQuery = '';
                       }
                       state.entriesSettingsLoad = state.entriesSettingsSave;
                     },
@@ -235,20 +237,23 @@ export class StreamlineHeader {
                     onClick={
                       itemInner.action === 'prev' || itemInner.action === 'next'
                         ? () => {
-                            state[`entries${active}CurrentPage`] =
-                              itemInner.action === 'next'
-                                ? state[`entries${active}CurrentPage`] + 1
-                                : state[`entries${active}CurrentPage`] - 1;
+                            const paginate = () => {
+                              state[`entries${active}CurrentPage`] =
+                                itemInner.action === 'next'
+                                  ? state[`entries${active}CurrentPage`] + 1
+                                  : state[`entries${active}CurrentPage`] - 1;
+                            };
 
                             if (!state.test) {
                               get({
                                 route: `get/${state.active}s`,
                                 type: state.active,
                                 value: state[`entries${active}Query`],
+                                callback: paginate,
                               });
                             } else {
+                              paginate();
                               setEntries();
-                              setPages();
                             }
                           }
                         : itemInner.onClick

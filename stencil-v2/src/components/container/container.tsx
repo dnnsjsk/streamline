@@ -19,6 +19,29 @@ export class StreamlineContainer {
   componentWillLoad() {
     state.isVisible = this.visible;
 
+    if (
+      state.data?.settings &&
+      Object.values(JSON.parse(state.data?.settings)).length !== 0
+    ) {
+      state.entriesSettings[0].children.forEach((item) => {
+        item.children.forEach((itemInner) => {
+          state.entriesSettingsLoad = {
+            ...state.entriesSettingsLoad,
+            [item.id]: {
+              ...state.entriesSettingsLoad[item.id],
+              [itemInner.id]:
+                (state.test
+                  ? state.entriesSettings
+                  : JSON.parse(state.data.settings))[item.id]?.[itemInner.id] ??
+                state.entriesSettingsLoad[item.id]?.[itemInner.id],
+            },
+          };
+        });
+      });
+    }
+
+    state.entriesSettingsSave = state.entriesSettingsLoad;
+
     ['test'].forEach((item) => {
       if (this[item]) state[item] = true;
     });
@@ -100,6 +123,11 @@ export class StreamlineContainer {
     });
   }
 
+  @Method()
+  async toggle() {
+    state.isVisible = !state.isVisible;
+  }
+
   render() {
     return (
       <Host>
@@ -156,7 +184,7 @@ export class StreamlineContainer {
               </div>
               <div
                 tabindex={-1}
-                class="absolute top-14 h-[calc(100%-56px-24px)] w-full overflow-y-scroll"
+                class="absolute top-14 h-[calc(100%-55px-24px)] w-full scroll-pt-[72px] overflow-y-scroll"
               >
                 <streamline-entries />
               </div>

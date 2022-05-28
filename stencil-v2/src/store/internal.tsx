@@ -3,7 +3,6 @@ import { resetScroll } from '../utils/general/resetScroll';
 import { setEntries } from '../utils/entries/setEntries';
 import { setActions } from '../utils/entries/setActions';
 import equal from 'fast-deep-equal/es6';
-import { setPages } from '../utils/set/setPages';
 import { setSearchPlaceholder } from '../utils/set/setSearchPlaceholder';
 
 const { state, dispose, onChange } = createStore({
@@ -172,23 +171,23 @@ onChange('isVisible', (value) => {
     };
   }
   resetScroll(value);
-  setPages();
 });
 
 onChange('searchValue', (value) => {
+  state.isLoading = false;
+  state.isEnter =
+    (state.active === 'post' || state.active === 'site') &&
+    state.searchValue.trim().length >= 1;
   if (value === '') {
     state.focusIndex = -1;
   }
   setEntries();
 });
 
-onChange('active', (value) => {
+onChange('active', () => {
   state.focusIndex = -1;
   setSearchPlaceholder();
   setEntries();
-  if (value === 'post' || value === 'site') {
-    setPages();
-  }
 });
 
 onChange('entriesSettingsSave', (value) => {

@@ -11,6 +11,7 @@ export namespace Components {
     interface StreamlineContainer {
         "setState": (data: any) => Promise<unknown>;
         "test": false;
+        "toggle": () => Promise<void>;
         "visible": false;
     }
     interface StreamlineDrawer {

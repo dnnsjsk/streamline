@@ -53,4 +53,16 @@ describe('streamline-dropdown', () => {
       expect(state.isVisible).toBe(false);
     });
   });
+
+  it("don't show keys when setting not active", async () => {
+    state.entriesSettingsLoad = {
+      ...state.entriesSettingsLoad,
+      keys: {
+        ...state.entriesSettingsLoad.keys,
+        navigationActive: false,
+      },
+    };
+    await page.waitForChanges();
+    expect(e().querySelector('.key')).toBeFalsy();
+  });
 });

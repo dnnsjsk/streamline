@@ -5,6 +5,8 @@ import { getEntriesSliced } from '../get/getEntriesSliced';
 import { sortEntries } from '../sort/sortEntries';
 
 export const setEntries = (removeSort = '') => {
+  const active = capitalizeFirstLetter(state.active);
+
   const result = filterDeep(
     state.test && state.active === 'post'
       ? [
@@ -15,7 +17,7 @@ export const setEntries = (removeSort = '') => {
               getEntriesSliced(state.entriesPost[0].children),
           },
         ]
-      : state[`entries${capitalizeFirstLetter(state.active)}`],
+      : state[`entries${active}`],
     (o) => {
       return (
         (o.name &&
@@ -30,7 +32,7 @@ export const setEntries = (removeSort = '') => {
     { childrenPath: ['children'] }
   );
 
-  state[`entries${capitalizeFirstLetter(state.active)}Active`] =
+  state[`entries${active}Active`] =
     result?.length >= 1
       ? result
       : [
@@ -44,6 +46,17 @@ export const setEntries = (removeSort = '') => {
                 : state.entriesPostCurrentPath,
           },
         ];
+
+  const isQueryMode = state.active === 'post' || state.active === 'site';
+
+  state.infoBar.pages.current = state[`entries${active}CurrentPage`];
+  state.infoBar.pages.amount = Math.ceil(
+    (state.test && isQueryMode
+      ? state[`entries${active}`]?.[0]?.children &&
+        Object.values(Object.values(state[`entries${active}`]?.[0]?.children))
+          .length
+      : state[`entries${active}Total`]) / state.entriesSettingsLoad.query.amount
+  );
 
   if (removeSort === '') {
     sortEntries();

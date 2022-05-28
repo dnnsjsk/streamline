@@ -164,11 +164,12 @@ export class StreamlineDropdown {
                     >
                       {item.text}
                     </span>
-                    {item.keys && (
-                      <div class="ml-4">
-                        <Keys keys={item.keys} />
-                      </div>
-                    )}
+                    {item.keys &&
+                      state.entriesSettingsLoad.keys.navigationActive && (
+                        <div class="ml-4">
+                          <Keys keys={item.keys} />
+                        </div>
+                      )}
                     {item.href && (
                       <span class="ml-auto pl-3 text-slate-400">
                         <Icon icon={IconLink} />

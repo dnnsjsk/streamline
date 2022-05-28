@@ -57,6 +57,22 @@ describe('streamline-search', () => {
     expect(state.searchValue).toBe('MPH');
   });
 
+  describe('show search button', () => {
+    it('in post', async () => {
+      state.active = 'post';
+      state.searchValue = 't';
+      await page.waitForChanges();
+      expect(e().querySelector('button')).toBeTruthy();
+    });
+
+    it('in site', async () => {
+      state.active = 'site';
+      state.searchValue = 't';
+      await page.waitForChanges();
+      expect(e().querySelector('button')).toBeTruthy();
+    });
+  });
+
   describe('key command', () => {
     describe('on windows', () => {
       it('should be activated by key', async () => {

@@ -4,7 +4,7 @@ const config: PlaywrightTestConfig = {
   testIgnore: 'components/**',
   testMatch: 'test/**/*.ts',
   retries: 3,
-  workers: 8,
+  workers: 4,
 };
 
 export default config;

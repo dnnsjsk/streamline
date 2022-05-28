@@ -6,7 +6,6 @@ import { setActions } from '../../utils/entries/setActions';
 import { StreamlineHeader } from '../header/header';
 import { StreamlineDropdown } from '../dropdown/dropdown';
 import { setEntries } from '../../utils/entries/setEntries';
-import { setPages } from '../../utils/set/setPages';
 import { enableMultisite } from '../../utils/test/enableMultisite';
 
 const menu = require('../../../../stencil-v2/src/components/container/test/entriesMenu.json');
@@ -233,7 +232,6 @@ describe('streamline-rows', () => {
             },
           };
           setEntries();
-          setPages();
           await page.waitForChanges();
         });
 

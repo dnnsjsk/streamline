@@ -23,6 +23,16 @@ Type: `Promise<unknown>`
 
 
 
+### `toggle() => Promise<void>`
+
+
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
 
 ## Dependencies
 

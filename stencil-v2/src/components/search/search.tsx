@@ -7,6 +7,8 @@ import IconSearch from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/
 import { getMetaKey } from '../../utils/get/getMetaKey';
 import { isAnimation } from '../../utils/is/isAnimation';
 import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
+import { get } from '../../utils/query/get';
+import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter';
 
 @Component({
   tag: 'streamline-search',
@@ -34,7 +36,7 @@ export class StreamlineSearch {
         }
 
         if (e.key === 'Enter' && state.isEnter && !state.test) {
-          // this.startQuery();
+          this.startQuery();
         }
         if (
           e.key === 'Backspace' &&
@@ -74,8 +76,17 @@ export class StreamlineSearch {
 
   private onInput = (e) => {
     state.searchValue = e.target.value;
-    state.isLoading = false;
-    state.isEnter = false;
+  };
+
+  private startQuery = () => {
+    if (state.active === 'post' || state.active === 'site') {
+      state[`entries${capitalizeFirstLetter(state.active)}CurrentPage`] = 1;
+      get({
+        route: `get/${state.active}s`,
+        type: state.active,
+        value: state.searchValue,
+      });
+    }
   };
 
   render() {
@@ -103,6 +114,7 @@ export class StreamlineSearch {
             <Button
               type="tertiary"
               text="Search"
+              onClick={this.startQuery}
               icon={
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
