@@ -9,6 +9,7 @@ export namespace Components {
     interface StreamlineBottomBar {
     }
     interface StreamlineContainer {
+        "active": '';
         "setState": (data: any) => Promise<unknown>;
         "test": false;
         "toggle": () => Promise<void>;
@@ -134,6 +135,7 @@ declare namespace LocalJSX {
     interface StreamlineBottomBar {
     }
     interface StreamlineContainer {
+        "active"?: '';
         "test"?: false;
         "visible"?: false;
     }

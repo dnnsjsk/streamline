@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import { Component, h, Host, Prop, Method } from '@stencil/core';
+import { Component, h, Host, Prop, Method, Watch } from '@stencil/core';
 import { state } from '../../store/internal';
 import { isAnimation } from '../../utils/is/isAnimation';
 import { setupEntries } from '../../utils/entries/setupEntries';
@@ -13,8 +13,14 @@ import { getMenu } from '../../utils/get/getMenu';
   assetsDirs: ['test'],
 })
 export class StreamlineContainer {
+  @Prop() active: '';
   @Prop() test: false;
   @Prop() visible: false;
+
+  @Watch('active')
+  watchFront(value) {
+    state.active = value;
+  }
 
   componentWillLoad() {
     state.isVisible = this.visible;

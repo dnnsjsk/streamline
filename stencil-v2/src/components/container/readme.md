@@ -7,6 +7,7 @@
 
 | Property  | Attribute | Description | Type      | Default     |
 | --------- | --------- | ----------- | --------- | ----------- |
+| `active`  | `active`  |             | `""`      | `undefined` |
 | `test`    | `test`    |             | `boolean` | `undefined` |
 | `visible` | `visible` |             | `boolean` | `undefined` |
 
