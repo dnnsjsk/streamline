@@ -2,13 +2,13 @@ import { state } from '../../store/internal';
 import { findDeep } from 'deepdash-es/standalone';
 import { post } from './post';
 import { set } from 'lodash-es';
-import { setEntries } from '../set/setEntries';
+import { setEntries } from '../entries/setEntries';
 
 export const save = (item, values) => {
   const obj = {
     postId: item.ID,
     siteId: item.siteId,
-    values: values,
+    ...values,
   };
 
   const update = () => {
@@ -30,10 +30,11 @@ export const save = (item, values) => {
           }
         );
         if (path) {
-          const currentPath = path.context['_item'].strPath;
-          set(newFavs, `${currentPath}.name`, obj.values['post_title']);
-          set(newFavs, `${currentPath}.post_title`, obj.values['post_title']);
-          set(newFavs, `${currentPath}.post_name`, obj.values['post_name']);
+          // @ts-ignore
+          const currentPath = path.context._item.strPath;
+          set(newFavs, `${currentPath}.name`, obj.post_title);
+          set(newFavs, `${currentPath}.post_title`, obj.post_title);
+          set(newFavs, `${currentPath}.post_name`, obj.post_name);
 
           state[itemNested] = newFavs;
         }

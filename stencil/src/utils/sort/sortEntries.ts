@@ -1,9 +1,9 @@
-import { stateLocal } from '../../store/local';
 import { sort } from './sort';
+import { state } from '../../store/internal';
 
 export const sortEntries = () => {
-  if (stateLocal?.sort?.['post'] || stateLocal?.sort?.['site']) {
-    Object.entries(stateLocal?.sort as unknown).forEach(([key, value]) => {
+  if (state?.sort?.post || state?.sort?.site) {
+    Object.entries(state?.sort as unknown).forEach(([key, value]) => {
       sort(
         {
           id: value.id,

@@ -1,4 +1,3 @@
-import { stateLocal } from '../../store/local';
 import { state } from '../../store/internal';
 import { capitalizeFirstLetter } from '../string/capitalizeFirstLetter';
 
@@ -27,8 +26,8 @@ export const sort = (item, direction = 'ascending', force = false) => {
   state[`entries${capitalizeFirstLetter(state.active)}Active`] = newArr;
 
   if (!force) {
-    stateLocal.sort = {
-      ...stateLocal.sort,
+    state.sort = {
+      ...state.sort,
       [item.type]: {
         id: item.id,
         direction: direction,

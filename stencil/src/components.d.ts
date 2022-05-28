@@ -6,38 +6,74 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface StreamlineBottomBar {
+    }
     interface StreamlineContainer {
-        "mac": boolean;
-        "setState": (data: any) => Promise<void>;
+        "active": '';
+        "setState": (data: any) => Promise<unknown>;
+        "test": false;
         "toggle": () => Promise<void>;
-        "visible": boolean;
+        "visible": false;
     }
-    interface StreamlineEntries {
+    interface StreamlineDrawer {
     }
-    interface StreamlineSearch {
-    }
-    interface StreamlineSidebar {
-    }
-    interface StreamlineUiDrawer {
-    }
-    interface StreamlineUiDropdown {
+    interface StreamlineDropdown {
         "items": any[];
         "type": string;
     }
-    interface StreamlineUiInput {
+    interface StreamlineEntries {
+    }
+    interface StreamlineHeader {
+        "item": { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; isMultisite: boolean; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; title: string; type: string; };
+    }
+    interface StreamlineInput {
         "handleInput": Function;
         "invalid": boolean;
         "label": string;
         "uid": string;
         "value": string;
     }
+    interface StreamlineRow {
+        "disabled": boolean;
+        "isCurrentSite": boolean;
+        "isEdit": boolean;
+        "isFav": boolean;
+        "isFocus": boolean;
+        "item": { active: string; ID: string; adminUrl: string; guid: string; href: string; hrefEdit: string; name: string; path: string; post_title: string; route: string; siteId: string; type: string; };
+        "mb": any;
+        "table": any;
+    }
+    interface StreamlineRows {
+    }
+    interface StreamlineSearch {
+    }
+    interface StreamlineSettings {
+    }
 }
 declare global {
+    interface HTMLStreamlineBottomBarElement extends Components.StreamlineBottomBar, HTMLStencilElement {
+    }
+    var HTMLStreamlineBottomBarElement: {
+        prototype: HTMLStreamlineBottomBarElement;
+        new (): HTMLStreamlineBottomBarElement;
+    };
     interface HTMLStreamlineContainerElement extends Components.StreamlineContainer, HTMLStencilElement {
     }
     var HTMLStreamlineContainerElement: {
         prototype: HTMLStreamlineContainerElement;
         new (): HTMLStreamlineContainerElement;
+    };
+    interface HTMLStreamlineDrawerElement extends Components.StreamlineDrawer, HTMLStencilElement {
+    }
+    var HTMLStreamlineDrawerElement: {
+        prototype: HTMLStreamlineDrawerElement;
+        new (): HTMLStreamlineDrawerElement;
+    };
+    interface HTMLStreamlineDropdownElement extends Components.StreamlineDropdown, HTMLStencilElement {
+    }
+    var HTMLStreamlineDropdownElement: {
+        prototype: HTMLStreamlineDropdownElement;
+        new (): HTMLStreamlineDropdownElement;
     };
     interface HTMLStreamlineEntriesElement extends Components.StreamlineEntries, HTMLStencilElement {
     }
@@ -45,91 +81,127 @@ declare global {
         prototype: HTMLStreamlineEntriesElement;
         new (): HTMLStreamlineEntriesElement;
     };
+    interface HTMLStreamlineHeaderElement extends Components.StreamlineHeader, HTMLStencilElement {
+    }
+    var HTMLStreamlineHeaderElement: {
+        prototype: HTMLStreamlineHeaderElement;
+        new (): HTMLStreamlineHeaderElement;
+    };
+    interface HTMLStreamlineInputElement extends Components.StreamlineInput, HTMLStencilElement {
+    }
+    var HTMLStreamlineInputElement: {
+        prototype: HTMLStreamlineInputElement;
+        new (): HTMLStreamlineInputElement;
+    };
+    interface HTMLStreamlineRowElement extends Components.StreamlineRow, HTMLStencilElement {
+    }
+    var HTMLStreamlineRowElement: {
+        prototype: HTMLStreamlineRowElement;
+        new (): HTMLStreamlineRowElement;
+    };
+    interface HTMLStreamlineRowsElement extends Components.StreamlineRows, HTMLStencilElement {
+    }
+    var HTMLStreamlineRowsElement: {
+        prototype: HTMLStreamlineRowsElement;
+        new (): HTMLStreamlineRowsElement;
+    };
     interface HTMLStreamlineSearchElement extends Components.StreamlineSearch, HTMLStencilElement {
     }
     var HTMLStreamlineSearchElement: {
         prototype: HTMLStreamlineSearchElement;
         new (): HTMLStreamlineSearchElement;
     };
-    interface HTMLStreamlineSidebarElement extends Components.StreamlineSidebar, HTMLStencilElement {
+    interface HTMLStreamlineSettingsElement extends Components.StreamlineSettings, HTMLStencilElement {
     }
-    var HTMLStreamlineSidebarElement: {
-        prototype: HTMLStreamlineSidebarElement;
-        new (): HTMLStreamlineSidebarElement;
-    };
-    interface HTMLStreamlineUiDrawerElement extends Components.StreamlineUiDrawer, HTMLStencilElement {
-    }
-    var HTMLStreamlineUiDrawerElement: {
-        prototype: HTMLStreamlineUiDrawerElement;
-        new (): HTMLStreamlineUiDrawerElement;
-    };
-    interface HTMLStreamlineUiDropdownElement extends Components.StreamlineUiDropdown, HTMLStencilElement {
-    }
-    var HTMLStreamlineUiDropdownElement: {
-        prototype: HTMLStreamlineUiDropdownElement;
-        new (): HTMLStreamlineUiDropdownElement;
-    };
-    interface HTMLStreamlineUiInputElement extends Components.StreamlineUiInput, HTMLStencilElement {
-    }
-    var HTMLStreamlineUiInputElement: {
-        prototype: HTMLStreamlineUiInputElement;
-        new (): HTMLStreamlineUiInputElement;
+    var HTMLStreamlineSettingsElement: {
+        prototype: HTMLStreamlineSettingsElement;
+        new (): HTMLStreamlineSettingsElement;
     };
     interface HTMLElementTagNameMap {
+        "streamline-bottom-bar": HTMLStreamlineBottomBarElement;
         "streamline-container": HTMLStreamlineContainerElement;
+        "streamline-drawer": HTMLStreamlineDrawerElement;
+        "streamline-dropdown": HTMLStreamlineDropdownElement;
         "streamline-entries": HTMLStreamlineEntriesElement;
+        "streamline-header": HTMLStreamlineHeaderElement;
+        "streamline-input": HTMLStreamlineInputElement;
+        "streamline-row": HTMLStreamlineRowElement;
+        "streamline-rows": HTMLStreamlineRowsElement;
         "streamline-search": HTMLStreamlineSearchElement;
-        "streamline-sidebar": HTMLStreamlineSidebarElement;
-        "streamline-ui-drawer": HTMLStreamlineUiDrawerElement;
-        "streamline-ui-dropdown": HTMLStreamlineUiDropdownElement;
-        "streamline-ui-input": HTMLStreamlineUiInputElement;
+        "streamline-settings": HTMLStreamlineSettingsElement;
     }
 }
 declare namespace LocalJSX {
+    interface StreamlineBottomBar {
+    }
     interface StreamlineContainer {
-        "mac"?: boolean;
-        "visible"?: boolean;
+        "active"?: '';
+        "test"?: false;
+        "visible"?: false;
     }
-    interface StreamlineEntries {
+    interface StreamlineDrawer {
     }
-    interface StreamlineSearch {
-    }
-    interface StreamlineSidebar {
-    }
-    interface StreamlineUiDrawer {
-    }
-    interface StreamlineUiDropdown {
+    interface StreamlineDropdown {
         "items"?: any[];
         "type"?: string;
     }
-    interface StreamlineUiInput {
+    interface StreamlineEntries {
+    }
+    interface StreamlineHeader {
+        "item"?: { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; isMultisite: boolean; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; title: string; type: string; };
+    }
+    interface StreamlineInput {
         "handleInput"?: Function;
         "invalid"?: boolean;
         "label"?: string;
         "uid"?: string;
         "value"?: string;
     }
+    interface StreamlineRow {
+        "disabled"?: boolean;
+        "isCurrentSite"?: boolean;
+        "isEdit"?: boolean;
+        "isFav"?: boolean;
+        "isFocus"?: boolean;
+        "item"?: { active: string; ID: string; adminUrl: string; guid: string; href: string; hrefEdit: string; name: string; path: string; post_title: string; route: string; siteId: string; type: string; };
+        "mb"?: any;
+        "table"?: any;
+    }
+    interface StreamlineRows {
+    }
+    interface StreamlineSearch {
+    }
+    interface StreamlineSettings {
+    }
     interface IntrinsicElements {
+        "streamline-bottom-bar": StreamlineBottomBar;
         "streamline-container": StreamlineContainer;
+        "streamline-drawer": StreamlineDrawer;
+        "streamline-dropdown": StreamlineDropdown;
         "streamline-entries": StreamlineEntries;
+        "streamline-header": StreamlineHeader;
+        "streamline-input": StreamlineInput;
+        "streamline-row": StreamlineRow;
+        "streamline-rows": StreamlineRows;
         "streamline-search": StreamlineSearch;
-        "streamline-sidebar": StreamlineSidebar;
-        "streamline-ui-drawer": StreamlineUiDrawer;
-        "streamline-ui-dropdown": StreamlineUiDropdown;
-        "streamline-ui-input": StreamlineUiInput;
+        "streamline-settings": StreamlineSettings;
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "streamline-bottom-bar": LocalJSX.StreamlineBottomBar & JSXBase.HTMLAttributes<HTMLStreamlineBottomBarElement>;
             "streamline-container": LocalJSX.StreamlineContainer & JSXBase.HTMLAttributes<HTMLStreamlineContainerElement>;
+            "streamline-drawer": LocalJSX.StreamlineDrawer & JSXBase.HTMLAttributes<HTMLStreamlineDrawerElement>;
+            "streamline-dropdown": LocalJSX.StreamlineDropdown & JSXBase.HTMLAttributes<HTMLStreamlineDropdownElement>;
             "streamline-entries": LocalJSX.StreamlineEntries & JSXBase.HTMLAttributes<HTMLStreamlineEntriesElement>;
+            "streamline-header": LocalJSX.StreamlineHeader & JSXBase.HTMLAttributes<HTMLStreamlineHeaderElement>;
+            "streamline-input": LocalJSX.StreamlineInput & JSXBase.HTMLAttributes<HTMLStreamlineInputElement>;
+            "streamline-row": LocalJSX.StreamlineRow & JSXBase.HTMLAttributes<HTMLStreamlineRowElement>;
+            "streamline-rows": LocalJSX.StreamlineRows & JSXBase.HTMLAttributes<HTMLStreamlineRowsElement>;
             "streamline-search": LocalJSX.StreamlineSearch & JSXBase.HTMLAttributes<HTMLStreamlineSearchElement>;
-            "streamline-sidebar": LocalJSX.StreamlineSidebar & JSXBase.HTMLAttributes<HTMLStreamlineSidebarElement>;
-            "streamline-ui-drawer": LocalJSX.StreamlineUiDrawer & JSXBase.HTMLAttributes<HTMLStreamlineUiDrawerElement>;
-            "streamline-ui-dropdown": LocalJSX.StreamlineUiDropdown & JSXBase.HTMLAttributes<HTMLStreamlineUiDropdownElement>;
-            "streamline-ui-input": LocalJSX.StreamlineUiInput & JSXBase.HTMLAttributes<HTMLStreamlineUiInputElement>;
+            "streamline-settings": LocalJSX.StreamlineSettings & JSXBase.HTMLAttributes<HTMLStreamlineSettingsElement>;
         }
     }
 }

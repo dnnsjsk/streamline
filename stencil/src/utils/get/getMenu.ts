@@ -1,6 +1,6 @@
 import { state } from '../../store/internal';
-import { setEntries } from '../set/setEntries';
 import { resetView } from '../general/resetView';
+import { setupEntries } from '../entries/setupEntries';
 
 export const getMenu = (obj = {} as any) => {
   let data = [];
@@ -77,30 +77,10 @@ export const getMenu = (obj = {} as any) => {
 
     if (isNetwork) {
       state.entriesNetworkMenu = data;
-      state.entriesNetworkMenuActive = data;
-      if (!state.entriesSearch.some((e) => e.type === 'networkMenu')) {
-        state.entriesSearch = [...state.entriesSearch, ...data];
-      }
     } else {
       state.entriesMenu = data;
-      state.entriesMenuActive = data;
-      state.entriesMenuCurrentPath = obj.path || state.currentSite.path;
-      if (!state.entriesSearch.some((e) => e.type === 'menu')) {
-        state.entriesSearch = [...state.entriesSearch, ...data];
-      } else if (
-        !state.entriesSearch.some(
-          (e) => e.siteId === Number(state.currentSite.id)
-        )
-      ) {
-        state.entriesSearch = [
-          state.entriesActions,
-          ...data,
-          ...state.entriesNetworkMenu,
-        ];
-      }
     }
-
-    setEntries();
+    setupEntries();
   }
 
   if (isAdmin && !obj.fetch) {

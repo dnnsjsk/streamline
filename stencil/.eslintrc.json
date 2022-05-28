@@ -1,33 +1,26 @@
 {
   "rules": {
-    "@stencil/async-methods": 0,
-    "@stencil/ban-prefix": 0,
-    "@stencil/decorators-context": 0,
-    "@stencil/dependency-suggestions": 0,
-    "@stencil/prefer-vdom-listener": 0,
     "@stencil/required-jsdoc": 0,
-    "@stencil/strict-boolean-conditions": 0,
-    "dot-notation": 0,
-    "jest/no-done-callback": 0,
-    "jest/no-export": 0,
-    "no-return-assign": 0,
-    "react/jsx-no-bind": 0
+    "@stencil/ban-prefix": 0,
+    "@stencil/async-methods": 0,
+    "@stencil/strict-mutable": 0,
+    "react/jsx-no-bind": 0,
+    "lines-between-class-members": 0,
+    "no-eval": 0
   },
   "env": {
-    "jest/globals": true,
+    "jest": true,
     "browser": true,
     "es2020": true
   },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 11,
+    "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint"],
   "extends": [
-    "standard",
     "plugin:@stencil/recommended",
-    "plugin:prettier/recommended",
-    "plugin:jest/recommended"
+    "standard",
+    "prettier"
   ]
 }

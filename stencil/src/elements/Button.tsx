@@ -7,22 +7,22 @@ export const Button = (props) => {
       {...props}
       class={{
         [props.class]: props.class,
-        'focus-out inline-flex items-center rounded-md justify-center font-semibold text-sm':
+        'focus inline-flex items-center justify-center rounded-md text-sm font-semibold':
           true,
-        'px-3 py-2 sm:py-2.5 sm:px-4':
+        'px-3 py-1.5':
           props.type === 'primary' ||
           props.type === 'secondary' ||
           props.type === 'transparent',
-        'bg-blue-600 text-white border-blue-600 text-white hover:bg-blue-700 hover:border-blue-700':
+        'border-blue-600 bg-blue-600 text-white text-white hover:border-blue-700 hover:bg-blue-700':
           props.type === 'primary',
-        'bg-slate-200 text-slate-600 border-slate-200 hover:bg-slate-900 hover:border-slate-900 hover:text-white':
+        'border-slate-200 bg-slate-200 text-slate-600 hover:border-slate-900 hover:bg-slate-900 hover:text-white':
           props.type === 'secondary',
-        'px-2 py-1 bg-white border border-slate-200 text-slate-600 hover:text-slate-50 hover:bg-slate-900 hover:border-slate-900 sm:px-3 sm:py-1.5':
+        'border border-slate-200 bg-white px-2 py-1 text-slate-600 hover:border-slate-900 hover:bg-slate-900 hover:text-slate-50 sm:px-3 sm:py-1.5':
           props.type === 'tertiary',
-        'opacity-50 pointer-events-none': props.disabled,
-        'border border-slate-200 text-slate-600 hover:text-slate-50 hover:bg-slate-900 hover:border-slate-900 !w-6 !h-6 absolute !p-0 mr-2':
+        'pointer-events-none opacity-50': props.disabled,
+        'absolute mr-2 !h-6 !w-6 border border-slate-200 !p-0 text-slate-600 hover:border-slate-900 hover:bg-slate-900 hover:text-slate-50':
           props.type === 'back',
-        'text-slate-600 hover:bg-slate-900 hover:border-slate-900 hover:text-white':
+        'text-slate-600 hover:border-slate-900 hover:bg-slate-900 hover:text-white':
           props.type === 'transparent',
       }}
       onMouseDown={(e) => e.preventDefault()}

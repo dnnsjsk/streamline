@@ -1,6 +1,6 @@
 import { filterDeep, findDeep } from 'deepdash-es/standalone';
 import { state } from '../../store/internal';
-import { setEntries } from './setEntries';
+import { setEntries } from '../entries/setEntries';
 import { merge, unset, get, compact } from 'lodash-es';
 import { capitalizeFirstLetter } from '../string/capitalizeFirstLetter';
 import { post } from '../query/post';
@@ -48,11 +48,13 @@ export const setFavourite = (obj) => {
       childrenPath: ['children'],
     });
 
-    const currentPath = path.context['_item'].strPath;
+    // @ts-ignore
+    const currentPath = path.context._item.strPath;
 
     unset(arr, currentPath);
 
-    const parentPath = path.context['_item'].parent.path;
+    // @ts-ignore
+    const parentPath = path.context._item.parent.path;
     const parentChildrenLength = Object.values(
       get(state.entriesFav, `${parentPath}.children`)
     ).length;
@@ -61,7 +63,8 @@ export const setFavourite = (obj) => {
       unset(arr, parentPath);
     }
 
-    const topPath = path.context['_item'].parent.parent.path;
+    // @ts-ignore
+    const topPath = path.context._item.parent.parent.path;
     const topChildrenLength = topPath
       ? Object.values(get(state.entriesFav, `${topPath}.children`)).length
       : false;

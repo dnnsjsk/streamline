@@ -4,7 +4,11 @@
     "allowUnreachableCode": false,
     "declaration": false,
     "experimentalDecorators": true,
-    "lib": ["dom", "es2017", "esnext", "dom.iterable"],
+    "lib": [
+      "dom",
+      "es2017",
+      "dom.iterable"
+    ],
     "moduleResolution": "node",
     "module": "esnext",
     "target": "es2017",
@@ -14,8 +18,10 @@
     "jsxFactory": "h",
     "resolveJsonModule": true
   },
-  "include": ["src", "types/jsx.d.ts",
-    "../stencil-v2/src/components/container/test/*.json"
+  "include": [
+    "src"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

@@ -3,11 +3,9 @@ import { state } from '../../store/internal';
 
 export const getEntriesSliced = (item) => {
   const min =
-    (state.entriesPostCurrentPage - 1) *
-    state.entriesSettingsLoad.queryAmount.default;
+    (state.entriesPostCurrentPage - 1) * state.entriesSettingsLoad.query.amount;
   const max =
-    state.entriesPostCurrentPage *
-    state.entriesSettingsLoad.queryAmount.default;
+    state.entriesPostCurrentPage * state.entriesSettingsLoad.query.amount;
 
   return isArray(item)
     ? item.slice(min, max)

@@ -1,15 +1,13 @@
 import { createStore } from '@stencil/store';
-import equal from 'fast-deep-equal/es6';
-import { blurSearch } from '../utils/search/blurSearch';
 import { resetScroll } from '../utils/general/resetScroll';
-import { resetView } from '../utils/general/resetView';
+import { setEntries } from '../utils/entries/setEntries';
+import { setActions } from '../utils/entries/setActions';
+import equal from 'fast-deep-equal/es6';
 import { setSearchPlaceholder } from '../utils/set/setSearchPlaceholder';
-import { getAll } from '../utils/get/getAll';
-import { isDefault } from '../utils/is/isDefault';
 
-const isTest = document
-  .querySelector('streamline-container')
-  ?.hasAttribute('test');
+const isFront = document
+  ?.querySelector('streamline-container')
+  ?.hasAttribute('front');
 
 const { state, dispose, onChange } = createStore({
   actions: {
@@ -17,29 +15,26 @@ const { state, dispose, onChange } = createStore({
       id: 'post',
       condition: true,
       name: 'Search for a post',
-      tab: 'post',
+      active: 'post',
       route: 'get/posts',
     },
     site: {
       id: 'site',
       // @ts-ignore
-      condition: window.streamlineData.network,
+      condition: window?.streamlineData?.network && !isFront,
       name: 'Search for a site',
-      tab: 'site',
+      active: 'site',
       route: 'get/sites',
     },
   },
-  active: localStorage.getItem('streamlineActive') || 'menu',
-  class: {
-    tag: 'px-2.5 py-1.5 bg-slate-200 text-slate-500 inline-block h-[max-content] leading-1',
-  },
+  active: 'search',
+  bodyStyle: {},
   currentSite: {
     // @ts-ignore
-    id: window.streamlineData.siteId,
+    id: window?.streamlineData?.siteId || '1',
     // @ts-ignore
-    path: window.streamlineData.sitePath,
+    path: window?.streamlineData?.sitePath || '/',
   },
-  bodyStyle: {},
   // @ts-ignore
   data: window.streamlineData,
   drawer: {
@@ -49,139 +44,73 @@ const { state, dispose, onChange } = createStore({
     title: '',
     values: {},
   },
-  entriesActions: {},
-  entriesEditing: {},
+  entriesActions: [],
   // @ts-ignore
-  entriesFav: JSON.parse(window.streamlineData.favourites),
+  entriesFav: JSON.parse(window?.streamlineData?.favourites ?? '[]'),
   // @ts-ignore
-  entriesFavActive: JSON.parse(window.streamlineData.favourites),
-  entriesMenu: [],
-  entriesMenuActive: [],
+  entriesFavActive: JSON.parse(window?.streamlineData?.favourites ?? '[]'),
+  // @ts-ignore
+  entriesMenu: JSON.parse(window?.streamlineData?.menu ?? '[]'),
   entriesMenuCurrentPath: '',
   entriesNetworkMenu: [],
-  entriesNetworkMenuActive: [],
   entriesPost: [],
   entriesPostActive: [],
   entriesPostCurrentPage: 1,
   entriesPostCurrentPath: '',
   entriesPostQuery: '',
   entriesPostTotal: 0,
+  entriesSearch: [],
+  entriesSearchActive: [],
   entriesSettings: [
     {
       type: 'settings',
       children: [
         {
-          name: 'Mode',
-          children: [
-            {
-              id: 'mode',
-              name: 'View mode',
-              nameParent: 'Mode',
-              label: 'Choose between different views',
-              choices: {
-                default: 'Default',
-                dashboard: 'Dashboard',
-              },
-            },
-          ],
-        },
-        {
           name: 'Key shortcuts',
+          id: 'keys',
           children: [
             {
-              id: 'keyNavigation',
+              id: 'navigation',
               name: 'Entry navigation',
               nameParent: 'Key shortcuts',
               label: 'Navigate between entry items',
-              metaKey: false,
               keys: ['↑', '↓'],
             },
             {
-              id: 'keyNavigationTabs',
+              id: 'navigationActive',
               name: 'Tab navigation',
               nameParent: 'Key shortcuts',
-              label: 'Navigate between top-level tab items',
-              metaKey: true,
-              keys: ['↑', '↓'],
+              label:
+                'Navigate between top-level items (search, favourites, settings)',
+              keys: ['Meta', '↑', '↓'],
             },
             {
-              id: 'keySearch',
+              id: 'search',
               name: 'Focus search',
               nameParent: 'Key shortcuts',
               label: 'Focus the search bar',
-              metaKey: true,
-              keys: ['s'],
-            },
-            {
-              id: 'keyExit',
-              name: 'Close',
-              nameParent: 'Key shortcuts',
-              label: 'Exit the app',
-              metaKey: false,
-              keys: ['esc'],
-            },
-          ],
-        },
-        {
-          name: 'Behaviour',
-          children: [
-            {
-              id: 'behaviourDefaultTab',
-              name: 'Default tab',
-              nameParent: 'Behaviour',
-              label: 'Which tab should be opened by default when opening app',
-              choices: {
-                last: 'Last',
-                site: 'Site',
-                networkMenu: 'Network',
-                fav: 'Faves',
-                menu: 'Menu',
-                post: 'Post',
-                settings: 'Settings',
-              },
-            },
-          ],
-        },
-        {
-          name: 'Searchbar',
-          children: [
-            {
-              id: 'searchResetInput',
-              name: 'Reset search',
-              nameParent: 'Searchbar',
-              label: 'Resets search value after switching tabs',
-            },
-            {
-              id: 'searchFocus',
-              name: 'Always focus',
-              nameParent: 'Searchbar',
-              label: 'Focus searchbar after switching tabs',
+              keys: ['Meta', 's'],
             },
           ],
         },
         {
           name: 'Appearance',
+          id: 'appearance',
           children: [
             {
-              id: 'appearanceAnimation',
+              id: 'animation',
               name: 'Enable animations',
               nameParent: 'Appearance',
               label: 'Enables micro animations throughout the app',
-            },
-            {
-              id: 'appearanceBlur',
-              name: 'Enable background blur',
-              nameParent: 'Appearance',
-              label:
-                'Enabling the overlay blur can decrease performance on slower machines',
             },
           ],
         },
         {
           name: 'Queries',
+          id: 'query',
           children: [
             {
-              id: 'queryAmount',
+              id: 'amount',
               name: 'Post amount',
               nameParent: 'Queries',
               label: 'Maximum number of displayed posts per page',
@@ -191,159 +120,79 @@ const { state, dispose, onChange } = createStore({
       ],
     },
   ],
-  entriesSearch: [],
-  entriesSearchActive: [],
   entriesSettingsActive: [],
+  entriesSettingsHaveChanged: false,
   entriesSettingsLoad: {
-    mode: {
-      default: 'default',
+    keys: {
+      navigation: true,
+      navigationActive: true,
+      search: true,
     },
-    keyNavigation: {
-      default: true,
+    appearance: {
+      animation: true,
     },
-    keyNavigationTabs: {
-      default: true,
-    },
-    keySearch: {
-      default: true,
-    },
-    keyExit: {
-      default: true,
-    },
-    behaviourDefaultTab: {
-      default: 'last',
-    },
-    searchResetInput: {
-      default: true,
-    },
-    searchFocus: {
-      default: true,
-    },
-    appearanceAnimation: {
-      default: true,
-    },
-    appearanceBlur: {
-      default: true,
-    },
-    queryAmount: {
-      default: 20,
+    query: {
+      amount: 20,
     },
   },
-  entriesSettingsSave: {},
-  entriesSettingsHaveChanged: false,
+  entriesSettingsSave: {} as any,
   entriesSite: [],
   entriesSiteActive: [],
   entriesSiteCurrentPage: 1,
   entriesSiteQuery: '',
   entriesSiteTotal: 0,
-  historySearchesSite: JSON.parse(
-    // @ts-ignore
-    window.streamlineData.historySearchesSite
-  ).reverse(),
-  historySearchesPost: JSON.parse(
-    // @ts-ignore
-    window.streamlineData.historySearchesPost
-  ).reverse(),
-  isEnter: false,
-  isHelp: false,
-  infoBarAmount: '',
-  infoBarPages: '',
-  isMac: false,
-  isLoading: false,
-  isSearch: true,
-  isSearchFocus: true,
-  isSlash: false,
   focusIndex: -1,
-  menus:
-    // @ts-ignore
-    window.streamlineData.network && !isTest
-      ? ['search', 'site', 'networkMenu', 'fav', 'menu', 'post', 'settings']
-      : !isTest
-      ? ['search', 'fav', 'menu', 'post', 'settings']
-      : ['fav', 'menu', 'post', 'settings'],
-  menu: {
-    search: {
-      name: 'search',
-      // @ts-ignore
-      condition: !isTest,
-      text: 'Search',
-      help: `
-      <p>The search tab is at the core and center of Streamline. It combines all the other modes (when in dashboard view) into one single screen.</p>
-      <p>Instead of searching for a single entry, the search tab allows you to search for all entries (menu, post, favourites) at once.</p>
-      `,
-    },
-    site: {
-      name: 'site',
-      // @ts-ignore
-      condition: window.streamlineData.network && !isTest,
-      text: 'Site',
-      help: `
-      <p>Streamline works with single sites and multisite networks. Since you are able to view this text, it means that you are currently on a multisite.</p>
-      <p>This tab can be used to search for a specific subsite in the network and use Streamline as the selected site.</p>
-      <p>After searching and selecting a site, the <strong>menu</strong> tab will show the admin menu of the chosen site, while the <strong>post</strong> tab makes it possible to search for posts of the respective subsite.</p>
-      `,
-    },
-    networkMenu: {
-      name: 'networkMenu',
-      // @ts-ignore
-      condition: window.streamlineData.network && !isTest,
-      text: 'Network',
-      help: `
-      <p>Streamline works with single sites and multisite networks. Since you are able to view this text, it means that you are currently on a multisite.</p>
-      <p>The network tab shows you all the available menu items from the network admin screen. Clicking any of the links will redirect to the respective page.</p>
-      `,
-    },
-    fav: {
-      name: 'fav',
-      condition: true,
-      text: 'Faves',
-      help: `
-      <p>All individual menu items and posts can be favourited for easier access.</p>
-      <p>This mode lists all of your currently favourites in unified list.</p>
-      `,
-    },
-    menu: {
-      name: 'menu',
-      condition: true,
-      text: 'Menu',
-      help: `
-      <p>The menu tab shows you all the available menu items from the admin screen. Clicking any of the links will redirect to the respective page.</p>
-      `,
-    },
-    post: {
-      name: 'post',
-      condition: true,
-      text: 'Post',
-      help: `
-      <p>Posts are an essential part of WordPress and the posts tab allows you to search for any posts on your site.</p>
-      `,
-    },
-    settings: {
-      name: 'settings',
-      condition: true,
-      text: 'Settings',
-      help: `
-      <p>The settings tab allows you to make Streamline your own by customising certain nuances to your liking.</p>
-      `,
+  infoBar: {
+    pages: {
+      current: 1,
+      amount: 1,
     },
   },
+  isEnter: false,
+  isFront: isFront,
+  isLoading: false,
+  isMac: navigator.userAgent.indexOf('Mac OS X') !== -1,
+  // @ts-ignore
+  isMultisite: window?.streamlineData?.network,
+  isVisible: false,
+  menus: ['search', 'fav', 'settings'],
   scroll: 0,
-  searchNoValue: 'No entries found',
   searchPlaceholder: '',
+  searchNoValue: 'No entries found',
   searchValue: '',
-  test: isTest,
-  visible: false,
+  sort: {
+    post: {},
+    site: {},
+  },
+  test: false,
 });
 
-onChange('active', (value) => {
-  state.entriesEditing = {};
-  if (value === 'search') {
-    getAll();
+onChange('isVisible', (value) => {
+  state.focusIndex = -1;
+  if (!value) {
+    state.drawer = {
+      ...state.drawer,
+      active: false,
+    };
   }
+  resetScroll(value);
 });
 
-onChange('drawer', () => {
-  blurSearch();
+onChange('searchValue', (value) => {
+  state.isLoading = false;
+  state.isEnter =
+    (state.active === 'post' || state.active === 'site') &&
+    state.searchValue.trim().length >= 1;
+  if (value === '') {
+    state.focusIndex = -1;
+  }
+  setEntries();
+});
+
+onChange('active', () => {
+  state.focusIndex = -1;
+  setSearchPlaceholder();
+  setEntries();
 });
 
 onChange('entriesSettingsSave', (value) => {
@@ -354,32 +203,6 @@ onChange('entriesSettingsLoad', (value) => {
   state.entriesSettingsHaveChanged = !equal(value, state.entriesSettingsSave);
 });
 
-onChange('searchValue', (value) => {
-  if (value === '') {
-    state.focusIndex = -1;
-  }
-});
-
-onChange('active', (value) => {
-  resetView();
-  setSearchPlaceholder();
-  localStorage.setItem('streamlineActive', value);
-
-  if (state.active === 'search') {
-    getAll();
-  }
-});
-
-onChange('visible', (value) => {
-  if (isDefault()) {
-    state.active = 'search';
-  } else if (!state.menus.includes(state.active)) {
-    state.active = 'menu';
-  } else if (state.entriesSettingsLoad.behaviourDefaultTab.default !== 'last') {
-    state.active = state.entriesSettingsLoad.behaviourDefaultTab.default;
-  }
-
-  resetScroll(value);
-});
+setActions();
 
 export { state, dispose, onChange };
