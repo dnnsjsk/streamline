@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 
-export const t = (tests, adminOnly = false) => {
+export const t = (tests, adminOnly = true) => {
   const env = adminOnly ? ['/wp-admin'] : ['/account', '/wp-admin'];
 
   env.forEach((item) => {

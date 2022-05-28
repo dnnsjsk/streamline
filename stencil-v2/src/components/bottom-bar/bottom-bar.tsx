@@ -12,7 +12,7 @@ export class StreamlineBottomBar {
   private getItems = () => {
     return [
       {
-        condition: state?.data?.network,
+        condition: state?.data?.network && !state.isFront,
         text: 'Site',
         value: state.currentSite.path,
       },

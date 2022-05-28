@@ -51,7 +51,7 @@ export class StreamlineHeader {
     const isQueryWithClose = isQueryMode && state[`entries${active}Query`];
 
     const path =
-      this.item.isMultisite && state.active !== 'site'
+      this.item.isMultisite && state.active !== 'site' && !state.isFront
         ? ` <span class="text-slate-300">∙</span> subsite: ${this.item.path}`
         : '';
 

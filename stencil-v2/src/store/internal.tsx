@@ -5,6 +5,10 @@ import { setActions } from '../utils/entries/setActions';
 import equal from 'fast-deep-equal/es6';
 import { setSearchPlaceholder } from '../utils/set/setSearchPlaceholder';
 
+const isFront = document
+  ?.querySelector('streamline-container')
+  ?.hasAttribute('front');
+
 const { state, dispose, onChange } = createStore({
   actions: {
     post: {
@@ -17,7 +21,7 @@ const { state, dispose, onChange } = createStore({
     site: {
       id: 'site',
       // @ts-ignore
-      condition: window?.streamlineData?.network,
+      condition: window?.streamlineData?.network && !isFront,
       name: 'Search for a site',
       active: 'site',
       route: 'get/sites',
@@ -145,6 +149,7 @@ const { state, dispose, onChange } = createStore({
     },
   },
   isEnter: false,
+  isFront: isFront,
   isLoading: false,
   isMac: navigator.userAgent.indexOf('Mac OS X') !== -1,
   // @ts-ignore

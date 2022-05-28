@@ -311,7 +311,6 @@ export class StreamlineRow {
       <li
         class={{
           'relative select-all': true,
-          'pointer-events-auto': !state.isLoading,
         }}
       >
         <a
