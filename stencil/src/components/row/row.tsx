@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, Element, h, Prop, State, Watch } from '@stencil/core';
 import { state } from '../../store/internal';
-import someDeep from 'deepdash-es/someDeep';
+import { someDeep } from 'deepdash-es/standalone';
 import { setFavourite } from '../../utils/set/setFavourite';
 import { get } from '../../utils/query/get';
 import { getMenu } from '../../utils/get/getMenu';

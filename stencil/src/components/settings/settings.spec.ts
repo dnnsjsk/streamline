@@ -3,7 +3,7 @@ import { dispose, state } from '../../store/internal';
 import { StreamlineSettings } from './settings';
 import { StreamlineHeader } from '../header/header';
 
-const settings = require('../../../../stencil-v2/src/components/container/test/entriesSettings.json');
+const settings = require('../../../../assets/components/build/test/entriesSettings.json');
 
 describe('streamline-settings', () => {
   let page: SpecPage;

@@ -185,8 +185,10 @@ class Rest
 
         if (is_multisite() && function_exists("switch_to_blog")) {
             switch_to_blog($data["siteId"]);
+            $path = get_site(get_current_blog_id())->path;
+        } else {
+            $path = "/";
         }
-        $path = get_site(get_current_blog_id())->path;
         $query = new WP_Query($args);
 
         foreach ($query->get_posts() as $post) {

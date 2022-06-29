@@ -3,10 +3,10 @@ import { dispose, state } from '../../store/internal';
 import { StreamlineBottomBar } from './bottom-bar';
 import { setActions } from '../../utils/entries/setActions';
 
-const menu = require('../../../../stencil-v2/src/components/container/test/entriesMenu.json');
-const fav = require('../../../../stencil-v2/src/components/container/test/entriesFav.json');
-const post = require('../../../../stencil-v2/src/components/container/test/entriesPost.json');
-const site = require('../../../../stencil-v2/src/components/container/test/entriesSite.json');
+const menu = require('../../../../assets/components/build/test/entriesMenu.json');
+const fav = require('../../../../assets/components/build/test/entriesFav.json');
+const post = require('../../../../assets/components/build/test/entriesPost.json');
+const site = require('../../../../assets/components/build/test/entriesSite.json');
 
 describe('streamline-bottom-bar', () => {
   let page: SpecPage;

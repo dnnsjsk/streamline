@@ -1,7 +1,7 @@
 import { state } from '../../store/internal';
 import { setActions } from '../entries/setActions';
 
-const menu = require('../../../../stencil-v2/src/components/container/test/entriesMenu.json');
+const menu = require('../../../../assets/components/build/test/entriesMenu.json');
 
 export const enableMultisite = async (page) => {
   state.actions = {

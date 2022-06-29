@@ -5,8 +5,8 @@ import { StreamlineRows } from '../rows/rows';
 import { StreamlineRow } from '../row/row';
 import { setActions } from '../../utils/entries/setActions';
 
-const menu = require('../../../../stencil-v2/src/components/container/test/entriesMenu.json');
-const fav = require('../../../../stencil-v2/src/components/container/test/entriesFav.json');
+const menu = require('../../../../assets/components/build/test/entriesMenu.json');
+const fav = require('../../../../assets/components/build/test/entriesFav.json');
 
 describe('streamline-entries', () => {
   let page: SpecPage;

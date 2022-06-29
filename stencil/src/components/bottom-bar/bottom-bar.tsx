@@ -10,6 +10,29 @@ import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter'
 })
 export class StreamlineBottomBar {
   private getItems = () => {
+    let amount = 0;
+
+    state[`entries${capitalizeFirstLetter(state.active)}Active`].forEach(
+      (item) => {
+        if (
+          item.type === 'post' ||
+          item.type === 'site' ||
+          item.type === 'action'
+        ) {
+          amount += Object.values(item.children).length;
+        }
+        if (
+          item.type === 'menu' ||
+          item.type === 'networkMenu' ||
+          item.type === 'settings'
+        ) {
+          Object.values(item.children as unknown).forEach((itemInner) => {
+            amount += Object.values(itemInner.children).length;
+          });
+        }
+      }
+    );
+
     return [
       {
         condition: state?.data?.network && !state.isFront,
@@ -27,32 +50,7 @@ export class StreamlineBottomBar {
       {
         condition: true,
         text: 'Entries',
-        value: () => {
-          let amount = 0;
-
-          state[`entries${capitalizeFirstLetter(state.active)}Active`].forEach(
-            (item) => {
-              if (
-                item.type === 'post' ||
-                item.type === 'site' ||
-                item.type === 'action'
-              ) {
-                amount += Object.values(item.children).length;
-              }
-              if (
-                item.type === 'menu' ||
-                item.type === 'networkMenu' ||
-                item.type === 'settings'
-              ) {
-                Object.values(item.children as unknown).forEach((itemInner) => {
-                  amount += Object.values(itemInner.children).length;
-                });
-              }
-            }
-          );
-
-          return amount;
-        },
+        value: amount,
       },
       {
         condition:
@@ -83,9 +81,7 @@ export class StreamlineBottomBar {
                   <span class="font-medium text-slate-500">
                     {item.text}:{' '}
                     <span class="font-semibold text-slate-700">
-                      {typeof item.value === 'string'
-                        ? item.value
-                        : item.value()}
+                      {item.value}
                     </span>
                     {index + 1 !==
                       this.getItems().filter((e) => e.condition).length && (

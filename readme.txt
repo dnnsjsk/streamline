@@ -1,7 +1,7 @@
 === spx ===
 Contributors: dnnsjsk
 Requires at least: 5.0
-Tested up to: 5.9.2
+Tested up to: 6.0.0
 Requires PHP: 7.0
 Stable tag: 2.0
 License: GPLv2 or later
@@ -14,6 +14,10 @@ Do things faster.
 Do things faster.
 
 == Changelog ==
+
+= 1.2.1 =
+* Fix: post query not working on single sites
+* Fix: NaN showing in bottom bar
 
 = 1.2.0 =
 * Enhancement: UI fixes
