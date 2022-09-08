@@ -6,7 +6,7 @@ t((item) => {
   test.describe(`${item} Search entries`, () => {
     test.describe('render', () => {
       test('normally', async ({ page }) => {
-        await expect(page.locator('streamline-row')).toHaveCount(105);
+        await expect(page.locator('streamline-row')).toHaveCount(107);
         await expect(page.locator('text=subsite: /streamline/')).toBeTruthy();
       });
 

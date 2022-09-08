@@ -5,11 +5,10 @@
   "scripts": {
     "build": "stencil build --docs",
     "start": "stencil build --dev --watch --serve",
-    "test": "stencil test --spec",
+    "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "stencil test --spec",
     "test:watch": "stencil test --spec --watchAll",
     "test:e2e": "npx playwright test",
-    "test:all": "npm run test:unit && npm run test:e2e",
     "generate": "stencil generate"
   },
   "dependencies": {

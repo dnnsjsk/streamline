@@ -14,7 +14,7 @@ t((item) => {
         await page.locator('streamline-row a').first().click();
         await expect(page.locator('text=Posts for')).toBeTruthy();
         await expect(page.locator('1/1')).toBeTruthy();
-        await expect(page.locator('streamline-row')).toHaveCount(3);
+        await expect(page.locator('streamline-row')).toHaveCount(4);
       });
 
       test('io', async ({ page }) => {
