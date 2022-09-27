@@ -47,13 +47,13 @@ class Init
             wp_enqueue_script(
                 "streamline",
                 plugins_url(
-                    "../assets/components/build/streamline.esm.js",
+                    "../includes/assets/components/build/streamline.esm.js",
                     dirname(__FILE__)
                 ),
                 [],
                 filemtime(
                     STREAMLINE_DIR .
-                        "/assets/components/build/streamline.esm.js"
+                        "/includes/assets/components/build/streamline.esm.js"
                 ),
                 true
             );
@@ -127,7 +127,7 @@ class Init
     private function addCss()
     {
         $str = file_get_contents(
-            STREAMLINE_DIR . "/assets/components/build/streamline.css"
+            STREAMLINE_DIR . "/includes/assets/components/build/streamline.css"
         );
 
         add_action("wp_head", function () use (&$str) {
@@ -271,7 +271,7 @@ class Init
     private function adminBar()
     {
         add_action("admin_head", function () {
-            $url = plugin_dir_url(STREAMLINE) . "assets/iconfonts/"; ?>
+            $url = plugin_dir_url(STREAMLINE) . "includes/assets/iconfonts/"; ?>
 			<style>
                 @font-face {
                     font-family: 'Streamline';
