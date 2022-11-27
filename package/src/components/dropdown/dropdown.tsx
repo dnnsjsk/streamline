@@ -113,7 +113,7 @@ export class StreamlineDropdown {
           'focus-white group flex h-full w-full items-center justify-center focus-within:text-blue-600 focus-within:opacity-100 hover:z-50 hover:text-blue-600 hover:opacity-100 focus:text-blue-600 focus:opacity-100':
             true,
           '!pointer-events-auto relative opacity-0 !opacity-100':
-            this.type === 'main',
+            this.type === 'main' && state.isVisible,
           'opacity-100': this.type === 'entry',
         }}
       >

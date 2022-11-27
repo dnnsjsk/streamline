@@ -15,6 +15,9 @@ Do things faster.
 
 == Changelog ==
 
+= 1.2.2 =
+* Fix: prevent dropdown being clickable although app is hidden
+
 = 1.2.1 =
 * Fix: post query not working on single sites
 * Fix: NaN showing in bottom bar
