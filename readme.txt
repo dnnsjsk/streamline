@@ -15,6 +15,9 @@ Do things faster.
 
 == Changelog ==
 
+= 1.2.3 =
+* Fix: Tailwind reset leaking out of component
+
 = 1.2.2 =
 * Enhancement: UI fixes
 * Enhancement: give actions better descriptions when there is a value in search bar

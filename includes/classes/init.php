@@ -127,7 +127,7 @@ class Init
     private function addCss()
     {
         $str = file_get_contents(
-            STREAMLINE_DIR . "/includes/assets/components/build/streamline.css"
+            STREAMLINE_DIR . "/includes/assets/streamline.css"
         );
 
         add_action("wp_head", function () use (&$str) {
@@ -272,80 +272,79 @@ class Init
     {
         add_action("admin_head", function () {
             $url = plugin_dir_url(STREAMLINE) . "includes/assets/iconfonts/"; ?>
-			<style>
-                @font-face {
-                    font-family: 'Streamline';
-                    src: url('<?php echo $url . "streamline.eot"; ?>');
-                    src: url('<?php echo $url .
-                        "streamline.eot?#iefix"; ?>') format('embedded-opentype'),
-                    url('<?php echo $url .
-                        "streamline.woff"; ?>') format('woff'),
-                    url('<?php echo $url .
-                        "streamline.ttf"; ?>') format('truetype'),
-                    url('<?php echo $url .
-                        "streamline.svg#Streamline"; ?>') format('svg');
-                    font-weight: normal;
-                    font-style: normal;
-                }
+          <style>
+              @font-face {
+                  font-family: 'Streamline';
+                  src: url('<?php echo $url . "streamline.eot"; ?>');
+                  src: url('<?php echo $url .
+                      "streamline.eot?#iefix"; ?>') format('embedded-opentype'),
+                  url('<?php echo $url . "streamline.woff"; ?>') format('woff'),
+                  url('<?php echo $url .
+                      "streamline.ttf"; ?>') format('truetype'),
+                  url('<?php echo $url .
+                      "streamline.svg#Streamline"; ?>') format('svg');
+                  font-weight: normal;
+                  font-style: normal;
+              }
 
-                #wp-admin-bar-streamline {
-	                  display: block !important;
-                    cursor: pointer !important;
-                }
+              #wp-admin-bar-streamline {
+                  display: block !important;
+                  cursor: pointer !important;
+              }
 
-                #wp-admin-bar-streamline * {
-                    cursor: pointer !important;
-                }
+              #wp-admin-bar-streamline * {
+                  cursor: pointer !important;
+              }
 
-                .streamline-icon:before {
-                    display: inline-block;
-                    font-family: 'Streamline' !important;
-                    font-style: normal;
-                    font-weight: normal;
-                    line-height: 1;
-                    -webkit-font-smoothing: antialiased;
-                    -moz-osx-font-smoothing: grayscale;
-                    content: '\0041' !important;
-                    position: relative;
-                    top: 2px;
-                }
+              .streamline-icon:before {
+                  display: inline-block;
+                  font-family: 'Streamline' !important;
+                  font-style: normal;
+                  font-weight: normal;
+                  line-height: 1;
+                  -webkit-font-smoothing: antialiased;
+                  -moz-osx-font-smoothing: grayscale;
+                  content: '\0041' !important;
+                  position: relative;
+                  top: 2px;
+              }
 
-                @media screen and (max-width: 782px) {
-                    #wp-admin-bar-streamline {
+              @media screen and (max-width: 782px) {
+                  #wp-admin-bar-streamline {
                       display: flex !important;
-	                    align-items: center !important;
-	                    justify-content: center !important;
-                    }
+                      align-items: center !important;
+                      justify-content: center !important;
+                  }
 
-                    #wp-admin-bar-streamline .streamline-icon:before {
-	                    font-size: 32px !important;
-	                    top: -1px !important;
-                    }
-                }
-			</style>
-      <script>
-          function streamlineResetSettings() {
-            fetch(window.streamline.rest + 'streamline/v1/reset/settings?userId=' + <?php echo get_current_user_id(); ?>, {
-              method: 'POST',
-              credentials: 'same-origin',
-              headers: {
-                // @ts-ignore
-                // eslint-disable-next-line no-undef
-                'X-WP-Nonce': window.streamline.nonceRest,
-                'Content-Type': 'application/json',
-              },
-            })
-              .then((response) => response && response.json())
-              .then((data) => {
-                const el = document.querySelector('#wp-admin-bar-streamline-reset a');
-
-                if (data.success) {
-                 el.innerHTML = 'Settings were reset!';
-                 window.location.reload();
+                  #wp-admin-bar-streamline .streamline-icon:before {
+                      font-size: 32px !important;
+                      top: -1px !important;
+                  }
+              }
+          </style>
+          <script>
+            function streamlineResetSettings() {
+              fetch(window.streamline.rest + "streamline/v1/reset/settings?userId=" + <?php echo get_current_user_id(); ?>, {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                  // @ts-ignore
+                  // eslint-disable-next-line no-undef
+                  "X-WP-Nonce": window.streamline.nonceRest,
+                  "Content-Type": "application/json"
                 }
               })
-          }
-      </script>
+                .then((response) => response && response.json())
+                .then((data) => {
+                  const el = document.querySelector("#wp-admin-bar-streamline-reset a");
+
+                  if (data.success) {
+                    el.innerHTML = "Settings were reset!";
+                    window.location.reload();
+                  }
+                });
+            }
+          </script>
 			<?php
         });
 

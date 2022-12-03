@@ -21,7 +21,6 @@ export const config: Config = {
       empty: true,
     },
   ],
-  globalStyle: 'src/css/global.scss',
   plugins: [
     inlineSvg(),
     sass(),
