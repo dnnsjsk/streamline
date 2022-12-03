@@ -8,6 +8,7 @@ import { getMetaKey } from '../../utils/get/getMetaKey';
   styleUrl: '../../css/tailwind.scss',
   shadow: true,
 })
+// eslint-disable-next-line no-unused-vars
 export class StreamlineEntries {
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineEntriesElement;

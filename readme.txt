@@ -1,13 +1,13 @@
 === spx ===
 Contributors: dnnsjsk
 Requires at least: 5.0
-Tested up to: 6.0.0
+Tested up to: 6.1.1
 Requires PHP: 7.0
 Stable tag: 2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Do things faster.
+Use WordPress faster.
 
 == Description ==
 
@@ -16,6 +16,11 @@ Do things faster.
 == Changelog ==
 
 = 1.2.2 =
+* Enhancement: UI fixes
+* Enhancement: give actions better descriptions when there is a value in search bar
+* Enhancement: give shortcut key hints when focussing on rows
+* Enhancement: use <kbd> tag for keyboard shortcuts
+* Enhancement: use solid icons throughout
 * Fix: prevent dropdown being clickable although app is hidden
 
 = 1.2.1 =

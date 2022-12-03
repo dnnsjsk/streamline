@@ -4,8 +4,8 @@ import { computePosition, flip, shift } from '@floating-ui/dom';
 import { isAnimation } from '../../utils/is/isAnimation';
 import { Icon } from '../../elements/Icon';
 import { isArray } from 'lodash-es';
-import IconDots from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/ellipsis.svg';
-import IconLink from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/up-right-from-square.svg';
+import IconDots from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/ellipsis.svg';
+import IconLink from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/up-right-from-square.svg';
 import { Keys } from '../../elements/Keys';
 import { state } from '../../store/internal';
 
@@ -14,6 +14,7 @@ import { state } from '../../store/internal';
   styleUrl: '../../css/tailwind.scss',
   shadow: true,
 })
+// eslint-disable-next-line no-unused-vars
 export class StreamlineDropdown {
   private button: HTMLElement;
   private dropdown: HTMLElement;

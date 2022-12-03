@@ -12,6 +12,7 @@ import { getMenu } from '../../utils/get/getMenu';
   shadow: true,
   assetsDirs: ['test'],
 })
+// eslint-disable-next-line no-unused-vars
 export class StreamlineContainer {
   @Prop() active: '';
   @Prop() test: false;
@@ -136,16 +137,13 @@ export class StreamlineContainer {
 
   render() {
     return (
-      <Host
-        class={{
-          'pointer-events-auto opacity-100': state.isVisible,
-          'pointer-events-none opacity-0': !state.isVisible,
-        }}
-      >
+      <Host>
         <div
           class={{
             'fixed top-0 left-0 z-[9999999999999999] flex h-full w-full items-center justify-center':
               true,
+            'pointer-events-auto opacity-100': state.isVisible,
+            'pointer-events-none opacity-0': !state.isVisible,
           }}
         >
           <div

@@ -10,6 +10,7 @@ import { debounce } from 'lodash-es';
   styleUrl: '../../css/tailwind.scss',
   shadow: true,
 })
+// eslint-disable-next-line no-unused-vars
 export class StreamlineRows {
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineRowsElement;

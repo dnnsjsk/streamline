@@ -47,9 +47,18 @@ describe('streamline-row', () => {
     expect(e()).toBeTruthy();
   });
 
+  it('shows enter key', async () => {
+    e().querySelector('a').focus();
+    await page.waitForChanges();
+    expect(e().querySelector('kbd')).toBeTruthy();
+  });
+
   describe('action', () => {
     it('fires for post', async () => {
       state.searchValue = 'en';
+      await page.waitForChanges();
+      const content = e().querySelector('a').textContent;
+      expect(content).toBe('Search for en in posts');
       e().querySelector('a').click();
       await page.waitForChanges();
       expect(state.active).toBe('post');

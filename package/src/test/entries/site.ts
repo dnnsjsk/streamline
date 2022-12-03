@@ -39,7 +39,7 @@ t((item) => {
       await expect(page.locator('Site: /spx/')).toBeTruthy();
       await page.locator('streamline-header button').click();
       await expect(page.locator('subsite: /spx/')).toBeTruthy();
-      await expect(page.locator('streamline-row')).toHaveCount(101);
+      await expect(page.locator('streamline-row')).toHaveCount(100);
     });
   });
 });

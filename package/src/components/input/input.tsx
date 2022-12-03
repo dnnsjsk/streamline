@@ -10,6 +10,7 @@ import { onChange } from '../../store/internal';
   styleUrl: '../../css/tailwind.scss',
   shadow: true,
 })
+// eslint-disable-next-line no-unused-vars
 export class StreamlineInput {
   private input: HTMLInputElement;
 

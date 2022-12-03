@@ -11,6 +11,7 @@ import { setEntries } from '../../utils/entries/setEntries';
   styleUrl: '../../css/tailwind.scss',
   shadow: true,
 })
+// eslint-disable-next-line no-unused-vars
 export class StreamlineSettings {
   componentWillLoad() {
     state.entriesSettingsActive = state.entriesSettings;
@@ -143,7 +144,7 @@ export class StreamlineSettings {
                                       />,
                                       <div
                                         class={{
-                                          'block h-5 w-14 rounded-full bg-slate-300 group-hover:bg-slate-400 peer-checked:bg-blue-600':
+                                          'block h-6 w-12 rounded-full bg-slate-300 group-hover:bg-slate-400 peer-checked:bg-blue-600':
                                             true,
                                           'transition duration-200 ease-in-out':
                                             isAnimation(),
@@ -151,7 +152,7 @@ export class StreamlineSettings {
                                       />,
                                       <div
                                         class={{
-                                          'dot absolute left-1 top-1 h-3 w-3 rounded-full bg-white peer-checked:translate-x-[36px]':
+                                          'dot absolute left-1 top-1 h-4 w-4 rounded-full bg-white peer-checked:translate-x-[24px]':
                                             true,
                                           'transition duration-200 ease-in-out':
                                             isAnimation(),

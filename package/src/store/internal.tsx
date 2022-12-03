@@ -15,6 +15,7 @@ const { state, dispose, onChange } = createStore({
       id: 'post',
       condition: true,
       name: 'Search for a post',
+      nameActive: 'Search for {{value}} in posts',
       active: 'post',
       route: 'get/posts',
     },
@@ -23,6 +24,7 @@ const { state, dispose, onChange } = createStore({
       // @ts-ignore
       condition: window?.streamlineData?.network && !isFront,
       name: 'Search for a site',
+      nameActive: 'Search for {{ value }} in sites',
       active: 'site',
       route: 'get/sites',
     },

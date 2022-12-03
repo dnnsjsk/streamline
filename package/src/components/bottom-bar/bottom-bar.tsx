@@ -8,6 +8,7 @@ import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter'
   styleUrl: '../../css/tailwind.scss',
   shadow: true,
 })
+// eslint-disable-next-line no-unused-vars
 export class StreamlineBottomBar {
   private getItems = () => {
     let amount = 0;

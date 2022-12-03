@@ -7,15 +7,17 @@ import { get } from '../../utils/query/get';
 import { getMenu } from '../../utils/get/getMenu';
 import { save } from '../../utils/query/save';
 import { isSaveable } from '../../utils/is/isSaveable';
-import IconHeart from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/heart.svg';
-import IconCheck from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/check.svg';
+import IconHeart from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/heart.svg';
+import IconCheck from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/check.svg';
 import { Icon } from '../../elements/Icon';
+import { Keys } from '../../elements/Keys';
 
 @Component({
   tag: 'streamline-row',
   styleUrls: ['../../css/tailwind.scss', '../../css/focus.scss'],
   shadow: true,
 })
+// eslint-disable-next-line no-unused-vars
 export class StreamlineRow {
   private button: HTMLElement;
 
@@ -31,6 +33,7 @@ export class StreamlineRow {
     href: '',
     hrefEdit: '',
     name: '',
+    nameActive: '',
     path: '',
     post_title: '',
     route: '',
@@ -45,11 +48,12 @@ export class StreamlineRow {
   @Prop({ reflect: true, mutable: true }) isEdit = false;
 
   @State() isAction;
-  @State() isSite;
-  @State() isPost;
-  @State() isMenu;
   @State() isDropdown;
+  @State() isMenu;
+  @State() isPost;
+  @State() isSite;
   @State() isTable;
+  @State() showKey = false;
 
   @State() previousValues;
 
@@ -318,7 +322,7 @@ export class StreamlineRow {
           tabindex={this.isEdit || this.disabled ? -1 : 0}
           href={this.item.href || this.item.guid}
           class={{
-            'sl-px focus-inner focus-white peer relative inline-block flex h-10 w-full cursor-pointer flex-wrap items-center text-sm font-medium text-slate-900 sm:hover:bg-slate-50 sm:hover:text-blue-600':
+            'sl-px focus-inner focus-white peer relative inline-block flex h-9 w-full cursor-pointer flex-wrap items-center text-sm font-medium text-slate-900 sm:hover:bg-slate-50 sm:hover:text-blue-600':
               true,
             'pointer-events-none':
               (this.isCurrentSite && this.isSite) ||
@@ -330,6 +334,8 @@ export class StreamlineRow {
           onDblClick={this.onDblClick}
           onMouseDown={(e) => e.preventDefault()}
           onKeyPress={this.onKeyPress}
+          onFocus={() => (this.showKey = true)}
+          onBlur={() => (this.showKey = false)}
         >
           {((this.isFav && state.active !== 'fav') ||
             (this.isCurrentSite && state.active === 'site')) && (
@@ -351,13 +357,30 @@ export class StreamlineRow {
               )}
             </span>
           )}
-          {!this.isTable && this.item.name}
+          {!this.isTable &&
+            (this.isAction ? (
+              state.searchValue !== '' &&
+              this.item.nameActive &&
+              this.item.nameActive !== '' ? (
+                <span
+                  innerHTML={this.item.nameActive.replace(
+                    /{{(.+?)}}/g,
+                    (_) =>
+                      `<span class="!text-slate-500 italic font-bold">${state.searchValue}</span>`
+                  )}
+                />
+              ) : (
+                this.item.name
+              )
+            ) : (
+              this.item.name
+            ))}
         </a>
         {this.isTable && (
           <div class="sl-px sl-grid pointer-events-none absolute top-0 w-full text-slate-700 sm:peer-hover:text-blue-600">
             {this.table.map((itemNested) => {
               return (
-                <div class={`relative flex h-10 items-center`}>
+                <div class={`relative flex h-9 items-center`}>
                   {itemNested.text ? (
                     itemNested.text?.(this.item)
                   ) : (
@@ -369,7 +392,7 @@ export class StreamlineRow {
                       tabindex={itemNested.edit && this.isEdit ? 0 : -1}
                       disabled={!itemNested.edit && this.isEdit}
                       class={{
-                        'focus-none pointer-events-none absolute -top-px left-0 h-[42px] w-4/5 select-text truncate bg-transparent text-sm font-medium leading-none':
+                        'focus-none pointer-events-none absolute -top-px left-0 h-[38px] w-4/5 select-text truncate bg-transparent text-sm font-medium leading-none':
                           true,
                         // @ts-ignore
                         '!pointer-events-auto text-green-600 placeholder-rose-600':
@@ -382,6 +405,11 @@ export class StreamlineRow {
                 </div>
               );
             })}
+          </div>
+        )}
+        {this.showKey && (
+          <div class="absolute right-2 top-1/2 -translate-y-1/2">
+            <Keys keys={['↵']} />
           </div>
         )}
         {this.isDropdown && (

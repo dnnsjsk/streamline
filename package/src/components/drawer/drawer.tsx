@@ -12,6 +12,7 @@ import { isSaveable } from '../../utils/is/isSaveable';
   styleUrl: '../../css/tailwind.scss',
   shadow: true,
 })
+// eslint-disable-next-line no-unused-vars
 export class StreamlineDrawer {
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineDrawerElement;

@@ -3,7 +3,7 @@ import { Component, h, Element } from '@stencil/core';
 import { onChange, state } from '../../store/internal';
 import { Button } from '../../elements/Button';
 import { Icon } from '../../elements/Icon';
-import IconSearch from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/magnifying-glass.svg';
+import IconSearch from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/magnifying-glass.svg';
 import { getMetaKey } from '../../utils/get/getMetaKey';
 import { isAnimation } from '../../utils/is/isAnimation';
 import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
@@ -15,6 +15,7 @@ import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter'
   styleUrl: '../../css/tailwind.scss',
   shadow: true,
 })
+// eslint-disable-next-line no-unused-vars
 export class StreamlineSearch {
   private input: HTMLInputElement;
 

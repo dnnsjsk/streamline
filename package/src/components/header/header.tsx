@@ -4,17 +4,17 @@ import { state } from '../../store/internal';
 import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter';
 import { Icon } from '../../elements/Icon';
 import { Button } from '../../elements/Button';
-import IconMenu from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/bars.svg';
-import IconNetwork from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/chart-network.svg';
-import IconPost from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/feather-pointed.svg';
-import IconSites from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/sitemap.svg';
-import IconSettings from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/gear.svg';
-import IconAction from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/rocket-launch.svg';
-import IconTear from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/face-smile-tear.svg';
-import IconTimes from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/xmark.svg';
-import IconFilterSlash from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/filter-slash.svg';
-import IconArrowLeft from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/arrow-left.svg';
-import IconArrowRight from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/regular/arrow-right.svg';
+import IconMenu from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/list-ul.svg';
+import IconNetwork from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/chart-network.svg';
+import IconPost from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/feather-pointed.svg';
+import IconSites from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/sitemap.svg';
+import IconSettings from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/gear.svg';
+import IconAction from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/rocket-launch.svg';
+import IconTear from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/face-smile-tear.svg';
+import IconTimes from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/xmark.svg';
+import IconFilterSlash from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/filter-slash.svg';
+import IconArrowLeft from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/arrow-left.svg';
+import IconArrowRight from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/arrow-right.svg';
 import { post } from '../../utils/query/post';
 import { setEntries } from '../../utils/entries/setEntries';
 import { get } from '../../utils/query/get';
@@ -24,6 +24,7 @@ import { get } from '../../utils/query/get';
   styleUrl: '../../css/tailwind.scss',
   shadow: true,
 })
+// eslint-disable-next-line no-unused-vars
 export class StreamlineHeader {
   @Prop() item = {
     ID: 1,
