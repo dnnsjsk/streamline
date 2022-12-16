@@ -158,7 +158,7 @@ export class StreamlineContainer {
           />
           <div
             class={{
-              'inner absolute grid h-full max-h-[600px] w-full max-w-screen-md overflow-hidden bg-white md:rounded-xl':
+              'inner absolute grid h-full w-full max-w-screen-md overflow-hidden bg-white sm:max-h-[600px] md:rounded-xl':
                 true,
               'translate-y-4 opacity-0': !state.isVisible,
               'opacity-100': state.isVisible,

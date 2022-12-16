@@ -15,6 +15,9 @@ Do things faster.
 
 == Changelog ==
 
+= 1.2.4 =
+* Enhancement: make app full screen on mobile
+
 = 1.2.3 =
 * Fix: Tailwind reset leaking out of component
 
