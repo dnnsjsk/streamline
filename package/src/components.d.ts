@@ -15,6 +15,9 @@ export namespace Components {
         "toggle": () => Promise<void>;
         "visible": false;
     }
+    /**
+     * Drawer.
+     */
     interface StreamlineDrawer {
     }
     interface StreamlineDropdown {
@@ -26,6 +29,9 @@ export namespace Components {
     interface StreamlineHeader {
         "item": { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; isMultisite: boolean; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; title: string; type: string; };
     }
+    /**
+     * Input.
+     */
     interface StreamlineInput {
         "handleInput": Function;
         "invalid": boolean;
@@ -63,6 +69,9 @@ declare global {
         prototype: HTMLStreamlineContainerElement;
         new (): HTMLStreamlineContainerElement;
     };
+    /**
+     * Drawer.
+     */
     interface HTMLStreamlineDrawerElement extends Components.StreamlineDrawer, HTMLStencilElement {
     }
     var HTMLStreamlineDrawerElement: {
@@ -87,6 +96,9 @@ declare global {
         prototype: HTMLStreamlineHeaderElement;
         new (): HTMLStreamlineHeaderElement;
     };
+    /**
+     * Input.
+     */
     interface HTMLStreamlineInputElement extends Components.StreamlineInput, HTMLStencilElement {
     }
     var HTMLStreamlineInputElement: {
@@ -139,6 +151,9 @@ declare namespace LocalJSX {
         "test"?: false;
         "visible"?: false;
     }
+    /**
+     * Drawer.
+     */
     interface StreamlineDrawer {
     }
     interface StreamlineDropdown {
@@ -150,6 +165,9 @@ declare namespace LocalJSX {
     interface StreamlineHeader {
         "item"?: { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; isMultisite: boolean; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; title: string; type: string; };
     }
+    /**
+     * Input.
+     */
     interface StreamlineInput {
         "handleInput"?: Function;
         "invalid"?: boolean;
@@ -193,10 +211,16 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "streamline-bottom-bar": LocalJSX.StreamlineBottomBar & JSXBase.HTMLAttributes<HTMLStreamlineBottomBarElement>;
             "streamline-container": LocalJSX.StreamlineContainer & JSXBase.HTMLAttributes<HTMLStreamlineContainerElement>;
+            /**
+             * Drawer.
+             */
             "streamline-drawer": LocalJSX.StreamlineDrawer & JSXBase.HTMLAttributes<HTMLStreamlineDrawerElement>;
             "streamline-dropdown": LocalJSX.StreamlineDropdown & JSXBase.HTMLAttributes<HTMLStreamlineDropdownElement>;
             "streamline-entries": LocalJSX.StreamlineEntries & JSXBase.HTMLAttributes<HTMLStreamlineEntriesElement>;
             "streamline-header": LocalJSX.StreamlineHeader & JSXBase.HTMLAttributes<HTMLStreamlineHeaderElement>;
+            /**
+             * Input.
+             */
             "streamline-input": LocalJSX.StreamlineInput & JSXBase.HTMLAttributes<HTMLStreamlineInputElement>;
             "streamline-row": LocalJSX.StreamlineRow & JSXBase.HTMLAttributes<HTMLStreamlineRowElement>;
             "streamline-rows": LocalJSX.StreamlineRows & JSXBase.HTMLAttributes<HTMLStreamlineRowsElement>;
