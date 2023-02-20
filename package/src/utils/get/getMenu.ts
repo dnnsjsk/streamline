@@ -51,7 +51,7 @@ export const getMenu = (obj = {} as any) => {
               nameParent: name,
               path: hrefSub,
               siteId: Number(siteId),
-              type: type,
+              type,
             };
           }
         });
@@ -68,10 +68,10 @@ export const getMenu = (obj = {} as any) => {
       {
         adminUrl,
         children: menu,
-        isMultisite: isMultisite,
+        isMultisite,
         path: obj.path || state.currentSite.path,
         siteId: Number(siteId),
-        type: type,
+        type,
       },
     ];
 
