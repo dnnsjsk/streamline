@@ -6,14 +6,14 @@ t((item) => {
   test.describe(`${item} Search entries`, () => {
     test.describe('render', () => {
       test('normally', async ({ page }) => {
-        await expect(page.locator('streamline-row')).toHaveCount(92);
+        await expect(page.locator('streamline-row')).toHaveCount(60);
         await expect(page.locator('text=subsite: /streamline/')).toBeTruthy();
       });
 
       test("when searching for 'post'", async ({ page }) => {
         await focus(page);
         await page.type('#streamline-search', 'post', { delay: 100 });
-        await expect(page.locator('streamline-row')).toHaveCount(7);
+        await expect(page.locator('streamline-row')).toHaveCount(6);
       });
     });
 

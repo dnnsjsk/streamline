@@ -15,6 +15,8 @@ Do things faster.
 
 == Changelog ==
 
+= 2.0.0 =
+
 = 1.2.4 =
 * Enhancement: make app full screen on mobile
 
