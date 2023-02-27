@@ -198,7 +198,7 @@ export class StreamlineRows {
                   Object.values(item.children as unknown).map((itemInner) => {
                     return itemInner.children ? (
                       <li key={itemInner.name}>
-                        <h2 class="sl-mx pb-2 pt-4 text-sm font-medium text-slate-500">
+                        <h2 class="sl-mx pb-1 pt-4 text-xs font-medium text-slate-500">
                           {itemInner.name}
                         </h2>
                         <ul>

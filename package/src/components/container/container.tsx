@@ -16,7 +16,6 @@ import { getMenu } from '../../utils/get/getMenu';
 export class StreamlineContainer {
   @Prop() active: '';
   @Prop() test: false;
-  @Prop() visible: false;
 
   @Watch('active')
   watchFront(value) {
@@ -24,7 +23,7 @@ export class StreamlineContainer {
   }
 
   componentWillLoad() {
-    state.isVisible = this.visible;
+    state.isVisible = (window as any)?.streamlineData?.isVisible;
 
     if (
       state.data?.settings &&

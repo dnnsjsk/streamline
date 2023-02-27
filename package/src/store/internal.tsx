@@ -32,10 +32,8 @@ const { state, dispose, onChange } = createStore({
   active: 'search',
   bodyStyle: {},
   currentSite: {
-    // @ts-ignore
-    id: window?.streamlineData?.siteId || '1',
-    // @ts-ignore
-    path: window?.streamlineData?.sitePath || '/',
+    id: (window as any)?.streamlineData?.siteId || '1',
+    path: (window as any)?.streamlineData?.sitePath || '/',
   },
   // @ts-ignore
   data: window.streamlineData,
@@ -47,12 +45,11 @@ const { state, dispose, onChange } = createStore({
     values: {},
   },
   entriesActions: [],
-  // @ts-ignore
-  entriesFav: JSON.parse(window?.streamlineData?.favourites ?? '[]'),
-  // @ts-ignore
-  entriesFavActive: JSON.parse(window?.streamlineData?.favourites ?? '[]'),
-  // @ts-ignore
-  entriesMenu: JSON.parse(window?.streamlineData?.menu ?? '[]'),
+  entriesFav: JSON.parse((window as any)?.streamlineData?.favourites ?? '[]'),
+  entriesFavActive: JSON.parse(
+    (window as any)?.streamlineData?.favourites ?? '[]'
+  ),
+  entriesMenu: JSON.parse((window as any)?.streamlineData?.menu ?? '[]'),
   entriesMenuCurrentPath: '',
   entriesNetworkMenu: [],
   entriesPost: [],
@@ -151,11 +148,10 @@ const { state, dispose, onChange } = createStore({
     },
   },
   isEnter: false,
-  isFront: isFront,
+  isFront,
   isLoading: false,
   isMac: navigator.userAgent.indexOf('Mac OS X') !== -1,
-  // @ts-ignore
-  isMultisite: window?.streamlineData?.network,
+  isMultisite: (window as any)?.streamlineData?.network,
   isVisible: false,
   menus: ['search', 'fav', 'settings'],
   scroll: 0,

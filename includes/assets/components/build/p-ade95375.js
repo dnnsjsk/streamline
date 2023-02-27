@@ -1,0 +1,1 @@
+import{s}from"./p-e24a7e82.js";const o=o=>s.isMac?o.metaKey:o.ctrlKey;export{o as g}

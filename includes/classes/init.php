@@ -216,6 +216,7 @@ class Init
             "favourites" => json_encode($favs),
             "isAdmin" => is_admin(),
             "isNetwork" => is_network_admin(),
+            "isVisible" => isset($_GET["streamline"]),
             "network" => !is_multisite() ? false : network_admin_url(),
             "settings" => json_encode($settings),
             "siteId" => strval(get_current_blog_id()),

@@ -24,7 +24,7 @@ import { get } from '../../utils/query/get';
   styleUrl: '../../css/tailwind.scss',
   shadow: true,
 })
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line no-unused-vars,@stencil-community/ban-prefix
 export class StreamlineHeader {
   @Prop() item = {
     ID: 1,
@@ -118,7 +118,7 @@ export class StreamlineHeader {
             <h1
               class="mr-6 truncate whitespace-nowrap text-base font-semibold text-slate-900"
               innerHTML={`${
-                // eslint-disable-next-line @stencil/strict-boolean-conditions
+                // eslint-disable-next-line @stencil-community/strict-boolean-conditions
                 this.item.title
                   ? this.item.title
                   : this.item.type === 'networkMenu'

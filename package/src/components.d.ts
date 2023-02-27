@@ -13,7 +13,6 @@ export namespace Components {
         "setState": (data: any) => Promise<unknown>;
         "test": false;
         "toggle": () => Promise<void>;
-        "visible": false;
     }
     /**
      * Drawer.
@@ -149,7 +148,6 @@ declare namespace LocalJSX {
     interface StreamlineContainer {
         "active"?: '';
         "test"?: false;
-        "visible"?: false;
     }
     /**
      * Drawer.
