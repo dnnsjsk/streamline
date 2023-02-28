@@ -16,6 +16,8 @@ Do things faster.
 == Changelog ==
 
 = 2.0.0 =
+* New: possibility to open Streamline via query parameter (?streamline)
+* New: possibility to set license key from PHP
 
 = 1.2.4 =
 * Enhancement: make app full screen on mobile
