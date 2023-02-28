@@ -1,16 +1,17 @@
 <?php
 /**
- * 1.0
+ * 1.1
+ * @date 12/04/2023
  */
 
 class StreamlinePlugin
 {
-    static $prefix = "";
-    static $name = "";
-    static $store_url = "";
-    static $item_id = null;
-    static $license_page = "";
-    static $file = "";
+    static string $prefix = "";
+    static string $name = "";
+    static string $store_url = "";
+    static ?int $item_id = null;
+    static string $license_page = "";
+    static string $file = "";
 
     static function init(
         $prefix,
@@ -39,6 +40,7 @@ class StreamlinePlugin
         }
         add_action("admin_init", [__CLASS__, "updater"], 0);
         add_action("admin_init", [__CLASS__, "option"]);
+        add_action("admin_init", [__CLASS__, "constant"]);
         add_action("admin_menu", [__CLASS__, "menu"], 11);
         add_action("plugins_loaded", function () use (&$name) {
             add_action("wp_ajax_${name}LicenseQuery", [
@@ -50,6 +52,46 @@ class StreamlinePlugin
                 "fabrikatSettingsQuery",
             ]);
         });
+    }
+
+    /**
+     * Get status.
+     *
+     * @since 1.1
+     */
+    static function getStatus(): string
+    {
+        return trim(get_option(self::$prefix . "license_status"));
+    }
+
+    /**
+     * Get key.
+     *
+     * @since 1.1
+     */
+    static function getKey(): string
+    {
+        return trim(get_option(self::$prefix . "license_key"));
+    }
+
+    /**
+     * Get key const.
+     *
+     * @since 1.1
+     */
+    static function getKeyConst(): string
+    {
+        return trim(get_option(self::$prefix . "license_key_const"));
+    }
+
+    /**
+     * Get settings.
+     *
+     * @since 1.1
+     */
+    static function getSettings(): string
+    {
+        return get_option(self::$prefix . "settings");
     }
 
     /**
@@ -88,14 +130,12 @@ class StreamlinePlugin
      */
     static function updater()
     {
-        $license_key = trim(get_option(self::$prefix . "license_key"));
-
-        $plugin_data = get_plugin_data(self::$file);
-        $plugin_version = $plugin_data["Version"];
+        $pluginData = get_plugin_data(self::$file);
+        $pluginVersion = $pluginData["Version"];
 
         new EDD_SL_Plugin_Updater(self::$store_url, self::$file, [
-            "version" => $plugin_version,
-            "license" => $license_key,
+            "version" => $pluginVersion,
+            "license" => self::getKey(),
             "item_id" => self::$item_id,
             "author" => "Fabrikat",
             "url" => home_url(),
@@ -135,15 +175,9 @@ class StreamlinePlugin
           shopUrl: '<?php echo self::$store_url; ?>',
           productId: '<?php echo self::$item_id; ?>',
           currentUrl: '<?php echo home_url(); ?>',
-          licenseStatus: '<?php echo get_option(
-              self::$prefix . "license_status"
-          ); ?>',
-          licenseCode: '<?php echo trim(
-              get_option(self::$prefix . "license_key")
-          ); ?>',
-          settings: '<?php echo json_encode(
-              get_option(self::$prefix . "settings")
-          ); ?>'
+          licenseStatus: '<?php echo self::getStatus(); ?>',
+          licenseCode: '<?php echo self::getKey(); ?>',
+          settings: '<?php echo json_encode(self::getSettings()); ?>'
         };
       </script>
       <div id="fabrikat-plugin"></div>
@@ -171,12 +205,93 @@ class StreamlinePlugin
      */
     static function sanitize($new)
     {
-        $old = get_option(self::$prefix . "license_key");
+        $old = self::getKey();
         if ($old && $old != $new) {
             delete_option(self::$prefix . "license_status");
         }
 
         return $new;
+    }
+
+    /**
+     * Check license.
+     *
+     * @since 1.1
+     */
+    static function checkLicense($license, $action)
+    {
+        $api_params = [
+            "edd_action" => $action,
+            "license" => $license,
+            "item_name" => urlencode(self::$name),
+            "url" => home_url(),
+        ];
+
+        $response = wp_remote_post(self::$store_url, [
+            "timeout" => 15,
+            "sslverify" => false,
+            "body" => $api_params,
+        ]);
+
+        $body = wp_remote_retrieve_body($response);
+        $licenseData = json_decode($body);
+
+        if (
+            !is_wp_error($response) ||
+            200 === wp_remote_retrieve_response_code($response)
+        ) {
+            if (
+                $action === "activate_license" &&
+                $licenseData->license === "valid"
+            ) {
+                update_option(
+                    self::$prefix . "license_status",
+                    $licenseData->license
+                );
+                update_option(self::$prefix . "license_key", $license);
+            } elseif (
+                $action === "deactivate_license" ||
+                $licenseData->license === "invalid"
+            ) {
+                update_option(
+                    self::$prefix . "license_status",
+                    $licenseData->license
+                );
+                delete_option(self::$prefix . "license_key");
+            }
+        }
+
+        return $licenseData;
+    }
+
+    static function constant()
+    {
+        $var = strtoupper(self::$prefix . "license");
+        $const = defined($var) ? constant($var) : false;
+
+        if (
+            !$const ||
+            !defined($var) ||
+            empty(constant($var)) ||
+            !is_string(constant($var))
+        ) {
+            return;
+        }
+
+        if ($const !== self::getKey()) {
+            if (self::getStatus() === "valid") {
+                self::checkLicense(self::getKey(), "deactivate_license");
+            }
+            if (
+                ($const !== self::getKeyConst() &&
+                    self::getStatus() !== "valid") ||
+                ($const === self::getKeyConst() &&
+                    self::getStatus() !== "invalid")
+            ) {
+                update_option(self::$prefix . "license_key_const", $const);
+                self::checkLicense($const, "activate_license");
+            }
+        }
     }
 
     /**
@@ -192,45 +307,8 @@ class StreamlinePlugin
                 : false;
             $action = $_POST["type"];
 
-            $api_params = [
-                "edd_action" => $action,
-                "license" => $license,
-                "item_name" => urlencode(self::$name),
-                "url" => home_url(),
-            ];
-
-            $response = wp_remote_post(self::$store_url, [
-                "timeout" => 15,
-                "sslverify" => false,
-                "body" => $api_params,
-            ]);
-
-            $body = wp_remote_retrieve_body($response);
-            $license_data = json_decode($body);
-
-            if (
-                !is_wp_error($response) ||
-                200 === wp_remote_retrieve_response_code($response)
-            ) {
-                if (
-                    $action === "activate_license" &&
-                    $license_data->license === "valid"
-                ) {
-                    update_option(
-                        self::$prefix . "license_status",
-                        $license_data->license
-                    );
-                    update_option(self::$prefix . "license_key", $license);
-                } elseif (
-                    $action === "deactivate_license" ||
-                    $license_data->license === "invalid"
-                ) {
-                    delete_option(self::$prefix . "license_status");
-                    delete_option(self::$prefix . "license_key");
-                }
-            }
-
-            wp_send_json($license_data);
+            $licenseData = self::checkLicense($license, $action);
+            wp_send_json($licenseData);
 
             die();
         }
