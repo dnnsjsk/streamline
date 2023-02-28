@@ -5,6 +5,7 @@ import { isAnimation } from '../../utils/is/isAnimation';
 import { setupEntries } from '../../utils/entries/setupEntries';
 import { getMetaKey } from '../../utils/get/getMetaKey';
 import { getMenu } from '../../utils/get/getMenu';
+import getM from '../../utils/get/getM';
 
 @Component({
   tag: 'streamline-container',
@@ -20,6 +21,30 @@ export class StreamlineContainer {
   @Watch('active')
   watchFront(value) {
     state.active = value;
+  }
+
+  connectedCallback() {
+    document.addEventListener('streamline/entries', function (event: any) {
+      const data = event.detail;
+
+      console.log(data);
+    });
+
+    const newEvent = new CustomEvent('streamline/entries', {
+      detail: {
+        wordpress: {
+          name: 'WordPress',
+          children: [
+            ...getM({
+              name: 'Admin menu',
+              url: state.data.adminUrl,
+            }),
+          ],
+        },
+      },
+    });
+
+    document.dispatchEvent(newEvent);
   }
 
   componentWillLoad() {

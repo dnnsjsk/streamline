@@ -21,8 +21,7 @@ const { state, dispose, onChange } = createStore({
     },
     site: {
       id: 'site',
-      // @ts-ignore
-      condition: window?.streamlineData?.network && !isFront,
+      condition: (window as any)?.streamlineData?.network && !isFront,
       name: 'Search for a site',
       nameActive: 'Search for {{value}} in sites',
       active: 'site',
@@ -35,8 +34,7 @@ const { state, dispose, onChange } = createStore({
     id: (window as any)?.streamlineData?.siteId || '1',
     path: (window as any)?.streamlineData?.sitePath || '/',
   },
-  // @ts-ignore
-  data: window.streamlineData,
+  data: (window as any).streamlineData,
   drawer: {
     active: false,
     items: [],
