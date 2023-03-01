@@ -39,7 +39,7 @@ export const setEntries = (removeSort = '') => {
           {
             title: state.searchNoValue,
             children: [],
-            isMultisite: state?.data?.network,
+            isMultisite: (state?.data as any)?.network,
             path:
               state.active === 'menu'
                 ? state.entriesMenuCurrentPath

@@ -1,31 +1,17 @@
 import { state } from '../../store/internal';
-import { resetView } from '../general/resetView';
-import { setupEntries } from '../entries/setupEntries';
 
-export const getMenu = (obj = {} as any) => {
-  let data = [];
-  const menu = {};
-
-  const isAdmin =
-    document.querySelector('#adminmenuwrap') &&
-    ((obj.network && state.data.isNetwork) ||
-      (!obj.network && state.data.isAdmin && !state.data.isNetwork));
-  const isNetwork = obj.network;
-  const isMultisite = !!state.data.network;
-  const adminUrl =
-    obj.adminUrl || (isNetwork ? state.data.network : state.data.adminUrl);
-  const siteId = obj.siteId || (isNetwork ? 0 : state.data.siteId);
-  const type = !obj.path && isNetwork ? 'networkMenu' : 'menu';
+export default async function getMenu({ url, name, isAdmin }) {
+  const menu = [];
 
   function get(doc) {
-    doc.querySelectorAll('.menu-top > a').forEach((item, index) => {
-      const name = (item as HTMLElement).innerText.replace(
+    doc.querySelectorAll('.menu-top > a').forEach((item) => {
+      const nameMenu = (item as HTMLElement).innerText.replace(
         /(\r\n|\n|\r)/gm,
         ''
       );
 
       const subMenu = item.closest('li.menu-top');
-      const subArr = {};
+      const subArr = [];
 
       if (subMenu) {
         const subSubMenu = subMenu.querySelectorAll('a');
@@ -43,60 +29,40 @@ export const getMenu = (obj = {} as any) => {
               : itemSub.innerText.replace(/(\r\n|\n|\r)/gm, '');
             const hrefSub = itemSub.getAttribute('href');
 
-            subArr[hrefSub] = {
-              adminUrl,
-              href: adminUrl + hrefSub,
-              index: subSubMenu.length === 1 ? indexSub : indexSub - 1,
+            subArr.push({
+              href: url + hrefSub,
               name: nameSub,
-              nameParent: name,
-              path: hrefSub,
-              siteId: Number(siteId),
-              type,
-            };
+            });
           }
         });
       }
 
-      menu[name] = {
-        index,
-        name,
+      menu.push({
+        name: nameMenu,
         children: subArr,
-      };
+      });
     });
 
-    data = [
+    return [
       {
-        adminUrl,
+        name,
         children: menu,
-        isMultisite,
-        path: obj.path || state.currentSite.path,
-        siteId: Number(siteId),
-        type,
       },
     ];
-
-    if (isNetwork) {
-      state.entriesNetworkMenu = data;
-    } else {
-      state.entriesMenu = data;
-    }
-    setupEntries();
   }
 
-  if (isAdmin && !obj.fetch) {
-    get(document);
-    obj.callback && obj.callback();
+  if (isAdmin) {
+    return get(document);
   } else {
     state.isLoading = true;
-    fetch(adminUrl)
+    return await fetch(url)
       .then((response) => response.text && response.text())
       .then((data) => {
         const parser = new DOMParser();
         const html = parser.parseFromString(data, 'text/html');
-        get(html);
-        resetView();
-        obj.callback && obj.callback();
+        return get(html);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => (state.isLoading = false));
   }
-};
+}

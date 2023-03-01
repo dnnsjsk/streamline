@@ -4,8 +4,7 @@ import { state } from '../../store/internal';
 import { isAnimation } from '../../utils/is/isAnimation';
 import { setupEntries } from '../../utils/entries/setupEntries';
 import { getMetaKey } from '../../utils/get/getMetaKey';
-import { getMenu } from '../../utils/get/getMenu';
-import getM from '../../utils/get/getM';
+import getMenu from '../../utils/get/getMenu';
 
 @Component({
   tag: 'streamline-container',
@@ -25,26 +24,60 @@ export class StreamlineContainer {
 
   connectedCallback() {
     document.addEventListener('streamline/entries', function (event: any) {
-      const data = event.detail;
-
-      console.log(data);
-    });
-
-    const newEvent = new CustomEvent('streamline/entries', {
-      detail: {
-        wordpress: {
-          name: 'WordPress',
+      const [key, value] = Object.entries(event.detail)[0] as any;
+      state.entries = {
+        ...state.entries,
+        [key]: {
+          actions: [
+            ...(state.entries[key]?.actions || []),
+            ...(value?.actions || []),
+          ],
           children: [
-            ...getM({
-              name: 'Admin menu',
-              url: state.data.adminUrl,
-            }),
+            ...(state.entries[key]?.children || []),
+            ...(value?.children || []),
           ],
         },
-      },
+      };
+
+      console.log(state.entries);
     });
 
-    document.dispatchEvent(newEvent);
+    async function dispatch({ name, url, isAdmin, condition = false }) {
+      if (!condition) return;
+
+      const children = await getMenu({
+        name,
+        url,
+        isAdmin,
+      });
+
+      const newEvent = new CustomEvent('streamline/entries', {
+        detail: {
+          wordpress: {
+            name: 'WordPress',
+            children,
+          },
+        },
+      });
+
+      document.dispatchEvent(newEvent);
+    }
+
+    if (state.data.isNetwork) {
+      dispatch({
+        name: 'Network menu',
+        url: state.data.networkAdminUrl,
+        condition: state.data.networkAdminUrl !== false,
+        isAdmin: true,
+      }).then(() => {});
+    }
+
+    dispatch({
+      name: 'Admin menu',
+      url: state.data.adminUrl,
+      condition: true,
+      isAdmin: state.data.isAdmin && !state.data.isNetwork,
+    }).then(() => {});
   }
 
   componentWillLoad() {
@@ -102,16 +135,6 @@ export class StreamlineContainer {
         }
       }
     });
-
-    if (!state.test) {
-      if (state.data.network && state.entriesNetworkMenu.length === 0) {
-        getMenu({ network: true });
-      }
-
-      if (state.entriesMenu.length === 0) {
-        getMenu({ network: false, adminUrl: state.data.adminUrl });
-      }
-    }
   }
 
   private cycleActive = (mode) => {

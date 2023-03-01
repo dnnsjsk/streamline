@@ -34,7 +34,20 @@ const { state, dispose, onChange } = createStore({
     id: (window as any)?.streamlineData?.siteId || '1',
     path: (window as any)?.streamlineData?.sitePath || '/',
   },
-  data: (window as any).streamlineData,
+  data: (window as any).streamlineData as {
+    adminUrl: string;
+    favourites: string;
+    isAdmin: boolean;
+    isMainSite: boolean;
+    isNetwork: boolean;
+    isVisible: boolean;
+    networkAdminUrl: string | boolean;
+    settings: any;
+    siteId: string;
+    sitePath: string;
+    siteUrl: string;
+    userId: string;
+  },
   drawer: {
     active: false,
     items: [],
@@ -56,6 +69,8 @@ const { state, dispose, onChange } = createStore({
   entriesPostCurrentPath: '',
   entriesPostQuery: '',
   entriesPostTotal: 0,
+  entries: [],
+  entriesActive: [],
   entriesSearch: [],
   entriesSearchActive: [],
   entriesSettings: [

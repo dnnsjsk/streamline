@@ -217,7 +217,7 @@ class Init
             "isAdmin" => is_admin(),
             "isNetwork" => is_network_admin(),
             "isVisible" => isset($_GET["streamline"]),
-            "network" => !is_multisite() ? false : network_admin_url(),
+            "networkAdminUrl" => !is_multisite() ? false : network_admin_url(),
             "settings" => json_encode($settings),
             "siteId" => strval(get_current_blog_id()),
             "sitePath" => is_multisite() ? $currentSite[0]->path : "/",

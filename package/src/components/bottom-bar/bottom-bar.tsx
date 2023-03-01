@@ -36,7 +36,7 @@ export class StreamlineBottomBar {
 
     return [
       {
-        condition: state?.data?.network && !state.isFront,
+        condition: (state?.data as any)?.network && !state.isFront,
         text: 'Site',
         value: state.currentSite.path,
       },

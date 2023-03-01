@@ -4,7 +4,6 @@ import { state } from '../../store/internal';
 import { someDeep } from 'deepdash-es/standalone';
 import { setFavourite } from '../../utils/set/setFavourite';
 import { get } from '../../utils/query/get';
-import { getMenu } from '../../utils/get/getMenu';
 import { save } from '../../utils/query/save';
 import { isSaveable } from '../../utils/is/isSaveable';
 import IconHeart from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/heart.svg';
@@ -134,9 +133,6 @@ export class StreamlineRow {
       if (this.isAction) {
         this.onClickAction();
       }
-      if (this.isSite) {
-        this.onClickSite();
-      }
     }
   };
 
@@ -153,28 +149,6 @@ export class StreamlineRow {
         callback: () => (state.active = this.item.active),
       });
     }
-  };
-
-  private onClickSite = () => {
-    state.currentSite = {
-      path: this.item.path,
-      id: this.item.siteId,
-    };
-
-    state.entriesPost = [];
-    state.entriesPostActive = [];
-    state.entriesPostQuery = '';
-
-    if (!state.data.isAdmin) {
-      state.isLoading = true;
-    }
-
-    getMenu({
-      adminUrl: this.item.adminUrl,
-      fetch: true,
-      siteId: this.item.siteId,
-      path: this.item.path,
-    });
   };
 
   private onClickPostsEditToggle = (edit) => {
@@ -235,8 +209,6 @@ export class StreamlineRow {
   private onClick = (e) =>
     this.isAction
       ? this.onClickAction()
-      : this.isSite
-      ? this.onClickSite()
       : this.isPost && window.innerWidth <= 639
       ? e.preventDefault()
       : false;
