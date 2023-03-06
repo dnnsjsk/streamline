@@ -4,14 +4,6 @@ import { state } from '../../store/internal';
 import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter';
 import { Icon } from '../../elements/Icon';
 import { Button } from '../../elements/Button';
-import IconMenu from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/list-ul.svg';
-import IconNetwork from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/chart-network.svg';
-import IconPost from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/feather-pointed.svg';
-import IconSites from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/sitemap.svg';
-import IconSettings from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/gear.svg';
-import IconAction from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/rocket-launch.svg';
-import IconTear from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/face-smile-tear.svg';
-import IconTimes from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/xmark.svg';
 import IconFilterSlash from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/filter-slash.svg';
 import IconArrowLeft from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/arrow-left.svg';
 import IconArrowRight from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/arrow-right.svg';
@@ -41,20 +33,13 @@ export class StreamlineHeader {
     tab: '',
     title: '',
     type: '',
+    icon: '',
   };
 
   render() {
     const active = capitalizeFirstLetter(state.active);
-    const isQuery = this.item.type === 'post' || this.item.type === 'site';
-    const isMenu =
-      this.item.type === 'menu' || this.item.type === 'networkMenu';
     const isQueryMode = state.active === 'site' || state.active === 'post';
     const isQueryWithClose = isQueryMode && state[`entries${active}Query`];
-
-    const path =
-      this.item.isMultisite && state.active !== 'site' && !state.isFront
-        ? ` <span class="text-slate-300">∙</span> subsite: ${this.item.path}`
-        : '';
 
     const hasPages =
       (state.test && isQueryMode) ||
@@ -71,80 +56,23 @@ export class StreamlineHeader {
       state.infoBar.pages.amount !== 1;
 
     return (
-      <div class="sl-px grid grid-cols-[minmax(0,1fr),minmax(0,auto)] items-center justify-between">
+      <div class="sl-mx grid grid-cols-[minmax(0,1fr),minmax(0,auto)] items-center justify-between border-b border-slate-200 py-2">
         <div class="w-full">
           <div class={`absolute -left-full top-0 z-[-1] h-full bg-white`} />
           <div class={`flex max-w-full flex-row items-center`}>
-            <div
-              class={{
-                'relative mr-3 flex w-4 flex-shrink-0 rounded-lg text-blue-600':
-                  true,
-                'ml-9': isQueryWithClose || isTestNav,
-              }}
-            >
-              {this.item.type === 'menu' || state.active === 'menu' ? (
-                <Icon icon={IconMenu} />
-              ) : this.item.type === 'networkMenu' ||
-                state.active === 'networkMenu' ? (
-                <Icon icon={IconNetwork} />
-              ) : this.item.type === 'post' || state.active === 'post' ? (
-                <Icon icon={IconPost} />
-              ) : this.item.type === 'settings' ||
-                state.active === 'settings' ? (
-                <Icon icon={IconSettings} />
-              ) : this.item.type === 'site' || state.active === 'site' ? (
-                <Icon icon={IconSites} />
-              ) : this.item.type === 'action' ? (
-                <Icon icon={IconAction} />
-              ) : (
-                this.item.type === undefined && <Icon icon={IconTear} />
-              )}
-            </div>
-            {(isQueryWithClose || isTestNav) && (
-              <Button
-                type="back"
-                icon={<Icon icon={IconTimes} />}
-                onClick={() => {
-                  if (!state.test) {
-                    state[`entries${active}CurrentPage`] = 1;
-                    state[`entries${active}Query`] = '';
-                    state[`entries${active}`] = [];
-                    state[`entries${active}Active`] = [];
-                  }
-                  state.active = 'search';
+            {this.item.icon && (
+              <div
+                class={{
+                  'relative mr-3 flex w-4 flex-shrink-0 rounded-lg text-blue-600':
+                    true,
+                  'ml-9': isQueryWithClose || isTestNav,
                 }}
+                innerHTML={this.item.icon}
               />
             )}
-            <h1
-              class="mr-6 truncate whitespace-nowrap text-base font-semibold text-slate-900"
-              innerHTML={`${
-                // eslint-disable-next-line @stencil-community/strict-boolean-conditions
-                this.item.title
-                  ? this.item.title
-                  : this.item.type === 'networkMenu'
-                  ? 'Network admin'
-                  : isMenu
-                  ? 'Admin menu' + path
-                  : (state.active === 'post' || state.active === 'site') &&
-                    state[`entries${active}`][0]?.queryValue
-                  ? `${active}s for: ` +
-                    `<span class="text-slate-400 italic">${
-                      state[
-                        `entries${state.active === 'post' ? 'Post' : 'Site'}`
-                      ][0]?.queryValue
-                    }</span>` +
-                    path
-                  : isQuery && state.active === 'fav'
-                  ? `${capitalizeFirstLetter(this.item.type)}s` + path
-                  : isQueryMode && !state[`entries${active}Query`]
-                  ? `No query, search for a ${state.active} in the search bar`
-                  : state.active === 'settings'
-                  ? 'Settings'
-                  : this.item.type === 'action'
-                  ? 'Actions'
-                  : 'No results'
-              }`}
-            />
+            <h1 class="mr-6 truncate whitespace-nowrap text-base font-semibold text-slate-900">
+              {this.item.name}
+            </h1>
           </div>
         </div>
         <div>

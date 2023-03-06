@@ -40,18 +40,23 @@ export class StreamlineRows {
   }
 
   private getArr = (type) => {
-    return (
-      (state[`entries${capitalizeFirstLetter(type)}Active`]?.length >= 1 &&
-        (state[`entries${capitalizeFirstLetter(type)}Active`] ||
-          state[`entries${capitalizeFirstLetter(type)}`])) ||
-      []
-    );
+    return type === 'entries'
+      ? (state.entriesActive?.length >= 1 &&
+          (state.entriesActive || state.entries)) ||
+          []
+      : (state[`entries${capitalizeFirstLetter(type)}Active`]?.length >= 1 &&
+          (state[`entries${capitalizeFirstLetter(type)}Active`] ||
+            state[`entries${capitalizeFirstLetter(type)}`])) ||
+          [];
   };
 
   render() {
     return (
       <div class="space-y-4">
         {this.getArr(state.active).map((item) => {
+          console.log(state.entries);
+          console.log(this.getArr(state.active));
+
           const onScroll = (e) => {
             this.el.shadowRoot.querySelector(
               `div[data-uid="${uid}"]`

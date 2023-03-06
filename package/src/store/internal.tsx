@@ -28,7 +28,7 @@ const { state, dispose, onChange } = createStore({
       route: 'get/sites',
     },
   },
-  active: 'search',
+  active: 'entries',
   bodyStyle: {},
   currentSite: {
     id: (window as any)?.streamlineData?.siteId || '1',
@@ -71,6 +71,8 @@ const { state, dispose, onChange } = createStore({
   entriesPostTotal: 0,
   entries: [],
   entriesActive: [],
+  entriesQuery: [],
+  entriesQueryActive: [],
   entriesSearch: [],
   entriesSearchActive: [],
   entriesSettings: [

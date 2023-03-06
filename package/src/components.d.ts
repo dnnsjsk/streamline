@@ -26,7 +26,7 @@ export namespace Components {
     interface StreamlineEntries {
     }
     interface StreamlineHeader {
-        "item": { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; isMultisite: boolean; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; title: string; type: string; };
+        "item": { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; isMultisite: boolean; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; title: string; type: string; icon: string; };
     }
     /**
      * Input.
@@ -161,7 +161,7 @@ declare namespace LocalJSX {
     interface StreamlineEntries {
     }
     interface StreamlineHeader {
-        "item"?: { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; isMultisite: boolean; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; title: string; type: string; };
+        "item"?: { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; isMultisite: boolean; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; title: string; type: string; icon: string; };
     }
     /**
      * Input.
