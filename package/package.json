@@ -28,6 +28,7 @@
     "@stencil/sass": "^3.0.0-0",
     "@stencil/store": "^2.0.3",
     "@tailwindcss/forms": "^0.5.3",
+    "@tailwindcss/line-clamp": "^0.4.2",
     "@types/jest": "^27.0.3",
     "autoprefixer": "^10.4.4",
     "eslint": "^8.35.0",

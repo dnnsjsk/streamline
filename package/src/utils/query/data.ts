@@ -1,12 +1,12 @@
-export const data = (method = 'GET') => {
+import { state } from '../../store/internal';
+
+export default function data(method = 'GET') {
   return {
-    method: method,
+    method,
     credentials: 'same-origin',
     headers: {
-      // @ts-ignore
-      // eslint-disable-next-line no-undef
-      'X-WP-Nonce': window?.streamline?.nonceRest,
+      'X-WP-Nonce': state.data.nonceRest,
       'Content-Type': 'application/json',
     },
   };
-};
+}

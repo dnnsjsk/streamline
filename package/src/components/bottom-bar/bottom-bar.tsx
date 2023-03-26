@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, h, Host } from '@stencil/core';
 // import { state } from '../../store/internal';
-// import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter';
+// import capitalizeFirstLetter from '../../utils/string/capitalizeFirstLetter';
 
 @Component({
   tag: 'streamline-bottom-bar',

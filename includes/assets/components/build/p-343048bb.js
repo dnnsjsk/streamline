@@ -1,0 +1,1 @@
+import{s as r}from"./p-29ba6bb1.js";function o(o){return r.isMac?o.metaKey:o.ctrlKey}export{o as g}

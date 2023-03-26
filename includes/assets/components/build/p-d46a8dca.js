@@ -1,1 +1,0 @@
-import{s}from"./p-51725e5b.js";const o=()=>s.entriesSettingsLoad.appearance.animation;export{o as i}

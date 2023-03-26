@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, Element, h } from '@stencil/core';
 import { state } from '../../store/internal';
-import { getMetaKey } from '../../utils/get/getMetaKey';
+import getMetaKey from '../../utils/get/getMetaKey';
 
 @Component({
   tag: 'streamline-entries',

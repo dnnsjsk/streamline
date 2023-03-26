@@ -1,33 +1,11 @@
 import { createStore } from '@stencil/store';
-import { resetScroll } from '../utils/general/resetScroll';
-import { setEntries } from '../utils/entries/setEntries';
-import { setActions } from '../utils/entries/setActions';
+import resetScroll from '../utils/general/resetScroll';
+import setEntries from '../utils/set/setEntries';
 import equal from 'fast-deep-equal/es6';
-import { setSearchPlaceholder } from '../utils/set/setSearchPlaceholder';
-
-const isFront = document
-  ?.querySelector('streamline-container')
-  ?.hasAttribute('front');
+import setSearchPlaceholder from '../utils/set/setSearchPlaceholder';
 
 const { state, dispose, onChange } = createStore({
-  actions: {
-    post: {
-      id: 'post',
-      condition: true,
-      name: 'Search for a post',
-      nameActive: 'Search for {{value}} in posts',
-      active: 'post',
-      route: 'get/posts',
-    },
-    site: {
-      id: 'site',
-      condition: (window as any)?.streamlineData?.network && !isFront,
-      name: 'Search for a site',
-      nameActive: 'Search for {{value}} in sites',
-      active: 'site',
-      route: 'get/sites',
-    },
-  },
+  action: {} as any,
   active: 'entries',
   bodyStyle: {},
   currentSite: {
@@ -36,48 +14,29 @@ const { state, dispose, onChange } = createStore({
   },
   data: (window as any).streamlineData as {
     adminUrl: string;
+    ajax: string;
     favourites: string;
     isAdmin: boolean;
     isMainSite: boolean;
     isNetwork: boolean;
     isVisible: boolean;
     networkAdminUrl: string | boolean;
+    nonce: string;
+    nonceRest: string;
+    rest: string;
     settings: any;
     siteId: string;
     sitePath: string;
     siteUrl: string;
     userId: string;
   },
-  drawer: {
-    active: false,
-    items: [],
-    onSave: null,
-    title: '',
-    values: {},
-  },
-  entriesActions: [],
-  entriesFav: JSON.parse((window as any)?.streamlineData?.favourites ?? '[]'),
-  entriesFavActive: JSON.parse(
-    (window as any)?.streamlineData?.favourites ?? '[]'
-  ),
-  entriesMenu: JSON.parse((window as any)?.streamlineData?.menu ?? '[]'),
-  entriesMenuCurrentPath: '',
-  entriesNetworkMenu: [],
-  entriesPost: [],
-  entriesPostActive: [],
-  entriesPostCurrentPage: 1,
-  entriesPostCurrentPath: '',
-  entriesPostQuery: '',
-  entriesPostTotal: 0,
   entries: [],
   entriesActive: [],
-  entriesQuery: [],
-  entriesQueryActive: [],
-  entriesSearch: [],
-  entriesSearchActive: [],
+  entriesMenu: JSON.parse((window as any)?.streamlineData?.menu ?? '[]'),
+  entriesNetworkMenu: [],
   entriesSettings: [
     {
-      type: 'settings',
+      name: 'Settings',
       children: [
         {
           name: 'Key shortcuts',
@@ -86,14 +45,12 @@ const { state, dispose, onChange } = createStore({
             {
               id: 'navigation',
               name: 'Entry navigation',
-              nameParent: 'Key shortcuts',
               label: 'Navigate between entry items',
               keys: ['↑', '↓'],
             },
             {
               id: 'navigationActive',
               name: 'Tab navigation',
-              nameParent: 'Key shortcuts',
               label:
                 'Navigate between top-level items (search, favourites, settings)',
               keys: ['Meta', '↑', '↓'],
@@ -101,7 +58,6 @@ const { state, dispose, onChange } = createStore({
             {
               id: 'search',
               name: 'Focus search',
-              nameParent: 'Key shortcuts',
               label: 'Focus the search bar',
               keys: ['Meta', 's'],
             },
@@ -114,7 +70,6 @@ const { state, dispose, onChange } = createStore({
             {
               id: 'animation',
               name: 'Enable animations',
-              nameParent: 'Appearance',
               label: 'Enables micro animations throughout the app',
             },
           ],
@@ -126,7 +81,6 @@ const { state, dispose, onChange } = createStore({
             {
               id: 'amount',
               name: 'Post amount',
-              nameParent: 'Queries',
               label: 'Maximum number of displayed posts per page',
             },
           ],
@@ -150,44 +104,27 @@ const { state, dispose, onChange } = createStore({
     },
   },
   entriesSettingsSave: {} as any,
-  entriesSite: [],
-  entriesSiteActive: [],
-  entriesSiteCurrentPage: 1,
-  entriesSiteQuery: '',
-  entriesSiteTotal: 0,
+  entriesQuery: [],
+  entriesQueryActive: [],
+  entriesQueryCurrentPage: 1,
+  entriesQueryCurrentPath: '',
+  entriesQueryQuery: '',
+  entriesQueryTotal: 0,
   focusIndex: -1,
-  infoBar: {
-    pages: {
-      current: 1,
-      amount: 1,
-    },
-  },
   isEnter: false,
-  isFront,
   isLoading: false,
   isMac: navigator.userAgent.indexOf('Mac OS X') !== -1,
   isMultisite: (window as any)?.streamlineData?.network,
   isVisible: false,
-  menus: ['search', 'fav', 'settings'],
+  menus: ['entries', 'settings'],
   scroll: 0,
   searchPlaceholder: '',
   searchNoValue: 'No entries found',
   searchValue: '',
-  sort: {
-    post: {},
-    site: {},
-  },
-  test: false,
 });
 
 onChange('isVisible', (value) => {
   state.focusIndex = -1;
-  if (!value) {
-    state.drawer = {
-      ...state.drawer,
-      active: false,
-    };
-  }
   resetScroll(value);
 });
 
@@ -205,7 +142,6 @@ onChange('searchValue', (value) => {
 onChange('active', () => {
   state.focusIndex = -1;
   setSearchPlaceholder();
-  setEntries();
 });
 
 onChange('entriesSettingsSave', (value) => {
@@ -215,7 +151,5 @@ onChange('entriesSettingsSave', (value) => {
 onChange('entriesSettingsLoad', (value) => {
   state.entriesSettingsHaveChanged = !equal(value, state.entriesSettingsSave);
 });
-
-setActions();
 
 export { state, dispose, onChange };

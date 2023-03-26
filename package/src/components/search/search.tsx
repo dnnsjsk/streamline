@@ -4,11 +4,11 @@ import { onChange, state } from '../../store/internal';
 import { Button } from '../../elements/Button';
 import { Icon } from '../../elements/Icon';
 import IconSearch from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/magnifying-glass.svg';
-import { getMetaKey } from '../../utils/get/getMetaKey';
-import { isAnimation } from '../../utils/is/isAnimation';
-import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
-import { get } from '../../utils/query/get';
-import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter';
+import getMetaKey from '../../utils/get/getMetaKey';
+import isAnimation from '../../utils/is/isAnimation';
+import setSearchPlaceholder from '../../utils/set/setSearchPlaceholder';
+import get from '../../utils/query/get';
+import capitalizeFirstLetter from '../../utils/string/capitalizeFirstLetter';
 
 @Component({
   tag: 'streamline-search',
@@ -36,15 +36,13 @@ export class StreamlineSearch {
           this.input?.focus?.();
         }
 
-        if (e.key === 'Enter' && state.isEnter && !state.test) {
+        if (e.key === 'Enter' && state.isEnter) {
           this.startQuery();
         }
         if (
           e.key === 'Backspace' &&
           state.searchValue === '' &&
-          state.active !== 'search' &&
-          state.active !== 'settings' &&
-          state.active !== 'fav' &&
+          state.active === 'query' &&
           this.el.shadowRoot.querySelector('input:focus')
         ) {
           if (isAnimation()) {
@@ -61,7 +59,7 @@ export class StreamlineSearch {
             );
           }
 
-          state.active = 'search';
+          state.active = 'entries';
         }
       }
     });

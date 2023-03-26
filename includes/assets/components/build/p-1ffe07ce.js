@@ -1,0 +1,1 @@
+import{s as e}from"./p-29ba6bb1.js";function n(n="GET"){return{method:n,credentials:"same-origin",headers:{"X-WP-Nonce":e.data.nonceRest,"Content-Type":"application/json"}}}export{n as d}

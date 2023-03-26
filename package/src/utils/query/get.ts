@@ -1,51 +1,41 @@
 import { state } from '../../store/internal';
-import { setSearchPlaceholder } from '../set/setSearchPlaceholder';
-import { resetView } from '../general/resetView';
-import { capitalizeFirstLetter } from '../string/capitalizeFirstLetter';
-import { data } from './data';
-import { setEntries } from '../entries/setEntries';
+import data from './data';
+import setEntries from '../set/setEntries';
 
-export const get = (obj) => {
-  const current = capitalizeFirstLetter(obj.tab || state.active);
-
+export default function get(obj) {
   state.isLoading = true;
+  state.entriesQuery = [];
+  state.entriesQueryActive = [];
   fetch(
-    // @ts-ignore
-    // eslint-disable-next-line no-undef
-    `${window.streamline.rest}streamline/v1/${obj.route}?siteId=${
-      state.currentSite.id
-    }&userId=${state.data.userId}&value=${obj.value}&amount=${
-      state.entriesSettingsLoad.query.amount
-    }&page=${state[`entries${current}CurrentPage`]}`,
+    `${state.data.rest}${obj.route}${
+      obj?.parameters
+        ? `?${new URLSearchParams(
+            JSON.parse(
+              JSON.stringify(obj.parameters).replace(
+                '{{value}}',
+                state.searchValue
+              )
+            )
+          ).toString()}`
+        : ''
+    }`,
     data() as any
   )
     .then((response) => response.json())
     .then((data) => {
-      // console.log(data);
-      state[`entries${capitalizeFirstLetter(obj.type)}`] = [
+      const arr = [
         {
-          children: data.children,
-          isMultisite: data.isMultisite,
-          path: state.currentSite.path,
-          queryValue: obj.value,
-          siteId: state.currentSite.id,
-          type: obj.type,
+          name: 'Query',
+          children: data,
         },
       ];
-
-      if (obj.type === 'post') {
-        state.entriesPostCurrentPath = state.currentSite.path;
-      }
-
-      setSearchPlaceholder();
-      if (obj.route === 'get/posts' || obj.route === 'get/sites') {
-        resetView();
-      }
-
-      state[`entries${current}Query`] = obj.value;
-      state[`entries${current}Total`] = data.total;
-      obj.callback && obj.callback();
+      state.action = obj;
+      state.entriesQuery = arr;
+      state.entriesQueryActive = arr;
+      state.searchValue = '';
+      state.active = 'query';
       setEntries();
+      obj.callback && obj.callback();
       state.isLoading = false;
     });
-};
+}

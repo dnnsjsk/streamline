@@ -1,9 +1,8 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, h, Host, Prop, Method, Watch } from '@stencil/core';
 import { state } from '../../store/internal';
-import { isAnimation } from '../../utils/is/isAnimation';
-import { setupEntries } from '../../utils/entries/setupEntries';
-import { getMetaKey } from '../../utils/get/getMetaKey';
+import isAnimation from '../../utils/is/isAnimation';
+import getMetaKey from '../../utils/get/getMetaKey';
 import getMenu from '../../utils/get/getMenu';
 
 @Component({
@@ -29,11 +28,18 @@ export class StreamlineContainer {
         ...state.entries,
         [key]: {
           ...(value?.info || {}),
-          actions: [
-            ...(state.entries[key]?.actions || []),
-            ...(value?.actions || []),
-          ],
           children: [
+            ...((value?.actions || []).length
+              ? [
+                  {
+                    name: 'Actions',
+                    children: [
+                      ...(state.entries[key]?.actions || []),
+                      ...(value?.actions || []),
+                    ],
+                  },
+                ]
+              : []),
             ...(state.entries[key]?.children || []),
             ...(value?.children || []),
           ],
@@ -67,6 +73,58 @@ export class StreamlineContainer {
       document.dispatchEvent(newEvent);
     }
 
+    const actions = new CustomEvent('streamline/entries', {
+      detail: {
+        wordpress: {
+          actions: [
+            {
+              name: 'Query',
+              children: [
+                {
+                  name: 'Search for a post',
+                  nameActive: 'Search for {{value}} in posts',
+                  type: 'api',
+                  route: '/wp/v2/posts',
+                  parameters: {
+                    per_page: 100,
+                    search: '{{value}}',
+                  },
+                  href: 'link',
+                  table: [
+                    {
+                      value: 'status',
+                      label: 'Status',
+                    },
+                    {
+                      value: 'title.rendered',
+                      label: 'Title',
+                    },
+                    {
+                      value: 'slug',
+                      label: 'Slug',
+                    },
+                    {
+                      value: 'type',
+                      label: 'Type',
+                    },
+                  ],
+                },
+                {
+                  condition: state.data.networkAdminUrl,
+                  name: 'Search for a site',
+                  nameActive: 'Search for {{value}} in sites',
+                  type: 'api',
+                  route: '/wp/v2/sites',
+                },
+              ],
+            },
+          ],
+        },
+      },
+    });
+
+    document.dispatchEvent(actions);
+
     if (state.data.isNetwork) {
       dispatch({
         name: 'Network menu',
@@ -98,9 +156,7 @@ export class StreamlineContainer {
             [item.id]: {
               ...state.entriesSettingsLoad[item.id],
               [itemInner.id]:
-                (state.test
-                  ? state.entriesSettings
-                  : JSON.parse(state.data.settings))[item.id]?.[itemInner.id] ??
+                JSON.parse(state.data.settings)[item.id]?.[itemInner.id] ??
                 state.entriesSettingsLoad[item.id]?.[itemInner.id],
             },
           };
@@ -109,10 +165,6 @@ export class StreamlineContainer {
     }
 
     state.entriesSettingsSave = state.entriesSettingsLoad;
-
-    ['test'].forEach((item) => {
-      if (this[item]) state[item] = true;
-    });
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'k' && getMetaKey(e)) {
@@ -166,20 +218,6 @@ export class StreamlineContainer {
       }
     }
   };
-
-  @Method()
-  async setState(data) {
-    return new Promise((resolve) => {
-      Object.entries(data).forEach(([key, value]) => {
-        if (state[key]) {
-          state[key] = value;
-        }
-      });
-
-      setupEntries();
-      return resolve;
-    });
-  }
 
   @Method()
   async toggle() {

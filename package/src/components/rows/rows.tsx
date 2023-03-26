@@ -1,9 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, h, Element } from '@stencil/core';
 import { state } from '../../store/internal';
-import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter';
-import { sort } from '../../utils/sort/sort';
-import { debounce } from 'lodash-es';
+import capitalizeFirstLetter from '../../utils/string/capitalizeFirstLetter';
 
 @Component({
   tag: 'streamline-rows',
@@ -14,30 +12,6 @@ import { debounce } from 'lodash-es';
 export class StreamlineRows {
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineRowsElement;
-
-  componentWillLoad() {
-    window.addEventListener(
-      'resize',
-      debounce(() => {
-        if (window.innerWidth >= 640 && state.drawer.active) {
-          state.drawer = {
-            ...state.drawer,
-            active: false,
-          };
-        }
-        if (
-          window.innerWidth <= 639 &&
-          this.el.shadowRoot.querySelector('streamline-row[is-edit]')
-        ) {
-          this.el.shadowRoot
-            .querySelectorAll('streamline-row')
-            .forEach((item) => {
-              item.removeAttribute('is-edit');
-            });
-        }
-      }, 500)
-    );
-  }
 
   private getArr = (type) => {
     return type === 'entries'
@@ -51,10 +25,9 @@ export class StreamlineRows {
           [];
   };
 
-  private rows({ uid, item, table, onScroll, first = false, render = true }) {
+  private rows({ uid, item, onScroll, first = false, render = true }) {
     return (
       <ul
-        data-uid={uid}
         onScroll={
           item.type === 'post' || item.type === 'site'
             ? (e) => onScroll(e)
@@ -63,35 +36,35 @@ export class StreamlineRows {
         class="overflow-x-auto overflow-y-hidden"
       >
         {item.children &&
-          Object.values(item.children as unknown).map((itemInner) => {
+          Object.values(item.children as unknown).map((itemInner, index) => {
             return itemInner.children ? (
-              <li key={itemInner.name}>
-                <h2
+              <li key={`${itemInner.name}-${index}`}>
+                <p
                   class={{
-                    'sl-mx relative pb-1 pt-4': true,
-                    'text-xs font-medium text-slate-500': !first,
-                    'text-[13px] font-semibold uppercase text-slate-900': first,
+                    'sl-mx relative pb-1': true,
+                    'pt-3 text-xs font-medium text-slate-500': !first,
+                    'pt-4 text-[13px] font-semibold uppercase text-slate-900':
+                      first,
                   }}
                 >
                   <span class="relative">
                     {first && (
-                      <span class="absolute top-1/2 -left-3 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-slate-400 sm:-left-3.5 lg:-left-4" />
+                      <span class="absolute top-1/2 -left-3 h-1 w-1 -translate-y-1/2 rounded-full bg-slate-400 sm:-left-3.5 sm:h-1.5 sm:w-1.5 lg:-left-4" />
                     )}
                     {itemInner.name}
                   </span>
-                </h2>
+                </p>
                 {render &&
                   itemInner.children &&
                   this.rows({
                     uid,
                     item: itemInner,
-                    table,
                     onScroll,
                     render: first,
                   })}
               </li>
             ) : (
-              <streamline-row item={itemInner} table={table} />
+              <streamline-row item={itemInner} />
             );
           })}
       </ul>
@@ -102,9 +75,6 @@ export class StreamlineRows {
     return (
       <div class="space-y-4">
         {this.getArr(state.active).map((item) => {
-          console.log(state.entries);
-          console.log(this.getArr(state.active));
-
           const onScroll = (e) => {
             this.el.shadowRoot.querySelector(
               `div[data-uid="${uid}"]`
@@ -114,114 +84,35 @@ export class StreamlineRows {
           const uid =
             Date.now().toString(36) + Math.random().toString(36).substr(2);
 
-          const table =
-            state.active === 'site'
-              ? [
-                  {
-                    id: 'domain',
-                    name: 'Domain',
-                    sort: true,
-                  },
-                  { id: 'path', name: 'Path', sort: true },
-                  { id: 'siteId', name: 'ID', sort: true },
-                ]
-              : item.type === 'post'
-              ? [
-                  {
-                    id: 'post_status',
-                    text: (itemInner) => {
-                      const isPublish = itemInner.post_status === 'publish';
-                      const isFuture = itemInner.post_status === 'future';
-                      const isDraft = itemInner.post_status === 'draft';
-                      const isPending = itemInner.post_status === 'pending';
-                      const isPrivate = itemInner.post_status === 'private';
-                      return (
-                        <span
-                          class={{
-                            'rounded-md px-2 py-1 text-xs font-semibold uppercase':
-                              true,
-                            'bg-green-100 text-green-600': isPublish,
-                            'bg-purple-100 text-purple-600': isFuture,
-                            'bg-yellow-100 text-yellow-600': isDraft,
-                            'bg-lime-100 text-lime-600': isPending,
-                            'bg-blue-100 text-blue-600': isPrivate,
-                            'bg-slate-100 text-slate-600':
-                              !isPublish &&
-                              !isFuture &&
-                              !isDraft &&
-                              !isPending &&
-                              !isPrivate,
-                          }}
-                        >
-                          {itemInner.post_status}
-                        </span>
-                      );
-                    },
-                    name: 'Status',
-                    sort: true,
-                  },
-                  { id: 'post_title', name: 'Title', edit: true, sort: true },
-                  { id: 'post_name', name: 'Slug', edit: true, sort: true },
-                  { id: 'post_type', name: 'Post type', sort: true },
-                ]
-              : [];
-
           return (
             <div>
               <streamline-header item={item}></streamline-header>
-              {(item.type === 'post' || item.type === 'site') && (
+              {state.active === 'query' && state.action.table?.length >= 2 && (
                 <div
                   data-uid={uid}
-                  class="scrollbar-none sticky top-[40px] z-10 overflow-x-auto bg-white"
+                  class="scrollbar-none sticky top-[39px] z-10 mt-[-2px] overflow-x-auto bg-white"
                 >
                   <div class="sl-mx sl-grid border-t border-slate-200">
-                    {table.map((itemInner) => {
-                      const sorter = () => {
-                        sort(
-                          {
-                            ...itemInner,
-                            type: item.type,
-                          },
-                          state?.sort?.[item.type]?.id !== itemInner.id
-                            ? 'ascending'
-                            : state?.sort?.[item.type]?.direction ===
-                              'ascending'
-                            ? 'descending'
-                            : 'ascending'
-                        );
-                      };
-
+                    {state.action.table.map((itemInner) => {
                       return (
                         <div
                           tabindex="0"
                           role="button"
-                          key={itemInner.id}
+                          key={itemInner.value}
                           class={{
                             'sl-border-b font-slate-500 group grid grid-cols-[1fr,auto] items-center whitespace-nowrap py-1.5 text-xs font-semibold uppercase hover:border-slate-900 focus:border-blue-500 focus:outline-none':
                               true,
                             'pointer-events-none': !itemInner.sort,
                           }}
                           onMouseDown={(e) => e.preventDefault()}
-                          onClick={sorter}
-                          onKeyDown={(e) => {
-                            if (
-                              e.target === this.el.shadowRoot.activeElement &&
-                              e.key === 'Enter'
-                            ) {
-                              sorter();
-                            }
-                          }}
                         >
-                          {itemInner.name}
+                          {itemInner.label}
                           <svg
                             class={{
                               'mr-2 hidden w-[8px] group-hover:block group-focus:block group-focus:text-blue-600':
                                 true,
-                              '!block':
-                                state?.sort?.[item.type]?.id === itemInner.id,
-                              'rotate-180':
-                                state?.sort?.[item.type]?.direction ===
-                                'descending',
+                              '!block': true,
+                              'rotate-180': false,
                             }}
                             xmlns="http://www.w3.org/2000/svg"
                             role="img"
@@ -238,7 +129,7 @@ export class StreamlineRows {
                   </div>
                 </div>
               )}
-              {this.rows({ uid, item, table, onScroll, first: true })}
+              {this.rows({ uid, item, onScroll, first: true })}
             </div>
           );
         })}

@@ -1,7 +1,7 @@
 import { state } from '../../store/internal';
-import { setEntries } from '../entries/setEntries';
+import setEntries from '../set/setEntries';
 
-export const resetView = () => {
+export default function resetView() {
   state.isLoading = false;
   state.searchValue = '';
   if (state.active === 'site' || state.active === 'post') {
@@ -10,4 +10,4 @@ export const resetView = () => {
     state.isEnter = false;
   }
   setEntries();
-};
+}

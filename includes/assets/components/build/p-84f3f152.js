@@ -1,1 +1,0 @@
-const r=r=>{for(const o of r)if(""===o.value)return!1;return!0};export{r as i}

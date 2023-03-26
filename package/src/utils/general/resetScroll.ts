@@ -1,6 +1,6 @@
 import { state } from '../../store/internal';
 
-export const resetScroll = (value) => {
+export default function resetScroll(value) {
   const values = ['position', 'overflow', 'left', 'top', 'width'];
 
   if (value === true) {
@@ -29,4 +29,4 @@ export const resetScroll = (value) => {
     });
     window.scrollTo(0, state.scroll);
   }
-};
+}
