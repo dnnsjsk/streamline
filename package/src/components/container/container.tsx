@@ -84,7 +84,7 @@ export class StreamlineContainer {
                   name: 'Search for a post',
                   nameActive: 'Search for {{value}} in posts',
                   type: 'api',
-                  route: '/wp/v2/posts',
+                  route: 'wp/v2/posts',
                   parameters: {
                     per_page: 100,
                     search: '{{value}}',
@@ -114,7 +114,7 @@ export class StreamlineContainer {
                   name: 'Search for a site',
                   nameActive: 'Search for {{value}} in sites',
                   type: 'api',
-                  route: '/wp/v2/sites',
+                  route: 'wp/v2/sites',
                 },
               ],
             },
