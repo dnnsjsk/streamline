@@ -55,8 +55,8 @@ graph TD;
   streamline-entries --> streamline-settings
   streamline-entries --> streamline-rows
   streamline-settings --> streamline-header
-  streamline-rows --> streamline-header
   streamline-rows --> streamline-row
+  streamline-rows --> streamline-header
   streamline-row --> streamline-dropdown
   streamline-drawer --> streamline-input
   style streamline-container fill:#f9f,stroke:#333,stroke-width:4px

@@ -41,14 +41,62 @@ export class StreamlineRows {
 
   private getArr = (type) => {
     return type === 'entries'
-      ? (state.entriesActive?.length >= 1 &&
-          (state.entriesActive || state.entries)) ||
+      ? (Object.values(state.entriesActive)?.length >= 1 &&
+          Object.values(state.entriesActive)) ||
+          Object.values(state.entries) ||
           []
       : (state[`entries${capitalizeFirstLetter(type)}Active`]?.length >= 1 &&
           (state[`entries${capitalizeFirstLetter(type)}Active`] ||
             state[`entries${capitalizeFirstLetter(type)}`])) ||
           [];
   };
+
+  private rows({ uid, item, table, onScroll, first = false, render = true }) {
+    return (
+      <ul
+        data-uid={uid}
+        onScroll={
+          item.type === 'post' || item.type === 'site'
+            ? (e) => onScroll(e)
+            : undefined
+        }
+        class="overflow-x-auto overflow-y-hidden"
+      >
+        {item.children &&
+          Object.values(item.children as unknown).map((itemInner) => {
+            return itemInner.children ? (
+              <li key={itemInner.name}>
+                <h2
+                  class={{
+                    'sl-mx relative pb-1 pt-4': true,
+                    'text-xs font-medium text-slate-500': !first,
+                    'text-[13px] font-semibold uppercase text-slate-900': first,
+                  }}
+                >
+                  <span class="relative">
+                    {first && (
+                      <span class="absolute top-1/2 -left-3 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-slate-400 sm:-left-3.5 lg:-left-4" />
+                    )}
+                    {itemInner.name}
+                  </span>
+                </h2>
+                {render &&
+                  itemInner.children &&
+                  this.rows({
+                    uid,
+                    item: itemInner,
+                    table,
+                    onScroll,
+                    render: first,
+                  })}
+              </li>
+            ) : (
+              <streamline-row item={itemInner} table={table} />
+            );
+          })}
+      </ul>
+    );
+  }
 
   render() {
     return (
@@ -124,7 +172,7 @@ export class StreamlineRows {
               {(item.type === 'post' || item.type === 'site') && (
                 <div
                   data-uid={uid}
-                  class={`scrollbar-none sticky top-[40px] z-10 overflow-x-auto bg-white`}
+                  class="scrollbar-none sticky top-[40px] z-10 overflow-x-auto bg-white"
                 >
                   <div class="sl-mx sl-grid border-t border-slate-200">
                     {table.map((itemInner) => {
@@ -190,37 +238,7 @@ export class StreamlineRows {
                   </div>
                 </div>
               )}
-              <ul
-                data-uid={uid}
-                onScroll={
-                  item.type === 'post' || item.type === 'site'
-                    ? (e) => onScroll(e)
-                    : undefined
-                }
-                class="overflow-x-auto overflow-y-hidden"
-              >
-                {item.children &&
-                  Object.values(item.children as unknown).map((itemInner) => {
-                    return itemInner.children ? (
-                      <li key={itemInner.name}>
-                        <h2 class="sl-mx pb-1 pt-4 text-xs font-medium text-slate-500">
-                          {itemInner.name}
-                        </h2>
-                        <ul>
-                          {Object.values(itemInner.children as unknown).map(
-                            (itemSub) => {
-                              return (
-                                <streamline-row item={itemSub} table={table} />
-                              );
-                            }
-                          )}
-                        </ul>
-                      </li>
-                    ) : (
-                      <streamline-row item={itemInner} table={table} />
-                    );
-                  })}
-              </ul>
+              {this.rows({ uid, item, table, onScroll, first: true })}
             </div>
           );
         })}

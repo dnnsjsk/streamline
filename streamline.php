@@ -12,7 +12,7 @@
 
 const STREAMLINE = __FILE__;
 const STREAMLINE_DIR = __DIR__;
-const STREAMLINE_STORE_URL = "http://wpstreamline.com";
+const STREAMLINE_STORE_URL = "https://wpstreamline.com";
 const STREAMLINE_ITEM_ID = 45;
 const STREAMLINE_ITEM_NAME = "Streamline";
 const STREAMLINE_LICENSE_PAGE = "streamline";

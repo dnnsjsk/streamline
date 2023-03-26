@@ -18,9 +18,10 @@ Do things faster.
 = 2.0.0 =
 * New: possibility to open Streamline via query parameter (?streamline)
 * New: possibility to set license key from PHP
+* Enhancement: make app full screen on mobile
 
 = 1.2.4 =
-* Enhancement: make app full screen on mobile
+* Fix: license activation not working correctly
 
 = 1.2.3 =
 * Fix: Tailwind reset leaking out of component

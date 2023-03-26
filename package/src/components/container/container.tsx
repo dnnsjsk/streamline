@@ -25,7 +25,7 @@ export class StreamlineContainer {
   connectedCallback() {
     document.addEventListener('streamline/entries', function (event: any) {
       const [key, value] = Object.entries(event.detail)[0] as any;
-      const data = Object.values({
+      const data = {
         ...state.entries,
         [key]: {
           ...(value?.info || {}),
@@ -38,7 +38,7 @@ export class StreamlineContainer {
             ...(value?.children || []),
           ],
         },
-      });
+      };
       state.entries = data;
       state.entriesActive = data;
     });
