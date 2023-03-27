@@ -28,12 +28,11 @@ export class StreamlineRows {
   private rows({ uid, item, onScroll, first = false, render = true }) {
     return (
       <ul
-        onScroll={
-          item.type === 'post' || item.type === 'site'
-            ? (e) => onScroll(e)
-            : undefined
-        }
-        class="overflow-x-auto overflow-y-hidden"
+        onScroll={state.active === 'query' ? (e) => onScroll(e) : undefined}
+        class={{
+          'pb-6 lg:pb-10': state.active === 'query',
+          'overflow-x-auto overflow-y-hidden': true,
+        }}
       >
         {item.children &&
           Object.values(item.children as unknown).map((itemInner, index) => {
@@ -73,7 +72,12 @@ export class StreamlineRows {
 
   render() {
     return (
-      <div class="space-y-4">
+      <div
+        class={{
+          'space-y-4': true,
+          'pb-6 lg:pb-10': state.active !== 'query',
+        }}
+      >
         {this.getArr(state.active).map((item) => {
           const onScroll = (e) => {
             this.el.shadowRoot.querySelector(

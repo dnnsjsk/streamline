@@ -36,7 +36,7 @@ export class StreamlineSettings {
   render() {
     return Object.values(state.entriesSettingsActive).map((item) => {
       return (
-        <div>
+        <div class="pb-6 lg:pb-10">
           <streamline-header item={item} />
           <ul class="sl-px space-y-4 sm:space-y-6">
             {Object.values(item.children as unknown).map((itemInner) => {

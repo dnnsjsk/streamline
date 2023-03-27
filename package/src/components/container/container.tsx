@@ -286,7 +286,6 @@ export class StreamlineContainer {
               </div>
               <streamline-bottom-bar class="absolute bottom-0 block h-6 w-full" />
             </div>
-            <streamline-drawer class="sm:hidden" />
           </div>
         </div>
       </Host>

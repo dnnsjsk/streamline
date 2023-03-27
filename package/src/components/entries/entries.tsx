@@ -68,7 +68,7 @@ export class StreamlineEntries {
     return (
       <div
         class={{
-          'relative mt-4 h-full w-full bg-white pb-6 lg:pb-10': true,
+          'relative mt-4 h-full w-full bg-white': true,
           'pointer-events-none opacity-50': state.isLoading,
         }}
       >
