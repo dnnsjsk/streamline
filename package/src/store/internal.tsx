@@ -8,6 +8,7 @@ const { state, dispose, onChange } = createStore({
   action: {} as any,
   active: 'entries',
   bodyStyle: {},
+  collapse: JSON.parse(localStorage.getItem('streamlineCollapse') || '[]'),
   currentSite: {
     id: (window as any)?.streamlineData?.siteId || '1',
     path: (window as any)?.streamlineData?.sitePath || '/',
@@ -74,17 +75,6 @@ const { state, dispose, onChange } = createStore({
             },
           ],
         },
-        {
-          name: 'Queries',
-          id: 'query',
-          children: [
-            {
-              id: 'amount',
-              name: 'Post amount',
-              label: 'Maximum number of displayed posts per page',
-            },
-          ],
-        },
       ],
     },
   ],
@@ -99,17 +89,10 @@ const { state, dispose, onChange } = createStore({
     appearance: {
       animation: true,
     },
-    query: {
-      amount: 20,
-    },
   },
   entriesSettingsSave: {} as any,
   entriesQuery: [],
   entriesQueryActive: [],
-  entriesQueryCurrentPage: 1,
-  entriesQueryCurrentPath: '',
-  entriesQueryQuery: '',
-  entriesQueryTotal: 0,
   focusIndex: -1,
   isEnter: false,
   isLoading: false,
@@ -121,6 +104,25 @@ const { state, dispose, onChange } = createStore({
   searchPlaceholder: '',
   searchNoValue: 'No entries found',
   searchValue: '',
+  searchedValue: '',
+  sort: JSON.parse(localStorage.getItem('streamlineSort') || '{}'),
+});
+
+onChange('active', () => {
+  state.focusIndex = -1;
+  setSearchPlaceholder();
+});
+
+onChange('collapse', (value) => {
+  localStorage.setItem('streamlineCollapse', JSON.stringify(value));
+});
+
+onChange('entriesSettingsLoad', (value) => {
+  state.entriesSettingsHaveChanged = !equal(value, state.entriesSettingsSave);
+});
+
+onChange('entriesSettingsSave', (value) => {
+  state.entriesSettingsHaveChanged = !equal(value, state.entriesSettingsLoad);
 });
 
 onChange('isVisible', (value) => {
@@ -139,17 +141,8 @@ onChange('searchValue', (value) => {
   setEntries();
 });
 
-onChange('active', () => {
-  state.focusIndex = -1;
-  setSearchPlaceholder();
-});
-
-onChange('entriesSettingsSave', (value) => {
-  state.entriesSettingsHaveChanged = !equal(value, state.entriesSettingsLoad);
-});
-
-onChange('entriesSettingsLoad', (value) => {
-  state.entriesSettingsHaveChanged = !equal(value, state.entriesSettingsSave);
+onChange('sort', (value) => {
+  localStorage.setItem('streamlineSort', JSON.stringify(value));
 });
 
 export { state, dispose, onChange };

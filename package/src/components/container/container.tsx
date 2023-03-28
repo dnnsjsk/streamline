@@ -82,12 +82,13 @@ export class StreamlineContainer {
               children: [
                 {
                   name: 'Search for a post',
-                  nameActive: 'Search for {{value}} in posts',
+                  nameActive: 'Search for {value} in posts',
+                  nameSearched: 'Showing posts for {value}',
                   type: 'api',
                   route: 'wp/v2/posts',
                   parameters: {
-                    per_page: 100,
-                    search: '{{value}}',
+                    per_page: 50,
+                    search: '{value}',
                   },
                   href: 'link',
                   table: [
@@ -98,23 +99,19 @@ export class StreamlineContainer {
                     {
                       value: 'title.rendered',
                       label: 'Title',
+                      sortable: true,
                     },
                     {
                       value: 'slug',
                       label: 'Slug',
+                      sortable: true,
                     },
                     {
                       value: 'type',
                       label: 'Type',
+                      sortable: true,
                     },
                   ],
-                },
-                {
-                  condition: state.data.networkAdminUrl,
-                  name: 'Search for a site',
-                  nameActive: 'Search for {{value}} in sites',
-                  type: 'api',
-                  route: 'wp/v2/sites',
                 },
               ],
             },
@@ -198,7 +195,7 @@ export class StreamlineContainer {
     const length = state.menus.length;
 
     if (index === -1) {
-      state.active = 'search';
+      state.active = 'entries';
       return;
     }
 
@@ -229,7 +226,7 @@ export class StreamlineContainer {
       <Host>
         <div
           class={{
-            'fixed top-0 left-0 z-[9999999999999999] flex h-full w-full items-center justify-center':
+            'fixed left-0 top-0 z-[9999999999999999] flex h-full w-full items-center justify-center':
               true,
             'pointer-events-auto opacity-100': state.isVisible,
             'pointer-events-none opacity-0': !state.isVisible,
@@ -237,7 +234,7 @@ export class StreamlineContainer {
         >
           <div
             class={{
-              'fixed top-0 left-0 h-full w-full bg-black/90 backdrop-blur-sm':
+              'fixed left-0 top-0 h-full w-full bg-black/90 backdrop-blur-sm':
                 true,
               'opacity-0': !state.isVisible,
               'opacity-100': state.isVisible,
@@ -256,7 +253,7 @@ export class StreamlineContainer {
           >
             <div class="relative h-full">
               <div class="absolute top-0 grid w-full grid-cols-[1fr,75px] bg-slate-50">
-                <div class="absolute left-0 bottom-0 z-50 h-px w-full bg-slate-200" />
+                <div class="absolute bottom-0 left-0 z-50 h-px w-full bg-slate-200" />
                 <streamline-search class="block h-14" />
                 {state.isLoading ? (
                   <div class="flex items-center justify-center">

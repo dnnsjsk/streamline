@@ -12,7 +12,7 @@ export default function get(obj) {
         ? `?${new URLSearchParams(
             JSON.parse(
               JSON.stringify(obj.parameters).replace(
-                '{{value}}',
+                '{value}',
                 state.searchValue
               )
             )

@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { h } from '@stencil/core';
 
-export const Icon = (props) => {
+export default function Icon(props) {
   return (
     <div
       innerHTML={props.icon}
@@ -11,4 +11,4 @@ export const Icon = (props) => {
       }}
     />
   );
-};
+}

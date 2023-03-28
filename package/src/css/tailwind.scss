@@ -15,18 +15,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.sl-border {
-  @apply border-t border-slate-100 first-of-type:border-none;
-}
-
-.sl-border-b {
-  @apply border-b border-dotted border-slate-200;
-}
-
-.sl-h2 {
-  @apply text-sm font-medium text-black sm:text-base;
-}
-
 .sl-px {
   @apply px-4 sm:px-8 lg:px-10;
 }

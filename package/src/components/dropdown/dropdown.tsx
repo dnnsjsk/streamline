@@ -2,11 +2,11 @@
 import { Component, h, Element, State, Prop } from '@stencil/core';
 import { computePosition, flip, shift } from '@floating-ui/dom';
 import isAnimation from '../../utils/is/isAnimation';
-import { Icon } from '../../elements/Icon';
+import Icon from '../../elements/Icon';
 import { isArray } from 'lodash-es';
 import IconDots from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/ellipsis.svg';
 import IconLink from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/up-right-from-square.svg';
-import { Keys } from '../../elements/Keys';
+import Keys from '../../elements/Keys';
 import { state } from '../../store/internal';
 
 @Component({
@@ -92,7 +92,7 @@ export class StreamlineDropdown {
         class={{
           'focus-white group flex h-full w-full items-center justify-center focus-within:text-blue-600 focus-within:opacity-100 hover:z-50 hover:text-blue-600 hover:opacity-100 focus:text-blue-600 focus:opacity-100':
             true,
-          '!pointer-events-auto relative opacity-0 !opacity-100':
+          '!pointer-events-auto relative !opacity-100 opacity-0':
             this.type === 'main' && state.isVisible,
           'opacity-100': this.type === 'entry',
         }}

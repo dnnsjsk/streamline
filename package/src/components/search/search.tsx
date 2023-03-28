@@ -1,8 +1,8 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, h, Element } from '@stencil/core';
 import { onChange, state } from '../../store/internal';
-import { Button } from '../../elements/Button';
-import { Icon } from '../../elements/Icon';
+import Button from '../../elements/Button';
+import Icon from '../../elements/Icon';
 import IconSearch from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/magnifying-glass.svg';
 import getMetaKey from '../../utils/get/getMetaKey';
 import isAnimation from '../../utils/is/isAnimation';

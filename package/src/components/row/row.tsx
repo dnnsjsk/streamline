@@ -1,9 +1,10 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, Element, h, Prop, State, Watch } from '@stencil/core';
 import { state } from '../../store/internal';
-import { Keys } from '../../elements/Keys';
+import Keys from '../../elements/Keys';
 import get from '../../utils/query/get';
 import { result } from 'lodash-es';
+import Value from '../../elements/Value';
 
 @Component({
   tag: 'streamline-row',
@@ -34,6 +35,7 @@ export class StreamlineRow {
 
   private onClick = () => {
     if (this.item?.type === 'api' && this.item?.route) {
+      state.searchedValue = state.searchValue;
       get({ ...this.item });
     }
   };
@@ -70,13 +72,7 @@ export class StreamlineRow {
             (state.searchValue !== '' &&
             this.item.nameActive &&
             this.item.nameActive !== '' ? (
-              <span
-                innerHTML={this.item.nameActive.replace(
-                  /{{(.+?)}}/g,
-                  (_) =>
-                    `<span class="!text-slate-500 italic">${state.searchValue}</span>`
-                )}
-              />
+              <Value>{this.item.nameActive}</Value>
             ) : (
               <span>{this.item.name}</span>
             ))}
@@ -101,7 +97,7 @@ export class StreamlineRow {
         )}
         {this.item.dropdown && (
           <streamline-dropdown
-            class="absolute top-0 right-4 block hidden h-full w-12 opacity-0 focus-within:opacity-100 hover:opacity-100 peer-hover:opacity-100 sm:right-8 sm:block lg:right-12"
+            class="absolute right-4 top-0 block hidden h-full w-12 opacity-0 focus-within:opacity-100 hover:opacity-100 peer-hover:opacity-100 sm:right-8 sm:block lg:right-12"
             type="entry"
             items={this.item.dropdown}
           />
