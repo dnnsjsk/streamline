@@ -94,7 +94,7 @@ export class StreamlineSearch {
         <input
           ref={(el) => (this.input = el as HTMLInputElement)}
           id="streamline-search"
-          class="peer m-0 h-full w-full w-full bg-transparent p-0 px-9 text-base font-normal text-slate-900 placeholder-slate-500 focus:outline-none lg:px-12"
+          class="peer m-0 h-full w-full w-full bg-transparent p-0 px-4 text-base font-normal text-slate-900 placeholder-slate-500 focus:outline-none sm:px-8 lg:px-10"
           type="text"
           autocomplete="off"
           placeholder={state.searchPlaceholder}
@@ -103,7 +103,7 @@ export class StreamlineSearch {
         />
         <Icon
           class={{
-            'absolute left-3 top-1/2 -translate-y-1/2 fill-current text-slate-500 peer-focus:text-blue-600 lg:left-5':
+            'absolute left-2.5 top-1/2 hidden -translate-y-1/2 fill-current text-slate-500 peer-focus:text-blue-600 sm:block lg:left-4':
               true,
           }}
           icon={IconSearch}

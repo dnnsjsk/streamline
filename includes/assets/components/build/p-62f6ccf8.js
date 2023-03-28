@@ -1,1 +1,0 @@
-import{h as n}from"./p-7d6df620.js";import{s as r}from"./p-38ad99f2.js";function e(r){return n("div",{innerHTML:r.icon,class:{"icon h-3.5 w-3.5 fill-current":!0,[r.class]:r.class}})}function o(n="GET"){return{method:n,credentials:"same-origin",headers:{"X-WP-Nonce":r.data.nonceRest,"Content-Type":"application/json"}}}export{e as I,o as d}

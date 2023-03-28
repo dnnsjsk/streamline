@@ -54,6 +54,8 @@ export class StreamlineRows {
                   }}
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
+                    if (!first) return;
+
                     if (collapsed) {
                       state.collapse = state.collapse.filter(
                         (item) => item !== id

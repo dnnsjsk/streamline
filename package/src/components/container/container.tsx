@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, h, Host, Prop, Method, Watch } from '@stencil/core';
-import { state } from '../../store/internal';
+import { onChange, state } from '../../store/internal';
 import isAnimation from '../../utils/is/isAnimation';
 import getMetaKey from '../../utils/get/getMetaKey';
 import getMenu from '../../utils/get/getMenu';
@@ -13,6 +13,8 @@ import getMenu from '../../utils/get/getMenu';
 })
 // eslint-disable-next-line no-unused-vars
 export class StreamlineContainer {
+  private scrollContainer: HTMLElement;
+
   @Prop() active: '';
   @Prop() test: false;
 
@@ -190,6 +192,10 @@ export class StreamlineContainer {
     });
   }
 
+  componentDidLoad() {
+    onChange('active', () => (this.scrollContainer.scrollTop = 0));
+  }
+
   private cycleActive = (mode) => {
     const index = state.menus.indexOf(state.active);
     const length = state.menus.length;
@@ -276,6 +282,7 @@ export class StreamlineContainer {
                 )}
               </div>
               <div
+                ref={(el) => (this.scrollContainer = el as HTMLElement)}
                 tabindex={-1}
                 class="absolute top-14 h-[calc(100%-55px-24px)] w-full scroll-pt-[72px] overflow-y-scroll"
               >
