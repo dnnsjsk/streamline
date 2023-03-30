@@ -145,7 +145,7 @@ export class StreamlineRows {
                           role="button"
                           key={itemInner.value}
                           class={{
-                            'font-slate-500 group grid grid-cols-[1fr,auto] items-center whitespace-nowrap border-b border-slate-300 py-1.5 text-xs font-semibold uppercase hover:border-slate-900 focus:border-blue-500 focus:outline-none':
+                            'font-slate-500 group grid grid-cols-[1fr,auto] items-center whitespace-nowrap border-b border-slate-200 py-1.5 text-xs font-semibold uppercase hover:border-slate-900 focus:border-blue-500 focus:outline-none':
                               true,
                             'pointer-events-none': !itemInner.sortable,
                           }}
