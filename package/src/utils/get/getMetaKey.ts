@@ -1,5 +1,5 @@
 import { state } from '../../store/internal';
 
-export const getMetaKey = (e) => {
+export default function getMetaKey(e) {
   return state.isMac ? e.metaKey : e.ctrlKey;
-};
+}

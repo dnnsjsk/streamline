@@ -1,9 +1,11 @@
 // eslint-disable-next-line no-unused-vars
-import { Component, h, Element } from '@stencil/core';
+import { Component, h, Element, Fragment } from '@stencil/core';
 import { state } from '../../store/internal';
-import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter';
-import { sort } from '../../utils/sort/sort';
-import { debounce } from 'lodash-es';
+import capitalizeFirstLetter from '../../utils/string/capitalizeFirstLetter';
+import IconChevronDown from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/chevron-down.svg';
+import IconChevronUp from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/chevron-up.svg';
+import setEntries from '../../utils/set/setEntries';
+import Icon from '../../elements/Icon';
 
 @Component({
   tag: 'streamline-rows',
@@ -15,42 +17,108 @@ export class StreamlineRows {
   // eslint-disable-next-line no-undef
   @Element() el: HTMLStreamlineRowsElement;
 
-  componentWillLoad() {
-    window.addEventListener(
-      'resize',
-      debounce(() => {
-        if (window.innerWidth >= 640 && state.drawer.active) {
-          state.drawer = {
-            ...state.drawer,
-            active: false,
-          };
-        }
-        if (
-          window.innerWidth <= 639 &&
-          this.el.shadowRoot.querySelector('streamline-row[is-edit]')
-        ) {
-          this.el.shadowRoot
-            .querySelectorAll('streamline-row')
-            .forEach((item) => {
-              item.removeAttribute('is-edit');
-            });
-        }
-      }, 500)
+  private getArr = (type) => {
+    return type === 'entries'
+      ? (Object.values(state.entriesActive)?.length >= 1 &&
+          Object.values(state.entriesActive)) ||
+          Object.values(state.entries) ||
+          []
+      : (state[`entries${capitalizeFirstLetter(type)}Active`]?.length >= 1 &&
+          (state[`entries${capitalizeFirstLetter(type)}Active`] ||
+            state[`entries${capitalizeFirstLetter(type)}`])) ||
+          [];
+  };
+
+  private rows({ uid, item, onScroll, first = false, render = true, name }) {
+    return (
+      <ul
+        onScroll={state.active === 'query' ? (e) => onScroll(e) : undefined}
+        class={{
+          'pb-6 lg:pb-10': state.active === 'query',
+          'overflow-x-auto overflow-y-hidden': true,
+        }}
+      >
+        {item.children &&
+          Object.values(item.children as unknown).map((itemInner, index) => {
+            const id = `${name}-${itemInner.name}`;
+            const collapsed = state.collapse.includes(id);
+
+            return itemInner.children ? (
+              <li key={`${itemInner.name}-${index}`}>
+                <p
+                  class={{
+                    'sl-px relative': true,
+                    'pb-1.5 pt-1.5 text-xs font-medium text-slate-500': !first,
+                    'group cursor-pointer py-2.5 text-[13px] font-bold uppercase text-slate-900 hover:text-blue-500':
+                      first,
+                  }}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    if (!first) return;
+
+                    if (collapsed) {
+                      state.collapse = state.collapse.filter(
+                        (item) => item !== id
+                      );
+                    } else {
+                      state.collapse = [...state.collapse, id];
+                    }
+                  }}
+                >
+                  <span class="relative">
+                    {first && (
+                      <Fragment>
+                        {!collapsed && (
+                          <span class="absolute -left-2.5 top-1/2 h-1 w-1 -translate-y-1/2 rounded-full bg-slate-400 group-hover:hidden sm:-left-3.5 sm:h-1.5 sm:w-1.5 lg:-left-4" />
+                        )}
+                        <span
+                          class={{
+                            'absolute -left-3 top-1/2 -translate-y-1/2 rounded-full text-slate-400 sm:-left-4 lg:-left-5':
+                              true,
+                            'hidden group-hover:block': !collapsed,
+                          }}
+                        >
+                          <Icon
+                            icon={collapsed ? IconChevronDown : IconChevronUp}
+                            class={{
+                              'relative h-2 w-2 sm:!h-3 sm:!w-3': true,
+                              'top-px': !collapsed,
+                              'top-0': collapsed,
+                            }}
+                          />
+                        </span>
+                      </Fragment>
+                    )}
+                    {itemInner.name}
+                  </span>
+                </p>
+                {!collapsed &&
+                  render &&
+                  itemInner.children &&
+                  this.rows({
+                    item: itemInner,
+                    name,
+                    onScroll,
+                    render: first,
+                    uid,
+                  })}
+              </li>
+            ) : (
+              <streamline-row item={itemInner} />
+            );
+          })}
+      </ul>
     );
   }
 
-  private getArr = (type) => {
-    return (
-      (state[`entries${capitalizeFirstLetter(type)}Active`]?.length >= 1 &&
-        (state[`entries${capitalizeFirstLetter(type)}Active`] ||
-          state[`entries${capitalizeFirstLetter(type)}`])) ||
-      []
-    );
-  };
-
   render() {
     return (
-      <div class="space-y-4">
+      <div
+        class={{
+          'space-y-4': true,
+          'pb-6 lg:pb-10': state.active !== 'query',
+        }}
+      >
         {this.getArr(state.active).map((item) => {
           const onScroll = (e) => {
             this.el.shadowRoot.querySelector(
@@ -61,114 +129,53 @@ export class StreamlineRows {
           const uid =
             Date.now().toString(36) + Math.random().toString(36).substr(2);
 
-          const table =
-            state.active === 'site'
-              ? [
-                  {
-                    id: 'domain',
-                    name: 'Domain',
-                    sort: true,
-                  },
-                  { id: 'path', name: 'Path', sort: true },
-                  { id: 'siteId', name: 'ID', sort: true },
-                ]
-              : item.type === 'post'
-              ? [
-                  {
-                    id: 'post_status',
-                    text: (itemInner) => {
-                      const isPublish = itemInner.post_status === 'publish';
-                      const isFuture = itemInner.post_status === 'future';
-                      const isDraft = itemInner.post_status === 'draft';
-                      const isPending = itemInner.post_status === 'pending';
-                      const isPrivate = itemInner.post_status === 'private';
-                      return (
-                        <span
-                          class={{
-                            'rounded-md px-2 py-1 text-xs font-semibold uppercase':
-                              true,
-                            'bg-green-100 text-green-600': isPublish,
-                            'bg-purple-100 text-purple-600': isFuture,
-                            'bg-yellow-100 text-yellow-600': isDraft,
-                            'bg-lime-100 text-lime-600': isPending,
-                            'bg-blue-100 text-blue-600': isPrivate,
-                            'bg-slate-100 text-slate-600':
-                              !isPublish &&
-                              !isFuture &&
-                              !isDraft &&
-                              !isPending &&
-                              !isPrivate,
-                          }}
-                        >
-                          {itemInner.post_status}
-                        </span>
-                      );
-                    },
-                    name: 'Status',
-                    sort: true,
-                  },
-                  { id: 'post_title', name: 'Title', edit: true, sort: true },
-                  { id: 'post_name', name: 'Slug', edit: true, sort: true },
-                  { id: 'post_type', name: 'Post type', sort: true },
-                ]
-              : [];
-
           return (
             <div>
               <streamline-header item={item}></streamline-header>
-              {(item.type === 'post' || item.type === 'site') && (
+              {state.active === 'query' && state.action.table?.length >= 2 && (
                 <div
                   data-uid={uid}
-                  class={`scrollbar-none sticky top-[40px] z-10 overflow-x-auto bg-white`}
+                  class="scrollbar-none sticky top-[39px] z-10 mt-[-2px] overflow-x-auto bg-white"
                 >
                   <div class="sl-mx sl-grid border-t border-slate-200">
-                    {table.map((itemInner) => {
-                      const sorter = () => {
-                        sort(
-                          {
-                            ...itemInner,
-                            type: item.type,
-                          },
-                          state?.sort?.[item.type]?.id !== itemInner.id
-                            ? 'ascending'
-                            : state?.sort?.[item.type]?.direction ===
-                              'ascending'
-                            ? 'descending'
-                            : 'ascending'
-                        );
-                      };
-
+                    {state.action.table.map((itemInner) => {
                       return (
                         <div
                           tabindex="0"
                           role="button"
-                          key={itemInner.id}
+                          key={itemInner.value}
                           class={{
-                            'sl-border-b font-slate-500 group grid grid-cols-[1fr,auto] items-center whitespace-nowrap py-1.5 text-xs font-semibold uppercase hover:border-slate-900 focus:border-blue-500 focus:outline-none':
+                            'font-slate-500 group grid grid-cols-[1fr,auto] items-center whitespace-nowrap border-b border-slate-200 py-1.5 text-xs font-semibold uppercase hover:border-slate-900 focus:border-blue-500 focus:outline-none':
                               true,
-                            'pointer-events-none': !itemInner.sort,
+                            'pointer-events-none': !itemInner.sortable,
                           }}
                           onMouseDown={(e) => e.preventDefault()}
-                          onClick={sorter}
-                          onKeyDown={(e) => {
-                            if (
-                              e.target === this.el.shadowRoot.activeElement &&
-                              e.key === 'Enter'
-                            ) {
-                              sorter();
-                            }
+                          onClick={() => {
+                            state.sort = {
+                              ...state.sort,
+                              [state.action.route]: {
+                                value: itemInner.value,
+                                direction:
+                                  state.sort?.[state.action.route]
+                                    ?.direction === 'asc'
+                                    ? 'desc'
+                                    : 'asc',
+                              },
+                            };
+                            setEntries();
                           }}
                         >
-                          {itemInner.name}
+                          {itemInner.label}
                           <svg
                             class={{
                               'mr-2 hidden w-[8px] group-hover:block group-focus:block group-focus:text-blue-600':
                                 true,
                               '!block':
-                                state?.sort?.[item.type]?.id === itemInner.id,
+                                state.sort?.[state.action.route]?.value ===
+                                itemInner.value,
                               'rotate-180':
-                                state?.sort?.[item.type]?.direction ===
-                                'descending',
+                                state.sort?.[state.action.route]?.direction ===
+                                'desc',
                             }}
                             xmlns="http://www.w3.org/2000/svg"
                             role="img"
@@ -185,37 +192,13 @@ export class StreamlineRows {
                   </div>
                 </div>
               )}
-              <ul
-                data-uid={uid}
-                onScroll={
-                  item.type === 'post' || item.type === 'site'
-                    ? (e) => onScroll(e)
-                    : undefined
-                }
-                class="overflow-x-auto overflow-y-hidden"
-              >
-                {item.children &&
-                  Object.values(item.children as unknown).map((itemInner) => {
-                    return itemInner.children ? (
-                      <li key={itemInner.name}>
-                        <h2 class="sl-mx pb-2 pt-4 text-sm font-medium text-slate-500">
-                          {itemInner.name}
-                        </h2>
-                        <ul>
-                          {Object.values(itemInner.children as unknown).map(
-                            (itemSub) => {
-                              return (
-                                <streamline-row item={itemSub} table={table} />
-                              );
-                            }
-                          )}
-                        </ul>
-                      </li>
-                    ) : (
-                      <streamline-row item={itemInner} table={table} />
-                    );
-                  })}
-              </ul>
+              {this.rows({
+                first: true,
+                item,
+                name: item.name,
+                onScroll,
+                uid,
+              })}
             </div>
           );
         })}

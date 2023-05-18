@@ -1,13 +1,13 @@
 // eslint-disable-next-line no-unused-vars
 import { h } from '@stencil/core';
 
-export const Button = (props) => {
+export default function Button(props) {
   return (
     <button
       {...props}
       class={{
         [props.class]: props.class,
-        'focus inline-flex items-center justify-center rounded-md text-sm font-semibold':
+        'focus inline-flex items-center justify-center rounded-md text-xs font-semibold':
           true,
         'px-3 py-1.5':
           props.type === 'primary' ||
@@ -31,4 +31,4 @@ export const Button = (props) => {
       {props.text && props.text}
     </button>
   );
-};
+}

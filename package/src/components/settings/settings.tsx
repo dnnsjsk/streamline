@@ -2,9 +2,9 @@
 import { Component, h } from '@stencil/core';
 import { state } from '../../store/internal';
 import { isBoolean, isNumber } from 'lodash-es';
-import { isAnimation } from '../../utils/is/isAnimation';
-import { Keys } from '../../elements/Keys';
-import { setEntries } from '../../utils/entries/setEntries';
+import isAnimation from '../../utils/is/isAnimation';
+import Keys from '../../elements/Keys';
+import setEntries from '../../utils/set/setEntries';
 
 @Component({
   tag: 'streamline-settings',
@@ -36,17 +36,17 @@ export class StreamlineSettings {
   render() {
     return Object.values(state.entriesSettingsActive).map((item) => {
       return (
-        <div>
+        <div class="pb-6 lg:pb-10">
           <streamline-header item={item} />
           <ul class="sl-px space-y-4 sm:space-y-6">
             {Object.values(item.children as unknown).map((itemInner) => {
               const innerId = itemInner.id;
 
               return (
-                <li key={itemInner.name} class="flex flex-col">
-                  <h2 class="sl-h2 mt-4 mb-3 inline-block space-y-2 pb-2 !text-sm !text-slate-500">
+                <li key={`settings-${innerId}`} class="flex flex-col">
+                  <span class="mb-3 mt-4 block inline-block space-y-2 pb-2 !text-sm text-sm font-medium !text-slate-500 text-black sm:text-base">
                     {itemInner.name}
-                  </h2>
+                  </span>
                   {itemInner.children && (
                     <ul class={`flex flex-col space-y-5`}>
                       {Object.values(itemInner.children as unknown).map(

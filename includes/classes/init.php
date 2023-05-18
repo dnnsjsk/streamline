@@ -212,11 +212,16 @@ class Init
         echo '<script id="streamline-data">';
         echo "window.streamlineData =";
         echo json_encode([
+            "ajax" => admin_url("admin-ajax.php"),
+            "nonce" => wp_create_nonce("ajax-nonce"),
+            "nonceRest" => wp_create_nonce("wp_rest"),
+            "rest" => esc_url_raw(rest_url()),
             "adminUrl" => admin_url(),
             "favourites" => json_encode($favs),
             "isAdmin" => is_admin(),
             "isNetwork" => is_network_admin(),
-            "network" => !is_multisite() ? false : network_admin_url(),
+            "isVisible" => isset($_GET["streamline"]),
+            "networkAdminUrl" => !is_multisite() ? false : network_admin_url(),
             "settings" => json_encode($settings),
             "siteId" => strval(get_current_blog_id()),
             "sitePath" => is_multisite() ? $currentSite[0]->path : "/",

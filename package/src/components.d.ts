@@ -10,15 +10,8 @@ export namespace Components {
     }
     interface StreamlineContainer {
         "active": '';
-        "setState": (data: any) => Promise<unknown>;
         "test": false;
         "toggle": () => Promise<void>;
-        "visible": false;
-    }
-    /**
-     * Drawer.
-     */
-    interface StreamlineDrawer {
     }
     interface StreamlineDropdown {
         "items": any[];
@@ -27,17 +20,7 @@ export namespace Components {
     interface StreamlineEntries {
     }
     interface StreamlineHeader {
-        "item": { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; isMultisite: boolean; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; title: string; type: string; };
-    }
-    /**
-     * Input.
-     */
-    interface StreamlineInput {
-        "handleInput": Function;
-        "invalid": boolean;
-        "label": string;
-        "uid": string;
-        "value": string;
+        "item": any;
     }
     interface StreamlineRow {
         "disabled": boolean;
@@ -45,9 +28,8 @@ export namespace Components {
         "isEdit": boolean;
         "isFav": boolean;
         "isFocus": boolean;
-        "item": { active: string; ID: string; adminUrl: string; guid: string; href: string; hrefEdit: string; name: string; nameActive: string; path: string; post_title: string; route: string; siteId: string; type: string; };
+        "item": any;
         "mb": any;
-        "table": any;
     }
     interface StreamlineRows {
     }
@@ -69,15 +51,6 @@ declare global {
         prototype: HTMLStreamlineContainerElement;
         new (): HTMLStreamlineContainerElement;
     };
-    /**
-     * Drawer.
-     */
-    interface HTMLStreamlineDrawerElement extends Components.StreamlineDrawer, HTMLStencilElement {
-    }
-    var HTMLStreamlineDrawerElement: {
-        prototype: HTMLStreamlineDrawerElement;
-        new (): HTMLStreamlineDrawerElement;
-    };
     interface HTMLStreamlineDropdownElement extends Components.StreamlineDropdown, HTMLStencilElement {
     }
     var HTMLStreamlineDropdownElement: {
@@ -95,15 +68,6 @@ declare global {
     var HTMLStreamlineHeaderElement: {
         prototype: HTMLStreamlineHeaderElement;
         new (): HTMLStreamlineHeaderElement;
-    };
-    /**
-     * Input.
-     */
-    interface HTMLStreamlineInputElement extends Components.StreamlineInput, HTMLStencilElement {
-    }
-    var HTMLStreamlineInputElement: {
-        prototype: HTMLStreamlineInputElement;
-        new (): HTMLStreamlineInputElement;
     };
     interface HTMLStreamlineRowElement extends Components.StreamlineRow, HTMLStencilElement {
     }
@@ -132,11 +96,9 @@ declare global {
     interface HTMLElementTagNameMap {
         "streamline-bottom-bar": HTMLStreamlineBottomBarElement;
         "streamline-container": HTMLStreamlineContainerElement;
-        "streamline-drawer": HTMLStreamlineDrawerElement;
         "streamline-dropdown": HTMLStreamlineDropdownElement;
         "streamline-entries": HTMLStreamlineEntriesElement;
         "streamline-header": HTMLStreamlineHeaderElement;
-        "streamline-input": HTMLStreamlineInputElement;
         "streamline-row": HTMLStreamlineRowElement;
         "streamline-rows": HTMLStreamlineRowsElement;
         "streamline-search": HTMLStreamlineSearchElement;
@@ -149,12 +111,6 @@ declare namespace LocalJSX {
     interface StreamlineContainer {
         "active"?: '';
         "test"?: false;
-        "visible"?: false;
-    }
-    /**
-     * Drawer.
-     */
-    interface StreamlineDrawer {
     }
     interface StreamlineDropdown {
         "items"?: any[];
@@ -163,17 +119,7 @@ declare namespace LocalJSX {
     interface StreamlineEntries {
     }
     interface StreamlineHeader {
-        "item"?: { ID: number; adminUrl: string; guid: string; href: string; hrefEdit: string; isMultisite: boolean; name: string; path: string; post_title: string; route: string; siteId: number; tab: string; title: string; type: string; };
-    }
-    /**
-     * Input.
-     */
-    interface StreamlineInput {
-        "handleInput"?: Function;
-        "invalid"?: boolean;
-        "label"?: string;
-        "uid"?: string;
-        "value"?: string;
+        "item"?: any;
     }
     interface StreamlineRow {
         "disabled"?: boolean;
@@ -181,9 +127,8 @@ declare namespace LocalJSX {
         "isEdit"?: boolean;
         "isFav"?: boolean;
         "isFocus"?: boolean;
-        "item"?: { active: string; ID: string; adminUrl: string; guid: string; href: string; hrefEdit: string; name: string; nameActive: string; path: string; post_title: string; route: string; siteId: string; type: string; };
+        "item"?: any;
         "mb"?: any;
-        "table"?: any;
     }
     interface StreamlineRows {
     }
@@ -194,11 +139,9 @@ declare namespace LocalJSX {
     interface IntrinsicElements {
         "streamline-bottom-bar": StreamlineBottomBar;
         "streamline-container": StreamlineContainer;
-        "streamline-drawer": StreamlineDrawer;
         "streamline-dropdown": StreamlineDropdown;
         "streamline-entries": StreamlineEntries;
         "streamline-header": StreamlineHeader;
-        "streamline-input": StreamlineInput;
         "streamline-row": StreamlineRow;
         "streamline-rows": StreamlineRows;
         "streamline-search": StreamlineSearch;
@@ -211,17 +154,9 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "streamline-bottom-bar": LocalJSX.StreamlineBottomBar & JSXBase.HTMLAttributes<HTMLStreamlineBottomBarElement>;
             "streamline-container": LocalJSX.StreamlineContainer & JSXBase.HTMLAttributes<HTMLStreamlineContainerElement>;
-            /**
-             * Drawer.
-             */
-            "streamline-drawer": LocalJSX.StreamlineDrawer & JSXBase.HTMLAttributes<HTMLStreamlineDrawerElement>;
             "streamline-dropdown": LocalJSX.StreamlineDropdown & JSXBase.HTMLAttributes<HTMLStreamlineDropdownElement>;
             "streamline-entries": LocalJSX.StreamlineEntries & JSXBase.HTMLAttributes<HTMLStreamlineEntriesElement>;
             "streamline-header": LocalJSX.StreamlineHeader & JSXBase.HTMLAttributes<HTMLStreamlineHeaderElement>;
-            /**
-             * Input.
-             */
-            "streamline-input": LocalJSX.StreamlineInput & JSXBase.HTMLAttributes<HTMLStreamlineInputElement>;
             "streamline-row": LocalJSX.StreamlineRow & JSXBase.HTMLAttributes<HTMLStreamlineRowElement>;
             "streamline-rows": LocalJSX.StreamlineRows & JSXBase.HTMLAttributes<HTMLStreamlineRowsElement>;
             "streamline-search": LocalJSX.StreamlineSearch & JSXBase.HTMLAttributes<HTMLStreamlineSearchElement>;

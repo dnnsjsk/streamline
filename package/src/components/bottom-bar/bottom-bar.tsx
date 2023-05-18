@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, h, Host } from '@stencil/core';
-import { state } from '../../store/internal';
-import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter';
+// import { state } from '../../store/internal';
+// import capitalizeFirstLetter from '../../utils/string/capitalizeFirstLetter';
 
 @Component({
   tag: 'streamline-bottom-bar',
@@ -10,59 +10,59 @@ import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter'
 })
 // eslint-disable-next-line no-unused-vars
 export class StreamlineBottomBar {
-  private getItems = () => {
-    let amount = 0;
-
-    state[`entries${capitalizeFirstLetter(state.active)}Active`].forEach(
-      (item) => {
-        if (
-          item.type === 'post' ||
-          item.type === 'site' ||
-          item.type === 'action'
-        ) {
-          amount += Object.values(item.children).length;
-        }
-        if (
-          item.type === 'menu' ||
-          item.type === 'networkMenu' ||
-          item.type === 'settings'
-        ) {
-          Object.values(item.children as unknown).forEach((itemInner) => {
-            amount += Object.values(itemInner.children).length;
-          });
-        }
-      }
-    );
-
-    return [
-      {
-        condition: state?.data?.network && !state.isFront,
-        text: 'Site',
-        value: state.currentSite.path,
-      },
-      {
-        condition: true,
-        text: 'Current',
-        value:
-          state.active === 'fav'
-            ? 'Favourites'
-            : capitalizeFirstLetter(state.active),
-      },
-      {
-        condition: true,
-        text: 'Entries',
-        value: amount,
-      },
-      {
-        condition:
-          state.active !== 'search' &&
-          state.active !== 'fav' &&
-          state.active !== 'settings',
-        text: 'Pages',
-        value: `${state.infoBar.pages.current}/${state.infoBar.pages.amount}`,
-      },
-    ];
-  };
+  // private getItems = () => {
+  //   let amount = 0;
+  //
+  //   state[`entries${capitalizeFirstLetter(state.active)}Active`].forEach(
+  //     (item) => {
+  //       if (
+  //         item.type === 'post' ||
+  //         item.type === 'site' ||
+  //         item.type === 'action'
+  //       ) {
+  //         amount += Object.values(item.children).length;
+  //       }
+  //       if (
+  //         item.type === 'menu' ||
+  //         item.type === 'networkMenu' ||
+  //         item.type === 'settings'
+  //       ) {
+  //         Object.values(item.children as unknown).forEach((itemInner) => {
+  //           amount += Object.values(itemInner.children).length;
+  //         });
+  //       }
+  //     }
+  //   );
+  //
+  //   return [
+  //     {
+  //       condition: (state?.data as any)?.network && !state.isFront,
+  //       text: 'Site',
+  //       value: state.currentSite.path,
+  //     },
+  //     {
+  //       condition: true,
+  //       text: 'Current',
+  //       value:
+  //         state.active === 'fav'
+  //           ? 'Favourites'
+  //           : capitalizeFirstLetter(state.active),
+  //     },
+  //     {
+  //       condition: true,
+  //       text: 'Entries',
+  //       value: amount,
+  //     },
+  //     {
+  //       condition:
+  //         state.active !== 'search' &&
+  //         state.active !== 'fav' &&
+  //         state.active !== 'settings',
+  //       text: 'Pages',
+  //       value: `${state.infoBar.pages.current}/${state.infoBar.pages.amount}`,
+  //     },
+  //   ];
+  // };
 
   render() {
     // const isMultisite = state?.data?.network;
@@ -75,7 +75,7 @@ export class StreamlineBottomBar {
           <span
             class={`whitespace-no-wrap relative -top-px flex items-center text-[11px]`}
           >
-            {this.getItems()
+            {/* this.getItems()
               .filter((e) => e.condition)
               .map((item, index) => {
                 return (
@@ -90,7 +90,7 @@ export class StreamlineBottomBar {
                     )}
                   </span>
                 );
-              })}
+              }) */}
           </span>
         </div>
       </Host>

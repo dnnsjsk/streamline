@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, Element, h } from '@stencil/core';
 import { state } from '../../store/internal';
-import { getMetaKey } from '../../utils/get/getMetaKey';
+import getMetaKey from '../../utils/get/getMetaKey';
 
 @Component({
   tag: 'streamline-entries',
@@ -68,7 +68,7 @@ export class StreamlineEntries {
     return (
       <div
         class={{
-          'relative mt-6 h-full w-full bg-white pb-6 lg:pb-10': true,
+          'relative mt-4 h-full w-full': true,
           'pointer-events-none opacity-50': state.isLoading,
         }}
       >

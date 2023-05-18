@@ -1,12 +1,10 @@
 import { state } from '../../store/internal';
-import { data } from './data';
+import data from './data';
 
-export const post = (obj) => {
+export default function post(obj) {
   state.isLoading = true;
   fetch(
-    // @ts-ignore
-    // eslint-disable-next-line no-undef
-    `${window?.streamline?.rest}streamline/v1/${obj.route}?siteId=${
+    `${state.data.rest}streamline/v1/${obj.route}?siteId=${
       state.currentSite.id
     }&userId=${state.data.userId}&type=${obj.type}&values=${JSON.stringify(
       obj.values
@@ -21,4 +19,4 @@ export const post = (obj) => {
     .catch(() => {
       state.isLoading = false;
     });
-};
+}

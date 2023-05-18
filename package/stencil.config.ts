@@ -10,9 +10,6 @@ import { inlineSvg } from 'stencil-inline-svg';
 export const config: Config = {
   namespace: 'streamline',
   taskQueue: 'async',
-  devServer: {
-    reloadStrategy: 'pageReload',
-  },
   outputTargets: [
     {
       type: 'www',
@@ -21,6 +18,10 @@ export const config: Config = {
       empty: true,
     },
   ],
+  devServer: {
+    openBrowser: false,
+  },
+  sourceMap: false,
   plugins: [
     inlineSvg(),
     sass(),
@@ -34,14 +35,4 @@ export const config: Config = {
     }),
     tailwindHMR(),
   ],
-  testing: {
-    transform: {
-      '^.+\\.(ts|tsx|js|jsx|css)$':
-        '<rootDir>/node_modules/@stencil/core/testing/jest-preprocessor.js',
-    },
-    moduleNameMapper: {
-      '^.+\\.svg$': 'jest-svg-transformer',
-    },
-    transformIgnorePatterns: ['/node_modules/(?!deepdash-es|lodash-es)'],
-  },
 };

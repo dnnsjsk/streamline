@@ -2,7 +2,7 @@
 import { h } from '@stencil/core';
 import { state } from '../store/internal';
 
-export const Keys = ({ keys }) => {
+export default function Keys({ keys }) {
   return (
     <div class="flex space-x-1.5">
       {keys.map((item) => {
@@ -23,4 +23,4 @@ export const Keys = ({ keys }) => {
       })}
     </div>
   );
-};
+}

@@ -1,14 +1,14 @@
 // eslint-disable-next-line no-unused-vars
 import { Component, h, Element } from '@stencil/core';
 import { onChange, state } from '../../store/internal';
-import { Button } from '../../elements/Button';
-import { Icon } from '../../elements/Icon';
+import Button from '../../elements/Button';
+import Icon from '../../elements/Icon';
 import IconSearch from '../../../node_modules/@fortawesome/fontawesome-pro/svgs/solid/magnifying-glass.svg';
-import { getMetaKey } from '../../utils/get/getMetaKey';
-import { isAnimation } from '../../utils/is/isAnimation';
-import { setSearchPlaceholder } from '../../utils/set/setSearchPlaceholder';
-import { get } from '../../utils/query/get';
-import { capitalizeFirstLetter } from '../../utils/string/capitalizeFirstLetter';
+import getMetaKey from '../../utils/get/getMetaKey';
+import isAnimation from '../../utils/is/isAnimation';
+import setSearchPlaceholder from '../../utils/set/setSearchPlaceholder';
+import get from '../../utils/query/get';
+import capitalizeFirstLetter from '../../utils/string/capitalizeFirstLetter';
 
 @Component({
   tag: 'streamline-search',
@@ -36,15 +36,13 @@ export class StreamlineSearch {
           this.input?.focus?.();
         }
 
-        if (e.key === 'Enter' && state.isEnter && !state.test) {
+        if (e.key === 'Enter' && state.isEnter) {
           this.startQuery();
         }
         if (
           e.key === 'Backspace' &&
           state.searchValue === '' &&
-          state.active !== 'search' &&
-          state.active !== 'settings' &&
-          state.active !== 'fav' &&
+          state.active === 'query' &&
           this.el.shadowRoot.querySelector('input:focus')
         ) {
           if (isAnimation()) {
@@ -61,7 +59,7 @@ export class StreamlineSearch {
             );
           }
 
-          state.active = 'search';
+          state.active = 'entries';
         }
       }
     });
@@ -96,7 +94,7 @@ export class StreamlineSearch {
         <input
           ref={(el) => (this.input = el as HTMLInputElement)}
           id="streamline-search"
-          class="peer m-0 h-full w-full w-full bg-transparent p-0 px-9 text-base font-normal text-slate-900 placeholder-slate-500 focus:outline-none lg:px-12"
+          class="peer m-0 h-full w-full w-full bg-transparent p-0 px-4 text-base font-normal text-slate-900 placeholder-slate-500 focus:outline-none sm:px-8 lg:px-10"
           type="text"
           autocomplete="off"
           placeholder={state.searchPlaceholder}
@@ -105,7 +103,7 @@ export class StreamlineSearch {
         />
         <Icon
           class={{
-            'absolute left-3 top-1/2 -translate-y-1/2 fill-current text-slate-500 peer-focus:text-blue-600 lg:left-5':
+            'absolute left-2.5 top-1/2 hidden -translate-y-1/2 fill-current text-slate-500 peer-focus:text-blue-600 sm:block lg:left-4':
               true,
           }}
           icon={IconSearch}

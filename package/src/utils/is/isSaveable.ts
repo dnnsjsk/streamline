@@ -1,6 +1,6 @@
-export const isSaveable = (query) => {
+export default function isSaveable(query) {
   for (const input of query)
     if ((input as HTMLInputElement).value === '') return false;
 
   return true;
-};
+}

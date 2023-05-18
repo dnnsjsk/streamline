@@ -11,14 +11,14 @@
 
 ### Depends on
 
-- [streamline-header](../header)
 - [streamline-row](../row)
+- [streamline-header](../header)
 
 ### Graph
 ```mermaid
 graph TD;
-  streamline-rows --> streamline-header
   streamline-rows --> streamline-row
+  streamline-rows --> streamline-header
   streamline-row --> streamline-dropdown
   streamline-entries --> streamline-rows
   style streamline-rows fill:#f9f,stroke:#333,stroke-width:4px

@@ -1,5 +1,5 @@
 import { state } from '../../store/internal';
 
-export const isAnimation = () => {
+export default function isAnimation() {
   return state.entriesSettingsLoad.appearance.animation;
-};
+}

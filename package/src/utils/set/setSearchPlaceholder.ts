@@ -1,7 +1,7 @@
 import { state } from '../../store/internal';
-import { capitalizeFirstLetter } from '../string/capitalizeFirstLetter';
+import capitalizeFirstLetter from '../string/capitalizeFirstLetter';
 
-export const setSearchPlaceholder = () => {
+export default function setSearchPlaceholder() {
   state.searchPlaceholder =
     state.active === 'post' || state.active === 'site'
       ? `${
@@ -13,4 +13,4 @@ export const setSearchPlaceholder = () => {
       : state.active === 'search'
       ? `Search or filter entries`
       : `Filter entries`;
-};
+}
