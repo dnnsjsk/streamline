@@ -1,17 +1,33 @@
-import { B as BUILD, c as consoleDevInfo, p as plt, w as win, H, d as doc, N as NAMESPACE, a as promiseResolve, b as bootstrapLazy } from './index-83c93766.js';
+import { B as BUILD, c as consoleDevInfo, p as plt, w as win, H, d as doc, N as NAMESPACE, a as promiseResolve, b as bootstrapLazy } from './index-5bd957b3.js';
+export { s as setNonce } from './index-5bd957b3.js';
 import { g as globalScripts } from './app-globals-0f993ce5.js';
 
 /*
- Stencil Client Patch Browser v2.21.0 | MIT Licensed | https://stenciljs.com
+ Stencil Client Patch Browser v3.2.0 | MIT Licensed | https://stenciljs.com
  */
+/**
+ * Helper method for querying a `meta` tag that contains a nonce value
+ * out of a DOM's head.
+ *
+ * @param doc The DOM containing the `head` to query against
+ * @returns The content of the meta tag representing the nonce value, or `undefined` if no tag
+ * exists or the tag has no content.
+ */
+function queryNonceMetaTagContent(doc) {
+    var _a, _b, _c;
+    return (_c = (_b = (_a = doc.head) === null || _a === void 0 ? void 0 : _a.querySelector('meta[name="csp-nonce"]')) === null || _b === void 0 ? void 0 : _b.getAttribute('content')) !== null && _c !== void 0 ? _c : undefined;
+}
+// TODO(STENCIL-661): Remove code related to the dynamic import shim
 const getDynamicImportFunction = (namespace) => `__sc_import_${namespace.replace(/\s|-/g, '_')}`;
 const patchBrowser = () => {
     // NOTE!! This fn cannot use async/await!
     if (BUILD.isDev && !BUILD.isTesting) {
         consoleDevInfo('Running in development mode.');
     }
+    // TODO(STENCIL-659): Remove code implementing the CSS variable shim
     if (BUILD.cssVarShim) {
         // shim css vars
+        // TODO(STENCIL-659): Remove code implementing the CSS variable shim
         plt.$cssShim$ = win.__cssshim;
     }
     if (BUILD.cloneNodeFix) {
@@ -30,12 +46,16 @@ const patchBrowser = () => {
         performance.getEntriesByName = () => [];
     }
     // @ts-ignore
-    const scriptElm = BUILD.scriptDataOpts || BUILD.safari10 || BUILD.dynamicImportShim
+    const scriptElm = 
+    // TODO(STENCIL-661): Remove code related to the dynamic import shim
+    // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
+    BUILD.scriptDataOpts || BUILD.safari10 || BUILD.dynamicImportShim
         ? Array.from(doc.querySelectorAll('script')).find((s) => new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`).test(s.src) ||
             s.getAttribute('data-stencil-namespace') === NAMESPACE)
         : null;
     const importMeta = import.meta.url;
-    const opts = BUILD.scriptDataOpts ? scriptElm['data-opts'] || {} : {};
+    const opts = BUILD.scriptDataOpts ? (scriptElm || {})['data-opts'] || {} : {};
+    // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
     if (BUILD.safari10 && 'onbeforeload' in scriptElm && !history.scrollRestoration /* IS_ESM_BUILD */) {
         // Safari < v11 support: This IF is true if it's Safari below v11.
         // This fn cannot use async/await since Safari didn't support it until v11,
@@ -50,22 +70,28 @@ const patchBrowser = () => {
             },
         };
     }
+    // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
     if (!BUILD.safari10 && importMeta !== '') {
         opts.resourcesUrl = new URL('.', importMeta).href;
+        // TODO(STENCIL-661): Remove code related to the dynamic import shim
+        // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
     }
     else if (BUILD.dynamicImportShim || BUILD.safari10) {
         opts.resourcesUrl = new URL('.', new URL(scriptElm.getAttribute('data-resources-url') || scriptElm.src, win.location.href)).href;
+        // TODO(STENCIL-661): Remove code related to the dynamic import shim
         if (BUILD.dynamicImportShim) {
             patchDynamicImport(opts.resourcesUrl, scriptElm);
         }
+        // TODO(STENCIL-661): Remove code related to the dynamic import shim
         if (BUILD.dynamicImportShim && !win.customElements) {
             // module support, but no custom elements support (Old Edge)
             // @ts-ignore
-            return import(/* webpackChunkName: "polyfills-dom" */ './dom-61a06fbc.js').then(() => opts);
+            return import(/* webpackChunkName: "polyfills-dom" */ './dom-c0f8af80.js').then(() => opts);
         }
     }
     return promiseResolve(opts);
 };
+// TODO(STENCIL-661): Remove code related to the dynamic import shim
 const patchDynamicImport = (base, orgScriptElm) => {
     const importFunctionName = getDynamicImportFunction(NAMESPACE);
     try {
@@ -81,6 +107,7 @@ const patchDynamicImport = (base, orgScriptElm) => {
         // basically this code is for old Edge, v18 and below
         const moduleMap = new Map();
         win[importFunctionName] = (src) => {
+            var _a;
             const url = new URL(src, base).href;
             let mod = moduleMap.get(url);
             if (!mod) {
@@ -90,6 +117,11 @@ const patchDynamicImport = (base, orgScriptElm) => {
                 script.src = URL.createObjectURL(new Blob([`import * as m from '${url}'; window.${importFunctionName}.m = m;`], {
                     type: 'application/javascript',
                 }));
+                // Apply CSP nonce to the script tag if it exists
+                const nonce = (_a = plt.$nonce$) !== null && _a !== void 0 ? _a : queryNonceMetaTagContent(doc);
+                if (nonce != null) {
+                    script.setAttribute('nonce', nonce);
+                }
                 mod = new Promise((resolve) => {
                     script.onload = () => {
                         resolve(win[importFunctionName].m);
