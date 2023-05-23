@@ -1,17 +1,6 @@
-=== streamline ===
-Contributors: dnnsjsk
-Requires at least: 5.0
-Tested up to: 6.1.1
-Requires PHP: 7.0
-Stable tag: 2.0
-License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+This was the second commercial plugin I released under my [Fabrikat](https://fabrikat.io) brand of WordPress plugins. It is a command-center like UI that allows for quick navigation between pages and posts. Since WordPress [Wordpress](https://wptavern.com/wordpress-is-developing-a-command-center-for-quick-search-and-navigation-inside-the-admin) similar plans for core, this plugin was deprecated.
 
-Use WordPress faster.
-
-== Description ==
-
-Do things faster.
+Feel free to reuse this code in whatever way you like!
 
 == Changelog ==
 
