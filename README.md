@@ -1,4 +1,4 @@
-This was the second commercial plugin I released under my [Fabrikat](https://fabrikat.io) brand of WordPress plugins. It is a command-center like UI that allows for quick navigation between pages and posts. Since WordPress [Wordpress](https://wptavern.com/wordpress-is-developing-a-command-center-for-quick-search-and-navigation-inside-the-admin) similar plans for core, this plugin was deprecated.
+This was the second commercial plugin I released under my [Fabrikat](https://fabrikat.io) brand of WordPress plugins. It is a command-center like UI that allows for quick navigation between pages and posts. Since [WordPress](https://wptavern.com/wordpress-is-developing-a-command-center-for-quick-search-and-navigation-inside-the-admin) had similar plans for core, this plugin was deprecated.
 
 Feel free to reuse this code in whatever way you like!
 
